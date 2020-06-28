@@ -1,0 +1,25 @@
+{
+  "extends": "erb/typescript",
+  "rules": {
+    // a temporary hack related to IDE not resolving correct package.json
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
+    "object-curly-spacing": ["error", "never"],
+    "react/prefer-stateless-function": "off",
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["services/**.ts"],
+      "rules": {
+        "class-methods-use-this": "off"
+      }
+    }
+  ]
+}
