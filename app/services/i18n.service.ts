@@ -15,7 +15,7 @@ export class I18nService {
     const localeDefaultAssetPath = `${this.localeAssetPath}/${this.localeDefault}.${this.localeAssetFormat}`;
     const localeAssets: any = {};
     localeAssets[this.localeDefault] = JSON.parse(
-      ctx.systemService.getFile(localeDefaultAssetPath)
+      ctx.systemService.readFile(localeDefaultAssetPath)
     );
     this.localeStrings = new LocalizedStrings(localeAssets);
   }

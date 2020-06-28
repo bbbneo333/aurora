@@ -5,14 +5,14 @@ import React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
 import './app.component.css';
-import * as AppConstants from './constants';
 import * as AppPages from './pages';
-
-import {I18nService, SystemService} from './services';
+import * as AppServices from './services';
+import {Routes} from './constants';
 
 interface AppComponentProps {
-  systemService: SystemService;
-  i18nService: I18nService;
+  systemService: AppServices.SystemService;
+  i18nService: AppServices.I18nService;
+  collectionService: AppServices.CollectionService;
 }
 
 const AppRouterOutlet = (props: AppComponentProps) => {
@@ -20,7 +20,7 @@ const AppRouterOutlet = (props: AppComponentProps) => {
     <BrowserRouter>
       <Switch>
         <Route
-          path={AppConstants.Routes.HOME}
+          path={Routes.HOME}
           render={routeProps => (
             <AppPages.HomeComponent {...routeProps} {...props} />
           )}
@@ -31,14 +31,18 @@ const AppRouterOutlet = (props: AppComponentProps) => {
 };
 
 class AppComponent extends React.Component {
-  private readonly i18nService: I18nService;
-  private readonly systemService: SystemService;
+  private readonly i18nService: AppServices.I18nService;
+  private readonly systemService: AppServices.SystemService;
+  private readonly collectionService: AppServices.CollectionService;
 
   constructor(props: never) {
     super(props);
-    //
-    this.systemService = new SystemService();
-    this.i18nService = new I18nService({
+    // instantiate services
+    this.systemService = new AppServices.SystemService();
+    this.i18nService = new AppServices.I18nService({
+      systemService: this.systemService
+    });
+    this.collectionService = new AppServices.CollectionService({
       systemService: this.systemService
     });
   }
@@ -46,7 +50,8 @@ class AppComponent extends React.Component {
   render() {
     const props = {
       systemService: this.systemService,
-      i18nService: this.i18nService
+      i18nService: this.i18nService,
+      collectionService: this.collectionService
     };
     return <AppRouterOutlet {...props} />;
   }

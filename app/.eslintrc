@@ -1,10 +1,16 @@
 {
-  "extends": "erb/typescript",
+  "extends": "airbnb",
+  "plugins": [
+    "promise"
+  ],
   "rules": {
     // a temporary hack related to IDE not resolving correct package.json
     "import/no-extraneous-dependencies": "off",
     "import/prefer-default-export": "off",
-    "object-curly-spacing": ["error", "never"],
+    "object-curly-spacing": [
+      "error",
+      "never"
+    ],
     "react/prefer-stateless-function": "off",
     "lines-between-class-members": [
       "error",
@@ -16,7 +22,9 @@
   },
   "overrides": [
     {
-      "files": ["services/**.ts"],
+      "files": [
+        "services/**.ts"
+      ],
       "rules": {
         "class-methods-use-this": "off"
       }
