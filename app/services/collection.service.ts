@@ -4,12 +4,12 @@ const debug = require('debug')('app:service:collection_service');
 
 import {SystemService, FSDirReadFileEventData, FSDirReadStats} from './system.service';
 import {SystemEnums, MediaEnums} from '../enums';
-import {AudioMetadataUtils} from '../utils';
+import {MediaMetadataUtils} from '../utils';
 
 export class CollectionService {
   private readonly systemService: SystemService;
 
-  constructor(ctx: {systemService: SystemService}) {
+  constructor(ctx: { systemService: SystemService }) {
     this.systemService = ctx.systemService;
   }
 
@@ -26,8 +26,8 @@ export class CollectionService {
     const selectedDirectory = selectedDirectories[0];
     const readDirectoryEmitter = this.systemService.readDirectory(selectedDirectory, {
       fileExtensions: [
-        MediaEnums.AudioFileExtensions.MP3,
-        MediaEnums.AudioFileExtensions.FLAC
+        MediaEnums.MediaFileExtensions.MP3,
+        MediaEnums.MediaFileExtensions.FLAC
       ]
     });
 
@@ -39,7 +39,7 @@ export class CollectionService {
     readDirectoryEmitter.on('file', async (fsDirReadFileEventData: FSDirReadFileEventData, fsDirReadNext) => {
       debug('addTracks - found file - %s', fsDirReadFileEventData.path);
       // read metadata
-      const audioMetadata = await AudioMetadataUtils.readMetadataFromFile(fsDirReadFileEventData.path);
+      const audioMetadata = await MediaMetadataUtils.readAudioMetadataFromFile(fsDirReadFileEventData.path);
       debug('addTracks - read file metadata - %s', audioMetadata.common.track);
       fsDirReadNext();
     });

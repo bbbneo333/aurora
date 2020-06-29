@@ -3,14 +3,14 @@ import {parseFile, IAudioMetadata} from 'music-metadata';
 /**
  * Reads audio metadata from audio file located at the path
  *
- * @function readMetadataFromFile
+ * @function readAudioMetadataFromFile
  * @param {String} filePath
  * @returns {Promise}
  */
-async function readMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
+async function readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
   return parseFile(filePath);
 }
 
-export const AudioMetadataUtils = {
-  readMetadataFromFile
+export const MediaMetadataUtils = {
+  readAudioMetadataFromFile
 };

@@ -1,1 +1,1 @@
-export {AudioMetadataUtils} from './audio-metadata.utils';
+export {MediaMetadataUtils} from './media-metadata.utils';
