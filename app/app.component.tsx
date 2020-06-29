@@ -8,6 +8,7 @@ import './app.component.css';
 import * as AppPages from './pages';
 import * as AppServices from './services';
 import {Routes} from './constants';
+import {MediaLibraryProvider} from "./contexts";
 
 interface AppComponentProps {
   systemService: AppServices.SystemService;
@@ -22,7 +23,9 @@ const AppRouterOutlet = (props: AppComponentProps) => {
         <Route
           path={Routes.HOME}
           render={routeProps => (
-            <AppPages.HomeComponent {...routeProps} {...props} />
+            <MediaLibraryProvider>
+              <AppPages.HomeComponent {...routeProps} {...props} />
+            </MediaLibraryProvider>
           )}
         />
       </Switch>
