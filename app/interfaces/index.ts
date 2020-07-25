@@ -1,1 +1,5 @@
-export {IMediaItem, IMediaItemManageAction} from './media.interface';
+export {
+  IMediaItem,
+  IMediaItemManageAction,
+  IMediaLibraryManager,
+} from './media.interface';

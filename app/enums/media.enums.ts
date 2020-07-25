@@ -6,4 +6,5 @@ export enum MediaFileExtensions {
 
 export enum MediaLibraryActions {
   ADD_TRACK,
+  REMOVE_TRACK,
 }

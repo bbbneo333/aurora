@@ -1,3 +1,4 @@
 {
-  "action_add_tracks": "Add Tracks"
+  "action_add_tracks": "Add Tracks",
+  "action_remove_track": "Remove Track"
 }

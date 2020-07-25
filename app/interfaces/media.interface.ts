@@ -5,6 +5,10 @@ export interface IMediaItem {
   track_name: string;
 }
 
+export interface IMediaLibraryManager {
+  addTracksFromDirectory(): void;
+}
+
 export interface IMediaItemManageAction {
   type: MediaEnums.MediaLibraryActions;
   data: any;

@@ -20,12 +20,15 @@ export function HomeComponent() {
 
   return (
     <div>
-      <ul style={{paddingLeft: 10, width: '95%'}}>
+      <ul>
         {mediaItems.map((mediaItem: IMediaItem) => (
           <MediaItemComponent key={mediaItem.id} mediaItem={mediaItem}/>
         ))}
       </ul>
-      <button type="submit" onClick={() => mediaLibraryManager.addTracksFromDirectory()}>
+      <button
+        type="submit"
+        onClick={() => mediaLibraryManager.addTracksFromDirectory()}
+      >
         {i18nService.getString('action_add_tracks')}
       </button>
     </div>
