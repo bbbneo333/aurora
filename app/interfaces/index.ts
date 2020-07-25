@@ -1,1 +1,1 @@
-export {IMediaItem} from './media.interface';
+export {IMediaItem, IMediaItemManageAction} from './media.interface';

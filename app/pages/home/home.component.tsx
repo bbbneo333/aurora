@@ -16,7 +16,7 @@ export function HomeComponent() {
     throw new Error('HomeComponent encountered error - Missing context - MediaLibraryContext');
   }
   const {i18nService} = appContext;
-  const {mediaItems, mediaLibraryManager} = mediaContext;
+  const {mediaLibraryManager, mediaItems} = mediaContext;
 
   return (
     <div>
