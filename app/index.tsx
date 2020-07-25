@@ -7,11 +7,9 @@ import {AppHotComponent} from './app.component';
 
 const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
 
-document.addEventListener('DOMContentLoaded', () => {
-  return render(
-    <AppContainer>
-      <AppHotComponent />
-    </AppContainer>,
-    document.getElementById('root')
-  );
-});
+document.addEventListener('DOMContentLoaded', () => render(
+  <AppContainer>
+    <AppHotComponent/>
+  </AppContainer>,
+  document.getElementById('root'),
+));

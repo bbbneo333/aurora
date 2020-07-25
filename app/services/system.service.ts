@@ -50,7 +50,7 @@ export class SystemService {
     const emitter = new EventEmitter();
     const dirReadStats: FSDirReadStats = {
       totalFilesRead: 0,
-      totalTimeTaken: 0
+      totalTimeTaken: 0,
     };
     const dirReadTimeStart = Date.now();
 
@@ -59,46 +59,49 @@ export class SystemService {
         if (dirReadErr) {
           return done(dirReadErr);
         }
+
         let dirPointer = 0;
-        (function next(fileIterateErr?: Error) {
+
+        return (function next(fileIterateErr?: Error) {
           if (fileIterateErr) {
             return done(fileIterateErr);
           }
 
-          let dirItem = dirList[dirPointer++];
+          let dirItem = dirList[dirPointer];
+          dirPointer += 1;
+
           if (!dirItem) {
+            // important - call DONE not NEXT, in order to signal end of dir
             return done(null);
           }
           dirItem = path.resolve(dir, dirItem);
 
-          fs.stat(dirItem, function(dirStatErr: Error, dirStat: FSStat) {
+          return fs.stat(dirItem, (dirStatErr: Error, dirStat: FSStat) => {
             if (dirStatErr) {
               return done(dirStatErr);
             }
             if (dirStat && dirStat.isDirectory()) {
               return readDirectoryItem(dirItem, next);
             }
+
+            // update stats
+            dirReadStats.totalFilesRead += 1;
+
             // skip file treatment if ignore by extensions
             // info - path.extname will extract out the extension from provided path: 'path/to/index.html' => .html
             if (dirReadOptions.fileExtensions && !dirReadOptions.fileExtensions.includes(path.extname(dirItem))) {
               return next();
             }
-            // read file contents
-            // fs.readFile(dirItem, (fileReadErr: Error, fileBuffer: Buffer) => {
-            //   if (fileReadErr) {
-            //     return done(fileReadErr);
-            //   }
-            // });
-            // update stats
-            dirReadStats.totalFilesRead += 1;
+
             // prepare prompt payload
             const fsDirReadFileEventData: FSDirReadFileEventData = {
-              path: dirItem
+              path: dirItem,
             };
+
             // handle prompt
-            emitter.emit('file', fsDirReadFileEventData, next);
+            return emitter.emit('file', fsDirReadFileEventData, next);
           });
-        })();
+        }());
       });
     }
 
@@ -131,7 +134,7 @@ export class SystemService {
   }): string[] | undefined {
     const currentWindow = remote.getCurrentWindow();
     return remote.dialog.showOpenDialogSync(currentWindow, {
-      properties: params.selectionModes
+      properties: params.selectionModes,
     });
   }
 }

@@ -10,12 +10,12 @@ export class I18nService {
   private readonly localeDefault = 'en';
   private readonly localeStrings: LocalizedStringsMethods;
 
-  constructor(ctx: {systemService: SystemService}) {
+  constructor(ctx: { systemService: SystemService }) {
     // get locale asset
     const localeDefaultAssetPath = `${this.localeAssetPath}/${this.localeDefault}.${this.localeAssetFormat}`;
     const localeAssets: any = {};
     localeAssets[this.localeDefault] = JSON.parse(
-      ctx.systemService.readFile(localeDefaultAssetPath)
+      ctx.systemService.readFile(localeDefaultAssetPath),
     );
     this.localeStrings = new LocalizedStrings(localeAssets);
   }

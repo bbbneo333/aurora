@@ -127,10 +127,10 @@
     "@types/redux-logger": "^3.0.7",
     "@types/sinon": "^7.5.2",
     "@types/tapable": "^1.0.5",
+    "@types/uuid": "^8.0.0",
     "@types/vfile-message": "^2.0.0",
     "@types/webpack": "^4.41.3",
-    "@typescript-eslint/eslint-plugin": "^2.17.0",
-    "@typescript-eslint/parser": "^2.17.0",
+    "@typescript-eslint/eslint-plugin": "^2.34.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
@@ -204,7 +204,8 @@
     "react-localization": "^1.0.15",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "uuid": "^8.2.0"
   },
   "devEngines": {
     "node": ">=7.x",
