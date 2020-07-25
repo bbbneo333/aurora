@@ -3,10 +3,11 @@ import {MediaEnums} from "../enums";
 
 export function mediaItemReducer(state: IMediaItem[], action: {
   type: MediaEnums.MediaLibraryActions,
+  data?: any,
 }): IMediaItem[] {
   switch (action.type) {
-    case MediaEnums.MediaLibraryActions.ADD_TRACKS:
-      return [...state, {id: 'someRandomId1', track_name: 'someRandomTrackName'}];
+    case MediaEnums.MediaLibraryActions.ADD_TRACK:
+      return [...state, action.data];
     default:
       return state;
   }

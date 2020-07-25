@@ -4,5 +4,5 @@ export enum MediaFileExtensions {
 }
 
 export enum MediaLibraryActions {
-  ADD_TRACKS,
+  ADD_TRACK,
 }

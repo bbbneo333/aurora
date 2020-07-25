@@ -2,24 +2,20 @@ import React, {useContext} from 'react';
 
 import './home.component.css';
 
-import {CollectionService, I18nService} from '../../services';
-import {MediaLibraryContext} from '../../contexts';
+import {AppContext, MediaLibraryContext} from '../../contexts';
 import {IMediaItem} from "../../interfaces";
-import {MediaEnums} from '../../enums';
 
-export function HomeComponent(props: {
-  i18nService: I18nService;
-  collectionService: CollectionService;
-}) {
-  // obtain context
+export function HomeComponent() {
+  const appContext = useContext(AppContext);
   const mediaContext = useContext(MediaLibraryContext);
-  // verify context
+  if (!appContext) {
+    throw new Error('HomeComponent encountered error - Missing context - AppContext');
+  }
   if (!mediaContext) {
     throw new Error('HomeComponent encountered error - Missing context - MediaLibraryContext');
   }
-  // break down context
-  const {mediaItems, mediaLibraryManage} = mediaContext;
-  const {i18nService} = props;
+  const {i18nService} = appContext;
+  const {mediaItems, mediaLibraryManager} = mediaContext;
 
   return (
     <div>
@@ -28,9 +24,7 @@ export function HomeComponent(props: {
           <li key={mediaItem.id}>{mediaItem.track_name}</li>
         ))}
       </ul>
-      <button type="submit" onClick={() => mediaLibraryManage({
-        type: MediaEnums.MediaLibraryActions.ADD_TRACKS,
-      })}>
+      <button type="submit" onClick={() => mediaLibraryManager.addTracksFromDirectory()}>
         {i18nService.getString('action_add_tracks')}
       </button>
     </div>
