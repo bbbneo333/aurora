@@ -48,6 +48,7 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
           fileExtensions: [
             MediaEnums.MediaFileExtensions.MP3,
             MediaEnums.MediaFileExtensions.FLAC,
+            MediaEnums.MediaFileExtensions.M4A,
           ],
         });
 
@@ -60,13 +61,13 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
           debug('addTracks - found file - %s', fsDirReadFileEventData.path);
           // read metadata
           const audioMetadata = await MediaMetadataUtils.readAudioMetadataFromFile(fsDirReadFileEventData.path);
-          debug('addTracks - read file metadata - %s', audioMetadata.common.track);
+          debug('addTracks - read file metadata - %s', JSON.stringify(audioMetadata.common));
           // add item to store
           mediaItemManage({
             type: MediaEnums.MediaLibraryActions.ADD_TRACK,
             data: {
               id: uuidv4(),
-              track_name: audioMetadata.common.title,
+              track_name: audioMetadata.common.title || 'unknown track',
             },
           });
           // proceed to next

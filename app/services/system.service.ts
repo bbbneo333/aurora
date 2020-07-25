@@ -67,9 +67,11 @@ export class SystemService {
             return done(fileIterateErr);
           }
 
-          dirPointer += 1;
           let dirItem = dirList[dirPointer];
+          dirPointer += 1;
+
           if (!dirItem) {
+            // important - call DONE not NEXT, in order to signal end of dir
             return done(null);
           }
           dirItem = path.resolve(dir, dirItem);
@@ -81,17 +83,21 @@ export class SystemService {
             if (dirStat && dirStat.isDirectory()) {
               return readDirectoryItem(dirItem, next);
             }
+
+            // update stats
+            dirReadStats.totalFilesRead += 1;
+
             // skip file treatment if ignore by extensions
             // info - path.extname will extract out the extension from provided path: 'path/to/index.html' => .html
             if (dirReadOptions.fileExtensions && !dirReadOptions.fileExtensions.includes(path.extname(dirItem))) {
               return next();
             }
-            // update stats
-            dirReadStats.totalFilesRead += 1;
+
             // prepare prompt payload
             const fsDirReadFileEventData: FSDirReadFileEventData = {
               path: dirItem,
             };
+
             // handle prompt
             return emitter.emit('file', fsDirReadFileEventData, next);
           });

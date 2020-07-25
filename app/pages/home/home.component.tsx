@@ -3,6 +3,7 @@ import React, {useContext} from 'react';
 import './home.component.css';
 
 import {AppContext, MediaLibraryContext} from '../../contexts';
+import {MediaItemComponent} from '../../components';
 import {IMediaItem} from '../../interfaces';
 
 export function HomeComponent() {
@@ -21,7 +22,7 @@ export function HomeComponent() {
     <div>
       <ul style={{paddingLeft: 10, width: '95%'}}>
         {mediaItems.map((mediaItem: IMediaItem) => (
-          <li key={mediaItem.id}>{mediaItem.track_name}</li>
+          <MediaItemComponent key={mediaItem.id} mediaItem={mediaItem}/>
         ))}
       </ul>
       <button type="submit" onClick={() => mediaLibraryManager.addTracksFromDirectory()}>
