@@ -3,7 +3,7 @@ import React, {useContext} from 'react';
 import './home.component.css';
 
 import {AppContext, MediaLibraryContext} from '../../contexts';
-import {IMediaItem} from "../../interfaces";
+import {IMediaItem} from '../../interfaces';
 
 export function HomeComponent() {
   const appContext = useContext(AppContext);

@@ -1,5 +1,4 @@
-/* eslint global-require: off, no-console: off */
-/* eslint prettier/prettier: off */
+/* eslint-disable global-require, no-console */
 
 /**
  * This module executes inside of electron's main process. You can start
@@ -55,13 +54,13 @@ const createWindow = async () => {
     width: 1024,
     height: 728,
     webPreferences: process.env.NODE_ENV === 'development' || process.env.E2E_BUILD === 'true' ? {
-      nodeIntegration: true
+      nodeIntegration: true,
     } : {
-      preload: path.join(__dirname, 'dist/renderer.prod.js')
-    }
+      preload: path.join(__dirname, 'dist/renderer.prod.js'),
+    },
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app.html`);
+  await mainWindow.loadURL(`file://${__dirname}/app.html`);
 
   // @TODO: Use 'ready-to-show' event
   // https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event

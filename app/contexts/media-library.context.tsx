@@ -2,14 +2,14 @@ import React, {createContext, useContext, useReducer} from 'react';
 import * as _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
-const debug = require('debug')('app:context:media_library_context');
-
-import {IMediaItem} from "../interfaces";
-import {MediaEnums, SystemEnums} from "../enums";
+import {IMediaItem} from '../interfaces';
+import {MediaEnums, SystemEnums} from '../enums';
 import {mediaItemReducer} from '../reducers';
-import {MediaMetadataUtils} from "../utils";
-import {FSDirReadFileEventData, FSDirReadStats} from "../services/system.service";
-import {AppContext} from "./app.context";
+import {MediaMetadataUtils} from '../utils';
+import {FSDirReadFileEventData, FSDirReadStats} from '../services/system.service';
+import {AppContext} from './app.context';
+
+const debug = require('debug')('app:context:media_library_context');
 
 const mediaItemStore: IMediaItem[] = [];
 
@@ -21,6 +21,7 @@ export const MediaLibraryContext = createContext<{
 } | null>(null);
 
 export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
+  const {children} = props;
   const appContext = useContext(AppContext);
   const [mediaItems, mediaItemManage] = useReducer(mediaItemReducer, mediaItemStore);
 
@@ -34,7 +35,7 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
     mediaLibraryManager: {
       addTracksFromDirectory() {
         const selectedDirectories = systemService.openSelectionDialog({
-          selectionModes: [SystemEnums.DialogOpenModes.Directory]
+          selectionModes: [SystemEnums.DialogOpenModes.Directory],
         });
         if (!selectedDirectories || _.isEmpty(selectedDirectories)) {
           return;
@@ -46,13 +47,13 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
         const readDirectoryEmitter = systemService.readDirectory(selectedDirectory, {
           fileExtensions: [
             MediaEnums.MediaFileExtensions.MP3,
-            MediaEnums.MediaFileExtensions.FLAC
-          ]
+            MediaEnums.MediaFileExtensions.FLAC,
+          ],
         });
 
         readDirectoryEmitter.on('error', (error) => {
           debug('addTracks - encountered error');
-          console.error(error);
+          debug(error);
         });
 
         readDirectoryEmitter.on('file', async (fsDirReadFileEventData: FSDirReadFileEventData, fsDirReadNext) => {
@@ -66,7 +67,7 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
             data: {
               id: uuidv4(),
               track_name: audioMetadata.common.title,
-            }
+            },
           });
           // proceed to next
           fsDirReadNext();
@@ -76,13 +77,13 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
           debug('addTracks - finished processing');
           debug(fsDirReadStats);
         });
-      }
+      },
     },
   };
 
   return (
     <MediaLibraryContext.Provider value={provider}>
-      {props.children}
+      {children}
     </MediaLibraryContext.Provider>
   );
 }

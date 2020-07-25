@@ -12,5 +12,5 @@ async function readAudioMetadataFromFile(filePath: string): Promise<IAudioMetada
 }
 
 export const MediaMetadataUtils = {
-  readAudioMetadataFromFile
+  readAudioMetadataFromFile,
 };

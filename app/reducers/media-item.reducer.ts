@@ -1,5 +1,5 @@
-import {IMediaItem} from "../interfaces";
-import {MediaEnums} from "../enums";
+import {IMediaItem} from '../interfaces';
+import {MediaEnums} from '../enums';
 
 export function mediaItemReducer(state: IMediaItem[], action: {
   type: MediaEnums.MediaLibraryActions,

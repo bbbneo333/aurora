@@ -1,4 +1,4 @@
-import React, {createContext} from "react";
+import React, {createContext} from 'react';
 
 import * as AppServices from '../services';
 
@@ -8,6 +8,7 @@ export const AppContext = createContext<{
 } | null>(null);
 
 export function AppContextProvider(props: { children: React.ReactNode }) {
+  const {children} = props;
   // instantiate services
   const systemService = new AppServices.SystemService();
   const i18nService = new AppServices.I18nService({
@@ -21,7 +22,7 @@ export function AppContextProvider(props: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={provider}>
-      {props.children}
+      {children}
     </AppContext.Provider>
   );
 }
