@@ -1,6 +1,6 @@
 /*
- * @NOTE: Prepend a `~` to css file paths that are in your node_modules
- *        See https://github.com/webpack-contrib/sass-loader#imports
+ * note - prepend a `~` to css file paths that are in your node_modules
+ * @see - https://github.com/webpack-contrib/sass-loader#imports
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
 

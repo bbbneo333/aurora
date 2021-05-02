@@ -1,9 +1,14 @@
 export {
+  AppContext,
+  AppContextProvider,
+} from './app.context';
+
+export {
   MediaLibraryContext,
   MediaLibraryProvider,
 } from './media-library.context';
 
 export {
-  AppContext,
-  AppContextProvider,
-} from './app.context';
+  MediaPlaybackContext,
+  MediaPlaybackProvider,
+} from './media-playback.context';

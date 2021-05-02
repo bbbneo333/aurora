@@ -2,26 +2,29 @@ import {hot} from 'react-hot-loader';
 import React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
-import './app.component.css';
 import * as AppPages from './pages';
 import * as AppConstants from './constants';
 import * as AppContexts from './contexts';
 
+import './app.component.css';
+
 function AppComponent() {
   return (
     <AppContexts.AppContextProvider>
-      <BrowserRouter>
-        <Switch>
-          <Route
-            path={AppConstants.Routes.HOME}
-            render={() => (
-              <AppContexts.MediaLibraryProvider>
-                <AppPages.HomeComponent/>
-              </AppContexts.MediaLibraryProvider>
-            )}
-          />
-        </Switch>
-      </BrowserRouter>
+      <AppContexts.MediaLibraryProvider>
+        <AppContexts.MediaPlaybackProvider>
+          <BrowserRouter>
+            <Switch>
+              <Route
+                path={AppConstants.Routes.HOME}
+                render={() => (
+                  <AppPages.HomeComponent/>
+                )}
+              />
+            </Switch>
+          </BrowserRouter>
+        </AppContexts.MediaPlaybackProvider>
+      </AppContexts.MediaLibraryProvider>
     </AppContexts.AppContextProvider>
   );
 }

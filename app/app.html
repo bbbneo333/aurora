@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <title>Aurora</title>
   <script>
     (() => {
-      // debug setup
+      // setup #1 - debug setup
       if (
         typeof process !== 'object' ||
         (typeof process === 'object' && process.env.NODE_ENV === 'development')
@@ -13,7 +13,7 @@
         // @see - https://github.com/visionmedia/debug#browser-support
         localStorage.debug = process.env.DEBUG;
       }
-      // hot reload setup
+      // setup #2 - hot reload setup
       if (
         typeof process !== 'object' ||
         (typeof process === 'object' && !process.env.START_HOT)
@@ -34,12 +34,11 @@
     const scripts = [];
 
     if (process.env.NODE_ENV === 'development') {
-      // Dynamically insert the DLL script in development env in the
-      // renderer process
+      // dynamically insert the DLL script in development env in the renderer process
       scripts.push('../dll/renderer.dev.dll.js');
     }
     if (process.env.START_HOT) {
-      // Dynamically insert the bundled app script in the renderer process
+      // dynamically insert the bundled app script in the renderer process
       const port = process.env.PORT || 1212;
       scripts.push(`http://localhost:${port}/dist/renderer.dev.js`);
     } else {

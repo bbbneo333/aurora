@@ -20,6 +20,7 @@ export interface FSDirReadFileEventData {
 
 export interface FSDirReadStats {
   totalFilesRead: number;
+  totalFilesSelected: number;
   totalTimeTaken: number;
 }
 
@@ -47,9 +48,10 @@ export class SystemService {
    * @returns {EventEmitter}
    */
   readDirectory(dirPath: string, dirReadOptions: FSDirReadOptions = {}): EventEmitter {
-    const emitter = new EventEmitter();
+    const dirReadEmitter = new EventEmitter();
     const dirReadStats: FSDirReadStats = {
       totalFilesRead: 0,
+      totalFilesSelected: 0,
       totalTimeTaken: 0,
     };
     const dirReadTimeStart = Date.now();
@@ -93,13 +95,16 @@ export class SystemService {
               return next();
             }
 
-            // prepare prompt payload
+            // update stats
+            dirReadStats.totalFilesSelected += 1;
+
+            // prepare file event payload
             const fsDirReadFileEventData: FSDirReadFileEventData = {
               path: dirItem,
             };
 
-            // handle prompt
-            return emitter.emit('file', fsDirReadFileEventData, next);
+            // emit event: file
+            return dirReadEmitter.emit('file', fsDirReadFileEventData, next);
           });
         }());
       });
@@ -107,15 +112,18 @@ export class SystemService {
 
     readDirectoryItem(dirPath, (dirReadErr: Error) => {
       if (dirReadErr) {
-        emitter.emit('error', dirReadErr);
+        dirReadEmitter.emit('error', dirReadErr);
         return;
       }
-      // update / emit stats
+
+      // update stats
       dirReadStats.totalTimeTaken = Date.now() - dirReadTimeStart;
-      emitter.emit('finished', dirReadStats);
+
+      // emit event: finished
+      dirReadEmitter.emit('finished', dirReadStats);
     });
 
-    return emitter;
+    return dirReadEmitter;
   }
 
   /**

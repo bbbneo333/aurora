@@ -1,5 +1,5 @@
 export {
   IMediaItem,
-  IMediaItemManageAction,
-  IMediaLibraryManager,
+  IMediaItemLibraryManageAction,
+  IMediaItemPlaybackQueueManageAction,
 } from './media.interface';
