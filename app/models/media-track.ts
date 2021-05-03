@@ -1,24 +1,23 @@
 import {MediaEnums} from '../enums';
-import {IMediaItem} from '../interfaces';
 
-export type MediaItemData = {
+type MediaTrackData = {
   id: any;
   track_name: any;
   location: {
     address: string;
-    type: MediaEnums.MediaItemLocationType;
+    type: MediaEnums.MediaTrackLocationType;
   };
 };
 
-export class MediaItem implements IMediaItem {
+export class MediaTrack {
   id: string;
   track_name: string;
   location: {
     address: string;
-    type: MediaEnums.MediaItemLocationType;
+    type: MediaEnums.MediaTrackLocationType;
   };
 
-  constructor(data: MediaItemData) {
+  constructor(data: MediaTrackData) {
     this.id = data.id;
     this.track_name = data.track_name;
     this.location = {

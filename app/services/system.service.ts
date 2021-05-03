@@ -91,8 +91,14 @@ export class SystemService {
 
             // skip file treatment if ignore by extensions
             // info - path.extname will extract out the extension from provided path: 'path/to/index.html' => .html
-            if (dirReadOptions.fileExtensions && !dirReadOptions.fileExtensions.includes(path.extname(dirItem))) {
-              return next();
+            // info - provided extensions do not have '.' prefix, handle accordingly
+            // important - there can be cases where item does not have any extension (extname resolves to null), handle accordingly
+            if (dirReadOptions.fileExtensions) {
+              const dirItemExtension = (path.extname(dirItem) || '').slice(1);
+
+              if (!dirReadOptions.fileExtensions.includes(dirItemExtension)) {
+                return next();
+              }
             }
 
             // update stats

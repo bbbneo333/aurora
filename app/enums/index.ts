@@ -1,4 +1,7 @@
-import * as SystemEnums from './system.enums';
 import * as MediaEnums from './media.enums';
+import * as SystemEnums from './system.enums';
 
-export {SystemEnums, MediaEnums};
+export {
+  MediaEnums,
+  SystemEnums,
+};

@@ -1,1 +1,1 @@
-export {MediaItemComponent} from './media-item/media-item.component';
+export {MediaTrackComponent} from './media-track/media-track.component';

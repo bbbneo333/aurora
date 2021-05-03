@@ -1,35 +1,38 @@
 import React, {useContext} from 'react';
+import {useSelector} from 'react-redux';
 
 import {AppContext, MediaLibraryContext} from '../../contexts';
-import {MediaItemComponent} from '../../components';
-import {IMediaItem} from '../../interfaces';
+import {MediaTrackComponent} from '../../components';
+import {RootState} from '../../reducers';
 
 import './home.component.css';
 
 export function HomeComponent() {
   const appContext = useContext(AppContext);
   const mediaLibraryContext = useContext(MediaLibraryContext);
+  const mediaLibrary = useSelector((state: RootState) => state.mediaLibrary);
+
   if (!appContext) {
     throw new Error('HomeComponent encountered error - Missing context - AppContext');
   }
   if (!mediaLibraryContext) {
     throw new Error('HomeComponent encountered error - Missing context - MediaLibraryContext');
   }
+
   const {
     i18nService,
   } = appContext;
   const {
     mediaLibraryManager,
-    mediaItems,
   } = mediaLibraryContext;
 
   return (
     <div>
       <ul>
-        {mediaItems.map((mediaItem: IMediaItem) => (
-          <MediaItemComponent
-            key={mediaItem.id}
-            mediaItem={mediaItem}
+        {mediaLibrary.mediaTracks.map(mediaTrack => (
+          <MediaTrackComponent
+            key={mediaTrack.id}
+            mediaTrack={mediaTrack}
           />
         ))}
       </ul>

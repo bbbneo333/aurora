@@ -1,1 +1,1 @@
-export {MediaItem} from './media-item';
+export {MediaTrack} from './media-track';

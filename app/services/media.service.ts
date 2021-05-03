@@ -1,6 +1,8 @@
-import {Howl, HowlOptions} from 'howler';
 import {parseFile, IAudioMetadata} from 'music-metadata';
 import * as _ from 'lodash';
+
+// @ts-ignore
+import {Howl, HowlOptions} from 'howler';
 
 export class MediaService {
   /**
