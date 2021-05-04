@@ -9,6 +9,6 @@ export {
 } from './media-library.context';
 
 export {
-  MediaPlaybackContext,
-  MediaPlaybackProvider,
-} from './media-playback.context';
+  MediaPlayerContext,
+  MediaPlayerProvider,
+} from './media-player.context';

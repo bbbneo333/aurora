@@ -12,7 +12,7 @@ function AppComponent() {
   return (
     <AppContexts.AppContextProvider>
       <AppContexts.MediaLibraryProvider>
-        <AppContexts.MediaPlaybackProvider>
+        <AppContexts.MediaPlayerProvider>
           <BrowserRouter>
             <Switch>
               <Route
@@ -23,7 +23,7 @@ function AppComponent() {
               />
             </Switch>
           </BrowserRouter>
-        </AppContexts.MediaPlaybackProvider>
+        </AppContexts.MediaPlayerProvider>
       </AppContexts.MediaLibraryProvider>
     </AppContexts.AppContextProvider>
   );

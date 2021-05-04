@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {useSelector} from 'react-redux';
 
-import {AppContext, MediaLibraryContext, MediaPlaybackContext} from '../../contexts';
+import {AppContext, MediaLibraryContext, MediaPlayerContext} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {MediaTrack} from '../../models';
 import {RootState} from '../../reducers';
@@ -11,7 +11,7 @@ export function MediaTrackComponent(props: {
 }) {
   const appContext = useContext(AppContext);
   const mediaLibraryContext = useContext(MediaLibraryContext);
-  const mediaPlaybackContext = useContext(MediaPlaybackContext);
+  const mediaPlayerContext = useContext(MediaPlayerContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
   if (!appContext) {
@@ -20,14 +20,14 @@ export function MediaTrackComponent(props: {
   if (!mediaLibraryContext) {
     throw new Error('MediaTrackComponent encountered error - Missing context - MediaLibraryContext');
   }
-  if (!mediaPlaybackContext) {
-    throw new Error('MediaTrackComponent encountered error - Missing context - MediaPlaybackContext');
+  if (!mediaPlayerContext) {
+    throw new Error('MediaTrackComponent encountered error - Missing context - MediaPlayerContext');
   }
 
   const {mediaTrack} = props;
   const {i18nService} = appContext;
   const {mediaLibraryManager} = mediaLibraryContext;
-  const {mediaPlaybackManager} = mediaPlaybackContext;
+  const {mediaPlayerManager} = mediaPlayerContext;
 
   const isMediaTrackPlaying = mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
     && mediaPlayer.mediaPlaybackCurrentMediaTrack
@@ -39,7 +39,7 @@ export function MediaTrackComponent(props: {
         ? (
           <button
             type="submit"
-            onClick={() => mediaPlaybackManager.pauseMediaPlayer()}
+            onClick={() => mediaPlayerManager.pauseMediaPlayer()}
           >
             <i className="fas fa-pause"/>
           </button>
@@ -47,7 +47,7 @@ export function MediaTrackComponent(props: {
         : (
           <button
             type="submit"
-            onClick={() => mediaPlaybackManager.playMediaTrack(mediaTrack)}
+            onClick={() => mediaPlayerManager.playMediaTrack(mediaTrack)}
           >
             <i className="fas fa-play-circle"/>
           </button>
@@ -57,7 +57,7 @@ export function MediaTrackComponent(props: {
         type="submit"
         onClick={() => {
           if (isMediaTrackPlaying) {
-            mediaPlaybackManager.stopMediaPlayer();
+            mediaPlayerManager.stopMediaPlayer();
           }
 
           mediaLibraryManager.removeMediaTrackFromLibrary(mediaTrack);

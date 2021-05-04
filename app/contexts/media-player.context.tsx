@@ -8,19 +8,19 @@ import {RootState} from '../reducers';
 
 import {AppContext} from './app.context';
 
-const debug = require('debug')('app:context:media_playback_context');
+const debug = require('debug')('app:context:media_player_context');
 
-export type MediaPlaybackManager = {
+export type MediaPlayerManager = {
   playMediaTrack(mediaTrack: MediaTrack): void;
   pauseMediaPlayer(): void;
   stopMediaPlayer(): void;
 };
 
-export const MediaPlaybackContext = createContext<{
-  mediaPlaybackManager: MediaPlaybackManager,
+export const MediaPlayerContext = createContext<{
+  mediaPlayerManager: MediaPlayerManager,
 } | null>(null);
 
-export function MediaPlaybackProvider(props: { children: React.ReactNode; }) {
+export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
   const {children} = props;
   const appContext = useContext(AppContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
@@ -34,7 +34,7 @@ export function MediaPlaybackProvider(props: { children: React.ReactNode; }) {
     mediaService,
   } = appContext;
 
-  const mediaPlaybackManager: MediaPlaybackManager = {
+  const mediaPlayerManager: MediaPlayerManager = {
     playMediaTrack(mediaTrack: MediaTrack): void {
       // stop and remove event handlers (via off) from existing running audio instance if we have any
       if (mediaPlayer.mediaPlaybackCurrentMediaTrack && mediaPlayer.mediaPlaybackCurrentMediaAudio) {
@@ -143,12 +143,12 @@ export function MediaPlaybackProvider(props: { children: React.ReactNode; }) {
   };
 
   const provider = {
-    mediaPlaybackManager,
+    mediaPlayerManager,
   };
 
   return (
-    <MediaPlaybackContext.Provider value={provider}>
+    <MediaPlayerContext.Provider value={provider}>
       {children}
-    </MediaPlaybackContext.Provider>
+    </MediaPlayerContext.Provider>
   );
 }
