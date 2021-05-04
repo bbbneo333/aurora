@@ -14,10 +14,10 @@ export enum MediaPlayerActions {
   ClearTracks = 'media/player/clearTracks',
   AddTrack = 'media/player/addTrack',
   RemoveTrack = 'media/player/removeTrack',
-  PlayTrack = 'media/player/playTrack',
+  LoadTrack = 'media/player/loadTrack',
   Play = 'media/player/play',
-  Pause = 'media/player/pause',
-  Stop = 'media/player/stop',
+  PausePlayer = 'media/player/pausePlayer',
+  StopPlayer = 'media/player/stopPlayer',
 }
 
 export enum MediaPlayerPlaybackState {
