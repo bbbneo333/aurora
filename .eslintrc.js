@@ -1,6 +1,7 @@
 module.exports = {
   extends: [
     'airbnb-typescript',
+    'plugin:react-hooks/recommended',
   ],
   plugins: [
     'promise',

@@ -1,33 +1,44 @@
 import React, {useContext} from 'react';
+import {useSelector} from 'react-redux';
+
+import {AppContext, MediaLibraryContext} from '../../contexts';
+import {MediaTrackComponent} from '../../components';
+import {RootState} from '../../reducers';
 
 import './home.component.css';
 
-import {AppContext, MediaLibraryContext} from '../../contexts';
-import {MediaItemComponent} from '../../components';
-import {IMediaItem} from '../../interfaces';
-
 export function HomeComponent() {
   const appContext = useContext(AppContext);
-  const mediaContext = useContext(MediaLibraryContext);
+  const mediaLibraryContext = useContext(MediaLibraryContext);
+  const mediaLibrary = useSelector((state: RootState) => state.mediaLibrary);
+
   if (!appContext) {
     throw new Error('HomeComponent encountered error - Missing context - AppContext');
   }
-  if (!mediaContext) {
+  if (!mediaLibraryContext) {
     throw new Error('HomeComponent encountered error - Missing context - MediaLibraryContext');
   }
-  const {i18nService} = appContext;
-  const {mediaLibraryManager, mediaItems} = mediaContext;
+
+  const {
+    i18nService,
+  } = appContext;
+  const {
+    mediaLibraryManager,
+  } = mediaLibraryContext;
 
   return (
     <div>
       <ul>
-        {mediaItems.map((mediaItem: IMediaItem) => (
-          <MediaItemComponent key={mediaItem.id} mediaItem={mediaItem}/>
+        {mediaLibrary.mediaTracks.map(mediaTrack => (
+          <MediaTrackComponent
+            key={mediaTrack.id}
+            mediaTrack={mediaTrack}
+          />
         ))}
       </ul>
       <button
         type="submit"
-        onClick={() => mediaLibraryManager.addTracksFromDirectory()}
+        onClick={() => mediaLibraryManager.addDirectoryToLibrary()}
       >
         {i18nService.getString('action_add_tracks')}
       </button>

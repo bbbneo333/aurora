@@ -20,6 +20,7 @@ export interface FSDirReadFileEventData {
 
 export interface FSDirReadStats {
   totalFilesRead: number;
+  totalFilesSelected: number;
   totalTimeTaken: number;
 }
 
@@ -47,9 +48,10 @@ export class SystemService {
    * @returns {EventEmitter}
    */
   readDirectory(dirPath: string, dirReadOptions: FSDirReadOptions = {}): EventEmitter {
-    const emitter = new EventEmitter();
+    const dirReadEmitter = new EventEmitter();
     const dirReadStats: FSDirReadStats = {
       totalFilesRead: 0,
+      totalFilesSelected: 0,
       totalTimeTaken: 0,
     };
     const dirReadTimeStart = Date.now();
@@ -89,17 +91,26 @@ export class SystemService {
 
             // skip file treatment if ignore by extensions
             // info - path.extname will extract out the extension from provided path: 'path/to/index.html' => .html
-            if (dirReadOptions.fileExtensions && !dirReadOptions.fileExtensions.includes(path.extname(dirItem))) {
-              return next();
+            // info - provided extensions do not have '.' prefix, handle accordingly
+            // important - there can be cases where item does not have any extension (extname resolves to null), handle accordingly
+            if (dirReadOptions.fileExtensions) {
+              const dirItemExtension = (path.extname(dirItem) || '').slice(1);
+
+              if (!dirReadOptions.fileExtensions.includes(dirItemExtension)) {
+                return next();
+              }
             }
 
-            // prepare prompt payload
+            // update stats
+            dirReadStats.totalFilesSelected += 1;
+
+            // prepare file event payload
             const fsDirReadFileEventData: FSDirReadFileEventData = {
               path: dirItem,
             };
 
-            // handle prompt
-            return emitter.emit('file', fsDirReadFileEventData, next);
+            // emit event: file
+            return dirReadEmitter.emit('file', fsDirReadFileEventData, next);
           });
         }());
       });
@@ -107,15 +118,18 @@ export class SystemService {
 
     readDirectoryItem(dirPath, (dirReadErr: Error) => {
       if (dirReadErr) {
-        emitter.emit('error', dirReadErr);
+        dirReadEmitter.emit('error', dirReadErr);
         return;
       }
-      // update / emit stats
+
+      // update stats
       dirReadStats.totalTimeTaken = Date.now() - dirReadTimeStart;
-      emitter.emit('finished', dirReadStats);
+
+      // emit event: finished
+      dirReadEmitter.emit('finished', dirReadStats);
     });
 
-    return emitter;
+    return dirReadEmitter;
   }
 
   /**

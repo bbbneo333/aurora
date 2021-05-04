@@ -1,10 +1,32 @@
 export enum MediaFileExtensions {
-  FLAC = '.flac',
-  MP3 = '.mp3',
-  M4A = '.m4a',
+  FLAC = 'flac',
+  MP3 = 'mp3',
+  M4A = 'm4a',
+  WAV = 'wav',
 }
 
 export enum MediaLibraryActions {
-  ADD_TRACK,
-  REMOVE_TRACK,
+  AddTrack = 'media/library/addTrack',
+  RemoveTrack = 'media/library/removeTrack',
+}
+
+export enum MediaPlayerActions {
+  ClearTracks = 'media/player/clearTracks',
+  AddTrack = 'media/player/addTrack',
+  RemoveTrack = 'media/player/removeTrack',
+  LoadTrack = 'media/player/loadTrack',
+  Play = 'media/player/play',
+  PausePlayer = 'media/player/pausePlayer',
+  StopPlayer = 'media/player/stopPlayer',
+}
+
+export enum MediaPlayerPlaybackState {
+  Playing = 'media/player/playing',
+  Paused = 'media/player/paused',
+  Loading = 'media/player/loading',
+  Idle = 'media/player/idle',
+}
+
+export enum MediaTrackLocationType {
+  LocalFileSystem = 'media/track/location/localFS',
 }

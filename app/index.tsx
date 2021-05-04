@@ -1,15 +1,21 @@
 import {AppContainer as ReactHotAppContainer} from 'react-hot-loader';
 import React, {Fragment} from 'react';
 import {render} from 'react-dom';
+import {Provider} from 'react-redux';
+import {createStore} from 'redux';
+
+import {AppHotComponent} from './app.component';
+import rootReducer from './reducers';
 
 import './app.global.css';
-import {AppHotComponent} from './app.component';
 
 const AppContainer = process.env.PLAIN_HMR ? Fragment : ReactHotAppContainer;
 
 document.addEventListener('DOMContentLoaded', () => render(
-  <AppContainer>
-    <AppHotComponent/>
-  </AppContainer>,
+  <Provider store={createStore(rootReducer)}>
+    <AppContainer>
+      <AppHotComponent/>
+    </AppContainer>
+  </Provider>,
   document.getElementById('root'),
 ));
