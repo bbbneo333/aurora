@@ -9,6 +9,16 @@ import {AppContext} from './app.context';
 
 const debug = require('debug')('app:context:media_player_context');
 
+export interface MediaPlayer {
+  playMediaTrack(mediaTrack: MediaTrack): boolean;
+
+  pausePlayer(): boolean;
+
+  resumePlayer(): boolean;
+
+  stopPlayer(): boolean;
+}
+
 export type MediaPlayerManager = {
   playMediaTrack(mediaTrack: MediaTrack): void;
   pauseMediaPlayer(): void;
@@ -33,8 +43,8 @@ export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
     mediaService,
   } = appContext;
 
-  const mediaPlayerLocal = {
-    playMediaTrack(mediaTrack: MediaTrack) {
+  const mediaPlayerLocal: MediaPlayer = {
+    playMediaTrack(mediaTrack: MediaTrack): boolean {
       // run and store a new audio instance
       const mediaPlaybackLocalAudio = mediaService.playLocalAudio(mediaTrack.location.address, {
         onplay: (mediaPlaybackAudioId: number) => {
@@ -76,6 +86,8 @@ export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
           mediaPlayingInstance: mediaPlaybackLocalAudio,
         },
       });
+
+      return true;
     },
     pausePlayer(): boolean {
       if (!mediaPlayer.mediaPlaybackCurrentPlayingInstance) {

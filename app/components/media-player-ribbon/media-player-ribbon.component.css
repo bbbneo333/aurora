@@ -1,0 +1,122 @@
+.media-player-container {
+  position: fixed;
+  width: 100%;
+  color: white;
+  background-color: #181818;
+  left: 0;
+  bottom: 0;
+}
+
+.media-player-content {
+  display: flex;
+  align-items: center;
+}
+
+.media-player-info-container {
+}
+
+.media-track-album-artwork-column {
+}
+
+.media-track-album-artwork-image {
+  width: 70px;
+}
+
+.media-track-info-column {
+  display: flex;
+  flex-flow: column;
+  font-size: 14px;
+}
+
+.media-track-info-name {
+  font-weight: 400;
+}
+
+.media-track-info-album {
+  font-weight: 200;
+}
+
+.media-player-controls-container {
+  text-align: center;
+  color: white;
+  /*background-color: rebeccapurple;*/
+}
+
+.media-player-controls-column {
+  flex-flow: row;
+  display: flex;
+  justify-content: center;
+}
+
+.media-player-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 10px;
+  /*background-color: green;*/
+  /*border-right: 2px solid blue;*/
+}
+
+.media-player-control.media-player-control-sm {
+  font-size: 15px;
+  color: #8c8c8c;
+}
+
+.media-player-control.media-player-control-md {
+  font-size: 20px;
+  color: #8c8c8c;
+}
+
+.media-player-control.media-player-control-lg {
+  font-size: 30px;
+}
+
+.media-player-control:hover {
+  color: white;
+}
+
+.media-player-progress-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  /*background-color: gray;*/
+}
+
+.media-player-progress-bar-column {
+  /*padding: 0;*/
+}
+
+.media-player-progress-counter-column {
+  color: #8c8c8c;
+  font-size: 10px;
+  font-weight: 500;
+  /*background-color: green;*/
+}
+
+.media-player-progress-counter-column.start {
+  text-align: right;
+}
+
+.media-player-progress-counter-column.end {
+  text-align: left;
+}
+
+.media-player-side-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.media-player-side-control {
+  margin-right: 5px;
+  text-align: center;
+  color: #8c8c8c;
+}
+
+.media-player-side-control:hover {
+  color: white;
+}
+
+.media-player-volume-bar-container {
+  margin-right: 10px;
+}

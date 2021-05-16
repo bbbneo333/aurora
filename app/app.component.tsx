@@ -3,8 +3,10 @@ import React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
 import * as AppPages from './pages';
-import * as AppConstants from './constants';
 import * as AppContexts from './contexts';
+
+import {MediaSidebarComponent, MediaPlayerRibbonComponent} from './components';
+import {Routes} from './constants';
 
 import './app.component.css';
 
@@ -13,10 +15,12 @@ function AppComponent() {
     <AppContexts.AppContextProvider>
       <AppContexts.MediaLibraryProvider>
         <AppContexts.MediaPlayerProvider>
+          <MediaSidebarComponent/>
+          <MediaPlayerRibbonComponent/>
           <BrowserRouter>
             <Switch>
               <Route
-                path={AppConstants.Routes.HOME}
+                path={Routes.HOME}
                 render={() => (
                   <AppPages.HomeComponent/>
                 )}
