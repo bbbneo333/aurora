@@ -8,8 +8,6 @@ import * as AppContexts from './contexts';
 import {MediaSidebarComponent, MediaPlayerRibbonComponent} from './components';
 import {Routes} from './constants';
 
-import './app.component.css';
-
 function AppComponent() {
   return (
     <AppContexts.AppContextProvider>

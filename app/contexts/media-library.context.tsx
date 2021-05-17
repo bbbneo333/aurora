@@ -71,6 +71,8 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
             mediaTrack: new MediaTrack({
               id: uuidv4(),
               track_name: audioMetadata.common.title || 'unknown track',
+              track_album_name: audioMetadata.common.album || 'unknown album',
+              track_duration: audioMetadata.format.duration || 1000,
               location: {
                 address: fsDirReadFileEventData.path,
                 type: MediaEnums.MediaTrackLocationType.LocalFileSystem,

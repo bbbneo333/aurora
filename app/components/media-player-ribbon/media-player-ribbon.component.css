@@ -90,6 +90,7 @@
   color: #8c8c8c;
   font-size: 10px;
   font-weight: 500;
+  overflow: hidden;
   /*background-color: green;*/
 }
 

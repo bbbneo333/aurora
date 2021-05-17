@@ -22,27 +22,15 @@ export class MediaService {
    * @function playLocalAudio
    * @param {String} mediaPlaybackFilePath
    * @param {HowlOptions} [mediaPlaybackOptions]
-   * @returns {{audio: Howl, audio_playback_id: number}}
+   * @returns {Howl}
    */
-  playLocalAudio(mediaPlaybackFilePath: string, mediaPlaybackOptions?: HowlOptions): {
-    audio: Howl,
-    audio_playback_id: number,
-  } {
+  playLocalAudio(mediaPlaybackFilePath: string, mediaPlaybackOptions?: HowlOptions): Howl {
     // prepare options for howl based on params provided
     const audioOptionsForHowl = _.assign({
       src: mediaPlaybackFilePath,
     }, mediaPlaybackOptions);
 
-    // create audio instance
-    const audio = new Howl(audioOptionsForHowl);
-
-    // play returns a unique sound ID that can be passed
-    // into any method on Howl to control that specific sound
-    const audioPlaybackId = audio.play();
-
-    return {
-      audio,
-      audio_playback_id: audioPlaybackId,
-    };
+    // create and return audio instance
+    return new Howl(audioOptionsForHowl);
   }
 }

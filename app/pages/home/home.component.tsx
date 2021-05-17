@@ -1,11 +1,9 @@
 import React, {useContext} from 'react';
 import {useSelector} from 'react-redux';
 
-import {AppContext, MediaLibraryContext} from '../../contexts';
 import {MediaTrackComponent} from '../../components';
+import {AppContext, MediaLibraryContext} from '../../contexts';
 import {RootState} from '../../reducers';
-
-import './home.component.css';
 
 export function HomeComponent() {
   const appContext = useContext(AppContext);

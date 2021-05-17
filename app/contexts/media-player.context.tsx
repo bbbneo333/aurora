@@ -21,6 +21,7 @@ export interface MediaPlayer {
 
 export type MediaPlayerManager = {
   playMediaTrack(mediaTrack: MediaTrack): void;
+  resumeMediaPlayer(): void;
   pauseMediaPlayer(): void;
   stopMediaPlayer(): void;
 };
@@ -61,21 +62,13 @@ export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
         },
         onstop: (mediaPlaybackAudioId: number) => {
           debug('playMediaTrack - audio %s - playback id - %d', 'stopped', mediaPlaybackAudioId);
-
-          // only issue stop when current playing instance is as same as the one we have received here
-          // there can be a case where a new instance has been already started and older instance stop after that
-          // in such case, we will end up stopping the wrong instance
-          if (mediaPlayer.mediaPlaybackCurrentPlayingInstance && mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio_playback_id === mediaPlaybackAudioId) {
-            dispatch({
-              type: MediaEnums.MediaPlayerActions.StopPlayer,
-            });
-          }
         },
         onend: (mediaPlaybackAudioId: number) => {
           debug('playMediaTrack - audio %s - playback id - %d', 'ended', mediaPlaybackAudioId);
-          dispatch({
-            type: MediaEnums.MediaPlayerActions.StopPlayer,
-          });
+        },
+        onseek: (mediaPlaybackAudioId: number) => {
+          const mediaSeek = 0;
+          debug('playMediaTrack - audio %s - playback id - %d, seek - %d', 'seeked', mediaPlaybackAudioId, mediaSeek);
         },
       });
 
@@ -83,9 +76,16 @@ export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
         type: MediaEnums.MediaPlayerActions.LoadTrack,
         data: {
           mediaTrackId: mediaTrack.id,
-          mediaPlayingInstance: mediaPlaybackLocalAudio,
+          mediaPlayingInstance: {
+            audio: mediaPlaybackLocalAudio,
+          },
         },
       });
+
+      // play returns a unique sound ID that can be passed
+      // into any method on Howl to control that specific sound
+      const audioPlaybackId = mediaPlaybackLocalAudio.play();
+      debug('playMediaTrack - playing track id - %s, playback id - %d', mediaTrack.id, audioPlaybackId);
 
       return true;
     },
@@ -166,6 +166,13 @@ export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
       }
 
       mediaPlayerLocal.pausePlayer();
+    },
+    resumeMediaPlayer(): void {
+      if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
+        return;
+      }
+
+      mediaPlayerLocal.resumePlayer();
     },
     stopMediaPlayer(): void {
       if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {

@@ -7,6 +7,7 @@ export interface MediaPlayerState {
   mediaTracks: MediaTrack[];
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState;
   mediaPlaybackCurrentMediaTrack?: MediaTrack;
+  mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: any;
 }
 
@@ -19,6 +20,7 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
   mediaPlaybackCurrentMediaTrack: undefined,
+  mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
 };
 
@@ -56,6 +58,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
+        mediaPlaybackCurrentMediaProgress: 0,
         mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
       };
     }
@@ -80,7 +83,19 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
         mediaPlaybackCurrentMediaTrack: undefined,
+        mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: undefined,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UpdateProgress: {
+      // data.mediaProgress: number
+      if (!state.mediaPlaybackCurrentMediaTrack) {
+        throw new Error('MediaPlayerReducer encountered error at UpdateProgress - No loaded media track was found');
+      }
+
+      return {
+        ...state,
+        mediaPlaybackCurrentMediaProgress: action.data.mediaProgress,
       };
     }
     default:
