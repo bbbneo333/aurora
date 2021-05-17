@@ -11,12 +11,17 @@ const debug = require('debug')('app:service:media_player_local_service');
 
 class MediaPlayerLocalService {
   playMediaTrack(mediaTrack: MediaTrack): boolean {
+    const self = this;
+
     // run and store a new audio instance
     const mediaPlaybackLocalAudio = this.playLocalAudio(mediaTrack.location.address, {
       onplay: (mediaPlaybackAudioId: number) => {
         debug('playMediaTrack - audio %s - playback id - %d', 'played', mediaPlaybackAudioId);
         store.dispatch({
           type: MediaEnums.MediaPlayerActions.Play,
+        });
+        requestAnimationFrame(() => {
+          self.reportMediaPlaybackProgress();
         });
       },
       onpause: (mediaPlaybackAudioId: number) => {
@@ -31,9 +36,12 @@ class MediaPlayerLocalService {
       onend: (mediaPlaybackAudioId: number) => {
         debug('playMediaTrack - audio %s - playback id - %d', 'ended', mediaPlaybackAudioId);
       },
-      onseek: (mediaPlaybackAudioId: number) => {
-        const mediaSeek = 0;
-        debug('playMediaTrack - audio %s - playback id - %d, seek - %d', 'seeked', mediaPlaybackAudioId, mediaSeek);
+      onseek(mediaPlaybackAudioId: number) {
+        const mediaPlaybackSeek = this.seek();
+        debug('playMediaTrack - audio %s - playback id - %d, seek - %d', 'seeked', mediaPlaybackAudioId, mediaPlaybackSeek);
+        requestAnimationFrame(() => {
+          self.reportMediaPlaybackProgress();
+        });
       },
     });
 
@@ -109,6 +117,34 @@ class MediaPlayerLocalService {
 
     // create and return audio instance
     return new Howl(audioOptionsForHowl);
+  }
+
+  private reportMediaPlaybackProgress(): void {
+    const self = this;
+    const {mediaPlayer} = store.getState();
+
+    debug('reportMediaPlaybackProgress - attempting to report progress...');
+
+    if (!mediaPlayer.mediaPlaybackCurrentPlayingInstance) {
+      debug('reportMediaPlaybackProgress - no running media instance found, aborting...');
+      return;
+    }
+
+    const mediaPlaybackProgress = mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.seek() || 0;
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
+      data: {
+        mediaPlaybackProgress,
+      },
+    });
+
+    debug('reportMediaPlaybackProgress - reported progress - %d', mediaPlaybackProgress);
+
+    if (mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.playing()) {
+      requestAnimationFrame(() => {
+        self.reportMediaPlaybackProgress();
+      });
+    }
   }
 }
 

@@ -77,11 +77,11 @@ export function MediaPlayerRibbonComponent() {
               </Row>
               <Row className={cx('media-player-progress-container')}>
                 <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'start')}>
-                  {/* TODO: Add implementation */}
-                  2:34
+                  {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaProgress || 0)}
                 </Col>
                 <Col className={cx('col-10', 'media-player-progress-bar-column')}>
-                  <MediaProgressBarComponent value={mediaPlayer.mediaPlaybackCurrentMediaProgress}/>
+                  {/* TODO: Add implementation for media playback progression */}
+                  <MediaProgressBarComponent value={100}/>
                 </Col>
                 <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'end')}>
                   {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
@@ -97,6 +97,7 @@ export function MediaPlayerRibbonComponent() {
                   <i className="fas fa-volume-up"/>
                 </Col>
                 <Col className={cx('col-8')}>
+                  {/* TODO: Add implementation for volume progression */}
                   <MediaProgressBarComponent
                     value={100}
                     progressContainerClassName={cx('media-player-volume-bar-container')}

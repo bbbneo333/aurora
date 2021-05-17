@@ -87,15 +87,15 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         mediaPlaybackCurrentPlayingInstance: undefined,
       };
     }
-    case MediaEnums.MediaPlayerActions.UpdateProgress: {
-      // data.mediaProgress: number
+    case MediaEnums.MediaPlayerActions.UpdatePlaybackProgress: {
+      // data.mediaPlaybackProgress: number
       if (!state.mediaPlaybackCurrentMediaTrack) {
-        throw new Error('MediaPlayerReducer encountered error at UpdateProgress - No loaded media track was found');
+        throw new Error('MediaPlayerReducer encountered error at UpdatePlaybackProgress - No loaded media track was found');
       }
 
       return {
         ...state,
-        mediaPlaybackCurrentMediaProgress: action.data.mediaProgress,
+        mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress,
       };
     }
     default:
