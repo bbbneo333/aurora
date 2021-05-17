@@ -1,22 +1,19 @@
 import React, {useContext} from 'react';
 import {useSelector} from 'react-redux';
 
-import {AppContext, MediaLibraryContext, MediaPlayerContext} from '../../contexts';
+import {MediaLibraryContext, MediaPlayerContext} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {MediaTrack} from '../../models';
 import {RootState} from '../../reducers';
+import {I18nService} from '../../services';
 
 export function MediaTrackComponent(props: {
   mediaTrack: MediaTrack,
 }) {
-  const appContext = useContext(AppContext);
   const mediaLibraryContext = useContext(MediaLibraryContext);
   const mediaPlayerContext = useContext(MediaPlayerContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
-  if (!appContext) {
-    throw new Error('MediaTrackComponent encountered error - Missing context - AppContext');
-  }
   if (!mediaLibraryContext) {
     throw new Error('MediaTrackComponent encountered error - Missing context - MediaLibraryContext');
   }
@@ -25,7 +22,6 @@ export function MediaTrackComponent(props: {
   }
 
   const {mediaTrack} = props;
-  const {i18nService} = appContext;
   const {mediaLibraryManager} = mediaLibraryContext;
   const {mediaPlayerManager} = mediaPlayerContext;
 
@@ -63,7 +59,7 @@ export function MediaTrackComponent(props: {
           mediaLibraryManager.removeMediaTrackFromLibrary(mediaTrack);
         }}
       >
-        {i18nService.getString('action_remove_track')}
+        {I18nService.getString('action_remove_track')}
       </button>
     </li>
   );

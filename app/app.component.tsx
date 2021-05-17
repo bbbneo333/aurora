@@ -10,24 +10,22 @@ import {Routes} from './constants';
 
 function AppComponent() {
   return (
-    <AppContexts.AppContextProvider>
-      <AppContexts.MediaLibraryProvider>
-        <AppContexts.MediaPlayerProvider>
-          <MediaSidebarComponent/>
-          <MediaPlayerRibbonComponent/>
-          <BrowserRouter>
-            <Switch>
-              <Route
-                path={Routes.HOME}
-                render={() => (
-                  <AppPages.HomeComponent/>
-                )}
-              />
-            </Switch>
-          </BrowserRouter>
-        </AppContexts.MediaPlayerProvider>
-      </AppContexts.MediaLibraryProvider>
-    </AppContexts.AppContextProvider>
+    <AppContexts.MediaLibraryProvider>
+      <AppContexts.MediaPlayerProvider>
+        <MediaSidebarComponent/>
+        <MediaPlayerRibbonComponent/>
+        <BrowserRouter>
+          <Switch>
+            <Route
+              path={Routes.HOME}
+              render={() => (
+                <AppPages.HomeComponent/>
+              )}
+            />
+          </Switch>
+        </BrowserRouter>
+      </AppContexts.MediaPlayerProvider>
+    </AppContexts.MediaLibraryProvider>
   );
 }
 

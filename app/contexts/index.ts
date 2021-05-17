@@ -1,9 +1,4 @@
 export {
-  AppContext,
-  AppContextProvider,
-} from './app.context';
-
-export {
   MediaLibraryContext,
   MediaLibraryProvider,
 } from './media-library.context';

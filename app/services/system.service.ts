@@ -24,7 +24,7 @@ export interface FSDirReadStats {
   totalTimeTaken: number;
 }
 
-export class SystemService {
+class SystemService {
   /**
    * Reads file at provided path and parsed it using the utf8 encoding
    * Read happens synchronously
@@ -152,3 +152,5 @@ export class SystemService {
     });
   }
 }
+
+export default new SystemService();

@@ -1,13 +1,12 @@
-import React, {createContext, useContext} from 'react';
+import React, {createContext} from 'react';
 import {useDispatch} from 'react-redux';
 import * as _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import {MediaEnums, SystemEnums} from '../enums';
 import {MediaTrack} from '../models';
+import {MediaService, SystemService} from '../services';
 import {FSDirReadFileEventData, FSDirReadStats} from '../services/system.service';
-
-import {AppContext} from './app.context';
 
 const debug = require('debug')('app:context:media_library_context');
 
@@ -22,21 +21,11 @@ export const MediaLibraryContext = createContext<{
 
 export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
   const {children} = props;
-  const appContext = useContext(AppContext);
   const dispatch = useDispatch();
-
-  if (!appContext) {
-    throw new Error('MediaLibraryProvider encountered error - Missing context - AppContext');
-  }
-
-  const {
-    mediaService,
-    systemService,
-  } = appContext;
 
   const mediaLibraryManager: MediaLibraryManager = {
     addDirectoryToLibrary(): void {
-      const selectedDirectories = systemService.openSelectionDialog({
+      const selectedDirectories = SystemService.openSelectionDialog({
         selectionModes: [SystemEnums.DialogOpenModes.Directory],
       });
       if (!selectedDirectories || _.isEmpty(selectedDirectories)) {
@@ -46,7 +35,7 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
       // openSelectionDialog responds back with a list of directories
       // we will be only processing the initial selection
       const selectedDirectory = selectedDirectories[0];
-      const readDirectoryEmitter = systemService.readDirectory(selectedDirectory, {
+      const readDirectoryEmitter = SystemService.readDirectory(selectedDirectory, {
         fileExtensions: [
           MediaEnums.MediaFileExtensions.MP3,
           MediaEnums.MediaFileExtensions.FLAC,
@@ -63,7 +52,7 @@ export function MediaLibraryProvider(props: { children: React.ReactNode; }) {
       readDirectoryEmitter.on('file', async (fsDirReadFileEventData: FSDirReadFileEventData, fsDirReadNext) => {
         debug('addTracksFromDirectory - found file - %s', fsDirReadFileEventData.path);
         // read metadata
-        const audioMetadata = await mediaService.readAudioMetadataFromFile(fsDirReadFileEventData.path);
+        const audioMetadata = await MediaService.readAudioMetadataFromFile(fsDirReadFileEventData.path);
         // update store
         dispatch({
           type: MediaEnums.MediaLibraryActions.AddTrack,

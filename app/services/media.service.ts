@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 // @ts-ignore
 import {Howl, HowlOptions} from 'howler';
 
-export class MediaService {
+class MediaService {
   /**
    * Reads audio metadata from audio file located at the path
    *
@@ -34,3 +34,5 @@ export class MediaService {
     return new Howl(audioOptionsForHowl);
   }
 }
+
+export default new MediaService();

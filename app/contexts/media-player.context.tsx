@@ -1,11 +1,10 @@
-import React, {createContext, useContext} from 'react';
+import React, {createContext} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {MediaEnums} from '../enums';
 import {MediaTrack} from '../models';
 import {RootState} from '../reducers';
-
-import {AppContext} from './app.context';
+import {MediaService} from '../services';
 
 const debug = require('debug')('app:context:media_player_context');
 
@@ -32,22 +31,13 @@ export const MediaPlayerContext = createContext<{
 
 export function MediaPlayerProvider(props: { children: React.ReactNode; }) {
   const {children} = props;
-  const appContext = useContext(AppContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
   const dispatch = useDispatch();
-
-  if (!appContext) {
-    throw new Error('MediaPlaybackProvider encountered error - Missing context - AppContext');
-  }
-
-  const {
-    mediaService,
-  } = appContext;
 
   const mediaPlayerLocal: MediaPlayer = {
     playMediaTrack(mediaTrack: MediaTrack): boolean {
       // run and store a new audio instance
-      const mediaPlaybackLocalAudio = mediaService.playLocalAudio(mediaTrack.location.address, {
+      const mediaPlaybackLocalAudio = MediaService.playLocalAudio(mediaTrack.location.address, {
         onplay: (mediaPlaybackAudioId: number) => {
           debug('playMediaTrack - audio %s - playback id - %d', 'played', mediaPlaybackAudioId);
           dispatch({
