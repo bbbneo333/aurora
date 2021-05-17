@@ -3,14 +3,13 @@ import React from 'react';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 
 import * as AppPages from './pages';
-import * as AppContexts from './contexts';
 
 import {MediaSidebarComponent, MediaPlayerRibbonComponent} from './components';
 import {Routes} from './constants';
 
 function AppComponent() {
   return (
-    <AppContexts.MediaPlayerProvider>
+    <div>
       <MediaSidebarComponent/>
       <MediaPlayerRibbonComponent/>
       <BrowserRouter>
@@ -23,7 +22,7 @@ function AppComponent() {
           />
         </Switch>
       </BrowserRouter>
-    </AppContexts.MediaPlayerProvider>
+    </div>
   );
 }
 

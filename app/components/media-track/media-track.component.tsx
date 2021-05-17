@@ -1,24 +1,17 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux';
 
-import {MediaPlayerContext} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {MediaTrack} from '../../models';
 import {RootState} from '../../reducers';
-import {I18nService, MediaLibraryService} from '../../services';
+import {I18nService, MediaLibraryService, MediaPlayerService} from '../../services';
 
 export function MediaTrackComponent(props: {
   mediaTrack: MediaTrack,
 }) {
-  const mediaPlayerContext = useContext(MediaPlayerContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
-  if (!mediaPlayerContext) {
-    throw new Error('MediaTrackComponent encountered error - Missing context - MediaPlayerContext');
-  }
-
   const {mediaTrack} = props;
-  const {mediaPlayerManager} = mediaPlayerContext;
 
   const isMediaTrackPlaying = mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
     && mediaPlayer.mediaPlaybackCurrentMediaTrack
@@ -30,7 +23,7 @@ export function MediaTrackComponent(props: {
         ? (
           <button
             type="submit"
-            onClick={() => mediaPlayerManager.pauseMediaPlayer()}
+            onClick={() => MediaPlayerService.pauseMediaPlayer()}
           >
             <i className="fas fa-pause"/>
           </button>
@@ -38,7 +31,7 @@ export function MediaTrackComponent(props: {
         : (
           <button
             type="submit"
-            onClick={() => mediaPlayerManager.playMediaTrack(mediaTrack)}
+            onClick={() => MediaPlayerService.playMediaTrack(mediaTrack)}
           >
             <i className="fas fa-play-circle"/>
           </button>
@@ -48,7 +41,7 @@ export function MediaTrackComponent(props: {
         type="submit"
         onClick={() => {
           if (isMediaTrackPlaying) {
-            mediaPlayerManager.stopMediaPlayer();
+            MediaPlayerService.stopMediaPlayer();
           }
 
           MediaLibraryService.removeMediaTrackFromLibrary(mediaTrack);

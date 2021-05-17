@@ -1,11 +1,11 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {Col, Container, Row} from 'react-bootstrap';
 
-import {MediaPlayerContext} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {RootState} from '../../reducers';
+import {MediaPlayerService} from '../../services';
 import {DateTimeUtils} from '../../utils';
 
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
@@ -15,14 +15,7 @@ import styles from './media-player-ribbon.component.css';
 const cx = classNames.bind(styles);
 
 export function MediaPlayerRibbonComponent() {
-  const mediaPlayerContext = useContext(MediaPlayerContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
-
-  if (!mediaPlayerContext) {
-    throw new Error('MediaPlayerRibbonComponent encountered error - Missing context - MediaPlayerContext');
-  }
-
-  const {mediaPlayerManager} = mediaPlayerContext;
 
   return mediaPlayer.mediaPlaybackCurrentMediaTrack
     ? (
@@ -57,7 +50,7 @@ export function MediaPlayerRibbonComponent() {
                       <div
                         className={cx('media-player-control', 'media-player-control-lg')}
                         onClick={() => {
-                          mediaPlayerManager.pauseMediaPlayer();
+                          MediaPlayerService.pauseMediaPlayer();
                         }}
                       >
                         <i className="fas fa-pause-circle"/>
@@ -68,7 +61,7 @@ export function MediaPlayerRibbonComponent() {
                       <div
                         className={cx('media-player-control', 'media-player-control-lg')}
                         onClick={() => {
-                          mediaPlayerManager.resumeMediaPlayer();
+                          MediaPlayerService.resumeMediaPlayer();
                         }}
                       >
                         <i className="fas fa-play-circle"/>
