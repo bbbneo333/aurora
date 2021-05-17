@@ -80,11 +80,16 @@ export function MediaPlayerRibbonComponent() {
                   {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaProgress || 0)}
                 </Col>
                 <Col className={cx('col-10', 'media-player-progress-bar-column')}>
-                  {/* TODO: Add implementation for media playback progression */}
-                  <MediaProgressBarComponent value={100}/>
+                  <MediaProgressBarComponent
+                    value={mediaPlayer.mediaPlaybackCurrentMediaProgress && mediaPlayer.mediaPlaybackCurrentMediaDuration
+                      ? (mediaPlayer.mediaPlaybackCurrentMediaProgress / mediaPlayer.mediaPlaybackCurrentMediaDuration) * 100
+                      : 0}
+                  />
                 </Col>
                 <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'end')}>
-                  {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
+                  {mediaPlayer.mediaPlaybackCurrentMediaDuration
+                    ? DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaDuration)
+                    : '--:--'}
                 </Col>
               </Row>
             </Col>

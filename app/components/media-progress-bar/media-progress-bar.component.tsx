@@ -146,6 +146,13 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     onHandlerMouseMove,
   ]);
 
+  useEffect(() => {
+    // as we are using a prop value to set a state, any change in the prop won't trigger the re-render
+    // in order to force re-render, useEffect is set to listen on prop value and triggers the re-render via setting the state (setMediaProgressCurrentValue)
+    // @see - https://stackoverflow.com/questions/54865764/react-usestate-does-not-reload-state-from-props
+    setMediaProgressCurrentValue(value || 0);
+  }, [value]);
+
   return (
     <div className={cx('media-progress-container', progressContainerClassName)}>
       <div
