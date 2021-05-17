@@ -1,21 +1,9 @@
-import {parseFile, IAudioMetadata} from 'music-metadata';
 import * as _ from 'lodash';
 
 // @ts-ignore
 import {Howl, HowlOptions} from 'howler';
 
 class MediaService {
-  /**
-   * Reads audio metadata from audio file located at the path
-   *
-   * @function readAudioMetadataFromFile
-   * @param {String} filePath
-   * @returns {Promise<IAudioMetadata>}
-   */
-  readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
-    return parseFile(filePath);
-  }
-
   /**
    * Plays audio from local media file
    *

@@ -1,22 +1,12 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import {useSelector} from 'react-redux';
 
 import {MediaTrackComponent} from '../../components';
-import {MediaLibraryContext} from '../../contexts';
 import {RootState} from '../../reducers';
-import {I18nService} from '../../services';
+import {I18nService, MediaLibraryService} from '../../services';
 
 export function HomeComponent() {
-  const mediaLibraryContext = useContext(MediaLibraryContext);
   const mediaLibrary = useSelector((state: RootState) => state.mediaLibrary);
-
-  if (!mediaLibraryContext) {
-    throw new Error('HomeComponent encountered error - Missing context - MediaLibraryContext');
-  }
-
-  const {
-    mediaLibraryManager,
-  } = mediaLibraryContext;
 
   return (
     <div>
@@ -30,7 +20,7 @@ export function HomeComponent() {
       </ul>
       <button
         type="submit"
-        onClick={() => mediaLibraryManager.addDirectoryToLibrary()}
+        onClick={() => MediaLibraryService.addDirectoryToLibrary()}
       >
         {I18nService.getString('action_add_tracks')}
       </button>

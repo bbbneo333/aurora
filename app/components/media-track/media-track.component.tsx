@@ -1,28 +1,23 @@
 import React, {useContext} from 'react';
 import {useSelector} from 'react-redux';
 
-import {MediaLibraryContext, MediaPlayerContext} from '../../contexts';
+import {MediaPlayerContext} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {MediaTrack} from '../../models';
 import {RootState} from '../../reducers';
-import {I18nService} from '../../services';
+import {I18nService, MediaLibraryService} from '../../services';
 
 export function MediaTrackComponent(props: {
   mediaTrack: MediaTrack,
 }) {
-  const mediaLibraryContext = useContext(MediaLibraryContext);
   const mediaPlayerContext = useContext(MediaPlayerContext);
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
-  if (!mediaLibraryContext) {
-    throw new Error('MediaTrackComponent encountered error - Missing context - MediaLibraryContext');
-  }
   if (!mediaPlayerContext) {
     throw new Error('MediaTrackComponent encountered error - Missing context - MediaPlayerContext');
   }
 
   const {mediaTrack} = props;
-  const {mediaLibraryManager} = mediaLibraryContext;
   const {mediaPlayerManager} = mediaPlayerContext;
 
   const isMediaTrackPlaying = mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
@@ -56,7 +51,7 @@ export function MediaTrackComponent(props: {
             mediaPlayerManager.stopMediaPlayer();
           }
 
-          mediaLibraryManager.removeMediaTrackFromLibrary(mediaTrack);
+          MediaLibraryService.removeMediaTrackFromLibrary(mediaTrack);
         }}
       >
         {I18nService.getString('action_remove_track')}
