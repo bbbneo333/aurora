@@ -24,7 +24,9 @@ export function MediaPlayerRibbonComponent() {
           <Row className={cx('media-player-content')}>
             <Col className={cx('col-3')}>
               <Row className={cx('media-player-info-container')}>
-                <Col className={cx('col-4', 'media-track-album-artwork-column')}/>
+                <Col className={cx('col-3', 'media-track-album-artwork-column')}>
+                  <div className={cx('media-track-album-artwork-container')}/>
+                </Col>
                 <Col className={cx('col-8', 'media-track-info-column')}>
                   <span className={cx('media-track-info-name')}>
                     {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_name}
@@ -32,6 +34,9 @@ export function MediaPlayerRibbonComponent() {
                   <span className={cx('media-track-info-album')}>
                     {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album_name}
                   </span>
+                </Col>
+                <Col className={cx('col-1', 'media-track-like-column')}>
+                  <i className="far fa-heart"/>
                 </Col>
               </Row>
             </Col>
@@ -95,18 +100,15 @@ export function MediaPlayerRibbonComponent() {
             </Col>
             <Col className={cx('col-3')}>
               <Row className={cx('media-player-side-container')}>
-                <Col className={cx('col-1', 'media-player-side-control')}>
+                <Col className={cx('col-1', 'media-player-side-column')}>
                   <i className="fas fa-list"/>
                 </Col>
-                <Col className={cx('col-1', 'media-player-side-control')}>
+                <Col className={cx('col-1', 'media-player-side-column')}>
                   <i className="fas fa-volume-up"/>
                 </Col>
-                <Col className={cx('col-6')}>
+                <Col className={cx('col-6', 'media-player-volume-column')}>
                   {/* TODO: Add implementation for volume progression */}
-                  <MediaProgressBarComponent
-                    value={100}
-                    progressContainerClassName={cx('media-player-volume-bar-container')}
-                  />
+                  <MediaProgressBarComponent value={100}/>
                 </Col>
               </Row>
             </Col>
