@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {Col, Container, Row} from 'react-bootstrap';
@@ -17,6 +17,29 @@ const cx = classNames.bind(styles);
 export function MediaPlayerRibbonComponent() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
+  const [mediaProgressIsDragging, setMediaProgressAsDragging] = useState<boolean>(false);
+  const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
+
+  const handleOnMediaProgressDragUpdate = useCallback((value) => {
+    setMediaProgressAsDragging(true);
+    setMediaProgressDragValue(value);
+  }, [
+    setMediaProgressDragValue,
+    setMediaProgressAsDragging,
+  ]);
+  const handleOnMediaProgressDragEnd = useCallback((value) => {
+    MediaPlayerService.seekMediaTrack(value);
+
+    setMediaProgressDragValue(undefined);
+    setMediaProgressAsDragging(false);
+
+    // we are returning with the value that needs to be set on the progress bar
+    return value;
+  }, [
+    setMediaProgressDragValue,
+    setMediaProgressAsDragging,
+  ]);
+
   return mediaPlayer.mediaPlaybackCurrentMediaTrack
     ? (
       <div className={cx('media-player-container')}>
@@ -24,7 +47,7 @@ export function MediaPlayerRibbonComponent() {
           <Row className={cx('media-player-content')}>
             <Col className={cx('col-3')}>
               <Row className={cx('media-player-info-container')}>
-                <Col className={cx('col-3', 'media-track-album-artwork-column')}>
+                <Col className={cx('col-4', 'media-track-album-artwork-column')}>
                   <div className={cx('media-track-album-artwork-container')}/>
                 </Col>
                 <Col className={cx('col-8', 'media-track-info-column')}>
@@ -35,9 +58,10 @@ export function MediaPlayerRibbonComponent() {
                     {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album_name}
                   </span>
                 </Col>
-                <Col className={cx('col-1', 'media-track-like-column')}>
-                  <i className="far fa-heart"/>
-                </Col>
+                {/* TODO: Fix the layout issue and this back */}
+                {/* <Col className={cx('col-1', 'media-track-like-column')}> */}
+                {/*  <i className="far fa-heart"/> */}
+                {/* </Col> */}
               </Row>
             </Col>
             <Col className={cx('col-6')}>
@@ -51,6 +75,7 @@ export function MediaPlayerRibbonComponent() {
                   </div>
                   {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
                     ? (
+                      // TODO: Fix eslint warnings
                       // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
                       <div
                         className={cx('media-player-control', 'media-player-control-lg')}
@@ -62,6 +87,7 @@ export function MediaPlayerRibbonComponent() {
                       </div>
                     )
                     : (
+                      // TODO: Fix eslint warnings
                       // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
                       <div
                         className={cx('media-player-control', 'media-player-control-lg')}
@@ -81,14 +107,20 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
               </Row>
               <Row className={cx('media-player-progress-container')}>
-                <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'start')}>
-                  {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaProgress || 0)}
+                <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'start', {
+                  updating: mediaProgressIsDragging,
+                })}
+                >
+                  {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
+                    ? mediaProgressDragValue
+                    : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
                 </Col>
                 <Col className={cx('col-10', 'media-player-progress-bar-column')}>
                   <MediaProgressBarComponent
-                    value={mediaPlayer.mediaPlaybackCurrentMediaProgress && mediaPlayer.mediaPlaybackCurrentMediaDuration
-                      ? (mediaPlayer.mediaPlaybackCurrentMediaProgress / mediaPlayer.mediaPlaybackCurrentMediaDuration) * 100
-                      : 0}
+                    value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
+                    maxValue={mediaPlayer.mediaPlaybackCurrentMediaDuration}
+                    onDragUpdate={handleOnMediaProgressDragUpdate}
+                    onDragEnd={handleOnMediaProgressDragEnd}
                   />
                 </Col>
                 <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'end')}>

@@ -113,6 +113,9 @@
   text-align: left;
 }
 
+.media-player-progress-counter-column.updating {
+}
+
 .media-player-side-container {
   display: flex;
   flex-flow: row;

@@ -75,6 +75,17 @@ class MediaPlayerLocalService {
     return true;
   }
 
+  seekMediaTrack(mediaTrackSeekPosition: number): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentPlayingInstance) {
+      return false;
+    }
+
+    mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.seek(mediaTrackSeekPosition);
+    return true;
+  }
+
   pausePlayer(): boolean {
     const {mediaPlayer} = store.getState();
 
@@ -149,7 +160,7 @@ class MediaPlayerLocalService {
     const mediaPlaybackProgress = this.getProgressFromAudio(mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio);
 
     if (mediaPlaybackExistingProgress !== mediaPlaybackProgress) {
-      debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);
+      // debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);-s-s-
 
       store.dispatch({
         type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,

@@ -41,6 +41,16 @@ class MediaPlayerService {
     MediaPlayerLocalService.playMediaTrack(mediaTrack);
   }
 
+  seekMediaTrack(mediaTrackSeekPosition: number): void {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack || mediaPlayer.mediaPlaybackCurrentMediaProgress === mediaTrackSeekPosition) {
+      return;
+    }
+
+    MediaPlayerLocalService.seekMediaTrack(mediaTrackSeekPosition);
+  }
+
   pauseMediaPlayer(): void {
     const {mediaPlayer} = store.getState();
 
