@@ -101,7 +101,7 @@ export function MediaPlayerRibbonComponent() {
                 <Col className={cx('col-1', 'media-player-side-control')}>
                   <i className="fas fa-volume-up"/>
                 </Col>
-                <Col className={cx('col-8')}>
+                <Col className={cx('col-6')}>
                   {/* TODO: Add implementation for volume progression */}
                   <MediaProgressBarComponent
                     value={100}

@@ -40,8 +40,12 @@ class MediaPlayerLocalService {
       onstop: (mediaPlaybackAudioId: number) => {
         debug('playMediaTrack - audio %s - playback id - %d', 'stopped', mediaPlaybackAudioId);
       },
-      onend: (mediaPlaybackAudioId: number) => {
+      onend(mediaPlaybackAudioId: number) {
         debug('playMediaTrack - audio %s - playback id - %d', 'ended', mediaPlaybackAudioId);
+
+        // TODO: Till we have support from playing via queue, once a track ends, we will seek it to start and pause the player
+        this.seek(0);
+        self.pausePlayer();
       },
       onseek(mediaPlaybackAudioId: number) {
         const mediaPlaybackProgress = self.getProgressFromAudio(this);
