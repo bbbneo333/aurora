@@ -154,6 +154,11 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
           ? getValueFromPercent(state.mediaProgressHandlerDragPercent, maxValue)
           : state.mediaProgressCurrentValue;
 
+        debug('state action - %s, reporting onDragEnd - %o', action.type, {
+          dragTraversalPercent: state.mediaProgressHandlerDragPercent,
+          mediaProgressValue,
+        });
+
         // instead of relying on the next render cycle to update the progress bar (via prop.value)
         // onDragEnd can also return the value that needs to be set for the progress bar here right away
         // this will prevent the jarring progress update when progress needs to be shifted backwards
@@ -201,7 +206,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
   const handleOnProgressHandlerMouseDown = (e: ReactMouseEvent) => {
     // only left mouse button
     if (e.button !== 0) return;
-    debug('onMouseDown - dragging? - %s, event coords - (x) %f (y)', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
+    debug('onMouseDown - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
       type: MediaProgressStateActionType.MediaProgressStartDrag,
@@ -232,7 +237,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       e.preventDefault();
     };
     const handleOnDocumentMouseUp = (e: MouseEvent) => {
-      debug('onMouseUp - dragging? - %s, event coords - (x) %f (y)', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
+      debug('onMouseUp - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
 
       mediaProgressStateDispatch({
         type: MediaProgressStateActionType.MediaProgressEndDrag,
@@ -267,6 +272,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     onDragEnd,
     mediaProgressHandlerIsDragging,
     mediaProgressBarContainerRef,
+    mediaProgressStateDispatch,
   ]);
 
   useEffect(() => {
