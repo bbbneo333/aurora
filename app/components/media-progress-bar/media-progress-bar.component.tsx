@@ -19,7 +19,6 @@ type MediaProgressBarComponentProps = {
   progressContainerClassName?: string;
   progressBarClassName?: string;
   progressHandlerClassName?: string;
-  onDragStart?(value: number): void;
   onDragUpdate?(value: number): void;
   onDragEnd?(value: number): void | number;
 };
@@ -39,6 +38,7 @@ enum MediaProgressStateActionType {
   MediaProgressStartDrag = 'mediaProgress/startDrag',
   MediaProgressUpdateDrag = 'mediaProgress/updateDrag',
   MediaProgressEndDrag = 'mediaProgress/endDrag',
+  MediaProgressJump = 'mediaProgress/jump',
   MediaResetDragEndPayload = 'mediaProgress/resetDragEndPayload',
 }
 
@@ -56,6 +56,34 @@ function getValueFromPercent(percent: number, maxValue: number): number {
   return Number(value.toFixed());
 }
 
+function getEventTraversalPercentFromPosition(mediaProgressDragPosition: number, mediaProgressContainerElement: HTMLDivElement, mediaProgressMaxThreshold: number): number {
+  const mediaProgressContainerPositionStartX = mediaProgressContainerElement.getBoundingClientRect().left;
+  const mediaProgressContainerPositionEndX = mediaProgressContainerElement.getBoundingClientRect().right;
+
+  let mediaProgressDragPercent: number;
+
+  if (mediaProgressDragPosition < mediaProgressContainerPositionStartX) {
+    // drag is out of bounds from the start
+    mediaProgressDragPercent = 0;
+  } else if (mediaProgressDragPosition > mediaProgressContainerPositionEndX) {
+    // drag is out of bounds from the end
+    mediaProgressDragPercent = 100;
+  } else {
+    debug('getEventTraversalPercentFromPosition - media progress drag position - (x) %f', mediaProgressDragPosition);
+    debug('getEventTraversalPercentFromPosition - media progress container position - (start) %f (end) %f', mediaProgressContainerPositionStartX, mediaProgressContainerPositionEndX);
+
+    const mediaProgressDragOffset = mediaProgressDragPosition - mediaProgressContainerPositionStartX;
+    const mediaProgressContainerWidth = mediaProgressContainerPositionEndX - mediaProgressContainerPositionStartX;
+
+    const mediaProgressContainerBreakpoint = mediaProgressContainerWidth / mediaProgressMaxThreshold;
+    const mediaProgressDragBreakpoint = Math.ceil((mediaProgressDragOffset / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
+
+    mediaProgressDragPercent = getPercentFromValue(mediaProgressDragBreakpoint, mediaProgressContainerWidth);
+  }
+
+  return mediaProgressDragPercent;
+}
+
 function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgressStateAction): MediaProgressState {
   switch (action.type) {
     case MediaProgressStateActionType.MediaProgressUpdate: {
@@ -69,14 +97,6 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       };
     }
     case MediaProgressStateActionType.MediaProgressStartDrag: {
-      const {
-        onDragStart,
-      } = action.data;
-
-      if (onDragStart) {
-        onDragStart(state.mediaProgressCurrentValue);
-      }
-
       return {
         ...state,
         mediaProgressHandlerIsDragging: true,
@@ -97,39 +117,16 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-
-      const mediaProgressContainerOffsetStartX = mediaProgressContainerElement.getBoundingClientRect().left;
-      const mediaProgressContainerOffsetEndX = mediaProgressContainerElement.getBoundingClientRect().right;
-
-      let eventTraversalPercent: number;
-
-      if (eventPositionX < mediaProgressContainerOffsetStartX) {
-        // drag is out of bounds from the start
-        eventTraversalPercent = 0;
-      } else if (eventPositionX > mediaProgressContainerOffsetEndX) {
-        // drag is out of bounds from the end
-        eventTraversalPercent = 100;
-      } else {
-        debug('state action - %s, event position - (x) %f', action.type, eventPositionX);
-        debug('state action - %s, media progress container offset - (start) %f (end) %f', action.type, mediaProgressContainerOffsetStartX, mediaProgressContainerOffsetEndX);
-
-        const eventOffsetToMediaProgressContainer = eventPositionX - mediaProgressContainerOffsetStartX;
-        const mediaProgressContainerWidth = mediaProgressContainerOffsetEndX - mediaProgressContainerOffsetStartX;
-
-        const mediaProgressContainerBreakpoint = mediaProgressContainerWidth / maxValue;
-        const eventOffsetToNearestBreakpoint = Math.ceil((eventOffsetToMediaProgressContainer / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
-
-        eventTraversalPercent = getPercentFromValue(eventOffsetToNearestBreakpoint, mediaProgressContainerWidth);
-      }
+      const mediaProgressHandlerDragPercent = getEventTraversalPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
 
       // we won't be doing anything in case the computed progress value is same
-      if (state.mediaProgressHandlerDragPercent === eventTraversalPercent) {
+      if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
         return state;
       }
 
       return {
         ...state,
-        mediaProgressHandlerDragPercent: eventTraversalPercent,
+        mediaProgressHandlerDragPercent,
         mediaProgressHandlerDragEndPayload: undefined,
       };
     }
@@ -141,6 +138,36 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
         mediaProgressHandlerDragEndPayload: {
           mediaProgressDragEndValue: state.mediaProgressCurrentValue,
           mediaProgressHandlerDragEndPercent: state.mediaProgressHandlerDragPercent,
+        },
+      };
+    }
+    case MediaProgressStateActionType.MediaProgressJump: {
+      const {
+        eventPositionX,
+        mediaProgressBarContainerRef,
+        maxValue,
+      } = action.data;
+
+      // if any of the required references is missing, do nothing, this is just for safety and won't likely happen
+      if (!mediaProgressBarContainerRef || !mediaProgressBarContainerRef.current) {
+        return state;
+      }
+
+      const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
+      const mediaProgressHandlerDragPercent = getEventTraversalPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+
+      // we won't be doing anything in case the computed progress value is same
+      if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
+        return state;
+      }
+
+      return {
+        ...state,
+        mediaProgressHandlerIsDragging: false,
+        mediaProgressHandlerDragPercent: undefined,
+        mediaProgressHandlerDragEndPayload: {
+          mediaProgressDragEndValue: state.mediaProgressCurrentValue,
+          mediaProgressHandlerDragEndPercent: mediaProgressHandlerDragPercent,
         },
       };
     }
@@ -162,7 +189,6 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     progressContainerClassName,
     progressBarClassName,
     progressHandlerClassName,
-    onDragStart,
     onDragUpdate,
     onDragEnd,
   } = props;
@@ -188,8 +214,21 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
     mediaProgressStateDispatch({
       type: MediaProgressStateActionType.MediaProgressStartDrag,
+    });
+
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
+  const handleOnProgressContainerMouseClick = (e: ReactMouseEvent) => {
+    debug('onMouseClick - event coords - (x) %f (y) %f', e.pageX, e.pageY);
+
+    mediaProgressStateDispatch({
+      type: MediaProgressStateActionType.MediaProgressJump,
       data: {
-        onDragStart,
+        eventPositionX: e.pageX,
+        mediaProgressBarContainerRef,
+        maxValue,
       },
     });
 
@@ -331,9 +370,12 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
   return (
     <div className={cx('media-progress-container', progressContainerClassName)}>
+      {/* TODO: Fix eslint warnings */}
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events */}
       <div
         ref={mediaProgressBarContainerRef}
         className={cx('media-progress-bar-container')}
+        onClick={handleOnProgressContainerMouseClick}
       >
         <div
           style={{
