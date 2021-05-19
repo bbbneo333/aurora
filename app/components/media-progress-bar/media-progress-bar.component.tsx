@@ -28,6 +28,10 @@ type MediaProgressState = {
   mediaProgressCurrentValue: number,
   mediaProgressHandlerIsDragging: boolean;
   mediaProgressHandlerDragPercent: undefined | number;
+  mediaProgressHandlerDragEndPayload: undefined | {
+    mediaProgressDragEndValue: number,
+    mediaProgressHandlerDragEndPercent: undefined | number;
+  };
 };
 
 enum MediaProgressStateActionType {
@@ -76,6 +80,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
         ...state,
         mediaProgressHandlerIsDragging: true,
         mediaProgressHandlerDragPercent: undefined,
+        mediaProgressHandlerDragEndPayload: undefined,
       };
     }
     case MediaProgressStateActionType.MediaProgressUpdateDrag: {
@@ -83,7 +88,6 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
         eventPositionX,
         mediaProgressBarContainerRef,
         maxValue,
-        onDragUpdate,
       } = action.data;
 
       // if any of the required references is missing, do nothing, this is just for safety and won't likely happen
@@ -122,56 +126,21 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
         return state;
       }
 
-      if (onDragUpdate) {
-        const mediaProgressValue = getValueFromPercent(eventTraversalPercent, maxValue);
-
-        debug('state action - %s, reporting onDragUpdate - %o', action.type, {
-          dragTraversalPercent: state.mediaProgressHandlerDragPercent,
-          eventTraversalPercent,
-          mediaProgressValue,
-        });
-
-        onDragUpdate(mediaProgressValue);
-      }
-
       return {
         ...state,
         mediaProgressHandlerDragPercent: eventTraversalPercent,
+        mediaProgressHandlerDragEndPayload: undefined,
       };
     }
     case MediaProgressStateActionType.MediaProgressEndDrag: {
-      const {
-        maxValue,
-        onDragEnd,
-      } = action.data;
-
-      let mediaProgressUpdated;
-
-      if (onDragEnd) {
-        // on the event of drag end, there can be a case where no drag (mouse movement) actually occurred since the drag was started
-        // in such cases, mediaProgressHandlerDragPosition will remain undefined and we will be reporting with the current value of the progress
-        const mediaProgressValue = state.mediaProgressHandlerDragPercent !== undefined
-          ? getValueFromPercent(state.mediaProgressHandlerDragPercent, maxValue)
-          : state.mediaProgressCurrentValue;
-
-        debug('state action - %s, reporting onDragEnd - %o', action.type, {
-          dragTraversalPercent: state.mediaProgressHandlerDragPercent,
-          mediaProgressValue,
-        });
-
-        // instead of relying on the next render cycle to update the progress bar (via prop.value)
-        // onDragEnd can also return the value that needs to be set for the progress bar here right away
-        // this will prevent the jarring progress update when progress needs to be shifted backwards
-        mediaProgressUpdated = onDragEnd(mediaProgressValue);
-      }
-
       return {
         ...state,
-        mediaProgressCurrentValue: mediaProgressUpdated !== undefined
-          ? mediaProgressUpdated
-          : state.mediaProgressCurrentValue,
         mediaProgressHandlerIsDragging: false,
         mediaProgressHandlerDragPercent: undefined,
+        mediaProgressHandlerDragEndPayload: {
+          mediaProgressDragEndValue: state.mediaProgressCurrentValue,
+          mediaProgressHandlerDragEndPercent: state.mediaProgressHandlerDragPercent,
+        },
       };
     }
     default:
@@ -197,10 +166,12 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     mediaProgressCurrentValue,
     mediaProgressHandlerIsDragging,
     mediaProgressHandlerDragPercent,
+    mediaProgressHandlerDragEndPayload,
   }, mediaProgressStateDispatch] = useReducer(mediaProgressStateReducer, {
     mediaProgressCurrentValue: value,
     mediaProgressHandlerIsDragging: false,
     mediaProgressHandlerDragPercent: undefined,
+    mediaProgressHandlerDragEndPayload: undefined,
   });
 
   const handleOnProgressHandlerMouseDown = (e: ReactMouseEvent) => {
@@ -220,6 +191,20 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
   };
 
   useEffect(() => {
+    // as we are using a prop value to set a state, any change in the prop won't trigger the re-render
+    // in order to force re-render, useEffect is set to listen on prop value and triggers the re-render via setting the state
+    // @see - https://stackoverflow.com/questions/54865764/react-usestate-does-not-reload-state-from-props
+    mediaProgressStateDispatch({
+      type: MediaProgressStateActionType.MediaProgressUpdate,
+      data: {
+        mediaProgress: value,
+      },
+    });
+  }, [
+    value,
+  ]);
+
+  useEffect(() => {
     const handleOnDocumentMouseMove = (e: MouseEvent) => {
       debug('onMouseMove - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
 
@@ -229,7 +214,6 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
           eventPositionX: e.pageX,
           mediaProgressBarContainerRef,
           maxValue,
-          onDragUpdate,
         },
       });
 
@@ -241,10 +225,6 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
       mediaProgressStateDispatch({
         type: MediaProgressStateActionType.MediaProgressEndDrag,
-        data: {
-          maxValue,
-          onDragEnd,
-        },
       });
 
       e.stopPropagation();
@@ -268,24 +248,70 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     };
   }, [
     maxValue,
-    onDragUpdate,
-    onDragEnd,
     mediaProgressHandlerIsDragging,
-    mediaProgressBarContainerRef,
-    mediaProgressStateDispatch,
   ]);
 
   useEffect(() => {
-    // as we are using a prop value to set a state, any change in the prop won't trigger the re-render
-    // in order to force re-render, useEffect is set to listen on prop value and triggers the re-render via setting the state (setMediaProgressCurrentValue)
-    // @see - https://stackoverflow.com/questions/54865764/react-usestate-does-not-reload-state-from-props
-    mediaProgressStateDispatch({
-      type: MediaProgressStateActionType.MediaProgressUpdate,
-      data: {
-        mediaProgress: value,
-      },
+    if (!onDragUpdate
+      || !mediaProgressHandlerIsDragging
+      || mediaProgressHandlerDragPercent === undefined) {
+      return;
+    }
+
+    const mediaProgressValue = getValueFromPercent(mediaProgressHandlerDragPercent, maxValue);
+
+    debug('reporting onDragUpdate - %o', {
+      mediaProgressHandlerDragPercent,
+      mediaProgressValue,
     });
-  }, [value]);
+
+    onDragUpdate(mediaProgressValue);
+  }, [
+    maxValue,
+    onDragUpdate,
+    mediaProgressHandlerIsDragging,
+    mediaProgressHandlerDragPercent,
+  ]);
+
+  useEffect(() => {
+    if (!onDragEnd || !mediaProgressHandlerDragEndPayload) {
+      return;
+    }
+
+    const {
+      mediaProgressDragEndValue,
+      mediaProgressHandlerDragEndPercent,
+    } = mediaProgressHandlerDragEndPayload;
+
+    // on the event of drag end, there can be a case where no drag (mouse movement) actually occurred since the drag was started
+    // in such cases, mediaProgressHandlerDragPosition will remain undefined and we will be reporting with the value with which the drag originally ended
+    const mediaProgressValue = mediaProgressHandlerDragEndPercent !== undefined
+      ? getValueFromPercent(mediaProgressHandlerDragEndPercent, maxValue)
+      : mediaProgressDragEndValue;
+
+    debug('reporting onDragEnd - %o', {
+      mediaProgressHandlerDragPercent: mediaProgressHandlerDragEndPercent,
+      mediaProgressValue,
+    });
+
+    // instead of relying on the next render cycle to update the progress bar (via prop.value)
+    // onDragEnd can also return the value that needs to be set for the progress bar here right away
+    // this will prevent the jarring progress update when progress needs to be shifted backwards
+    const mediaProgressUpdated = onDragEnd(mediaProgressValue);
+
+    if (mediaProgressUpdated !== undefined) {
+      mediaProgressStateDispatch({
+        type: MediaProgressStateActionType.MediaProgressUpdate,
+        data: {
+          mediaProgress: mediaProgressUpdated,
+        },
+      });
+    }
+  }, [
+    maxValue,
+    onDragEnd,
+    mediaProgressHandlerDragEndPayload,
+  ]);
 
   const mediaProgressPercentage = `${mediaProgressHandlerDragPercent !== undefined
     ? mediaProgressHandlerDragPercent
