@@ -140,7 +140,10 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
                 <Col className={cx('col-6', 'media-player-volume-column')}>
                   {/* TODO: Add implementation for volume progression */}
-                  <MediaProgressBarComponent value={100}/>
+                  <MediaProgressBarComponent
+                    value={4}
+                    maxValue={10}
+                  />
                 </Col>
               </Row>
             </Col>
