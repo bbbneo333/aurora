@@ -39,6 +39,7 @@ enum MediaProgressStateActionType {
   MediaProgressStartDrag = 'mediaProgress/startDrag',
   MediaProgressUpdateDrag = 'mediaProgress/updateDrag',
   MediaProgressEndDrag = 'mediaProgress/endDrag',
+  MediaResetDragEndPayload = 'mediaProgress/resetDragEndPayload',
 }
 
 type MediaProgressStateAction = {
@@ -141,6 +142,12 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
           mediaProgressDragEndValue: state.mediaProgressCurrentValue,
           mediaProgressHandlerDragEndPercent: state.mediaProgressHandlerDragPercent,
         },
+      };
+    }
+    case MediaProgressStateActionType.MediaResetDragEndPayload: {
+      return {
+        ...state,
+        mediaProgressHandlerDragEndPayload: undefined,
       };
     }
     default:
@@ -307,6 +314,11 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
         },
       });
     }
+
+    // reset drag end payload in order to not pick it up accidentally on next render cycle
+    mediaProgressStateDispatch({
+      type: MediaProgressStateActionType.MediaResetDragEndPayload,
+    });
   }, [
     maxValue,
     onDragEnd,
