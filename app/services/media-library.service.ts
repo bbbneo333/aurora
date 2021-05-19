@@ -60,8 +60,7 @@ class MediaLibraryService {
     });
 
     readDirectoryEmitter.on('finished', (fsDirReadStats: FSDirReadStats) => {
-      debug('addTracksFromDirectory - finished processing');
-      debug(fsDirReadStats);
+      debug('addTracksFromDirectory - finished processing - %o', fsDirReadStats);
     });
   }
 

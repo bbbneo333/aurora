@@ -160,7 +160,7 @@ class MediaPlayerLocalService {
     const mediaPlaybackProgress = this.getProgressFromAudio(mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio);
 
     if (mediaPlaybackExistingProgress !== mediaPlaybackProgress) {
-      // debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);-s-s-
+      debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);
 
       store.dispatch({
         type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
