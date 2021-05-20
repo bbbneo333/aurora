@@ -27,8 +27,8 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaPlaybackCurrentMediaDuration: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
-  mediaPlaybackVolumeMaxLimit: 10,
-  mediaPlaybackVolumeCurrent: 10,
+  mediaPlaybackVolumeMaxLimit: 100,
+  mediaPlaybackVolumeCurrent: 100,
   mediaPlaybackVolumeMuted: false,
 };
 

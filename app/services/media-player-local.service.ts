@@ -158,8 +158,8 @@ class MediaPlayerLocalService {
       return false;
     }
 
-    const mediaPlaybackLocalAudio = this.getVolumeForLocalAudioPlayer(mediaPlaybackVolume);
-    mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.volume(mediaPlaybackLocalAudio);
+    const mediaPlaybackLocalVolume = this.getVolumeForLocalAudioPlayer(mediaPlaybackVolume);
+    mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.volume(mediaPlaybackLocalVolume);
     return true;
   }
 
