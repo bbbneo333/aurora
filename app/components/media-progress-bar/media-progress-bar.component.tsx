@@ -47,41 +47,41 @@ type MediaProgressStateAction = {
   data?: any;
 };
 
-function getPercentFromValue(value: number, maxValue: number): number {
-  return (value / maxValue) * 100;
+function getPercentFromValue(mediaProgressValue: number, mediaProgressMaxThreshold: number): number {
+  return (mediaProgressValue / mediaProgressMaxThreshold) * 100;
 }
 
-function getValueFromPercent(percent: number, maxValue: number): number {
-  const value = (percent / 100) * maxValue;
+function getValueFromPercent(mediaProgressPercent: number, mediaProgressMaxThreshold: number): number {
+  const value = (mediaProgressPercent / 100) * mediaProgressMaxThreshold;
   return Number(value.toFixed());
 }
 
-function getEventTraversalPercentFromPosition(mediaProgressDragPosition: number, mediaProgressContainerElement: HTMLDivElement, mediaProgressMaxThreshold: number): number {
+function getPercentFromPosition(mediaProgressPosition: number, mediaProgressContainerElement: HTMLDivElement, mediaProgressMaxThreshold: number): number {
   const mediaProgressContainerPositionStartX = mediaProgressContainerElement.getBoundingClientRect().left;
   const mediaProgressContainerPositionEndX = mediaProgressContainerElement.getBoundingClientRect().right;
 
-  let mediaProgressDragPercent: number;
+  let mediaProgressPercent: number;
 
-  if (mediaProgressDragPosition < mediaProgressContainerPositionStartX) {
+  if (mediaProgressPosition < mediaProgressContainerPositionStartX) {
     // drag is out of bounds from the start
-    mediaProgressDragPercent = 0;
-  } else if (mediaProgressDragPosition > mediaProgressContainerPositionEndX) {
+    mediaProgressPercent = 0;
+  } else if (mediaProgressPosition > mediaProgressContainerPositionEndX) {
     // drag is out of bounds from the end
-    mediaProgressDragPercent = 100;
+    mediaProgressPercent = 100;
   } else {
-    debug('getEventTraversalPercentFromPosition - media progress drag position - (x) %f', mediaProgressDragPosition);
-    debug('getEventTraversalPercentFromPosition - media progress container position - (start) %f (end) %f', mediaProgressContainerPositionStartX, mediaProgressContainerPositionEndX);
+    debug('getPercentFromPosition - media progress position - (x) %f', mediaProgressPosition);
+    debug('getPercentFromPosition - media progress container position - (start) %f (end) %f', mediaProgressContainerPositionStartX, mediaProgressContainerPositionEndX);
 
-    const mediaProgressDragOffset = mediaProgressDragPosition - mediaProgressContainerPositionStartX;
+    const mediaProgressOffset = mediaProgressPosition - mediaProgressContainerPositionStartX;
     const mediaProgressContainerWidth = mediaProgressContainerPositionEndX - mediaProgressContainerPositionStartX;
 
     const mediaProgressContainerBreakpoint = mediaProgressContainerWidth / mediaProgressMaxThreshold;
-    const mediaProgressDragBreakpoint = Math.ceil((mediaProgressDragOffset / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
+    const mediaProgressNearBreakpoint = Math.ceil((mediaProgressOffset / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
 
-    mediaProgressDragPercent = getPercentFromValue(mediaProgressDragBreakpoint, mediaProgressContainerWidth);
+    mediaProgressPercent = getPercentFromValue(mediaProgressNearBreakpoint, mediaProgressContainerWidth);
   }
 
-  return mediaProgressDragPercent;
+  return mediaProgressPercent;
 }
 
 function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgressStateAction): MediaProgressState {
@@ -117,7 +117,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressHandlerDragPercent = getEventTraversalPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
 
       // we won't be doing anything in case the computed progress value is same
       if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
@@ -154,7 +154,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressHandlerDragPercent = getEventTraversalPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
 
       // we won't be doing anything in case the computed progress value is same
       if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
