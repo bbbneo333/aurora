@@ -1,5 +1,6 @@
 import React, {
   MouseEvent as ReactMouseEvent,
+  useCallback,
   useEffect,
   useReducer,
   useRef,
@@ -47,41 +48,41 @@ type MediaProgressStateAction = {
   data?: any;
 };
 
-function getPercentFromValue(value: number, maxValue: number): number {
-  return (value / maxValue) * 100;
+function getPercentFromValue(mediaProgressValue: number, mediaProgressMaxThreshold: number): number {
+  return (mediaProgressValue / mediaProgressMaxThreshold) * 100;
 }
 
-function getValueFromPercent(percent: number, maxValue: number): number {
-  const value = (percent / 100) * maxValue;
+function getValueFromPercent(mediaProgressPercent: number, mediaProgressMaxThreshold: number): number {
+  const value = (mediaProgressPercent / 100) * mediaProgressMaxThreshold;
   return Number(value.toFixed());
 }
 
-function getEventTraversalPercentFromPosition(mediaProgressDragPosition: number, mediaProgressContainerElement: HTMLDivElement, mediaProgressMaxThreshold: number): number {
+function getPercentFromPosition(mediaProgressPosition: number, mediaProgressContainerElement: HTMLDivElement, mediaProgressMaxThreshold: number): number {
   const mediaProgressContainerPositionStartX = mediaProgressContainerElement.getBoundingClientRect().left;
   const mediaProgressContainerPositionEndX = mediaProgressContainerElement.getBoundingClientRect().right;
 
-  let mediaProgressDragPercent: number;
+  let mediaProgressPercent: number;
 
-  if (mediaProgressDragPosition < mediaProgressContainerPositionStartX) {
+  if (mediaProgressPosition < mediaProgressContainerPositionStartX) {
     // drag is out of bounds from the start
-    mediaProgressDragPercent = 0;
-  } else if (mediaProgressDragPosition > mediaProgressContainerPositionEndX) {
+    mediaProgressPercent = 0;
+  } else if (mediaProgressPosition > mediaProgressContainerPositionEndX) {
     // drag is out of bounds from the end
-    mediaProgressDragPercent = 100;
+    mediaProgressPercent = 100;
   } else {
-    debug('getEventTraversalPercentFromPosition - media progress drag position - (x) %f', mediaProgressDragPosition);
-    debug('getEventTraversalPercentFromPosition - media progress container position - (start) %f (end) %f', mediaProgressContainerPositionStartX, mediaProgressContainerPositionEndX);
+    debug('getPercentFromPosition - media progress position - (x) %f', mediaProgressPosition);
+    debug('getPercentFromPosition - media progress container position - (start) %f (end) %f', mediaProgressContainerPositionStartX, mediaProgressContainerPositionEndX);
 
-    const mediaProgressDragOffset = mediaProgressDragPosition - mediaProgressContainerPositionStartX;
+    const mediaProgressOffset = mediaProgressPosition - mediaProgressContainerPositionStartX;
     const mediaProgressContainerWidth = mediaProgressContainerPositionEndX - mediaProgressContainerPositionStartX;
 
     const mediaProgressContainerBreakpoint = mediaProgressContainerWidth / mediaProgressMaxThreshold;
-    const mediaProgressDragBreakpoint = Math.ceil((mediaProgressDragOffset / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
+    const mediaProgressNearBreakpoint = Math.ceil((mediaProgressOffset / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
 
-    mediaProgressDragPercent = getPercentFromValue(mediaProgressDragBreakpoint, mediaProgressContainerWidth);
+    mediaProgressPercent = getPercentFromValue(mediaProgressNearBreakpoint, mediaProgressContainerWidth);
   }
 
-  return mediaProgressDragPercent;
+  return mediaProgressPercent;
 }
 
 function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgressStateAction): MediaProgressState {
@@ -117,7 +118,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressHandlerDragPercent = getEventTraversalPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
 
       // we won't be doing anything in case the computed progress value is same
       if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
@@ -154,7 +155,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressHandlerDragPercent = getEventTraversalPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
 
       // we won't be doing anything in case the computed progress value is same
       if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
@@ -207,10 +208,10 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     mediaProgressHandlerDragEndPayload: undefined,
   });
 
-  const handleOnProgressHandlerMouseDown = (e: ReactMouseEvent) => {
+  const handleOnProgressHandlerMouseDown = useCallback((e: ReactMouseEvent) => {
     // only left mouse button
     if (e.button !== 0) return;
-    debug('onMouseDown - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
+    debug('onMouseDown - event coords - (x) %f (y) %f', e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
       type: MediaProgressStateActionType.MediaProgressStartDrag,
@@ -218,9 +219,9 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
     e.stopPropagation();
     e.preventDefault();
-  };
+  }, []);
 
-  const handleOnProgressContainerMouseClick = (e: ReactMouseEvent) => {
+  const handleOnProgressContainerMouseClick = useCallback((e: ReactMouseEvent) => {
     debug('onMouseClick - event coords - (x) %f (y) %f', e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
@@ -234,7 +235,9 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
     e.stopPropagation();
     e.preventDefault();
-  };
+  }, [
+    maxValue,
+  ]);
 
   useEffect(() => {
     // as we are using a prop value to set a state, any change in the prop won't trigger the re-render
