@@ -20,7 +20,7 @@ type MediaProgressBarComponentProps = {
   progressContainerClassName?: string;
   progressBarClassName?: string;
   progressHandlerClassName?: string;
-  onDragUpdate?(value: number): void;
+  onDragUpdate?(value: number): void | number;
   onDragEnd?(value: number): void | number;
 };
 
@@ -314,7 +314,19 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       mediaProgressValue,
     });
 
-    onDragUpdate(mediaProgressValue);
+    // instead of relying on the next render cycle to update the progress bar (via prop.value)
+    // onDragUpdate can also return the value that needs to be set for the progress bar here right away
+    // this will prevent the jarring progress update when progress needs to be shifted backwards
+    const mediaProgressUpdated = onDragUpdate(mediaProgressValue);
+
+    if (mediaProgressUpdated !== undefined) {
+      mediaProgressStateDispatch({
+        type: MediaProgressStateActionType.MediaProgressUpdate,
+        data: {
+          mediaProgress: mediaProgressUpdated,
+        },
+      });
+    }
   }, [
     maxValue,
     onDragUpdate,

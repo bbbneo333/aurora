@@ -41,44 +41,88 @@ class MediaPlayerService {
     MediaPlayerLocalService.playMediaTrack(mediaTrack);
   }
 
-  seekMediaTrack(mediaTrackSeekPosition: number): void {
+  seekMediaTrack(mediaTrackSeekPosition: number): boolean {
     const {mediaPlayer} = store.getState();
 
     if (!mediaPlayer.mediaPlaybackCurrentMediaTrack || mediaPlayer.mediaPlaybackCurrentMediaProgress === mediaTrackSeekPosition) {
-      return;
+      return false;
     }
 
-    MediaPlayerLocalService.seekMediaTrack(mediaTrackSeekPosition);
+    return MediaPlayerLocalService.seekMediaTrack(mediaTrackSeekPosition);
   }
 
-  pauseMediaPlayer(): void {
+  pauseMediaPlayer(): boolean {
     const {mediaPlayer} = store.getState();
 
     if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return;
+      return false;
     }
 
-    MediaPlayerLocalService.pausePlayer();
+    return MediaPlayerLocalService.pausePlayer();
   }
 
-  resumeMediaPlayer(): void {
+  resumeMediaPlayer(): boolean {
     const {mediaPlayer} = store.getState();
 
     if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return;
+      return false;
     }
 
-    MediaPlayerLocalService.resumePlayer();
+    return MediaPlayerLocalService.resumePlayer();
   }
 
-  stopMediaPlayer(): void {
+  stopMediaPlayer(): boolean {
     const {mediaPlayer} = store.getState();
 
     if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return;
+      return false;
     }
 
-    MediaPlayerLocalService.stopPlayer();
+    return MediaPlayerLocalService.stopPlayer();
+  }
+
+  changeMediaPlayerVolume(mediaPlaybackVolume: number): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
+      return false;
+    }
+    if (mediaPlayer.mediaPlaybackVolumeCurrent === mediaPlaybackVolume) {
+      return true;
+    }
+
+    return MediaPlayerLocalService.changeVolume(mediaPlaybackVolume);
+  }
+
+  muteMediaPlayerVolume(): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
+      return false;
+    }
+    if (mediaPlayer.mediaPlaybackVolumeMuted) {
+      return true;
+    }
+
+    return MediaPlayerLocalService.muteVolume();
+  }
+
+  unmuteMediaPlayerVolume(): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
+      return false;
+    }
+    if (!mediaPlayer.mediaPlaybackVolumeMuted) {
+      return true;
+    }
+
+    // in case playback volume is 0, we will increase the volume to maximum limit
+    // this should also unmute the volume state
+    if (mediaPlayer.mediaPlaybackVolumeCurrent === 0) {
+      return this.changeMediaPlayerVolume(mediaPlayer.mediaPlaybackVolumeMaxLimit);
+    }
+    return MediaPlayerLocalService.unmuteVolume();
   }
 }
 

@@ -19,6 +19,9 @@ export enum MediaPlayerActions {
   PausePlayer = 'media/player/pausePlayer',
   StopPlayer = 'media/player/stopPlayer',
   UpdatePlaybackProgress = 'media/player/updatePlaybackProgress',
+  UpdatePlaybackVolume = 'media/player/updatePlaybackVolume',
+  MutePlaybackVolume = 'media/player/mutePlaybackVolume',
+  UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
 }
 
 export enum MediaPlayerPlaybackState {

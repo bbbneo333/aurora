@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {Col, Container, Row} from 'react-bootstrap';
@@ -17,8 +17,13 @@ const cx = classNames.bind(styles);
 export function MediaPlayerRibbonComponent() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
+  const mediaPlaybackVolumeMidThreshold = useRef<number>(mediaPlayer.mediaPlaybackVolumeMaxLimit / 2);
+
   const [mediaProgressIsDragging, setMediaProgressAsDragging] = useState<boolean>(false);
   const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
+
+  // TODO: Add implementation for setMediaVolumeDragStartValue
+  const [mediaVolumeDragStartValue] = useState<number | undefined>(undefined);
 
   const handleOnMediaProgressDragUpdate = useCallback((value) => {
     setMediaProgressAsDragging(true);
@@ -38,6 +43,23 @@ export function MediaPlayerRibbonComponent() {
   }, [
     setMediaProgressDragValue,
     setMediaProgressAsDragging,
+  ]);
+  const handleOnVolumeChangeDrag = useCallback(value => (MediaPlayerService.changeMediaPlayerVolume(value) ? value : undefined), []);
+  const handleOnVolumeButtonClick = useCallback(() => {
+    if (mediaPlayer.mediaPlaybackVolumeMuted) {
+      // in case we have a value from where the drag started towards the position till volume was muted
+      // we will change the volume back to that value, otherwise simply unmute the volume
+      if (mediaVolumeDragStartValue) {
+        MediaPlayerService.changeMediaPlayerVolume(mediaVolumeDragStartValue);
+      } else {
+        MediaPlayerService.unmuteMediaPlayerVolume();
+      }
+    } else {
+      MediaPlayerService.muteMediaPlayerVolume();
+    }
+  }, [
+    mediaVolumeDragStartValue,
+    mediaPlayer.mediaPlaybackVolumeMuted,
   ]);
 
   return mediaPlayer.mediaPlaybackCurrentMediaTrack
@@ -135,14 +157,31 @@ export function MediaPlayerRibbonComponent() {
                 <Col className={cx('col-1', 'media-player-side-column')}>
                   <i className="fas fa-list"/>
                 </Col>
-                <Col className={cx('col-1', 'media-player-side-column')}>
-                  <i className="fas fa-volume-up"/>
+                <Col
+                  className={cx('col-1', 'media-player-side-column')}
+                  onClick={handleOnVolumeButtonClick}
+                >
+                  <i className={cx('fas', {
+                    'fa-volume-up': !mediaPlayer.mediaPlaybackVolumeMuted
+                      && mediaPlayer.mediaPlaybackVolumeCurrent !== 0
+                      && mediaPlayer.mediaPlaybackVolumeCurrent > mediaPlaybackVolumeMidThreshold.current,
+                    'fa-volume-down': !mediaPlayer.mediaPlaybackVolumeMuted
+                      && mediaPlayer.mediaPlaybackVolumeCurrent !== 0
+                      && mediaPlayer.mediaPlaybackVolumeCurrent <= mediaPlaybackVolumeMidThreshold.current,
+                    'fa-volume-mute': mediaPlayer.mediaPlaybackVolumeMuted
+                      || mediaPlayer.mediaPlaybackVolumeCurrent === 0,
+                  })}
+                  />
                 </Col>
                 <Col className={cx('col-6', 'media-player-volume-column')}>
                   {/* TODO: Add implementation for volume progression */}
                   <MediaProgressBarComponent
-                    value={4}
-                    maxValue={10}
+                    value={mediaPlayer.mediaPlaybackVolumeMuted
+                      ? 0
+                      : mediaPlayer.mediaPlaybackVolumeCurrent}
+                    maxValue={mediaPlayer.mediaPlaybackVolumeMaxLimit}
+                    onDragUpdate={handleOnVolumeChangeDrag}
+                    onDragEnd={handleOnVolumeChangeDrag}
                   />
                 </Col>
               </Row>

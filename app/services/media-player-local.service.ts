@@ -11,10 +11,14 @@ const debug = require('debug')('app:service:media_player_local_service');
 
 class MediaPlayerLocalService {
   playMediaTrack(mediaTrack: MediaTrack): boolean {
+    const {mediaPlayer} = store.getState();
     const self = this;
 
     // run and store a new audio instance
     const mediaPlaybackLocalAudio = this.playLocalAudio(mediaTrack.location.address, {
+      // settings
+      volume: self.getVolumeForLocalAudioPlayer(mediaPlayer.mediaPlaybackVolumeCurrent),
+      // event listeners
       onplay(mediaPlaybackAudioId: number) {
         const mediaPlaybackDuration = self.getDurationFromAudio(this);
         const mediaPlaybackProgress = self.getProgressFromAudio(this);
@@ -31,13 +35,14 @@ class MediaPlayerLocalService {
           self.reportMediaPlaybackProgress();
         });
       },
-      onpause: (mediaPlaybackAudioId: number) => {
+      onpause(mediaPlaybackAudioId: number) {
         debug('playMediaTrack - audio %s - playback id - %d', 'paused', mediaPlaybackAudioId);
+
         store.dispatch({
           type: MediaEnums.MediaPlayerActions.PausePlayer,
         });
       },
-      onstop: (mediaPlaybackAudioId: number) => {
+      onstop(mediaPlaybackAudioId: number) {
         debug('playMediaTrack - audio %s - playback id - %d', 'stopped', mediaPlaybackAudioId);
       },
       onend(mediaPlaybackAudioId: number) {
@@ -53,6 +58,27 @@ class MediaPlayerLocalService {
 
         requestAnimationFrame(() => {
           self.reportMediaPlaybackProgress();
+        });
+      },
+      onvolume(mediaPlaybackAudioId: number) {
+        const mediaPlaybackSystemVolume = self.getVolumeForSystemAudioPlayer(this.volume());
+        debug('playMediaTrack - audio %s - playback id - %d, volume - %d', 'volume', mediaPlaybackAudioId, mediaPlaybackSystemVolume);
+
+        store.dispatch({
+          type: MediaEnums.MediaPlayerActions.UpdatePlaybackVolume,
+          data: {
+            mediaPlaybackVolume: mediaPlaybackSystemVolume,
+          },
+        });
+      },
+      onmute(mediaPlaybackAudioId: number) {
+        const mediaPlaybackVolumeMuted = this.mute();
+        debug('playMediaTrack - audio %s - playback id - %d, muted - %s', 'mute', mediaPlaybackAudioId, mediaPlaybackVolumeMuted);
+
+        store.dispatch({
+          type: mediaPlaybackVolumeMuted
+            ? MediaEnums.MediaPlayerActions.MutePlaybackVolume
+            : MediaEnums.MediaPlayerActions.UnmutePlaybackVolume,
         });
       },
     });
@@ -125,6 +151,40 @@ class MediaPlayerLocalService {
     return true;
   }
 
+  changeVolume(mediaPlaybackVolume: number): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentPlayingInstance) {
+      return false;
+    }
+
+    const mediaPlaybackLocalAudio = this.getVolumeForLocalAudioPlayer(mediaPlaybackVolume);
+    mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.volume(mediaPlaybackLocalAudio);
+    return true;
+  }
+
+  muteVolume(): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentPlayingInstance) {
+      return false;
+    }
+
+    mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.mute(true);
+    return true;
+  }
+
+  unmuteVolume(): boolean {
+    const {mediaPlayer} = store.getState();
+
+    if (!mediaPlayer.mediaPlaybackCurrentPlayingInstance) {
+      return false;
+    }
+
+    mediaPlayer.mediaPlaybackCurrentPlayingInstance.audio.mute(false);
+    return true;
+  }
+
   private playLocalAudio(mediaPlaybackFilePath: string, mediaPlaybackOptions?: HowlOptions): Howl {
     // prepare options for howl based on params provided
     const audioOptionsForHowl = _.assign({
@@ -145,6 +205,22 @@ class MediaPlayerLocalService {
     // important - howl has documented to report seek in seconds, but we get results via seek() in floating points
     // we are rounding off the seek value to provide consistent results
     return Math.round(mediaPlaybackLocalAudio.seek()) || 0;
+  }
+
+  private getVolumeForLocalAudioPlayer(mediaPlaybackSystemVolume: number): number {
+    const {mediaPlayer} = store.getState();
+
+    // system volume ranges from 0 to mediaPlaybackVolumeMaxLimit
+    // local volume ranges from 0.0 - 1.0
+    return mediaPlaybackSystemVolume / mediaPlayer.mediaPlaybackVolumeMaxLimit;
+  }
+
+  private getVolumeForSystemAudioPlayer(mediaPlaybackLocalVolume: number): number {
+    const {mediaPlayer} = store.getState();
+
+    // system volume ranges from 0 to mediaPlaybackVolumeMaxLimit
+    // local volume ranges from 0.0 - 1.0
+    return mediaPlaybackLocalVolume * mediaPlayer.mediaPlaybackVolumeMaxLimit;
   }
 
   private reportMediaPlaybackProgress(): void {

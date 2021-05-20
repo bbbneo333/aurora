@@ -10,6 +10,9 @@ export interface MediaPlayerState {
   mediaPlaybackCurrentMediaDuration?: number;
   mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: any;
+  mediaPlaybackVolumeMaxLimit: number,
+  mediaPlaybackVolumeCurrent: number,
+  mediaPlaybackVolumeMuted: boolean,
 }
 
 export interface MediaPlayerStateAction {
@@ -24,6 +27,9 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaPlaybackCurrentMediaDuration: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
+  mediaPlaybackVolumeMaxLimit: 10,
+  mediaPlaybackVolumeCurrent: 10,
+  mediaPlaybackVolumeMuted: false,
 };
 
 export default (state: MediaPlayerState = mediaPlayerInitialState, action: MediaPlayerStateAction): MediaPlayerState => {
@@ -104,6 +110,26 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       return {
         ...state,
         mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UpdatePlaybackVolume: {
+      // data.mediaPlaybackVolume: number
+      return {
+        ...state,
+        mediaPlaybackVolumeCurrent: action.data.mediaPlaybackVolume,
+        mediaPlaybackVolumeMuted: action.data.mediaPlaybackVolume === 0,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.MutePlaybackVolume: {
+      return {
+        ...state,
+        mediaPlaybackVolumeMuted: true,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UnmutePlaybackVolume: {
+      return {
+        ...state,
+        mediaPlaybackVolumeMuted: false,
       };
     }
     default:
