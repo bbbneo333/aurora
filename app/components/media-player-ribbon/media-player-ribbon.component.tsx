@@ -82,7 +82,7 @@ export function MediaPlayerRibbonComponent() {
                     {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album_name}
                   </span>
                 </Col>
-                {/* TODO: Fix the layout issue and this back */}
+                {/* TODO: Fix the layout issue and add this back */}
                 {/* <Col className={cx('col-1', 'media-track-like-column')}> */}
                 {/*  <i className="far fa-heart"/> */}
                 {/* </Col> */}
@@ -160,9 +160,15 @@ export function MediaPlayerRibbonComponent() {
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="fas fa-list"/>
                   </div>
+                  {/* in order to have a consistent width for various volume indicators, we are setting a min-width */}
+                  {/* so that it doesn't affects further items in the row */}
+                  {/* TODO: Fix eslint warnings */}
                   {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
                   <div
                     className={cx('media-player-control', 'media-player-control-sm')}
+                    style={{
+                      minWidth: '34px',
+                    }}
                     onClick={handleOnVolumeButtonClick}
                   >
                     <i className={cx('fas', {
