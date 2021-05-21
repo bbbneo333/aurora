@@ -156,35 +156,37 @@ export function MediaPlayerRibbonComponent() {
             </Col>
             <Col className={cx('col-3')}>
               <Row className={cx('media-player-side-container')}>
-                <Col className={cx('col-1', 'media-player-side-column')}>
-                  <i className="fas fa-list"/>
-                </Col>
-                <Col
-                  className={cx('col-1', 'media-player-side-column')}
-                  onClick={handleOnVolumeButtonClick}
-                >
-                  <i className={cx('fas', {
-                    'fa-volume-up': !mediaPlayer.mediaPlaybackVolumeMuted
-                      && mediaPlayer.mediaPlaybackVolumeCurrent !== 0
-                      && mediaPlayer.mediaPlaybackVolumeCurrent > mediaPlaybackVolumeMidThreshold.current,
-                    'fa-volume-down': !mediaPlayer.mediaPlaybackVolumeMuted
-                      && mediaPlayer.mediaPlaybackVolumeCurrent !== 0
-                      && mediaPlayer.mediaPlaybackVolumeCurrent <= mediaPlaybackVolumeMidThreshold.current,
-                    'fa-volume-mute': mediaPlayer.mediaPlaybackVolumeMuted
-                      || mediaPlayer.mediaPlaybackVolumeCurrent === 0,
-                  })}
-                  />
-                </Col>
-                <Col className={cx('col-6', 'media-player-volume-column')}>
-                  {/* TODO: Add implementation for volume progression */}
-                  <MediaProgressBarComponent
-                    value={mediaPlayer.mediaPlaybackVolumeMuted
-                      ? 0
-                      : mediaPlayer.mediaPlaybackVolumeCurrent}
-                    maxValue={mediaPlayer.mediaPlaybackVolumeMaxLimit}
-                    onDragUpdate={handleOnVolumeChangeDrag}
-                    onDragEnd={handleOnVolumeChangeDrag}
-                  />
+                <Col className={cx('col-12 col-lg-8 col-xl-6', 'media-player-side-column')}>
+                  <div className={cx('media-player-control', 'media-player-control-sm')}>
+                    <i className="fas fa-list"/>
+                  </div>
+                  {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+                  <div
+                    className={cx('media-player-control', 'media-player-control-sm')}
+                    onClick={handleOnVolumeButtonClick}
+                  >
+                    <i className={cx('fas', {
+                      'fa-volume-up': !mediaPlayer.mediaPlaybackVolumeMuted
+                        && mediaPlayer.mediaPlaybackVolumeCurrent !== 0
+                        && mediaPlayer.mediaPlaybackVolumeCurrent > mediaPlaybackVolumeMidThreshold.current,
+                      'fa-volume-down': !mediaPlayer.mediaPlaybackVolumeMuted
+                        && mediaPlayer.mediaPlaybackVolumeCurrent !== 0
+                        && mediaPlayer.mediaPlaybackVolumeCurrent <= mediaPlaybackVolumeMidThreshold.current,
+                      'fa-volume-mute': mediaPlayer.mediaPlaybackVolumeMuted
+                        || mediaPlayer.mediaPlaybackVolumeCurrent === 0,
+                    })}
+                    />
+                  </div>
+                  <div className={cx('media-player-control', 'w-100')}>
+                    <MediaProgressBarComponent
+                      value={mediaPlayer.mediaPlaybackVolumeMuted
+                        ? 0
+                        : mediaPlayer.mediaPlaybackVolumeCurrent}
+                      maxValue={mediaPlayer.mediaPlaybackVolumeMaxLimit}
+                      onDragUpdate={handleOnVolumeChangeDrag}
+                      onDragEnd={handleOnVolumeChangeDrag}
+                    />
+                  </div>
                 </Col>
               </Row>
             </Col>

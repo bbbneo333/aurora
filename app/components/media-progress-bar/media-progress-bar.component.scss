@@ -2,7 +2,8 @@
   position: relative;
 }
 
-.media-progress-container:hover, .media-progress-container.dragging {
+.media-progress-container:hover,
+.media-progress-container.dragging {
   .media-progress-bar {
     background-color: white;
   }

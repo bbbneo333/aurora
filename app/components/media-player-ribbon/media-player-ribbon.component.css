@@ -118,20 +118,11 @@
 
 .media-player-side-container {
   display: flex;
-  flex-flow: row;
-  align-items: center;
   justify-content: flex-end;
 }
 
 .media-player-side-column {
-  margin-right: 5px;
-  text-align: center;
-  color: #8c8c8c;
-}
-
-.media-player-side-column:hover {
-  color: white;
-}
-
-.media-player-volume-column {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
 }
