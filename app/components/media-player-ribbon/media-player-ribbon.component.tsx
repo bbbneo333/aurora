@@ -71,21 +71,20 @@ export function MediaPlayerRibbonComponent() {
           <Row className={cx('media-player-content')}>
             <Col className={cx('col-3')}>
               <Row className={cx('media-player-info-container')}>
-                <Col className={cx('col-4', 'media-track-album-artwork-column')}>
+                <Col className={cx('col-12', 'media-player-info-column')}>
                   <div className={cx('media-track-album-artwork-container')}/>
+                  <div className={cx('media-track-info-container')}>
+                    <span className={cx('media-track-info-name')}>
+                      {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_name}
+                    </span>
+                    <span className={cx('media-track-info-album')}>
+                      {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album_name}
+                    </span>
+                  </div>
+                  <div className={cx('media-player-control', 'media-player-control-sm')}>
+                    <i className="far fa-heart"/>
+                  </div>
                 </Col>
-                <Col className={cx('col-8', 'media-track-info-column')}>
-                  <span className={cx('media-track-info-name')}>
-                    {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_name}
-                  </span>
-                  <span className={cx('media-track-info-album')}>
-                    {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album_name}
-                  </span>
-                </Col>
-                {/* TODO: Fix the layout issue and add this back */}
-                {/* <Col className={cx('col-1', 'media-track-like-column')}> */}
-                {/*  <i className="far fa-heart"/> */}
-                {/* </Col> */}
               </Row>
             </Col>
             <Col className={cx('col-6')}>
