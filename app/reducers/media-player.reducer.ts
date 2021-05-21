@@ -117,7 +117,6 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       return {
         ...state,
         mediaPlaybackVolumeCurrent: action.data.mediaPlaybackVolume,
-        mediaPlaybackVolumeMuted: action.data.mediaPlaybackVolume === 0,
       };
     }
     case MediaEnums.MediaPlayerActions.MutePlaybackVolume: {

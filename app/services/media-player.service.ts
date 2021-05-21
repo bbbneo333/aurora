@@ -87,6 +87,10 @@ class MediaPlayerService {
     if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
       return false;
     }
+    // raising the volume above 0 will unmute the muted audio as well
+    if (mediaPlaybackVolume > 0 && mediaPlayer.mediaPlaybackVolumeMuted) {
+      this.unmuteMediaPlayerVolume();
+    }
     if (mediaPlayer.mediaPlaybackVolumeCurrent === mediaPlaybackVolume) {
       return true;
     }
@@ -117,11 +121,6 @@ class MediaPlayerService {
       return true;
     }
 
-    // in case playback volume is 0, we will increase the volume to maximum limit
-    // this should also unmute the volume state
-    if (mediaPlayer.mediaPlaybackVolumeCurrent === 0) {
-      return this.changeMediaPlayerVolume(mediaPlayer.mediaPlaybackVolumeMaxLimit);
-    }
     return MediaPlayerLocalService.unmuteVolume();
   }
 }

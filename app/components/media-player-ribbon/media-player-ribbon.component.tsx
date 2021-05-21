@@ -46,19 +46,21 @@ export function MediaPlayerRibbonComponent() {
   ]);
   const handleOnVolumeChangeDrag = useCallback(value => (MediaPlayerService.changeMediaPlayerVolume(value) ? value : undefined), []);
   const handleOnVolumeButtonClick = useCallback(() => {
-    if (mediaPlayer.mediaPlaybackVolumeMuted) {
-      // in case we have a value from where the drag started towards the position till volume was muted
-      // we will change the volume back to that value, otherwise simply unmute the volume
-      if (mediaVolumeDragStartValue) {
-        MediaPlayerService.changeMediaPlayerVolume(mediaVolumeDragStartValue);
-      } else {
-        MediaPlayerService.unmuteMediaPlayerVolume();
-      }
-    } else {
+    // in case the drag brought down the volume all the way to 0, we will try to raise the volume to either:
+    // (a) maximum value from where the first drag started originally started, or
+    // (b) maximum volume
+    // otherwise in case we already have a volume > 0, simply unmute
+    if (mediaPlayer.mediaPlaybackVolumeCurrent === 0) {
+      MediaPlayerService.changeMediaPlayerVolume(mediaVolumeDragStartValue || mediaPlayer.mediaPlaybackVolumeMaxLimit);
+    } else if (!mediaPlayer.mediaPlaybackVolumeMuted) {
       MediaPlayerService.muteMediaPlayerVolume();
+    } else {
+      MediaPlayerService.unmuteMediaPlayerVolume();
     }
   }, [
     mediaVolumeDragStartValue,
+    mediaPlayer.mediaPlaybackVolumeCurrent,
+    mediaPlayer.mediaPlaybackVolumeMaxLimit,
     mediaPlayer.mediaPlaybackVolumeMuted,
   ]);
 
