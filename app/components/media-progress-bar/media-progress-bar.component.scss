@@ -1,0 +1,58 @@
+.media-progress-container {
+  position: relative;
+}
+
+.media-progress-container:hover, .media-progress-container.dragging {
+  .media-progress-bar {
+    background-color: white;
+  }
+
+  .media-progress-handler {
+    opacity: 1;
+  }
+}
+
+.media-progress-container.dragging {
+  // disable transitions and add back the other ones from draggable components
+  // when we are dragging to remove lag in respect to cursor position
+
+  .media-progress-bar {
+    transition: background-color .1s ease;
+  }
+
+  .media-progress-handler {
+    transition: opacity .1s ease;
+  }
+}
+
+.media-progress-bar-container {
+  display: flex;
+  height: 4px;
+  overflow: hidden;
+  background-color: #8c8c8c45;
+  border-radius: 0.25rem;
+}
+
+.media-progress-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  background-color: #8c8c8c;
+  transition: width .1s ease, background-color .1s ease;
+}
+
+.media-progress-handler {
+  position: absolute;
+  height: 12px;
+  width: 12px;
+  top: -4px;
+  left: 0;
+  background-color: #e9ecef;
+  border-radius: 50%;
+  margin-left: -6px;
+  opacity: 0;
+  transition: left .1s ease, opacity .1s ease;
+}

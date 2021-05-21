@@ -8,7 +8,7 @@ import React, {
 
 import classNames from 'classnames/bind';
 
-import styles from './media-progress-bar.component.css';
+import styles from './media-progress-bar.component.scss';
 
 const debug = require('debug')('app:component:media_progress_bar_component');
 
@@ -185,7 +185,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
 
 export function MediaProgressBarComponent(props: MediaProgressBarComponentProps = {}) {
   const {
-    value = 0,
+    value,
     maxValue = 100,
     progressContainerClassName,
     progressBarClassName,
@@ -202,7 +202,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     mediaProgressHandlerDragPercent,
     mediaProgressHandlerDragEndPayload,
   }, mediaProgressStateDispatch] = useReducer(mediaProgressStateReducer, {
-    mediaProgressCurrentValue: value,
+    mediaProgressCurrentValue: value || 0,
     mediaProgressHandlerIsDragging: false,
     mediaProgressHandlerDragPercent: undefined,
     mediaProgressHandlerDragEndPayload: undefined,
@@ -384,7 +384,10 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     : getPercentFromValue(mediaProgressCurrentValue, maxValue)}%`;
 
   return (
-    <div className={cx('media-progress-container', progressContainerClassName)}>
+    <div className={cx('media-progress-container', progressContainerClassName, {
+      dragging: mediaProgressHandlerIsDragging,
+    })}
+    >
       {/* TODO: Fix eslint warnings */}
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions,jsx-a11y/click-events-have-key-events */}
       <div
@@ -396,9 +399,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
           style={{
             width: mediaProgressPercentage,
           }}
-          className={cx('media-progress-bar', progressBarClassName, {
-            'media-progress-bar-dragging': mediaProgressHandlerIsDragging,
-          })}
+          className={cx('media-progress-bar', progressBarClassName)}
         />
       </div>
       {/* TODO: Fix eslint warnings */}
@@ -407,9 +408,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
         style={{
           left: mediaProgressPercentage,
         }}
-        className={cx('media-progress-handler', progressHandlerClassName, {
-          'media-progress-handler-dragging': mediaProgressHandlerIsDragging,
-        })}
+        className={cx('media-progress-handler', progressHandlerClassName)}
         onMouseDown={handleOnProgressHandlerMouseDown}
       />
     </div>
