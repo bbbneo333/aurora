@@ -66,7 +66,6 @@
   padding: 5px 10px;
   transition: color .1s ease;
   /*background-color: green;*/
-  /*border-right: 2px solid blue;*/
 }
 
 .media-player-control.media-player-control-sm {
@@ -111,9 +110,6 @@
 
 .media-player-progress-counter-column.end {
   text-align: left;
-}
-
-.media-player-progress-counter-column.updating {
 }
 
 .media-player-side-container {

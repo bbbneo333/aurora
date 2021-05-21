@@ -18,31 +18,23 @@ export function MediaPlayerRibbonComponent() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
   const mediaPlaybackVolumeMidThreshold = useRef<number>(mediaPlayer.mediaPlaybackVolumeMaxLimit / 2);
-
-  const [mediaProgressIsDragging, setMediaProgressAsDragging] = useState<boolean>(false);
   const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
 
   // TODO: Add implementation for setMediaVolumeDragStartValue
   const [mediaVolumeDragStartValue] = useState<number | undefined>(undefined);
 
   const handleOnMediaProgressDragUpdate = useCallback((value) => {
-    setMediaProgressAsDragging(true);
     setMediaProgressDragValue(value);
   }, [
     setMediaProgressDragValue,
-    setMediaProgressAsDragging,
   ]);
   const handleOnMediaProgressDragEnd = useCallback((value) => {
     MediaPlayerService.seekMediaTrack(value);
-
     setMediaProgressDragValue(undefined);
-    setMediaProgressAsDragging(false);
-
     // we are returning with the value that needs to be set on the progress bar
     return value;
   }, [
     setMediaProgressDragValue,
-    setMediaProgressAsDragging,
   ]);
   const handleOnVolumeChangeDrag = useCallback(value => (MediaPlayerService.changeMediaPlayerVolume(value) ? value : undefined), []);
   const handleOnVolumeButtonClick = useCallback(() => {
@@ -130,10 +122,7 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
               </Row>
               <Row className={cx('media-player-progress-container')}>
-                <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'start', {
-                  updating: mediaProgressIsDragging,
-                })}
-                >
+                <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'start')}>
                   {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
                     ? mediaProgressDragValue
                     : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
