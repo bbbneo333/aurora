@@ -156,7 +156,7 @@ export function MediaPlayerRibbonComponent() {
             </Col>
             <Col className={cx('col-3')}>
               <Row className={cx('media-player-side-container')}>
-                <Col className={cx('col-12 col-lg-8 col-xl-6', 'media-player-side-column')}>
+                <Col className={cx('col-md-10 col-xl-8', 'media-player-side-column')}>
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="fas fa-list"/>
                   </div>
