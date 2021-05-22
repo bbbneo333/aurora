@@ -6,6 +6,7 @@
   left: 0;
   bottom: 0;
   padding: 10px;
+  user-select: none;
 }
 
 .media-player-content {
@@ -31,16 +32,19 @@
 .media-track-info-container {
   display: flex;
   flex-flow: column;
-  font-size: 14px;
   align-items: flex-start;
   padding: 5px 10px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .media-track-info-name {
+  font-size: 14px;
   font-weight: 400;
 }
 
 .media-track-info-album {
+  font-size: 12px;
   font-weight: 200;
 }
 

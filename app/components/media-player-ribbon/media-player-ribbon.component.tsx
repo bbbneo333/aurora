@@ -61,7 +61,7 @@ export function MediaPlayerRibbonComponent() {
       <div className={cx('media-player-container')}>
         <Container fluid>
           <Row className={cx('media-player-content')}>
-            <Col className={cx('col-3')}>
+            <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-info-container')}>
                 <Col className={cx('col-12', 'media-player-info-column')}>
                   <div className={cx('media-track-album-artwork-container')}/>
@@ -79,7 +79,7 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
               </Row>
             </Col>
-            <Col className={cx('col-6')}>
+            <Col className={cx('col-md-4 col-xl-6')}>
               <Row className={cx('media-player-controls-container')}>
                 <Col className={cx('media-player-controls-column')}>
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
@@ -142,7 +142,7 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
               </Row>
             </Col>
-            <Col className={cx('col-3')}>
+            <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-side-container')}>
                 <Col className={cx('col-md-10 col-xl-8', 'media-player-side-column')}>
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
