@@ -15,11 +15,16 @@
   align-items: center;
 }
 
+.media-player-info-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 .media-player-info-column {
   display: flex;
   flex-flow: row;
   align-items: center;
-  justify-content: flex-start;
 }
 
 .media-track-like-column {
@@ -92,10 +97,16 @@
 .media-player-side-container {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 }
 
-.media-player-side-column {
+.media-player-side-controls-column {
   display: flex;
   flex-flow: row;
   align-items: center;
+}
+
+.media-player-volume-bar-container {
+  padding-left: 10px;
+  width: 100%;
 }

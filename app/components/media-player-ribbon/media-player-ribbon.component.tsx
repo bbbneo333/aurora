@@ -80,7 +80,7 @@ export function MediaPlayerRibbonComponent() {
             </Col>
             <Col className={cx('col-md-4 col-xl-6')}>
               <Row className={cx('media-player-controls-container')}>
-                <Col className={cx('media-player-controls-column')}>
+                <Col className={cx('col-12', 'media-player-controls-column')}>
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="fas fa-random"/>
                   </div>
@@ -144,7 +144,7 @@ export function MediaPlayerRibbonComponent() {
             </Col>
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-side-container')}>
-                <Col className={cx('col-md-10 col-xl-8', 'media-player-side-column')}>
+                <Col className={cx('col-md-10 col-xl-8', 'media-player-side-controls-column')}>
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="fas fa-list"/>
                   </div>
@@ -171,7 +171,7 @@ export function MediaPlayerRibbonComponent() {
                     })}
                     />
                   </div>
-                  <div className={cx('media-player-control', 'w-100')}>
+                  <div className={cx('media-player-volume-bar-container')}>
                     <MediaProgressBarComponent
                       value={mediaPlayer.mediaPlaybackVolumeMuted
                         ? 0
