@@ -9,6 +9,8 @@ import {MediaPlayerService} from '../../services';
 import {DateTimeUtils} from '../../utils';
 
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
+import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
+import {MediaTrackCoverPictureComponent} from '../media-track-cover-picture/media-track-cover-picture.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -64,15 +66,12 @@ export function MediaPlayerRibbonComponent() {
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-info-container')}>
                 <Col className={cx('col-12', 'media-player-info-column')}>
-                  <div className={cx('media-track-album-artwork-container')}/>
-                  <div className={cx('media-track-info-container')}>
-                    <span className={cx('media-track-info-name')}>
-                      {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_name}
-                    </span>
-                    <span className={cx('media-track-info-album')}>
-                      {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album_name}
-                    </span>
-                  </div>
+                  <MediaTrackCoverPictureComponent
+                    mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
+                  />
+                  <MediaTrackInfoComponent
+                    mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
+                  />
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="far fa-heart"/>
                   </div>

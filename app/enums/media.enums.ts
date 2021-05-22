@@ -34,3 +34,7 @@ export enum MediaPlayerPlaybackState {
 export enum MediaTrackLocationType {
   LocalFileSystem = 'media/track/location/localFS',
 }
+
+export enum MediaTrackCoverPictureImageDataType {
+  Buffer = 'media/track/coverPictureImageDataType/buffer',
+}

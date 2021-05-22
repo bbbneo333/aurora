@@ -22,32 +22,6 @@
   justify-content: flex-start;
 }
 
-.media-track-album-artwork-container {
-  height: 65px;
-  min-width: 65px;
-  background-color: #2b2b2b;
-  margin: 0 10px;
-}
-
-.media-track-info-container {
-  display: flex;
-  flex-flow: column;
-  align-items: flex-start;
-  padding: 5px 10px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.media-track-info-name {
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.media-track-info-album {
-  font-size: 12px;
-  font-weight: 200;
-}
-
 .media-track-like-column {
   text-align: end;
 }
@@ -104,7 +78,6 @@
   color: #8c8c8c;
   font-size: 10px;
   font-weight: 500;
-  overflow: hidden;
   /*background-color: green;*/
 }
 
