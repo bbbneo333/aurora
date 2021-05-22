@@ -2,8 +2,8 @@
   position: relative;
 }
 
-.media-progress-container:hover,
-.media-progress-container.dragging {
+.media-progress-container:not(.disabled):hover,
+.media-progress-container:not(.disabled).dragging {
   .media-progress-bar {
     background-color: white;
   }
@@ -26,12 +26,19 @@
   }
 }
 
+.media-progress-container.disabled {
+  .media-progress-bar-container {
+    background-color: #8c8c8c9e;
+  }
+}
+
 .media-progress-bar-container {
   display: flex;
   height: 4px;
   overflow: hidden;
   background-color: #8c8c8c45;
   border-radius: 0.25rem;
+  transition: background-color .5s ease;
 }
 
 .media-progress-bar {

@@ -17,6 +17,7 @@ const cx = classNames.bind(styles);
 type MediaProgressBarComponentProps = {
   value?: number;
   maxValue?: number;
+  disabled?: boolean;
   progressContainerClassName?: string;
   progressBarClassName?: string;
   progressHandlerClassName?: string;
@@ -192,6 +193,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
   const {
     value = 0,
     maxValue = 100,
+    disabled = false,
     progressContainerClassName,
     progressBarClassName,
     progressHandlerClassName,
@@ -216,8 +218,13 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
   });
 
   const handleOnProgressHandlerMouseDown = useCallback((e: ReactMouseEvent) => {
-    // only left mouse button
-    if (e.button !== 0) return;
+    // only when:
+    // - progress bar is enabled
+    // - left mouse button
+    if (disabled || e.button !== 0) {
+      return;
+    }
+
     debug('onMouseDown - event coords - (x) %f (y) %f', e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
@@ -226,9 +233,16 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
     e.stopPropagation();
     e.preventDefault();
-  }, []);
+  }, [
+    disabled,
+  ]);
 
   const handleOnProgressContainerMouseClick = useCallback((e: ReactMouseEvent) => {
+    // only when progress bar is enabled
+    if (disabled) {
+      return;
+    }
+
     debug('onMouseClick - event coords - (x) %f (y) %f', e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
@@ -243,6 +257,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     e.stopPropagation();
     e.preventDefault();
   }, [
+    disabled,
     mediaProgressMaxValue,
   ]);
 
@@ -263,7 +278,27 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
   ]);
 
   useEffect(() => {
+    // for ending the drag if progress bar was disabled during an active drag
+    if (disabled && mediaProgressHandlerIsDragging) {
+      debug('ending drag due to disabled during an active drag');
+
+      mediaProgressStateDispatch({
+        type: MediaProgressStateActionType.MediaProgressEndDrag,
+      });
+    }
+  }, [
+    disabled,
+    mediaProgressHandlerIsDragging,
+  ]);
+
+  useEffect(() => {
+    // for adding / removing handlers whenever we enter / exit drag state
     const handleOnDocumentMouseMove = (e: MouseEvent) => {
+      // only when progress bar is enabled
+      if (disabled) {
+        return;
+      }
+
       debug('onMouseMove - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
 
       mediaProgressStateDispatch({
@@ -279,6 +314,11 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       e.preventDefault();
     };
     const handleOnDocumentMouseUp = (e: MouseEvent) => {
+      // only when progress bar is enabled
+      if (disabled) {
+        return;
+      }
+
       debug('onMouseUp - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressHandlerIsDragging, e.pageX, e.pageY);
 
       mediaProgressStateDispatch({
@@ -305,11 +345,13 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       document.removeEventListener('mouseup', handleOnDocumentMouseUp);
     };
   }, [
+    disabled,
     mediaProgressMaxValue,
     mediaProgressHandlerIsDragging,
   ]);
 
   useEffect(() => {
+    // for reporting drag updates whenever we are in drag state
     if (!onDragUpdate
       || !mediaProgressHandlerIsDragging
       || mediaProgressHandlerDragPercent === undefined) {
@@ -344,6 +386,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
   ]);
 
   useEffect(() => {
+    // for reporting drag end whenever drag is ended
     if (!onDragEnd || !mediaProgressHandlerDragEndPayload) {
       return;
     }
@@ -394,6 +437,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
   return (
     <div className={cx('media-progress-container', progressContainerClassName, {
+      disabled,
       dragging: mediaProgressHandlerIsDragging,
     })}
     >

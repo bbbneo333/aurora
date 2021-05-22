@@ -128,6 +128,7 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
                 <Col className={cx('col-10', 'media-player-progress-bar-column')}>
                   <MediaProgressBarComponent
+                    disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
                     value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
                     maxValue={mediaPlayer.mediaPlaybackCurrentMediaDuration}
                     onDragUpdate={handleOnMediaProgressDragUpdate}
