@@ -26,6 +26,7 @@ type MediaProgressBarComponentProps = {
 
 type MediaProgressState = {
   mediaProgressCurrentValue: number,
+  mediaProgressMaxValue: number,
   mediaProgressHandlerIsDragging: boolean;
   mediaProgressHandlerDragPercent: undefined | number;
   mediaProgressHandlerDragEndPayload: undefined | {
@@ -90,11 +91,15 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
     case MediaProgressStateActionType.MediaProgressUpdate: {
       const {
         mediaProgress,
+        mediaProgressMaxValue,
       } = action.data;
 
       return {
         ...state,
         mediaProgressCurrentValue: mediaProgress,
+        mediaProgressMaxValue: mediaProgressMaxValue !== undefined
+          ? mediaProgressMaxValue
+          : state.mediaProgressMaxValue,
       };
     }
     case MediaProgressStateActionType.MediaProgressStartDrag: {
@@ -109,7 +114,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       const {
         eventPositionX,
         mediaProgressBarContainerRef,
-        maxValue,
+        mediaProgressMaxValue,
       } = action.data;
 
       // if any of the required references is missing, do nothing, this is just for safety and won't likely happen
@@ -118,7 +123,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, mediaProgressMaxValue);
 
       // we won't be doing anything in case the computed progress value is same
       if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
@@ -146,7 +151,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       const {
         eventPositionX,
         mediaProgressBarContainerRef,
-        maxValue,
+        mediaProgressMaxValue,
       } = action.data;
 
       // if any of the required references is missing, do nothing, this is just for safety and won't likely happen
@@ -155,7 +160,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
       }
 
       const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, maxValue);
+      const mediaProgressHandlerDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, mediaProgressMaxValue);
 
       // we won't be doing anything in case the computed progress value is same
       if (state.mediaProgressHandlerDragPercent === mediaProgressHandlerDragPercent) {
@@ -185,7 +190,7 @@ function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgr
 
 export function MediaProgressBarComponent(props: MediaProgressBarComponentProps = {}) {
   const {
-    value,
+    value = 0,
     maxValue = 100,
     progressContainerClassName,
     progressBarClassName,
@@ -198,11 +203,13 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
 
   const [{
     mediaProgressCurrentValue,
+    mediaProgressMaxValue,
     mediaProgressHandlerIsDragging,
     mediaProgressHandlerDragPercent,
     mediaProgressHandlerDragEndPayload,
   }, mediaProgressStateDispatch] = useReducer(mediaProgressStateReducer, {
-    mediaProgressCurrentValue: value || 0,
+    mediaProgressCurrentValue: value,
+    mediaProgressMaxValue: maxValue,
     mediaProgressHandlerIsDragging: false,
     mediaProgressHandlerDragPercent: undefined,
     mediaProgressHandlerDragEndPayload: undefined,
@@ -229,14 +236,14 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       data: {
         eventPositionX: e.pageX,
         mediaProgressBarContainerRef,
-        maxValue,
+        mediaProgressMaxValue,
       },
     });
 
     e.stopPropagation();
     e.preventDefault();
   }, [
-    maxValue,
+    mediaProgressMaxValue,
   ]);
 
   useEffect(() => {
@@ -247,10 +254,12 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       type: MediaProgressStateActionType.MediaProgressUpdate,
       data: {
         mediaProgress: value,
+        mediaProgressMaxValue: maxValue,
       },
     });
   }, [
     value,
+    maxValue,
   ]);
 
   useEffect(() => {
@@ -262,7 +271,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
         data: {
           eventPositionX: e.pageX,
           mediaProgressBarContainerRef,
-          maxValue,
+          mediaProgressMaxValue,
         },
       });
 
@@ -296,7 +305,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       document.removeEventListener('mouseup', handleOnDocumentMouseUp);
     };
   }, [
-    maxValue,
+    mediaProgressMaxValue,
     mediaProgressHandlerIsDragging,
   ]);
 
@@ -307,7 +316,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       return;
     }
 
-    const mediaProgressValue = getValueFromPercent(mediaProgressHandlerDragPercent, maxValue);
+    const mediaProgressValue = getValueFromPercent(mediaProgressHandlerDragPercent, mediaProgressMaxValue);
 
     debug('reporting onDragUpdate - %o', {
       mediaProgressHandlerDragPercent,
@@ -328,8 +337,8 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       });
     }
   }, [
-    maxValue,
     onDragUpdate,
+    mediaProgressMaxValue,
     mediaProgressHandlerIsDragging,
     mediaProgressHandlerDragPercent,
   ]);
@@ -347,7 +356,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     // on the event of drag end, there can be a case where no drag (mouse movement) actually occurred since the drag was started
     // in such cases, mediaProgressHandlerDragPosition will remain undefined and we will be reporting with the value with which the drag originally ended
     const mediaProgressValue = mediaProgressHandlerDragEndPercent !== undefined
-      ? getValueFromPercent(mediaProgressHandlerDragEndPercent, maxValue)
+      ? getValueFromPercent(mediaProgressHandlerDragEndPercent, mediaProgressMaxValue)
       : mediaProgressDragEndValue;
 
     debug('reporting onDragEnd - %o', {
@@ -374,14 +383,14 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       type: MediaProgressStateActionType.MediaResetDragEndPayload,
     });
   }, [
-    maxValue,
     onDragEnd,
+    mediaProgressMaxValue,
     mediaProgressHandlerDragEndPayload,
   ]);
 
   const mediaProgressPercentage = `${mediaProgressHandlerDragPercent !== undefined
     ? mediaProgressHandlerDragPercent
-    : getPercentFromValue(mediaProgressCurrentValue, maxValue)}%`;
+    : getPercentFromValue(mediaProgressCurrentValue, mediaProgressMaxValue)}%`;
 
   return (
     <div className={cx('media-progress-container', progressContainerClassName, {
