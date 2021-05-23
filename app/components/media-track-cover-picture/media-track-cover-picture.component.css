@@ -1,0 +1,12 @@
+.media-track-cover-picture-container {
+  height: 70px;
+  width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*background-color: #2b2b2b;*/
+}
+
+.media-track-cover-picture-container > img {
+  width: 100%;
+}

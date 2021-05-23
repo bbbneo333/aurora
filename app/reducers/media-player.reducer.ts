@@ -7,7 +7,12 @@ export interface MediaPlayerState {
   mediaTracks: MediaTrack[];
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState;
   mediaPlaybackCurrentMediaTrack?: MediaTrack;
+  mediaPlaybackCurrentMediaDuration?: number;
+  mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: any;
+  mediaPlaybackVolumeMaxLimit: number,
+  mediaPlaybackVolumeCurrent: number,
+  mediaPlaybackVolumeMuted: boolean,
 }
 
 export interface MediaPlayerStateAction {
@@ -19,7 +24,12 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
   mediaPlaybackCurrentMediaTrack: undefined,
+  mediaPlaybackCurrentMediaDuration: undefined,
+  mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
+  mediaPlaybackVolumeMaxLimit: 100,
+  mediaPlaybackVolumeCurrent: 100,
+  mediaPlaybackVolumeMuted: false,
 };
 
 export default (state: MediaPlayerState = mediaPlayerInitialState, action: MediaPlayerStateAction): MediaPlayerState => {
@@ -56,10 +66,14 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
+        mediaPlaybackCurrentMediaDuration: undefined,
+        mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
       };
     }
     case MediaEnums.MediaPlayerActions.Play: {
+      // data.mediaPlaybackDuration: number
+      // data.mediaPlaybackProgress?: number
       if (!state.mediaPlaybackCurrentMediaTrack) {
         throw new Error('MediaPlayerReducer encountered error at Play - No loaded media track was found');
       }
@@ -67,6 +81,8 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       return {
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Playing,
+        mediaPlaybackCurrentMediaDuration: action.data.mediaPlaybackDuration,
+        mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress || 0,
       };
     }
     case MediaEnums.MediaPlayerActions.PausePlayer: {
@@ -80,7 +96,39 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
         mediaPlaybackCurrentMediaTrack: undefined,
+        mediaPlaybackCurrentMediaDuration: undefined,
+        mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: undefined,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UpdatePlaybackProgress: {
+      // data.mediaPlaybackProgress: number
+      if (!state.mediaPlaybackCurrentMediaTrack) {
+        throw new Error('MediaPlayerReducer encountered error at UpdatePlaybackProgress - No loaded media track was found');
+      }
+
+      return {
+        ...state,
+        mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UpdatePlaybackVolume: {
+      // data.mediaPlaybackVolume: number
+      return {
+        ...state,
+        mediaPlaybackVolumeCurrent: action.data.mediaPlaybackVolume,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.MutePlaybackVolume: {
+      return {
+        ...state,
+        mediaPlaybackVolumeMuted: true,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UnmutePlaybackVolume: {
+      return {
+        ...state,
+        mediaPlaybackVolumeMuted: false,
       };
     }
     default:

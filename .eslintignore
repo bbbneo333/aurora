@@ -43,6 +43,9 @@ dll
 main.js
 main.js.map
 
+# App vendor
+app/vendor
+
 .idea
 npm-debug.log.*
 __snapshots__

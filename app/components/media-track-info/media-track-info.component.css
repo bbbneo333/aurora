@@ -1,0 +1,17 @@
+.media-track-info-container {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.media-track-info-title {
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.media-track-info-subtitle {
+  font-size: 12px;
+  font-weight: 200;
+}

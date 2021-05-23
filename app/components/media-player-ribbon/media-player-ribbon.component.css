@@ -1,0 +1,135 @@
+.media-player-container {
+  position: fixed;
+  width: 100%;
+  color: white;
+  background-color: #181818;
+  left: 0;
+  bottom: -100px;
+  padding: 10px;
+  transition: bottom .2s ease;
+  user-select: none;
+}
+
+.media-player-container.active {
+  bottom: 0;
+}
+
+.media-player-content {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
+.media-player-info-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.media-player-info-column {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
+.media-player-track-info-container {
+  margin: 5px 10px;
+}
+
+.media-track-like-column {
+  text-align: end;
+}
+
+.media-player-controls-container {
+  text-align: center;
+  color: white;
+  /*background-color: rebeccapurple;*/
+}
+
+.media-player-controls-column {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-player-control {
+  text-align: center;
+  margin: 5px 10px;
+  transition: color .1s ease;
+  /*background-color: green;*/
+}
+
+.media-player-control.media-player-control-sm {
+  font-size: 15px;
+  color: #8c8c8c;
+}
+
+.media-player-control.media-player-control-md {
+  font-size: 20px;
+  color: #8c8c8c;
+}
+
+.media-player-control.media-player-control-lg {
+  font-size: 30px;
+}
+
+.media-player-control:hover {
+  color: white;
+}
+
+.media-player-progress-container {
+  /*background-color: gray;*/
+}
+
+.media-player-progress-column {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-player-progress-bar-container {
+  margin: 0 10px;
+  width: 70%;
+}
+
+.media-player-progress-counter {
+  color: #8c8c8c;
+  width: 15%;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  /*background-color: green;*/
+}
+
+.media-player-progress-counter.start {
+  text-align: right;
+}
+
+.media-player-progress-counter.end {
+  text-align: left;
+}
+
+.media-player-side-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.media-player-side-controls-column {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+}
+
+.media-player-volume-button {
+  /*in order to have a consistent width for various volume indicators, we are setting a min-width*/
+  /*so that it doesn't affects further items in the row*/
+  min-width: 34px;
+}
+
+.media-player-volume-bar-container {
+  width: 100%;
+}

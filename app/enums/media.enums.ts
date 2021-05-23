@@ -18,6 +18,10 @@ export enum MediaPlayerActions {
   Play = 'media/player/play',
   PausePlayer = 'media/player/pausePlayer',
   StopPlayer = 'media/player/stopPlayer',
+  UpdatePlaybackProgress = 'media/player/updatePlaybackProgress',
+  UpdatePlaybackVolume = 'media/player/updatePlaybackVolume',
+  MutePlaybackVolume = 'media/player/mutePlaybackVolume',
+  UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
 }
 
 export enum MediaPlayerPlaybackState {
@@ -29,4 +33,8 @@ export enum MediaPlayerPlaybackState {
 
 export enum MediaTrackLocationType {
   LocalFileSystem = 'media/track/location/localFS',
+}
+
+export enum MediaTrackCoverPictureImageDataType {
+  Buffer = 'media/track/coverPictureImageDataType/buffer',
 }

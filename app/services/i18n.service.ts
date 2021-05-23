@@ -2,20 +2,20 @@
 
 import LocalizedStrings, {LocalizedStringsMethods} from 'react-localization';
 
-import {SystemService} from './system.service';
+import SystemService from './system.service';
 
-export class I18nService {
+class I18nService {
   private readonly localeAssetPath = 'resources/locales';
   private readonly localeAssetFormat = 'json';
   private readonly localeDefault = 'en';
   private readonly localeStrings: LocalizedStringsMethods;
 
-  constructor(ctx: { systemService: SystemService }) {
+  constructor() {
     // get locale asset
     const localeDefaultAssetPath = `${this.localeAssetPath}/${this.localeDefault}.${this.localeAssetFormat}`;
     const localeAssets: any = {};
     localeAssets[this.localeDefault] = JSON.parse(
-      ctx.systemService.readFile(localeDefaultAssetPath),
+      SystemService.readFile(localeDefaultAssetPath),
     );
     this.localeStrings = new LocalizedStrings(localeAssets);
   }
@@ -25,3 +25,5 @@ export class I18nService {
     return this.localeStrings.formatString(this.localeStrings[key]) as string;
   }
 }
+
+export default new I18nService();
