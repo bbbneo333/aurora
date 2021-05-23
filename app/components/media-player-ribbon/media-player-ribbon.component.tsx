@@ -58,9 +58,12 @@ export function MediaPlayerRibbonComponent() {
     mediaPlayer.mediaPlaybackVolumeMuted,
   ]);
 
-  return mediaPlayer.mediaPlaybackCurrentMediaTrack
-    ? (
-      <div className={cx('media-player-container')}>
+  return (
+    <div className={cx('media-player-container', {
+      active: mediaPlayer.mediaPlaybackCurrentMediaTrack,
+    })}
+    >
+      {mediaPlayer.mediaPlaybackCurrentMediaTrack && (
         <Container fluid>
           <Row className={cx('media-player-content')}>
             <Col className={cx('col-md-4 col-xl-3')}>
@@ -123,7 +126,7 @@ export function MediaPlayerRibbonComponent() {
               </Row>
               <Row className={cx('media-player-progress-container')}>
                 <Col className={cx('col-12', 'media-player-progress-column')}>
-                  <div className={cx('media-player-progress-counter')}>
+                  <div className={cx('media-player-progress-counter', 'start')}>
                     {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
                       ? mediaProgressDragValue
                       : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
@@ -137,7 +140,7 @@ export function MediaPlayerRibbonComponent() {
                       onDragEnd={handleOnMediaProgressDragEnd}
                     />
                   </div>
-                  <div className={cx('media-player-progress-counter')}>
+                  <div className={cx('media-player-progress-counter', 'end')}>
                     {mediaPlayer.mediaPlaybackCurrentMediaDuration
                       ? DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaDuration)
                       : '--:--'}
@@ -189,9 +192,7 @@ export function MediaPlayerRibbonComponent() {
             </Col>
           </Row>
         </Container>
-      </div>
-    )
-    : (
-      <div className={cx('media-player-no-content')}/>
-    );
+      )}
+    </div>
+  );
 }

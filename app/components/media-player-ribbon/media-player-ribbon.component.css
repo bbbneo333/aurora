@@ -4,9 +4,14 @@
   color: white;
   background-color: #181818;
   left: 0;
-  bottom: 0;
+  bottom: -100px;
   padding: 10px;
+  transition: bottom .2s ease;
   user-select: none;
+}
+
+.media-player-container.active {
+  bottom: 0;
 }
 
 .media-player-content {
@@ -86,14 +91,25 @@
 
 .media-player-progress-bar-container {
   margin: 0 10px;
-  width: 100%;
+  width: 70%;
 }
 
 .media-player-progress-counter {
   color: #8c8c8c;
+  width: 15%;
   font-size: 10px;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
   /*background-color: green;*/
+}
+
+.media-player-progress-counter.start {
+  text-align: right;
+}
+
+.media-player-progress-counter.end {
+  text-align: left;
 }
 
 .media-player-side-container {
