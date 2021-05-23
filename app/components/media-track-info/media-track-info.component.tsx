@@ -9,13 +9,15 @@ const cx = classNames.bind(styles);
 
 export function MediaTrackInfoComponent(props: {
   mediaTrack: MediaTrack,
+  infoContainerClassName?: string,
 }) {
   const {
     mediaTrack,
+    infoContainerClassName,
   } = props;
 
   return (
-    <div className={cx('media-track-info-container')}>
+    <div className={cx('media-track-info-container', infoContainerClassName)}>
       <span className={cx('media-track-info-title')}>
         {mediaTrack.track_name}
       </span>

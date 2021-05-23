@@ -2,7 +2,6 @@
   display: flex;
   flex-flow: column;
   align-items: flex-start;
-  padding: 5px 10px;
   white-space: nowrap;
   overflow: hidden;
 }

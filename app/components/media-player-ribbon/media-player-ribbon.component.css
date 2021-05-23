@@ -27,6 +27,10 @@
   align-items: center;
 }
 
+.media-player-track-info-container {
+  margin: 5px 10px;
+}
+
 .media-track-like-column {
   text-align: end;
 }
@@ -46,7 +50,7 @@
 
 .media-player-control {
   text-align: center;
-  padding: 5px 10px;
+  margin: 5px 10px;
   transition: color .1s ease;
   /*background-color: green;*/
 }
@@ -70,28 +74,26 @@
 }
 
 .media-player-progress-container {
-  display: flex;
-  flex-flow: row;
-  align-items: center;
   /*background-color: gray;*/
 }
 
-.media-player-progress-bar-column {
+.media-player-progress-column {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: center;
 }
 
-.media-player-progress-counter-column {
+.media-player-progress-bar-container {
+  margin: 0 10px;
+  width: 100%;
+}
+
+.media-player-progress-counter {
   color: #8c8c8c;
   font-size: 10px;
   font-weight: 500;
   /*background-color: green;*/
-}
-
-.media-player-progress-counter-column.start {
-  text-align: right;
-}
-
-.media-player-progress-counter-column.end {
-  text-align: left;
 }
 
 .media-player-side-container {
@@ -107,6 +109,6 @@
 }
 
 .media-player-volume-bar-container {
-  padding-left: 10px;
+  margin-left: 10px;
   width: 100%;
 }

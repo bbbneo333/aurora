@@ -71,6 +71,7 @@ export function MediaPlayerRibbonComponent() {
                   />
                   <MediaTrackInfoComponent
                     mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
+                    infoContainerClassName={cx('media-player-track-info-container')}
                   />
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="far fa-heart"/>
@@ -121,24 +122,26 @@ export function MediaPlayerRibbonComponent() {
                 </Col>
               </Row>
               <Row className={cx('media-player-progress-container')}>
-                <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'start')}>
-                  {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
-                    ? mediaProgressDragValue
-                    : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
-                </Col>
-                <Col className={cx('col-10', 'media-player-progress-bar-column')}>
-                  <MediaProgressBarComponent
-                    disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
-                    value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
-                    maxValue={mediaPlayer.mediaPlaybackCurrentMediaDuration}
-                    onDragUpdate={handleOnMediaProgressDragUpdate}
-                    onDragEnd={handleOnMediaProgressDragEnd}
-                  />
-                </Col>
-                <Col className={cx('col-1', 'p-0', 'media-player-progress-counter-column', 'end')}>
-                  {mediaPlayer.mediaPlaybackCurrentMediaDuration
-                    ? DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaDuration)
-                    : '--:--'}
+                <Col className={cx('col-12', 'media-player-progress-column')}>
+                  <div className={cx('media-player-progress-counter')}>
+                    {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
+                      ? mediaProgressDragValue
+                      : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
+                  </div>
+                  <div className={cx('media-player-progress-bar-container')}>
+                    <MediaProgressBarComponent
+                      disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
+                      value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
+                      maxValue={mediaPlayer.mediaPlaybackCurrentMediaDuration}
+                      onDragUpdate={handleOnMediaProgressDragUpdate}
+                      onDragEnd={handleOnMediaProgressDragEnd}
+                    />
+                  </div>
+                  <div className={cx('media-player-progress-counter')}>
+                    {mediaPlayer.mediaPlaybackCurrentMediaDuration
+                      ? DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaDuration)
+                      : '--:--'}
+                  </div>
                 </Col>
               </Row>
             </Col>
