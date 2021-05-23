@@ -124,7 +124,12 @@
   align-items: center;
 }
 
+.media-player-volume-button {
+  /*in order to have a consistent width for various volume indicators, we are setting a min-width*/
+  /*so that it doesn't affects further items in the row*/
+  min-width: 34px;
+}
+
 .media-player-volume-bar-container {
-  margin-left: 10px;
   width: 100%;
 }

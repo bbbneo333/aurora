@@ -8,6 +8,7 @@ import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
 import {DateTimeUtils} from '../../utils';
 
+import {MediaButtonComponent} from '../media-button/media-button.component';
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
 import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
 import {MediaTrackCoverPictureComponent} from '../media-track-cover-picture/media-track-cover-picture.component';
@@ -39,7 +40,7 @@ export function MediaPlayerRibbonComponent() {
     setMediaProgressDragValue,
   ]);
   const handleOnVolumeChangeDrag = useCallback(value => (MediaPlayerService.changeMediaPlayerVolume(value) ? value : undefined), []);
-  const handleOnVolumeButtonClick = useCallback(() => {
+  const handleOnVolumeButtonSubmit = useCallback(() => {
     // in case the drag brought down the volume all the way to 0, we will try to raise the volume to either:
     // (a) maximum value from where the first drag started originally started, or
     // (b) maximum volume
@@ -93,28 +94,24 @@ export function MediaPlayerRibbonComponent() {
                   </div>
                   {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
                     ? (
-                      // TODO: Fix eslint warnings
-                      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-                      <div
-                        className={cx('media-player-control', 'media-player-control-lg')}
-                        onClick={() => {
+                      <MediaButtonComponent
+                        buttonClassName={cx('media-player-control', 'media-player-control-lg')}
+                        onSubmit={() => {
                           MediaPlayerService.pauseMediaPlayer();
                         }}
                       >
                         <i className="fas fa-pause-circle"/>
-                      </div>
+                      </MediaButtonComponent>
                     )
                     : (
-                      // TODO: Fix eslint warnings
-                      // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-                      <div
-                        className={cx('media-player-control', 'media-player-control-lg')}
-                        onClick={() => {
+                      <MediaButtonComponent
+                        buttonClassName={cx('media-player-control', 'media-player-control-lg')}
+                        onSubmit={() => {
                           MediaPlayerService.resumeMediaPlayer();
                         }}
                       >
                         <i className="fas fa-play-circle"/>
-                      </div>
+                      </MediaButtonComponent>
                     )}
                   <div className={cx('media-player-control', 'media-player-control-md')}>
                     <i className="fas fa-step-forward"/>
@@ -154,16 +151,9 @@ export function MediaPlayerRibbonComponent() {
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="fas fa-list"/>
                   </div>
-                  {/* in order to have a consistent width for various volume indicators, we are setting a min-width */}
-                  {/* so that it doesn't affects further items in the row */}
-                  {/* TODO: Fix eslint warnings */}
-                  {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-                  <div
-                    className={cx('media-player-control', 'media-player-control-sm')}
-                    style={{
-                      minWidth: '34px',
-                    }}
-                    onClick={handleOnVolumeButtonClick}
+                  <MediaButtonComponent
+                    buttonClassName={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
+                    onSubmit={handleOnVolumeButtonSubmit}
                   >
                     <i className={cx('fas', {
                       'fa-volume-up': !mediaPlayer.mediaPlaybackVolumeMuted
@@ -176,7 +166,7 @@ export function MediaPlayerRibbonComponent() {
                         || mediaPlayer.mediaPlaybackVolumeCurrent === 0,
                     })}
                     />
-                  </div>
+                  </MediaButtonComponent>
                   <div className={cx('media-player-volume-bar-container')}>
                     <MediaProgressBarComponent
                       value={mediaPlayer.mediaPlaybackVolumeMuted
