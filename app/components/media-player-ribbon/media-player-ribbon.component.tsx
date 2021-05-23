@@ -28,18 +28,20 @@ export function MediaPlayerRibbonComponent() {
 
   const handleOnMediaProgressDragUpdate = useCallback((value) => {
     setMediaProgressDragValue(value);
+    // we don't want updated value to be committed
+    return false;
   }, [
     setMediaProgressDragValue,
   ]);
-  const handleOnMediaProgressDragEnd = useCallback((value) => {
+  const handleOnMediaProgressDragCommit = useCallback((value) => {
     MediaPlayerService.seekMediaTrack(value);
     setMediaProgressDragValue(undefined);
-    // we are returning with the value that needs to be set on the progress bar
-    return value;
   }, [
     setMediaProgressDragValue,
   ]);
-  const handleOnVolumeChangeDrag = useCallback(value => (MediaPlayerService.changeMediaPlayerVolume(value) ? value : undefined), []);
+  const handleOnVolumeChangeDragCommit = useCallback((value) => {
+    MediaPlayerService.changeMediaPlayerVolume(value);
+  }, []);
   const handleOnVolumeButtonSubmit = useCallback(() => {
     // in case the drag brought down the volume all the way to 0, we will try to raise the volume to either:
     // (a) maximum value from where the first drag started originally started, or
@@ -134,7 +136,7 @@ export function MediaPlayerRibbonComponent() {
                       value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
                       maxValue={mediaPlayer.mediaPlaybackCurrentMediaDuration}
                       onDragUpdate={handleOnMediaProgressDragUpdate}
-                      onDragEnd={handleOnMediaProgressDragEnd}
+                      onDragCommit={handleOnMediaProgressDragCommit}
                     />
                   </div>
                   <div className={cx('media-player-progress-counter', 'end')}>
@@ -169,12 +171,12 @@ export function MediaPlayerRibbonComponent() {
                   </MediaButtonComponent>
                   <div className={cx('media-player-volume-bar-container')}>
                     <MediaProgressBarComponent
+                      autoCommitOnUpdate
                       value={mediaPlayer.mediaPlaybackVolumeMuted
                         ? 0
                         : mediaPlayer.mediaPlaybackVolumeCurrent}
                       maxValue={mediaPlayer.mediaPlaybackVolumeMaxLimit}
-                      onDragUpdate={handleOnVolumeChangeDrag}
-                      onDragEnd={handleOnVolumeChangeDrag}
+                      onDragCommit={handleOnVolumeChangeDragCommit}
                     />
                   </div>
                 </Col>
