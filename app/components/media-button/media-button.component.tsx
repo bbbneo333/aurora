@@ -1,28 +1,34 @@
-import React, {useEffect, useRef} from 'react';
-import classNames from 'classnames/bind';
-import {SystemEnums} from '../../enums';
+import React, {DetailsHTMLAttributes, useEffect, useRef} from 'react';
+import * as _ from 'lodash';
 
-const cx = classNames.bind({});
+import {SystemEnums} from '../../enums';
 
 // we are relying on outline script to remove outlines in case of mouse clicks
 require('../../vendor/js/outline');
 
-export function MediaButtonComponent(props: {
-  buttonClassName?: string,
+export type MediaButtonComponentProps = {
   children?: any,
-  onSubmit?(): void,
-}) {
+  onButtonSubmit?(event: Event): void,
+  onButtonMove?(event: KeyboardEvent): void,
+};
+
+export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsHTMLAttributes<HTMLDivElement>) {
   const {
-    buttonClassName,
     children,
-    onSubmit,
+    onButtonSubmit,
+    onButtonMove,
   } = props;
 
+  const mediaButtonContainerProps = _.omit(props, [
+    'children',
+    'onButtonSubmit',
+    'onButtonMove',
+  ]);
   const mediaButtonContainerRef = useRef(null);
 
   useEffect(() => {
     // for adding listeners to button
-    if (!onSubmit
+    if ((!onButtonSubmit && !onButtonMove)
       || !mediaButtonContainerRef
       || !mediaButtonContainerRef.current) {
       return undefined;
@@ -31,13 +37,29 @@ export function MediaButtonComponent(props: {
     const mediaButtonContainerElement = (mediaButtonContainerRef.current as unknown as HTMLDivElement);
 
     const handleOnMouseClick = (event: MouseEvent) => {
-      onSubmit();
+      if (onButtonSubmit) {
+        onButtonSubmit(event);
+      }
       event.stopPropagation();
       event.preventDefault();
     };
     const handleOnKeyUp = (event: KeyboardEvent) => {
-      if (event.key === SystemEnums.KeyboardKeyCodes.Enter) {
-        onSubmit();
+      switch (event.key) {
+        case SystemEnums.KeyboardKeyCodes.ArrowLeft:
+        case SystemEnums.KeyboardKeyCodes.ArrowRight: {
+          if (onButtonMove) {
+            onButtonMove(event);
+          }
+          break;
+        }
+        case SystemEnums.KeyboardKeyCodes.Enter: {
+          if (onButtonSubmit) {
+            onButtonSubmit(event);
+          }
+          break;
+        }
+        default:
+        // do nothing
       }
       event.stopPropagation();
       event.preventDefault();
@@ -51,7 +73,8 @@ export function MediaButtonComponent(props: {
       mediaButtonContainerElement.removeEventListener('keyup', handleOnKeyUp);
     };
   }, [
-    onSubmit,
+    onButtonSubmit,
+    onButtonMove,
     mediaButtonContainerRef,
   ]);
 
@@ -60,7 +83,7 @@ export function MediaButtonComponent(props: {
       ref={mediaButtonContainerRef}
       role="button"
       tabIndex={0}
-      className={cx(buttonClassName)}
+      {...mediaButtonContainerProps}
     >
       {children}
     </div>

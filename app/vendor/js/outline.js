@@ -52,7 +52,11 @@ const debug = require('debug')('app:vendor:js:outline');
     set_css(':focus{outline:0}::-moz-focus-inner{border:0;}');
   });
 
-  add_event_listener('keydown', function () {
-    set_css('');
+  // This is slightly different from the original implementation
+  // We are only enabling outlines when Tab is pressed
+  add_event_listener('keydown', function (event) {
+    if (event.code === 'Tab') {
+      set_css('');
+    }
   });
 })(document);

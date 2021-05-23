@@ -95,8 +95,8 @@ export function MediaPlayerRibbonComponent() {
                   {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
                     ? (
                       <MediaButtonComponent
-                        buttonClassName={cx('media-player-control', 'media-player-control-lg')}
-                        onSubmit={() => {
+                        className={cx('media-player-control', 'media-player-control-lg')}
+                        onButtonSubmit={() => {
                           MediaPlayerService.pauseMediaPlayer();
                         }}
                       >
@@ -105,8 +105,8 @@ export function MediaPlayerRibbonComponent() {
                     )
                     : (
                       <MediaButtonComponent
-                        buttonClassName={cx('media-player-control', 'media-player-control-lg')}
-                        onSubmit={() => {
+                        className={cx('media-player-control', 'media-player-control-lg')}
+                        onButtonSubmit={() => {
                           MediaPlayerService.resumeMediaPlayer();
                         }}
                       >
@@ -152,8 +152,8 @@ export function MediaPlayerRibbonComponent() {
                     <i className="fas fa-list"/>
                   </div>
                   <MediaButtonComponent
-                    buttonClassName={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
-                    onSubmit={handleOnVolumeButtonSubmit}
+                    className={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
+                    onButtonSubmit={handleOnVolumeButtonSubmit}
                   >
                     <i className={cx('fas', {
                       'fa-volume-up': !mediaPlayer.mediaPlaybackVolumeMuted

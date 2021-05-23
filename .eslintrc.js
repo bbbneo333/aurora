@@ -21,5 +21,8 @@ module.exports = {
     'arrow-parens': [2, 'as-needed', {
       requireForBlockBody: true,
     }],
+    'react/jsx-props-no-spreading': ['error', {
+      html: 'ignore',
+    }],
   },
 };
