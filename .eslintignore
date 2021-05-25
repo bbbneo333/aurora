@@ -32,19 +32,20 @@ node_modules
 
 # App packaged
 release
-app/main.prod.js
-app/main.prod.js.map
-app/renderer.prod.js
-app/renderer.prod.js.map
-app/style.css
-app/style.css.map
+src/*.main.prod.js
+src/main.prod.js
+src/main.prod.js.map
+src/renderer.prod.js
+src/renderer.prod.js.map
+src/style.css
+src/style.css.map
 dist
 dll
 main.js
 main.js.map
 
 # App vendor
-app/vendor
+src/vendor
 
 .idea
 npm-debug.log.*
@@ -56,8 +57,3 @@ package.json
 *.css.d.ts
 *.sass.d.ts
 *.scss.d.ts
-
-# auto generated files
-internals
-configs
-babel.config.js
