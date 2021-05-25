@@ -27,5 +27,6 @@ module.exports = {
     'react/jsx-props-no-spreading': ['error', {
       html: 'ignore',
     }],
+    'react/require-default-props': 'off',
   },
 };
