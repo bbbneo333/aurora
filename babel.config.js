@@ -2,7 +2,7 @@
 
 const developmentEnvironments = ['development', 'test'];
 
-const developmentPlugins = [require('react-hot-loader/babel')];
+const developmentPlugins = [require('@babel/plugin-transform-runtime')];
 
 const productionPlugins = [
   require('babel-plugin-dev-expression'),
@@ -10,10 +10,10 @@ const productionPlugins = [
   // babel-preset-react-optimize
   require('@babel/plugin-transform-react-constant-elements'),
   require('@babel/plugin-transform-react-inline-elements'),
-  require('babel-plugin-transform-react-remove-prop-types')
+  require('babel-plugin-transform-react-remove-prop-types'),
 ];
 
-module.exports = api => {
+module.exports = (api) => {
   // See docs about api at https://babeljs.io/docs/en/config-files#apicache
 
   const development = api.env(developmentEnvironments);
@@ -23,7 +23,7 @@ module.exports = api => {
       // @babel/preset-env will automatically target our browserslist targets
       require('@babel/preset-env'),
       require('@babel/preset-typescript'),
-      [require('@babel/preset-react'), { development }]
+      [require('@babel/preset-react'), { development }],
     ],
     plugins: [
       // Stage 0
@@ -35,11 +35,11 @@ module.exports = api => {
       [require('@babel/plugin-proposal-optional-chaining'), { loose: false }],
       [
         require('@babel/plugin-proposal-pipeline-operator'),
-        { proposal: 'minimal' }
+        { proposal: 'minimal' },
       ],
       [
         require('@babel/plugin-proposal-nullish-coalescing-operator'),
-        { loose: false }
+        { loose: false },
       ],
       require('@babel/plugin-proposal-do-expressions'),
 
@@ -53,10 +53,14 @@ module.exports = api => {
       // Stage 3
       require('@babel/plugin-syntax-dynamic-import'),
       require('@babel/plugin-syntax-import-meta'),
-      [require('@babel/plugin-proposal-class-properties'), { loose: true }],
+
+      // In the original implementation, following plugin had been registered with loose: true
+      // But in order to turn off the warnings, that option was remove
+      [require('@babel/plugin-proposal-class-properties')],
+
       require('@babel/plugin-proposal-json-strings'),
 
-      ...(development ? developmentPlugins : productionPlugins)
-    ]
+      ...(development ? developmentPlugins : productionPlugins),
+    ],
   };
 };
