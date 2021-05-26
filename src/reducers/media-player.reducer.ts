@@ -1,15 +1,15 @@
 import * as _ from 'lodash';
 
 import {MediaEnums} from '../enums';
-import {MediaTrack} from '../models';
+import {IMediaPlayback, IMediaTrack} from '../interfaces';
 
 export interface MediaPlayerState {
-  mediaTracks: MediaTrack[];
+  mediaTracks: IMediaTrack[];
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState;
-  mediaPlaybackCurrentMediaTrack?: MediaTrack;
+  mediaPlaybackCurrentMediaTrack?: IMediaTrack;
   mediaPlaybackCurrentMediaDuration?: number;
   mediaPlaybackCurrentMediaProgress?: number;
-  mediaPlaybackCurrentPlayingInstance?: any;
+  mediaPlaybackCurrentPlayingInstance?: IMediaPlayback;
   mediaPlaybackVolumeMaxLimit: number,
   mediaPlaybackVolumeCurrent: number,
   mediaPlaybackVolumeMuted: boolean,

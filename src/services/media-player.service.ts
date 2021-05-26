@@ -1,127 +1,372 @@
-import {MediaTrack} from '../models';
 import {MediaEnums} from '../enums';
+import {IMediaProvider, IMediaTrack} from '../interfaces';
+import {MediaLocalProvider} from '../providers';
 
-import MediaPlayerLocalService from './media-player-local.service';
 import store from '../store';
 
 const debug = require('debug')('app:service:media_player_service');
 
 class MediaPlayerService {
-  playMediaTrack(mediaTrack: MediaTrack): void {
-    const {mediaPlayer} = store.getState();
+  private readonly mediaProviders: IMediaProvider[] = [];
 
-    if (mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      // resume media player if we are playing same track
-      if (mediaPlayer.mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
-        debug('playMediaTrack - resuming - media track id - %s', mediaPlayer.mediaPlaybackCurrentMediaTrack.id);
-        MediaPlayerLocalService.resumePlayer();
-        return;
+  constructor() {
+    // TODO: This needs to be moved down to App level
+    const mediaLocalProvider = new MediaLocalProvider();
+    this.mediaProviders.push(mediaLocalProvider);
+  }
+
+  playMediaTrack(mediaTrack: IMediaTrack): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeCurrent,
+    } = mediaPlayer;
+
+    const self = this;
+
+    async function play() {
+      if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
+        // resume media playback if we are playing same track
+        if (mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
+          debug('playMediaTrack - resuming - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+          return self.resumeMediaPlayer();
+        }
+
+        // stop media player
+        debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+        const mediaPlaybackStopped = await mediaPlaybackCurrentPlayingInstance.stopPlayback();
+        if (!mediaPlaybackStopped) {
+          return false;
+        }
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlayer.mediaPlaybackCurrentMediaTrack.id);
-      MediaPlayerLocalService.stopPlayer();
-    }
+      // playing a new media track would always clear off the queue
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.ClearTracks,
+      });
 
-    // playing a new media track would always clear off the queue
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.ClearTracks,
-    });
+      // add track to the queue
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.AddTrack,
+        data: {
+          mediaTrack,
+        },
+      });
 
-    // add track to the queue
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.AddTrack,
-      data: {
-        mediaTrack,
-      },
-    });
+      // request media provider to load the track
+      debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
 
-    // request media player to play the track
-    debug('playMediaTrack - playing - media track id - %s', mediaTrack.id);
-    MediaPlayerLocalService.playMediaTrack(mediaTrack);
-  }
+      const mediaProvider = self.getMediaProviderForTrack();
+      const mediaPlayback = mediaProvider.mediaPlaybackService.playMediaTrack(mediaTrack, {
+        mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
+        mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
+      });
 
-  seekMediaTrack(mediaTrackSeekPosition: number): boolean {
-    const {mediaPlayer} = store.getState();
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.LoadTrack,
+        data: {
+          mediaTrackId: mediaTrack.id,
+          mediaPlayingInstance: mediaPlayback,
+        },
+      });
 
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack || mediaPlayer.mediaPlaybackCurrentMediaProgress === mediaTrackSeekPosition) {
-      return false;
-    }
+      // request media provider to play the track
+      debug('playMediaTrack - playing - media track id - %s', mediaTrack.id);
 
-    return MediaPlayerLocalService.seekMediaTrack(mediaTrackSeekPosition);
-  }
+      const mediaPlayed = await mediaPlayback.play();
+      if (!mediaPlayed) {
+        return false;
+      }
 
-  pauseMediaPlayer(): boolean {
-    const {mediaPlayer} = store.getState();
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.Play,
+        data: {
+          mediaPlaybackDuration: mediaTrack.track_duration,
+          mediaPlaybackProgress: mediaPlayback.getPlaybackProgress(),
+        },
+      });
 
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return false;
-    }
+      requestAnimationFrame(() => {
+        self.reportMediaPlaybackProgress();
+      });
 
-    return MediaPlayerLocalService.pausePlayer();
-  }
-
-  resumeMediaPlayer(): boolean {
-    const {mediaPlayer} = store.getState();
-
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return false;
-    }
-
-    return MediaPlayerLocalService.resumePlayer();
-  }
-
-  stopMediaPlayer(): boolean {
-    const {mediaPlayer} = store.getState();
-
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return false;
-    }
-
-    return MediaPlayerLocalService.stopPlayer();
-  }
-
-  changeMediaPlayerVolume(mediaPlaybackVolume: number): boolean {
-    const {mediaPlayer} = store.getState();
-
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return false;
-    }
-    // raising the volume above 0 will unmute the muted audio as well
-    if (mediaPlaybackVolume > 0 && mediaPlayer.mediaPlaybackVolumeMuted) {
-      this.unmuteMediaPlayerVolume();
-    }
-    if (mediaPlayer.mediaPlaybackVolumeCurrent === mediaPlaybackVolume) {
       return true;
     }
 
-    return MediaPlayerLocalService.changeVolume(mediaPlaybackVolume);
+    play()
+      .then((mediaPlayed) => {
+        if (!mediaPlayed) {
+          // TODO: Handle cases where media could not be played
+        }
+      });
   }
 
-  muteMediaPlayerVolume(): boolean {
-    const {mediaPlayer} = store.getState();
+  seekMediaTrack(mediaTrackSeekPosition: number): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
 
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return false;
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      return;
     }
-    if (mediaPlayer.mediaPlaybackVolumeMuted) {
+
+    mediaPlaybackCurrentPlayingInstance
+      .seekPlayback(mediaTrackSeekPosition)
+      .then((mediaPlaybackSeeked) => {
+        if (!mediaPlaybackSeeked) {
+          // TODO: Handle cases where media playback could not be seeked
+          return;
+        }
+
+        requestAnimationFrame(() => {
+          this.reportMediaPlaybackProgress();
+        });
+      });
+  }
+
+  pauseMediaPlayer(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      return;
+    }
+
+    mediaPlaybackCurrentPlayingInstance
+      .pausePlayback()
+      .then((mediaPlaybackPaused) => {
+        if (!mediaPlaybackPaused) {
+          // TODO: Handle cases where media playback could not be paused
+          return;
+        }
+
+        store.dispatch({
+          type: MediaEnums.MediaPlayerActions.PausePlayer,
+        });
+      });
+  }
+
+  resumeMediaPlayer(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      return;
+    }
+
+    mediaPlaybackCurrentPlayingInstance
+      .resumePlayback()
+      .then((mediaPlaybackResumed) => {
+        if (!mediaPlaybackResumed) {
+          // TODO: Handle cases where playback could not be resumed
+          return;
+        }
+
+        store.dispatch({
+          type: MediaEnums.MediaPlayerActions.Play,
+          data: {
+            mediaPlaybackDuration: mediaPlaybackCurrentMediaTrack.track_duration,
+            mediaPlaybackProgress: mediaPlaybackCurrentPlayingInstance.getPlaybackProgress(),
+          },
+        });
+
+        requestAnimationFrame(() => {
+          this.reportMediaPlaybackProgress();
+        });
+      });
+  }
+
+  stopMediaPlayer(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      return;
+    }
+
+    mediaPlaybackCurrentPlayingInstance
+      .stopPlayback()
+      .then((mediaPlaybackStopped) => {
+        if (!mediaPlaybackStopped) {
+          // TODO: Handle cases where media playback could not be stopped
+          return;
+        }
+
+        store.dispatch({
+          type: MediaEnums.MediaPlayerActions.StopPlayer,
+        });
+      });
+  }
+
+  changeMediaPlayerVolume(mediaPlaybackVolume: number): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    async function changeVolume() {
+      if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+        return false;
+      }
+
+      // raising the volume above 0 will unmute the muted audio as well
+      if (mediaPlaybackVolume > 0 && mediaPlaybackVolumeMuted) {
+        const mediaPlaybackVolumeUnMuted = await mediaPlaybackCurrentPlayingInstance.unmutePlaybackVolume();
+        if (!mediaPlaybackVolumeUnMuted) {
+          return false;
+        }
+      }
+      // change the volume
+      const mediaPlaybackVolumeChanged = await mediaPlaybackCurrentPlayingInstance.changePlaybackVolume(mediaPlaybackVolume, mediaPlaybackVolumeMaxLimit);
+      if (!mediaPlaybackVolumeChanged) {
+        return false;
+      }
+
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.UpdatePlaybackVolume,
+        data: {
+          mediaPlaybackVolume,
+        },
+      });
+
       return true;
     }
 
-    return MediaPlayerLocalService.muteVolume();
+    changeVolume()
+      .then((mediaPlaybackVolumeChanged) => {
+        if (!mediaPlaybackVolumeChanged) {
+          // TODO: Handle cases where media playback volume could not be changed
+        }
+      });
   }
 
-  unmuteMediaPlayerVolume(): boolean {
-    const {mediaPlayer} = store.getState();
+  muteMediaPlayerVolume(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
 
-    if (!mediaPlayer.mediaPlaybackCurrentMediaTrack) {
-      return false;
-    }
-    if (!mediaPlayer.mediaPlaybackVolumeMuted) {
-      return true;
+    if (!mediaPlaybackCurrentMediaTrack
+      || !mediaPlaybackCurrentPlayingInstance
+      || mediaPlaybackVolumeMuted) {
+      return;
     }
 
-    return MediaPlayerLocalService.unmuteVolume();
+    mediaPlaybackCurrentPlayingInstance
+      .mutePlaybackVolume()
+      .then((mediaPlaybackMuted) => {
+        if (!mediaPlaybackMuted) {
+          // TODO: Handle cases where media playback could not be muted
+          return;
+        }
+
+        store.dispatch({
+          type: MediaEnums.MediaPlayerActions.MutePlaybackVolume,
+        });
+      });
+  }
+
+  unmuteMediaPlayerVolume(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack
+      || !mediaPlaybackCurrentPlayingInstance
+      || !mediaPlaybackVolumeMuted) {
+      return;
+    }
+
+    mediaPlaybackCurrentPlayingInstance
+      .unmutePlaybackVolume()
+      .then((mediaPlaybackUnMuted) => {
+        if (!mediaPlaybackUnMuted) {
+          // TODO: Handle cases where media playback could not be un-muted
+          return;
+        }
+
+        store.dispatch({
+          type: MediaEnums.MediaPlayerActions.UnmutePlaybackVolume,
+        });
+      });
+  }
+
+  private getMediaProviderForTrack(): IMediaProvider {
+    // TODO: Right now we only have one, this will be done on the basis of mediaTrack in future
+    return this.mediaProviders[0];
+  }
+
+  private reportMediaPlaybackProgress() {
+    const {
+      mediaPlayer,
+    } = store.getState();
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentMediaProgress,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      debug('reportMediaPlaybackProgress - no running media instance found, aborting...');
+      return;
+    }
+
+    const mediaPlaybackExistingProgress = mediaPlaybackCurrentMediaProgress || 0;
+    const mediaPlaybackProgress = mediaPlaybackCurrentPlayingInstance.getPlaybackProgress();
+
+    if (mediaPlaybackExistingProgress !== mediaPlaybackProgress) {
+      debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);
+
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
+        data: {
+          mediaPlaybackProgress,
+        },
+      });
+    }
+
+    if (mediaPlaybackCurrentPlayingInstance.checkIfPlaying()) {
+      requestAnimationFrame(() => {
+        this.reportMediaPlaybackProgress();
+      });
+    }
   }
 }
 
