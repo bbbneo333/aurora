@@ -13,6 +13,10 @@
   }
 }
 
+.media-progress-container:not(.disabled) .media-progress-handler:focus {
+  opacity: 1;
+}
+
 .media-progress-container.dragging {
   // disable transitions and add back the other ones from draggable components
   // when we are dragging to remove lag in respect to cursor position
@@ -63,8 +67,4 @@
   margin-left: -6px;
   opacity: 0;
   transition: left .1s ease, opacity .1s ease;
-}
-
-.media-progress-handler:focus {
-  opacity: 1;
 }
