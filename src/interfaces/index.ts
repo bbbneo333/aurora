@@ -1,6 +1,6 @@
 import {
-  MediaTrackCoverPicture,
   IMediaTrack,
+  IMediaTrackCoverPicture,
   IMediaPlayback,
   IMediaPlaybackOptions,
   IMediaLibraryService,
@@ -9,8 +9,8 @@ import {
 } from './media.interfaces';
 
 export {
-  MediaTrackCoverPicture,
   IMediaTrack,
+  IMediaTrackCoverPicture,
   IMediaPlayback,
   IMediaPlaybackOptions,
   IMediaLibraryService,

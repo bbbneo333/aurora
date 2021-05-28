@@ -2,14 +2,14 @@ import React from 'react';
 import classNames from 'classnames/bind';
 
 import {MediaEnums} from '../../enums';
-import {MediaTrack} from '../../models';
+import {IMediaTrack} from '../../interfaces';
 
 import styles from './media-track-cover-picture.component.css';
 
 const cx = classNames.bind(styles);
 
 export function MediaTrackCoverPictureComponent(props: {
-  mediaTrack: MediaTrack,
+  mediaTrack: IMediaTrack,
 }) {
   const {mediaTrack} = props;
 

@@ -20,7 +20,7 @@ export function HomeComponent() {
       </ul>
       <button
         type="submit"
-        onClick={() => MediaLibraryService.addDirectoryToLibrary()}
+        onClick={() => MediaLibraryService.addMediaTracks()}
       >
         {I18nService.getString('action_add_tracks')}
       </button>

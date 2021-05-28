@@ -1,37 +1,30 @@
-import {MediaEnums} from '../enums';
+import {IMediaTrack, IMediaTrackCoverPicture} from '../../interfaces';
 
-type MediaTrackCoverPicture = {
-  image_data: any,
-  image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType,
-  image_format: string,
-};
-
-type MediaTrackData = {
+type MediaLocalTrackData = {
   id: any;
   track_name: string;
   track_artists: string[],
   track_album_name: string;
   track_duration: number;
-  track_cover_picture?: MediaTrackCoverPicture;
+  track_cover_picture?: IMediaTrackCoverPicture;
   location: {
     address: string;
-    type: MediaEnums.MediaTrackLocationType;
   };
 };
 
-export class MediaTrack {
+export class MediaLocalTrack implements IMediaTrack {
+  readonly provider = 'media_local';
   id: string;
   track_name: string;
   track_artists: string[];
   track_album_name: string;
   track_duration: number;
-  track_cover_picture?: MediaTrackCoverPicture;
+  track_cover_picture?: IMediaTrackCoverPicture;
   location: {
     address: string;
-    type: MediaEnums.MediaTrackLocationType;
   };
 
-  constructor(data: MediaTrackData) {
+  constructor(data: MediaLocalTrackData) {
     this.id = data.id;
     this.track_name = data.track_name;
     this.track_artists = data.track_artists;
@@ -40,7 +33,6 @@ export class MediaTrack {
     this.track_cover_picture = data.track_cover_picture;
     this.location = {
       address: data.location.address,
-      type: data.location.type,
     };
   }
 }

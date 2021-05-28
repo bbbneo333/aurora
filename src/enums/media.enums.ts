@@ -31,10 +31,14 @@ export enum MediaPlayerPlaybackState {
   Idle = 'media/player/idle',
 }
 
-export enum MediaTrackLocationType {
-  LocalFileSystem = 'media/track/location/localFS',
-}
-
 export enum MediaTrackCoverPictureImageDataType {
   Buffer = 'media/track/coverPictureImageDataType/buffer',
+}
+
+export enum MediaProviderUpdateEvent {
+  AddedProvider = 'media/provider/added',
+}
+
+export enum MediaLibraryUpdateEvent {
+  AddedTrack = 'media/library/trackAdded',
 }

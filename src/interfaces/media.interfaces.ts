@@ -1,22 +1,21 @@
+import {EventEmitter} from 'events';
+
 import {MediaEnums} from '../enums';
 
-export interface MediaTrackCoverPicture {
+export interface IMediaTrackCoverPicture {
   image_data: any,
   image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType,
   image_format: string,
 }
 
 export interface IMediaTrack {
+  readonly provider: string;
   id: any;
   track_name: string;
   track_artists: string[],
   track_album_name: string;
   track_duration: number;
-  track_cover_picture?: MediaTrackCoverPicture;
-  location: {
-    address: string;
-    type: MediaEnums.MediaTrackLocationType;
-  };
+  track_cover_picture?: IMediaTrackCoverPicture;
 }
 
 export interface IMediaPlayback {
@@ -47,6 +46,11 @@ export interface IMediaPlaybackOptions {
 }
 
 export interface IMediaLibraryService {
+  mediaLibraryUpdates: EventEmitter;
+
+  addMediaTracks(): void;
+
+  removeMediaTrack(mediaTrack: IMediaTrack): boolean;
 }
 
 export interface IMediaPlaybackService {
@@ -54,6 +58,7 @@ export interface IMediaPlaybackService {
 }
 
 export interface IMediaProvider {
+  mediaProviderNamespace: string;
   mediaLibraryService: IMediaLibraryService;
   mediaPlaybackService: IMediaPlaybackService;
 }

@@ -3,24 +3,21 @@ import {Howl} from 'howler';
 
 import Promise from 'bluebird';
 
-import {
-  IMediaPlayback,
-  IMediaPlaybackOptions,
-  IMediaTrack,
-} from '../../interfaces';
+import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
+import {MediaLocalTrack} from './media-local-track.model';
 
 const debug = require('debug')('app:provider:media_local:media_playback');
 
-export class MediaPlayback implements IMediaPlayback {
-  private readonly mediaTrack: IMediaTrack;
+export class MediaLocalPlayback implements IMediaPlayback {
+  private readonly mediaTrack: MediaLocalTrack;
   private readonly mediaPlaybackLocalAudio: any;
   private mediaPlaybackId: number | undefined;
 
-  constructor(mediaTrack: IMediaTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
+  constructor(mediaTrack: MediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
     this.mediaTrack = mediaTrack;
     this.mediaPlaybackLocalAudio = new Howl({
       src: mediaTrack.location.address,
-      volume: MediaPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
+      volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
     });
   }
 
@@ -96,7 +93,7 @@ export class MediaPlayback implements IMediaPlayback {
       });
 
       debug('changing volume track id - %s, playback id - %d, volume - %d', this.mediaTrack.id, this.mediaPlaybackId, mediaPlaybackVolume);
-      this.mediaPlaybackLocalAudio.volume(MediaPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackVolume, mediaPlaybackMaxVolume));
+      this.mediaPlaybackLocalAudio.volume(MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackVolume, mediaPlaybackMaxVolume));
     });
   }
 

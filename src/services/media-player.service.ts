@@ -1,20 +1,12 @@
 import {MediaEnums} from '../enums';
-import {IMediaProvider, IMediaTrack} from '../interfaces';
-import {MediaLocalProvider} from '../providers';
+import {IMediaTrack} from '../interfaces';
+import MediaProviderService from './media-provider.service';
 
 import store from '../store';
 
 const debug = require('debug')('app:service:media_player_service');
 
 class MediaPlayerService {
-  private readonly mediaProviders: IMediaProvider[] = [];
-
-  constructor() {
-    // TODO: This needs to be moved down to App level
-    const mediaLocalProvider = new MediaLocalProvider();
-    this.mediaProviders.push(mediaLocalProvider);
-  }
-
   playMediaTrack(mediaTrack: IMediaTrack): void {
     const {
       mediaPlayer,
@@ -60,7 +52,7 @@ class MediaPlayerService {
       // request media provider to load the track
       debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
 
-      const mediaProvider = self.getMediaProviderForTrack();
+      const mediaProvider = MediaProviderService.getMediaProvider(mediaTrack.provider);
       const mediaPlayback = mediaProvider.mediaPlaybackService.playMediaTrack(mediaTrack, {
         mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
         mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
@@ -326,11 +318,6 @@ class MediaPlayerService {
           type: MediaEnums.MediaPlayerActions.UnmutePlaybackVolume,
         });
       });
-  }
-
-  private getMediaProviderForTrack(): IMediaProvider {
-    // TODO: Right now we only have one, this will be done on the basis of mediaTrack in future
-    return this.mediaProviders[0];
   }
 
   private reportMediaPlaybackProgress() {

@@ -1,14 +1,14 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import {MediaTrack} from '../../models';
+import {IMediaTrack} from '../../interfaces';
 
 import styles from './media-track-info.component.css';
 
 const cx = classNames.bind(styles);
 
 export function MediaTrackInfoComponent(props: {
-  mediaTrack: MediaTrack,
+  mediaTrack: IMediaTrack,
   infoContainerClassName?: string,
 }) {
   const {

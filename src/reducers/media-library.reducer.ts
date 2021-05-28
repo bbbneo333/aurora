@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 
 import {MediaEnums} from '../enums';
-import {MediaTrack} from '../models';
+import {IMediaTrack} from '../interfaces';
 
 export interface MediaLibraryState {
-  mediaTracks: MediaTrack[];
+  mediaTracks: IMediaTrack[];
 }
 
 const mediaLibraryInitialState: MediaLibraryState = {
