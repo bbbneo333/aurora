@@ -6,9 +6,10 @@ import {
 
 import {MediaLocalLibraryService} from './media-local-library.service';
 import {MediaLocalPlaybackService} from './media-local-playback.service';
+import MediaLocalConstants from './media-local.constants.json';
 
 export class MediaLocalProvider implements IMediaProvider {
-  readonly mediaProviderNamespace = 'media_local';
+  readonly mediaProviderNamespace = MediaLocalConstants.Provider;
   readonly mediaLibraryService: IMediaLibraryService;
   readonly mediaPlaybackService: IMediaPlaybackService;
 

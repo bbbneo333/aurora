@@ -1,5 +1,7 @@
 import {IMediaTrack, IMediaTrackCoverPicture} from '../../interfaces';
 
+import MediaLocalConstants from './media-local.constants.json';
+
 type MediaLocalTrackData = {
   id: any;
   track_name: string;
@@ -13,7 +15,7 @@ type MediaLocalTrackData = {
 };
 
 export class MediaLocalTrack implements IMediaTrack {
-  readonly provider = 'media_local';
+  readonly provider = MediaLocalConstants.Provider;
   id: string;
   track_name: string;
   track_artists: string[];
