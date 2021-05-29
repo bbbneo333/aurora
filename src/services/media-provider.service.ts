@@ -1,18 +1,21 @@
-import {EventEmitter} from 'events';
+import {TypedEmitter} from 'tiny-typed-emitter';
 
 import {IMediaProvider} from '../interfaces';
 import {MediaEnums} from '../enums';
 
 const debug = require('debug')('app:service:media_provider_service');
 
-class MediaProviderService {
+interface IMediaProviderEvents {
+  [MediaEnums.MediaProviderUpdateEvent.AddedProvider]: (provider: IMediaProvider) => void;
+}
+
+class MediaProviderService extends TypedEmitter<IMediaProviderEvents> {
   private readonly mediaProviders: IMediaProvider[] = [];
-  readonly mediaProviderUpdates = new EventEmitter();
 
   addMediaProvider(mediaProvider: IMediaProvider): void {
     debug('adding media provider - %s', mediaProvider.mediaProviderNamespace);
     this.mediaProviders.push(mediaProvider);
-    this.mediaProviderUpdates.emit(MediaEnums.MediaProviderUpdateEvent.AddedProvider, mediaProvider);
+    this.emit(MediaEnums.MediaProviderUpdateEvent.AddedProvider, mediaProvider);
   }
 
   getMediaProvider(mediaProviderNamespace: string): IMediaProvider {

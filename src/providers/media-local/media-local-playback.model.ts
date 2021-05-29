@@ -1,9 +1,9 @@
 // @ts-ignore
 import {Howl} from 'howler';
-
 import Promise from 'bluebird';
 
 import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
+
 import {MediaLocalTrack} from './media-local-track.model';
 
 const debug = require('debug')('app:provider:media_local:media_playback');

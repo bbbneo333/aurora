@@ -1,13 +1,13 @@
 import {IMediaProvider, IMediaTrack} from '../interfaces';
 import {MediaEnums} from '../enums';
-import MediaProviderService from './media-provider.service';
-
 import store from '../store';
+
+import MediaProviderService from './media-provider.service';
 
 class MediaLibraryService {
   constructor() {
     // subscribe to media provider updates
-    MediaProviderService.mediaProviderUpdates.on(MediaEnums.MediaProviderUpdateEvent.AddedProvider, MediaLibraryService.registerMediaProviderHandles);
+    MediaProviderService.on(MediaEnums.MediaProviderUpdateEvent.AddedProvider, MediaLibraryService.registerMediaProviderHandles);
   }
 
   addMediaTracks(): void {
@@ -33,7 +33,7 @@ class MediaLibraryService {
   }
 
   private static registerMediaProviderHandles(mediaProvider: IMediaProvider): void {
-    mediaProvider.mediaLibraryService.mediaLibraryUpdates.on(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, MediaLibraryService.addMediaTrackToLibrary);
+    mediaProvider.mediaLibraryService.on(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, MediaLibraryService.addMediaTrackToLibrary);
   }
 
   private static addMediaTrackToLibrary(mediaTrack: IMediaTrack): void {

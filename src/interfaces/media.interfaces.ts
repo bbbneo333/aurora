@@ -1,4 +1,4 @@
-import {EventEmitter} from 'events';
+import {TypedEmitter} from 'tiny-typed-emitter';
 
 import {MediaEnums} from '../enums';
 
@@ -45,9 +45,11 @@ export interface IMediaPlaybackOptions {
   mediaPlaybackMaxVolume: number;
 }
 
-export interface IMediaLibraryService {
-  mediaLibraryUpdates: EventEmitter;
+export interface IMediaLibraryEvents {
+  [MediaEnums.MediaLibraryUpdateEvent.AddedTrack]: (mediaTrack: IMediaTrack) => void;
+}
 
+export interface IMediaLibraryService extends TypedEmitter<IMediaLibraryEvents> {
   addMediaTracks(): void;
 
   removeMediaTrack(mediaTrack: IMediaTrack): boolean;

@@ -211,6 +211,7 @@
     "redux": "^4.1.0",
     "regenerator-runtime": "^0.13.5",
     "source-map-support": "^0.5.19",
+    "tiny-typed-emitter": "^2.0.3",
     "uuid": "^8.2.0"
   },
   "devEngines": {

@@ -1,8 +1,4 @@
-import {
-  IMediaPlayback,
-  IMediaPlaybackOptions,
-  IMediaPlaybackService,
-} from '../../interfaces';
+import {IMediaPlayback, IMediaPlaybackOptions, IMediaPlaybackService} from '../../interfaces';
 
 import {MediaLocalPlayback} from './media-local-playback.model';
 import {MediaLocalTrack} from './media-local-track.model';

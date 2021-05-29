@@ -1,4 +1,4 @@
-import {EventEmitter} from 'events';
+import {TypedEmitter} from 'tiny-typed-emitter';
 import * as _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 import {
@@ -8,22 +8,21 @@ import {
   selectCover,
 } from 'music-metadata';
 
-import {IMediaLibraryService} from '../../interfaces';
+import {IMediaLibraryEvents, IMediaLibraryService} from '../../interfaces';
 import {MediaEnums, SystemEnums} from '../../enums';
 import SystemService, {FSDirReadFileEventData, FSDirReadStats} from '../../services/system.service';
+
 import {MediaLocalTrack} from './media-local-track.model';
 
 const debug = require('debug')('app:provider:media_local:media_library');
 
-export class MediaLocalLibraryService implements IMediaLibraryService {
+export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> implements IMediaLibraryService {
   readonly mediaTrackSupportedFileTypes = [
     MediaEnums.MediaFileExtensions.MP3,
     MediaEnums.MediaFileExtensions.FLAC,
     MediaEnums.MediaFileExtensions.M4A,
     MediaEnums.MediaFileExtensions.WAV,
   ];
-
-  readonly mediaLibraryUpdates = new EventEmitter();
 
   addMediaTracks(): void {
     const selectedDirectories = SystemService.openSelectionDialog({
@@ -68,7 +67,7 @@ export class MediaLocalLibraryService implements IMediaLibraryService {
         },
       });
       // emit event
-      this.mediaLibraryUpdates.emit(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, mediaTrack);
+      this.emit(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, mediaTrack);
       // proceed to next
       fsDirReadNext();
     });

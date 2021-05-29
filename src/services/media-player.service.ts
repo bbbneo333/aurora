@@ -1,5 +1,6 @@
 import {MediaEnums} from '../enums';
 import {IMediaTrack} from '../interfaces';
+
 import MediaProviderService from './media-provider.service';
 
 import store from '../store';
