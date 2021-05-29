@@ -2,12 +2,12 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 
 import {MediaEnums} from '../../enums';
-import {MediaTrack} from '../../models';
+import {IMediaTrack} from '../../interfaces';
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService, MediaPlayerService} from '../../services';
 
 export function MediaTrackComponent(props: {
-  mediaTrack: MediaTrack,
+  mediaTrack: IMediaTrack,
 }) {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
@@ -44,7 +44,7 @@ export function MediaTrackComponent(props: {
             MediaPlayerService.stopMediaPlayer();
           }
 
-          MediaLibraryService.removeMediaTrackFromLibrary(mediaTrack);
+          MediaLibraryService.removeMediaTrack(mediaTrack);
         }}
       >
         {I18nService.getString('action_remove_track')}
