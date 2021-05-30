@@ -5,6 +5,7 @@ import Promise from 'bluebird';
 import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
 
 import {MediaLocalTrack} from './media-local-track.model';
+import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_playback');
 
@@ -18,6 +19,8 @@ export class MediaLocalPlayback implements IMediaPlayback {
     this.mediaPlaybackLocalAudio = new Howl({
       src: mediaTrack.location.address,
       volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
+      // important - in order to support MediaSession, we need to used HTML5 audio
+      html5: true,
     });
   }
 
@@ -40,9 +43,7 @@ export class MediaLocalPlayback implements IMediaPlayback {
   }
 
   getPlaybackProgress(): number {
-    // important - howl has documented to report seek in seconds, but we get results via seek() in floating points
-    // we are rounding off the seek value to provide consistent results
-    return Math.round(this.mediaPlaybackLocalAudio.seek()) || 0;
+    return MediaLocalUtils.parseMediaPlaybackDuration(this.mediaPlaybackLocalAudio.seek());
   }
 
   seekPlayback(mediaPlaybackSeekPosition: number): Promise<boolean> {
