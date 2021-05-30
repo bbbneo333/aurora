@@ -61,7 +61,7 @@ export function MediaSessionComponent() {
       debug('received action - %s', 'nexttrack');
       // TODO: Add support for changing to next track once we have playback queue support
     });
-  });
+  }, []);
 
   useEffect(() => {
     if (!navigator.mediaSession
@@ -89,20 +89,23 @@ export function MediaSessionComponent() {
   useEffect(() => {
     if (!navigator.mediaSession
       || !navigator.mediaSession.setPositionState
+      || !mediaPlayer.mediaPlaybackCurrentMediaTrack
       || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlayerPlaybackState.Playing) {
       return;
     }
 
-    debug('updating position state - duration - %f, position - %f', mediaPlayer.mediaPlaybackCurrentMediaDuration, mediaPlayer.mediaPlaybackCurrentMediaProgress);
-
-    navigator.mediaSession.setPositionState({
-      duration: mediaPlayer.mediaPlaybackCurrentMediaDuration,
+    const mediaSessionPlaybackState = {
+      duration: mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration,
       playbackRate: 1.0,
       position: mediaPlayer.mediaPlaybackCurrentMediaProgress,
-    });
+    };
+
+    debug('updating position state - %o', mediaSessionPlaybackState);
+
+    navigator.mediaSession.setPositionState(mediaSessionPlaybackState);
   }, [
     mediaPlayer.mediaPlaybackState,
-    mediaPlayer.mediaPlaybackCurrentMediaDuration,
+    mediaPlayer.mediaPlaybackCurrentMediaTrack,
     mediaPlayer.mediaPlaybackCurrentMediaProgress,
   ]);
 

@@ -7,7 +7,6 @@ export interface MediaPlayerState {
   mediaTracks: IMediaTrack[];
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState;
   mediaPlaybackCurrentMediaTrack?: IMediaTrack;
-  mediaPlaybackCurrentMediaDuration?: number;
   mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: IMediaPlayback;
   mediaPlaybackVolumeMaxLimit: number,
@@ -24,7 +23,6 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
   mediaPlaybackCurrentMediaTrack: undefined,
-  mediaPlaybackCurrentMediaDuration: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
   mediaPlaybackVolumeMaxLimit: 100,
@@ -56,7 +54,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     }
     case MediaEnums.MediaPlayerActions.LoadTrack: {
       // data.mediaTrackId: string - track's id from the list which needs to be loaded
-      // data.mediaPlayingInstance: any - optional payload which can be used by the players to track playing instance
+      // data.mediaPlayingInstance: any - playback instance
       const mediaTrackToLoad = _.find(state.mediaTracks, mediaTrack => mediaTrack.id === action.data.mediaTrackId);
       if (!mediaTrackToLoad) {
         throw new Error('MediaPlayerReducer encountered error at LoadTrack - Provided media track was not found');
@@ -66,13 +64,21 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
-        mediaPlaybackCurrentMediaDuration: undefined,
         mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
       };
     }
+    case MediaEnums.MediaPlayerActions.LoadExistingTrack: {
+      if (!state.mediaPlaybackCurrentMediaTrack) {
+        throw new Error('MediaPlayerReducer encountered error at LoadExistingTrack - No existing loaded track was found');
+      }
+
+      return {
+        ...state,
+        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
+      };
+    }
     case MediaEnums.MediaPlayerActions.Play: {
-      // data.mediaPlaybackDuration: number
       // data.mediaPlaybackProgress?: number
       if (!state.mediaPlaybackCurrentMediaTrack) {
         throw new Error('MediaPlayerReducer encountered error at Play - No loaded media track was found');
@@ -81,7 +87,6 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       return {
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Playing,
-        mediaPlaybackCurrentMediaDuration: action.data.mediaPlaybackDuration,
         mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress || 0,
       };
     }
@@ -96,7 +101,6 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
         mediaPlaybackCurrentMediaTrack: undefined,
-        mediaPlaybackCurrentMediaDuration: undefined,
         mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: undefined,
       };

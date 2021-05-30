@@ -78,7 +78,6 @@ class MediaPlayerService {
       store.dispatch({
         type: MediaEnums.MediaPlayerActions.Play,
         data: {
-          mediaPlaybackDuration: mediaTrack.track_duration,
           mediaPlaybackProgress: mediaPlayback.getPlaybackProgress(),
         },
       });
@@ -165,6 +164,10 @@ class MediaPlayerService {
       return;
     }
 
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+    });
+
     mediaPlaybackCurrentPlayingInstance
       .resumePlayback()
       .then((mediaPlaybackResumed) => {
@@ -176,7 +179,6 @@ class MediaPlayerService {
         store.dispatch({
           type: MediaEnums.MediaPlayerActions.Play,
           data: {
-            mediaPlaybackDuration: mediaPlaybackCurrentMediaTrack.track_duration,
             mediaPlaybackProgress: mediaPlaybackCurrentPlayingInstance.getPlaybackProgress(),
           },
         });
