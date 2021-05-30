@@ -61,7 +61,7 @@ export function MediaSessionComponent() {
       debug('received action - %s', 'nexttrack');
       // TODO: Add support for changing to next track once we have playback queue support
     });
-  });
+  }, []);
 
   useEffect(() => {
     if (!navigator.mediaSession
