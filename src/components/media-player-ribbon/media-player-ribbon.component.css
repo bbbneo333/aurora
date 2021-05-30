@@ -1,12 +1,3 @@
-@keyframes loading-color-animate {
-  from {
-    color: #8c8c8c;
-  }
-  to {
-    color: #8c8c8c9e;
-  }
-}
-
 .media-player-container {
   position: fixed;
   width: 100%;
@@ -67,12 +58,6 @@
   margin: 5px 10px;
   transition: color .1s ease;
   /*background-color: green;*/
-}
-
-.media-player-control[disabled] {
-  animation: loading-color-animate .7s infinite;
-  animation-timing-function: linear;
-  animation-direction: alternate;
 }
 
 .media-player-control:not([disabled]):hover {
