@@ -134,15 +134,13 @@ export function MediaPlayerRibbonComponent() {
                     <MediaProgressBarComponent
                       disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
                       value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
-                      maxValue={mediaPlayer.mediaPlaybackCurrentMediaDuration}
+                      maxValue={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration}
                       onDragUpdate={handleOnMediaProgressDragUpdate}
                       onDragCommit={handleOnMediaProgressDragCommit}
                     />
                   </div>
                   <div className={cx('media-player-progress-counter', 'end')}>
-                    {mediaPlayer.mediaPlaybackCurrentMediaDuration
-                      ? DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaDuration)
-                      : '--:--'}
+                    {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
                   </div>
                 </Col>
               </Row>
