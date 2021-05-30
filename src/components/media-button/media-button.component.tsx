@@ -1,13 +1,19 @@
 import React, {DetailsHTMLAttributes, useEffect, useRef} from 'react';
 import * as _ from 'lodash';
+import classNames from 'classnames/bind';
 
 import {SystemEnums} from '../../enums';
+
+import styles from './media-button.component.css';
+
+const cx = classNames.bind(styles);
 
 // we are relying on outline script to remove outlines in case of mouse clicks
 require('../../vendor/js/outline');
 
 export type MediaButtonComponentProps = {
   children?: any,
+  disabled?: boolean,
   onButtonSubmit?(event: Event): void,
   onButtonMove?(event: KeyboardEvent): void,
 };
@@ -15,6 +21,8 @@ export type MediaButtonComponentProps = {
 export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsHTMLAttributes<HTMLDivElement>) {
   const {
     children,
+    className,
+    disabled = false,
     onButtonSubmit,
     onButtonMove,
   } = props;
@@ -23,8 +31,13 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
     'children',
     'onButtonSubmit',
     'onButtonMove',
+    // we are using our own classnames as well
+    'className',
   ]);
   const mediaButtonContainerRef = useRef(null);
+
+  // merge our own classnames with the provided ones
+  const mediaButtonClassName = cx('media-button', className);
 
   useEffect(() => {
     // for adding listeners to button
@@ -37,7 +50,7 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
     const mediaButtonContainerElement = (mediaButtonContainerRef.current as unknown as HTMLDivElement);
 
     const handleOnMouseClick = (event: MouseEvent) => {
-      if (onButtonSubmit) {
+      if (onButtonSubmit && !disabled) {
         onButtonSubmit(event);
       }
       event.stopPropagation();
@@ -47,13 +60,13 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
       switch (event.key) {
         case SystemEnums.KeyboardKeyCodes.ArrowLeft:
         case SystemEnums.KeyboardKeyCodes.ArrowRight: {
-          if (onButtonMove) {
+          if (onButtonMove && !disabled) {
             onButtonMove(event);
           }
           break;
         }
         case SystemEnums.KeyboardKeyCodes.Enter: {
-          if (onButtonSubmit) {
+          if (onButtonSubmit && !disabled) {
             onButtonSubmit(event);
           }
           break;
@@ -73,6 +86,7 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
       mediaButtonContainerElement.removeEventListener('keyup', handleOnKeyUp);
     };
   }, [
+    disabled,
     onButtonSubmit,
     onButtonMove,
     mediaButtonContainerRef,
@@ -80,6 +94,8 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
 
   return (
     <div
+      className={mediaButtonClassName}
+      aria-disabled={disabled}
       ref={mediaButtonContainerRef}
       role="button"
       tabIndex={0}

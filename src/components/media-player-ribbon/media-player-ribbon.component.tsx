@@ -107,6 +107,7 @@ export function MediaPlayerRibbonComponent() {
                     )
                     : (
                       <MediaButtonComponent
+                        disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
                         className={cx('media-player-control', 'media-player-control-lg')}
                         onButtonSubmit={() => {
                           MediaPlayerService.resumeMediaPlayer();

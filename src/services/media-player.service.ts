@@ -164,6 +164,10 @@ class MediaPlayerService {
       return;
     }
 
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+    });
+
     mediaPlaybackCurrentPlayingInstance
       .resumePlayback()
       .then((mediaPlaybackResumed) => {

@@ -54,7 +54,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     }
     case MediaEnums.MediaPlayerActions.LoadTrack: {
       // data.mediaTrackId: string - track's id from the list which needs to be loaded
-      // data.mediaPlayingInstance: any - optional payload which can be used by the players to track playing instance
+      // data.mediaPlayingInstance: any - playback instance
       const mediaTrackToLoad = _.find(state.mediaTracks, mediaTrack => mediaTrack.id === action.data.mediaTrackId);
       if (!mediaTrackToLoad) {
         throw new Error('MediaPlayerReducer encountered error at LoadTrack - Provided media track was not found');
@@ -66,6 +66,16 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
         mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.LoadExistingTrack: {
+      if (!state.mediaPlaybackCurrentMediaTrack) {
+        throw new Error('MediaPlayerReducer encountered error at LoadExistingTrack - No existing loaded track was found');
+      }
+
+      return {
+        ...state,
+        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
       };
     }
     case MediaEnums.MediaPlayerActions.Play: {

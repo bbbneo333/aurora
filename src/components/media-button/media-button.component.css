@@ -1,0 +1,7 @@
+.media-button[disabled] {
+  outline: none;
+}
+
+.media-button[disabled]:hover {
+  cursor: default;
+}
