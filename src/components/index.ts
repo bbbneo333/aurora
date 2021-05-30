@@ -1,6 +1,7 @@
 export {MediaButtonComponent} from './media-button/media-button.component';
 export {MediaPlayerRibbonComponent} from './media-player-ribbon/media-player-ribbon.component';
 export {MediaProgressBarComponent} from './media-progress-bar/media-progress-bar.component';
+export {MediaSessionComponent} from './media-session/media-session.component';
 export {MediaSidebarComponent} from './media-sidebar/media-sidebar.component';
 export {MediaTrackComponent} from './media-track/media-track.component';
 export {MediaTrackInfoComponent} from './media-track-info/media-track-info.component';

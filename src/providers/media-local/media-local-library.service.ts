@@ -13,6 +13,7 @@ import {MediaEnums, SystemEnums} from '../../enums';
 import SystemService, {FSDirReadFileEventData, FSDirReadStats} from '../../services/system.service';
 
 import {MediaLocalTrack} from './media-local-track.model';
+import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_library');
 
@@ -56,7 +57,7 @@ export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> 
         track_name: audioMetadata.common.title || 'unknown track',
         track_artists: audioMetadata.common.artists || ['unknown artist'],
         track_album_name: audioMetadata.common.album || 'unknown album',
-        track_duration: audioMetadata.format.duration || 1000,
+        track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
         track_cover_picture: audioCoverPicture ? {
           image_data: audioCoverPicture.data,
           image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
