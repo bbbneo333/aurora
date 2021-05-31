@@ -1,3 +1,8 @@
+/**
+ * Builder used by main process for building Menu
+ * TODO: Using defaults, needs to be looked into before release
+ */
+
 import {
   app,
   Menu,
@@ -12,28 +17,32 @@ interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
 }
 
 export default class MenuBuilder {
-  mainWindow: BrowserWindow;
+  private readonly mainWindow: BrowserWindow;
+  private readonly appDebug: boolean;
+  private readonly appPlatform?: string;
 
   constructor(mainWindow: BrowserWindow) {
     this.mainWindow = mainWindow;
+    this.appDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+    this.appPlatform = process.platform;
   }
 
   buildMenu(): Menu {
-    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    if (this.appDebug) {
       this.setupDevelopmentEnvironment();
     }
 
-    const template = process.platform === 'darwin'
+    const menuTemplate = this.appPlatform === 'darwin'
       ? this.buildDarwinTemplate()
       : this.buildDefaultTemplate();
 
-    const menu = Menu.buildFromTemplate(template);
+    const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
 
     return menu;
   }
 
-  setupDevelopmentEnvironment(): void {
+  private setupDevelopmentEnvironment(): void {
     this.mainWindow.webContents.on('context-menu', (_, props) => {
       const {
         x,
@@ -51,7 +60,7 @@ export default class MenuBuilder {
     });
   }
 
-  buildDarwinTemplate(): MenuItemConstructorOptions[] {
+  private buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'Electron',
       submenu: [
@@ -59,12 +68,16 @@ export default class MenuBuilder {
           label: 'About ElectronReact',
           selector: 'orderFrontStandardAboutPanel:',
         },
-        {type: 'separator'},
+        {
+          type: 'separator',
+        },
         {
           label: 'Services',
           submenu: [],
         },
-        {type: 'separator'},
+        {
+          type: 'separator',
+        },
         {
           label: 'Hide ElectronReact',
           accelerator: 'Command+H',
@@ -79,7 +92,9 @@ export default class MenuBuilder {
           label: 'Show All',
           selector: 'unhideAllApplications:',
         },
-        {type: 'separator'},
+        {
+          type: 'separator',
+        },
         {
           label: 'Quit',
           accelerator: 'Command+Q',
@@ -102,7 +117,9 @@ export default class MenuBuilder {
           accelerator: 'Shift+Command+Z',
           selector: 'redo:',
         },
-        {type: 'separator'},
+        {
+          type: 'separator',
+        },
         {
           label: 'Cut',
           accelerator: 'Command+X',
@@ -176,7 +193,9 @@ export default class MenuBuilder {
           accelerator: 'Command+W',
           selector: 'performClose:',
         },
-        {type: 'separator'},
+        {
+          type: 'separator',
+        },
         {
           label: 'Bring All to Front',
           selector: 'arrangeInFront:',
@@ -215,14 +234,12 @@ export default class MenuBuilder {
       ],
     };
 
-    const subMenuView = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
-      ? subMenuViewDev
-      : subMenuViewProd;
+    const subMenuView = this.appDebug ? subMenuViewDev : subMenuViewProd;
 
     return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
-  buildDefaultTemplate() {
+  private buildDefaultTemplate(): MenuItemConstructorOptions[] {
     return [
       {
         label: '&File',
@@ -242,7 +259,7 @@ export default class MenuBuilder {
       },
       {
         label: '&View',
-        submenu: process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+        submenu: this.appDebug
           ? [
             {
               label: '&Reload',
