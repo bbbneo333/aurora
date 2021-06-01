@@ -1,9 +1,10 @@
+import Debug from 'debug';
 import {TypedEmitter} from 'tiny-typed-emitter';
 
 import {IMediaProvider} from '../interfaces';
 import {MediaEnums} from '../enums';
 
-const debug = require('debug')('app:service:media_provider_service');
+const debug = Debug('app:service:media_provider_service');
 
 interface IMediaProviderEvents {
   [MediaEnums.MediaProviderUpdateEvent.AddedProvider]: (provider: IMediaProvider) => void;

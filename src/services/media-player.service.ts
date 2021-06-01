@@ -1,11 +1,12 @@
+import Debug from 'debug';
+
 import {MediaEnums} from '../enums';
 import {IMediaTrack} from '../interfaces';
+import store from '../store';
 
 import MediaProviderService from './media-provider.service';
 
-import store from '../store';
-
-const debug = require('debug')('app:service:media_player_service');
+const debug = Debug('app:service:media_player_service');
 
 class MediaPlayerService {
   playMediaTrack(mediaTrack: IMediaTrack): void {

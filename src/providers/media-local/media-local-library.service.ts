@@ -1,6 +1,8 @@
 import {TypedEmitter} from 'tiny-typed-emitter';
 import * as _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
+import Debug from 'debug';
+
 import {
   IAudioMetadata,
   IPicture,
@@ -15,7 +17,7 @@ import SystemService, {FSDirReadFileEventData, FSDirReadStats} from '../../servi
 import {MediaLocalTrack} from './media-local-track.model';
 import MediaLocalUtils from './media-local.utils';
 
-const debug = require('debug')('app:provider:media_local:media_library');
+const debug = Debug('app:provider:media_local:media_library');
 
 export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> implements IMediaLibraryService {
   readonly mediaTrackSupportedFileTypes = [

@@ -1,13 +1,14 @@
 // @ts-ignore
 import {Howl} from 'howler';
 import Promise from 'bluebird';
+import Debug from 'debug';
 
 import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
 
 import {MediaLocalTrack} from './media-local-track.model';
 import MediaLocalUtils from './media-local.utils';
 
-const debug = require('debug')('app:provider:media_local:media_playback');
+const debug = Debug('app:provider:media_local:media_playback');
 
 export class MediaLocalPlayback implements IMediaPlayback {
   private readonly mediaTrack: MediaLocalTrack;

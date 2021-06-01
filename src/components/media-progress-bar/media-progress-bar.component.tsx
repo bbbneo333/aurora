@@ -6,6 +6,7 @@ import React, {
   useRef,
 } from 'react';
 
+import Debug from 'debug';
 import classNames from 'classnames/bind';
 
 import {SystemEnums} from '../../enums';
@@ -14,7 +15,7 @@ import {MediaButtonComponent} from '../media-button/media-button.component';
 
 import styles from './media-progress-bar.component.scss';
 
-const debug = require('debug')('app:component:media_progress_bar_component');
+const debug = Debug('app:component:media_progress_bar_component');
 
 const cx = classNames.bind(styles);
 

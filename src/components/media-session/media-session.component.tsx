@@ -1,11 +1,12 @@
 import React, {useEffect} from 'react';
 import {useSelector} from 'react-redux';
+import Debug from 'debug';
 
 import {MediaEnums} from '../../enums';
 import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
 
-const debug = require('debug')('app:component:media_session_component');
+const debug = Debug('app:component:media_session_component');
 
 export function MediaSessionComponent() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
