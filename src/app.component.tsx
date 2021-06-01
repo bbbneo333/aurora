@@ -9,6 +9,8 @@ import {MediaLocalProvider} from './providers';
 import {MediaProviderService} from './services';
 import * as AppPages from './pages';
 
+import './app.global.css';
+
 const debug = Debug('app:component:app_component');
 
 debug('chromium version - %s', _.get(process, 'versions.chrome'));
