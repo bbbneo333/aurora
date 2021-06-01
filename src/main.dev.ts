@@ -32,7 +32,8 @@ class App {
   private readonly appStartMinimized?: string;
   private readonly appResourcesPath: string;
   private readonly appEnableAutoUpdater = false;
-  private readonly appHTMLFilePath = `${__dirname}/index.html`;
+  private readonly appHTMLFilePath = path.join(__dirname, 'index.html');
+  private readonly appJSFilePath = path.join(__dirname, 'index.js');
 
   constructor() {
     this.appEnv = process.env.NODE_ENV;
@@ -102,8 +103,10 @@ class App {
       height: 728,
       icon: this.getAssetPath('icon.png'),
       webPreferences: {
-        nodeIntegration: true,
+        nodeIntegration: false,
+        contextIsolation: true,
         enableRemoteModule: true,
+        preload: this.appJSFilePath,
       },
     });
 
