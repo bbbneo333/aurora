@@ -33,7 +33,7 @@ class App {
   private readonly appResourcesPath: string;
   private readonly appEnableAutoUpdater = false;
   private readonly appHTMLFilePath = path.join(__dirname, 'index.html');
-  private readonly appJSFilePath = path.join(__dirname, 'index.js');
+  private readonly appJSFilePath = path.join(__dirname, 'preloads/index.js');
 
   constructor() {
     this.appEnv = process.env.NODE_ENV;
