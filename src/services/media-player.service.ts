@@ -356,6 +356,8 @@ class MediaPlayerService {
       requestAnimationFrame(() => {
         this.reportMediaPlaybackProgress();
       });
+    } else {
+      debug('reportMediaPlaybackProgress - media instance not playing, aborting...');
     }
   }
 }

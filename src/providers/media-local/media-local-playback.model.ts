@@ -49,8 +49,13 @@ export class MediaLocalPlayback implements IMediaPlayback {
   seekPlayback(mediaPlaybackSeekPosition: number): Promise<boolean> {
     return new Promise((resolve) => {
       this.mediaPlaybackLocalAudio.once('seek', (mediaPlaybackAudioId: number) => {
-        debug('audio event %s - playback id - %d', 'seek', mediaPlaybackAudioId);
-        resolve(true);
+        // TODO: Hack - When using HTML5 audio, seek is fired even before audio actually starts playing (checkIfPlaying() remains false)
+        //  We are reporting a success after a 100 ms delay which during testing always gave positive results (checkIfPlaying() remained true)
+        //  Check this unresolved issue - https://github.com/goldfire/howler.js/issues/1235
+        setTimeout(() => {
+          debug('audio event %s - playback id - %d, playing ? - %s', 'seek', mediaPlaybackAudioId, this.checkIfPlaying());
+          resolve(true);
+        }, 100);
       });
 
       debug('seeking track id - %s, playback id - %d, seek position - %d', this.mediaTrack.id, this.mediaPlaybackId, mediaPlaybackSeekPosition);
