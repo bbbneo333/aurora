@@ -1,6 +1,5 @@
-import {TypedEmitter} from 'tiny-typed-emitter';
-
 import {MediaEnums} from '../enums';
+import {EventEmitter} from '../models';
 
 export interface IMediaTrackCoverPicture {
   image_data: any,
@@ -49,7 +48,7 @@ export interface IMediaLibraryEvents {
   [MediaEnums.MediaLibraryUpdateEvent.AddedTrack]: (mediaTrack: IMediaTrack) => void;
 }
 
-export interface IMediaLibraryService extends TypedEmitter<IMediaLibraryEvents> {
+export interface IMediaLibraryService extends EventEmitter<IMediaLibraryEvents> {
   addMediaTracks(): void;
 
   removeMediaTrack(mediaTrack: IMediaTrack): boolean;

@@ -1,5 +1,4 @@
-import {EventEmitter} from 'events';
-
+import {EventEmitter} from '../models';
 import {SystemEnums} from '../enums';
 
 const {remote} = window.require('electron');

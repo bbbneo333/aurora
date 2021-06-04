@@ -1,7 +1,7 @@
 import Debug from 'debug';
-import {TypedEmitter} from 'tiny-typed-emitter';
 
 import {IMediaProvider} from '../interfaces';
+import {EventEmitter} from '../models';
 import {MediaEnums} from '../enums';
 
 const debug = Debug('app:service:media_provider_service');
@@ -10,7 +10,7 @@ interface IMediaProviderEvents {
   [MediaEnums.MediaProviderUpdateEvent.AddedProvider]: (provider: IMediaProvider) => void;
 }
 
-class MediaProviderService extends TypedEmitter<IMediaProviderEvents> {
+class MediaProviderService extends EventEmitter<IMediaProviderEvents> {
   private readonly mediaProviders: IMediaProvider[] = [];
 
   addMediaProvider(mediaProvider: IMediaProvider): void {

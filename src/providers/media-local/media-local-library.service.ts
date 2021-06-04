@@ -1,4 +1,3 @@
-import {TypedEmitter} from 'tiny-typed-emitter';
 import * as _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 import Debug from 'debug';
@@ -12,6 +11,7 @@ import {
 
 import {IMediaLibraryEvents, IMediaLibraryService} from '../../interfaces';
 import {MediaEnums, SystemEnums} from '../../enums';
+import {EventEmitter} from '../../models';
 import SystemService, {FSDirReadFileEventData, FSDirReadStats} from '../../services/system.service';
 
 import {MediaLocalTrack} from './media-local-track.model';
@@ -19,7 +19,7 @@ import MediaLocalUtils from './media-local.utils';
 
 const debug = Debug('app:provider:media_local:media_library');
 
-export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> implements IMediaLibraryService {
+export class MediaLocalLibraryService extends EventEmitter<IMediaLibraryEvents> implements IMediaLibraryService {
   readonly mediaTrackSupportedFileTypes = [
     MediaEnums.MediaFileExtensions.MP3,
     MediaEnums.MediaFileExtensions.FLAC,
