@@ -3,7 +3,6 @@ import {useSelector} from 'react-redux';
 
 import {MediaTrackComponent} from '../../components';
 import {RootState} from '../../reducers';
-import {I18nService, MediaLibraryService} from '../../services';
 
 export function HomeComponent() {
   const mediaLibrary = useSelector((state: RootState) => state.mediaLibrary);
@@ -18,12 +17,6 @@ export function HomeComponent() {
           />
         ))}
       </ul>
-      <button
-        type="submit"
-        onClick={() => MediaLibraryService.addMediaTracks()}
-      >
-        {I18nService.getString('action_add_tracks')}
-      </button>
     </div>
   );
 }

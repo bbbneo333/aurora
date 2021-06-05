@@ -1,0 +1,56 @@
+/*app main*/
+
+.app-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/*app main > column - app stage*/
+
+.app-stage-container {
+  flex: 1 0 0;
+  display: flex;
+  flex-flow: row;
+}
+
+/*app main > app stage > rows [sidebar, content]*/
+
+.app-sidebar-container {
+  width: 30%;
+  border-right: 2px solid;
+}
+
+.app-content-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/*app main > app stage > content > columns [header, browser]*/
+
+.app-content-header-container {
+  flex: 0 0 50px;
+  border-bottom: 2px solid;
+}
+
+.app-content-browser-container {
+  flex: 1 0 0;
+  overflow-y: scroll;
+}
+
+/*app main > column - app media player*/
+
+.app-media-player-container {
+  flex: 0 0 100px;
+  margin-bottom: -100px;
+  transition: margin-bottom .4s ease;
+}
+
+.app-media-player-container.active {
+  margin-bottom: 0;
+}

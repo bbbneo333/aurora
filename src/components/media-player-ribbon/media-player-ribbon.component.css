@@ -1,23 +1,12 @@
 .media-player-container {
-  position: fixed;
-  width: 100%;
-  color: white;
-  background-color: #181818;
-  left: 0;
-  bottom: -100px;
-  padding: 10px;
-  transition: bottom .2s ease;
-  user-select: none;
-}
-
-.media-player-container.active {
-  bottom: 0;
-}
-
-.media-player-content {
   display: flex;
   flex-flow: row;
   align-items: center;
+  height: 100%;
+  color: white;
+  background-color: #181818;
+  padding: 10px;
+  user-select: none;
 }
 
 .media-player-info-container {

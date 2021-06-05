@@ -62,13 +62,10 @@ export function MediaPlayerRibbonComponent() {
   ]);
 
   return (
-    <div className={cx('media-player-container', {
-      active: mediaPlayer.mediaPlaybackCurrentMediaTrack,
-    })}
-    >
-      {mediaPlayer.mediaPlaybackCurrentMediaTrack && (
-        <Container fluid>
-          <Row className={cx('media-player-content')}>
+    mediaPlayer.mediaPlaybackCurrentMediaTrack
+      ? (
+        <Container fluid className={cx('h-100')}>
+          <Row className={cx('media-player-container')}>
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-info-container')}>
                 <Col className={cx('col-12', 'media-player-info-column')}>
@@ -183,7 +180,9 @@ export function MediaPlayerRibbonComponent() {
             </Col>
           </Row>
         </Container>
-      )}
-    </div>
+      )
+      : (
+        <></>
+      )
   );
 }
