@@ -5,46 +5,44 @@
  */
 
 import {
-  app,
-  Menu,
   shell,
   BrowserWindow,
+  Menu,
   MenuItemConstructorOptions,
 } from 'electron';
+
+import {
+  IAppBuilder,
+  IAppMain,
+} from '../../interfaces';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
-export default class MenuBuilder {
-  private readonly mainWindow: BrowserWindow;
-  private readonly appDebug: boolean;
-  private readonly appPlatform?: string;
+export default class MenuBuilder implements IAppBuilder {
+  private readonly app: IAppMain;
 
-  constructor(mainWindow: BrowserWindow) {
-    this.mainWindow = mainWindow;
-    this.appDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-    this.appPlatform = process.platform;
+  constructor(app: IAppMain) {
+    this.app = app;
   }
 
-  buildMenu(): Menu {
-    if (this.appDebug) {
-      this.setupDevelopmentEnvironment();
+  build(mainWindow: BrowserWindow): void {
+    if (this.app.debug) {
+      this.setupDevelopmentEnvironment(mainWindow);
     }
 
-    const menuTemplate = this.appPlatform === 'darwin'
-      ? this.buildDarwinTemplate()
-      : this.buildDefaultTemplate();
+    const menuTemplate = this.app.platform === 'darwin'
+      ? this.buildDarwinTemplate(mainWindow)
+      : this.buildDefaultTemplate(mainWindow);
 
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
-
-    return menu;
   }
 
-  private setupDevelopmentEnvironment(): void {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
+  private setupDevelopmentEnvironment(browserWindow: BrowserWindow): void {
+    browserWindow.webContents.on('context-menu', (_, props) => {
       const {
         x,
         y,
@@ -54,14 +52,16 @@ export default class MenuBuilder {
         .buildFromTemplate([{
           label: 'Inspect element',
           click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
+            browserWindow.webContents.inspectElement(x, y);
           },
         }])
-        .popup({window: this.mainWindow});
+        .popup({
+          window: browserWindow,
+        });
     });
   }
 
-  private buildDarwinTemplate(): MenuItemConstructorOptions[] {
+  private buildDarwinTemplate(browserWindow: BrowserWindow): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'Electron',
       submenu: [
@@ -100,7 +100,7 @@ export default class MenuBuilder {
           label: 'Quit',
           accelerator: 'Command+Q',
           click: () => {
-            app.quit();
+            this.app.quit();
           },
         },
       ],
@@ -150,21 +150,21 @@ export default class MenuBuilder {
           label: 'Reload',
           accelerator: 'Command+R',
           click: () => {
-            this.mainWindow.webContents.reload();
+            browserWindow.webContents.reload();
           },
         },
         {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
           click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+            browserWindow.setFullScreen(!browserWindow.isFullScreen());
           },
         },
         {
           label: 'Toggle Developer Tools',
           accelerator: 'Alt+Command+I',
           click: () => {
-            this.mainWindow.webContents.toggleDevTools();
+            browserWindow.webContents.toggleDevTools();
           },
         },
       ],
@@ -176,7 +176,7 @@ export default class MenuBuilder {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
           click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+            browserWindow.setFullScreen(!browserWindow.isFullScreen());
           },
         },
       ],
@@ -235,12 +235,12 @@ export default class MenuBuilder {
       ],
     };
 
-    const subMenuView = this.appDebug ? subMenuViewDev : subMenuViewProd;
+    const subMenuView = this.app.debug ? subMenuViewDev : subMenuViewProd;
 
     return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
-  private buildDefaultTemplate(): MenuItemConstructorOptions[] {
+  private buildDefaultTemplate(browserWindow: BrowserWindow): MenuItemConstructorOptions[] {
     return [
       {
         label: '&File',
@@ -253,34 +253,34 @@ export default class MenuBuilder {
             label: '&Close',
             accelerator: 'Ctrl+W',
             click: () => {
-              this.mainWindow.close();
+              browserWindow.close();
             },
           },
         ],
       },
       {
         label: '&View',
-        submenu: this.appDebug
+        submenu: this.app.debug
           ? [
             {
               label: '&Reload',
               accelerator: 'Ctrl+R',
               click: () => {
-                this.mainWindow.webContents.reload();
+                browserWindow.webContents.reload();
               },
             },
             {
               label: 'Toggle &Full Screen',
               accelerator: 'F11',
               click: () => {
-                this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+                browserWindow.setFullScreen(!browserWindow.isFullScreen());
               },
             },
             {
               label: 'Toggle &Developer Tools',
               accelerator: 'Alt+Ctrl+I',
               click: () => {
-                this.mainWindow.webContents.toggleDevTools();
+                browserWindow.webContents.toggleDevTools();
               },
             },
           ]
@@ -289,7 +289,7 @@ export default class MenuBuilder {
               label: 'Toggle &Full Screen',
               accelerator: 'F11',
               click: () => {
-                this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+                browserWindow.setFullScreen(!browserWindow.isFullScreen());
               },
             },
           ],

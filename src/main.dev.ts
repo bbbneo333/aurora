@@ -15,40 +15,52 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import path from 'path';
-import {app, BrowserWindow, shell} from 'electron';
+import {app, shell, BrowserWindow} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
+
+import {
+  IAppBuilder,
+  IAppMain,
+} from './interfaces';
 
 import {
   MenuBuilder,
 } from './main/builders';
 
-class App {
-  private appMainWindow?: BrowserWindow;
-  private readonly appEnv?: string;
-  private readonly appDebug: boolean;
-  private readonly appForceExtensionDownload: boolean;
-  private readonly appPlatform?: string;
-  private readonly appStartMinimized?: string;
-  private readonly appResourcesPath: string;
-  private readonly appEnableAutoUpdater = false;
-  private readonly appHTMLFilePath = path.join(__dirname, 'index.html');
+class App implements IAppMain {
+  readonly env?: string;
+  readonly platform?: string;
+  readonly debug: boolean;
+
+  private mainWindow?: BrowserWindow;
+  private readonly forceExtensionDownload: boolean;
+  private readonly startMinimized?: string;
+  private readonly resourcesPath: string;
+  private readonly enableAutoUpdater = false;
+  private readonly htmlFilePath = path.join(__dirname, 'index.html');
+  private readonly builders: IAppBuilder[] = [];
 
   constructor() {
-    this.appEnv = process.env.NODE_ENV;
-    this.appDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-    this.appForceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
-    this.appPlatform = process.platform;
-    this.appStartMinimized = process.env.START_MINIMIZED;
-    this.appResourcesPath = process.resourcesPath;
+    this.env = process.env.NODE_ENV;
+    this.platform = process.platform;
+    this.debug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+    this.forceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
+    this.startMinimized = process.env.START_MINIMIZED;
+    this.resourcesPath = process.resourcesPath;
 
     this.installSourceMapSupport();
     this.installDebugSupport();
+    this.registerBuilders();
     this.registerEvents();
   }
 
+  quit(): void {
+    app.quit();
+  }
+
   private installSourceMapSupport(): void {
-    if (this.appEnv !== 'production') {
+    if (this.env !== 'production') {
       return;
     }
 
@@ -57,7 +69,7 @@ class App {
   }
 
   private installDebugSupport(): void {
-    if (!this.appDebug) {
+    if (!this.debug) {
       return;
     }
 
@@ -69,20 +81,20 @@ class App {
     const extensions = ['REACT_DEVELOPER_TOOLS'];
 
     return extensionInstaller
-      .default(extensions.map(name => extensionInstaller[name]), this.appForceExtensionDownload)
+      .default(extensions.map(name => extensionInstaller[name]), this.forceExtensionDownload)
       .catch(console.log);
   }
 
   private getAssetPath(...paths: string[]): string {
     const appAssetsPath = app.isPackaged
-      ? path.join(this.appResourcesPath, 'assets')
+      ? path.join(this.resourcesPath, 'assets')
       : path.join(__dirname, '../assets');
 
     return path.join(appAssetsPath, ...paths);
   }
 
   private registerAutoUpdater() {
-    if (!this.appEnableAutoUpdater) {
+    if (!this.enableAutoUpdater) {
       return;
     }
 
@@ -92,7 +104,7 @@ class App {
   }
 
   private async createWindow(): Promise<BrowserWindow> {
-    if (this.appDebug) {
+    if (this.debug) {
       await this.installExtensions();
     }
 
@@ -108,7 +120,7 @@ class App {
       },
     });
 
-    mainWindow.loadURL(`file://${this.appHTMLFilePath}`);
+    mainWindow.loadURL(`file://${this.htmlFilePath}`);
 
     // @TODO: Use 'ready-to-show' event
     //    https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -117,7 +129,7 @@ class App {
         throw new Error('App encountered error at createWindow - "mainWindow" is not defined');
       }
 
-      if (this.appStartMinimized) {
+      if (this.startMinimized) {
         mainWindow.minimize();
       } else {
         mainWindow.show();
@@ -126,17 +138,17 @@ class App {
     });
 
     mainWindow.on('closed', () => {
-      this.appMainWindow = undefined;
+      this.mainWindow = undefined;
     });
-
-    const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
 
     // open urls in the user's browser
     mainWindow.webContents.on('new-window', (event, url) => {
       event.preventDefault();
       shell.openExternal(url);
     });
+
+    // run builders
+    this.runBuilders(mainWindow);
 
     // register handler for auto-updates
     this.registerAutoUpdater();
@@ -148,23 +160,35 @@ class App {
     app.on('window-all-closed', () => {
       // respect the OSX convention of having the application in memory even
       // after all windows have been closed
-      if (this.appPlatform !== 'darwin') {
+      if (this.platform !== 'darwin') {
         app.quit();
       }
     });
 
     app.whenReady()
       .then(async () => {
-        this.appMainWindow = await this.createWindow();
+        this.mainWindow = await this.createWindow();
       })
       .catch(console.log);
 
     app.on('activate', async () => {
       // on macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open
-      if (!this.appMainWindow) {
-        this.appMainWindow = await this.createWindow();
+      if (!this.mainWindow) {
+        this.mainWindow = await this.createWindow();
       }
+    });
+  }
+
+  private registerBuilders(): void {
+    this.builders.push(
+      new MenuBuilder(this),
+    );
+  }
+
+  private runBuilders(mainWindow: BrowserWindow): void {
+    this.builders.forEach((builder) => {
+      builder.build(mainWindow);
     });
   }
 }
