@@ -2,7 +2,6 @@ import {
   IAppMain,
   IAppBuilder,
   IAppModule,
-  AppSyncMessageHandler,
 } from './app.interfaces';
 
 import {
@@ -30,5 +29,4 @@ export {
   IMediaPlaybackService,
   IMediaProvider,
   IMediaSettingsComponent,
-  AppSyncMessageHandler,
 };

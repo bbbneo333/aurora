@@ -1,6 +1,5 @@
 // @ts-ignore
 import {Howl} from 'howler';
-import Promise from 'bluebird';
 
 import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
 

@@ -1,6 +1,9 @@
 import {BrowserWindow} from 'electron';
 
-export type AppSyncMessageHandler = (...args: any[]) => {};
+import {
+  AppAsyncMessageHandler,
+  AppSyncMessageHandler,
+} from '../types';
 
 export interface IAppMain {
   env?: string;
@@ -11,7 +14,11 @@ export interface IAppMain {
 
   registerSyncMessageHandler(messageChannel: string, messageHandlerSync: AppSyncMessageHandler, messageHandlerCtx?: any): void;
 
+  registerAsyncMessageHandler(messageChannel: string, messageHandler: AppAsyncMessageHandler, messageHandlerCtx?: any): void;
+
   getAssetPath(...paths: string[]): string;
+
+  getCurrentWindow(): BrowserWindow;
 }
 
 export interface IAppBuilder {

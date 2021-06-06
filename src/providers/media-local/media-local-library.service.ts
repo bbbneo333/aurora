@@ -1,6 +1,6 @@
 import {TypedEmitter} from 'tiny-typed-emitter';
-import * as _ from 'lodash';
 import {v4 as uuidv4} from 'uuid';
+
 import {
   IAudioMetadata,
   IPicture,
@@ -9,8 +9,9 @@ import {
 } from 'music-metadata';
 
 import {IMediaLibraryEvents, IMediaLibraryService} from '../../interfaces';
-import {MediaEnums, SystemEnums} from '../../enums';
-import SystemService, {FSDirReadFileEventData, FSDirReadStats} from '../../services/system.service';
+import {AppEnums, MediaEnums} from '../../enums';
+import {AppService} from '../../services';
+import {FSDirectorySelectionResponse} from '../../types';
 
 import {MediaLocalTrack} from './media-local-track.model';
 import MediaLocalUtils from './media-local.utils';
@@ -26,56 +27,48 @@ export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> 
   ];
 
   addMediaTracks(): void {
-    const selectedDirectories = SystemService.openSelectionDialog({
-      selectionModes: [SystemEnums.DialogOpenModes.Directory],
-    });
-    if (!selectedDirectories || _.isEmpty(selectedDirectories)) {
-      return;
-    }
+    AppService
+      .sendAsyncMessage(AppEnums.IPCCommChannels.FSSelectDirectory, {
+        readFileExtensions: this.mediaTrackSupportedFileTypes,
+      })
+      .then(async (fsDirectorySelectionResponse: FSDirectorySelectionResponse) => {
+        if (!fsDirectorySelectionResponse) {
+          // user either cancelled the selection or no selected directories could be obtained, abort
+          return;
+        }
 
-    // openSelectionDialog responds back with a list of directories
-    // we will be only processing the initial selection
-    const selectedDirectory = selectedDirectories[0];
-    const readDirectoryEmitter = SystemService.readDirectory(selectedDirectory, {
-      fileExtensions: this.mediaTrackSupportedFileTypes,
-    });
+        await Promise.all(fsDirectorySelectionResponse.directory_read.files.map(async (fsDirectoryReadFile) => {
+          debug('addTracksFromDirectory - found file - %s', fsDirectoryReadFile.path);
+          // read metadata
+          const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(fsDirectoryReadFile.path);
+          // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
+          const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
+          // prepare media track
+          const mediaTrack = new MediaLocalTrack({
+            id: uuidv4(),
+            track_name: audioMetadata.common.title || 'unknown track',
+            track_artists: audioMetadata.common.artists || ['unknown artist'],
+            track_album_name: audioMetadata.common.album || 'unknown album',
+            track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
+            track_cover_picture: audioCoverPicture ? {
+              image_data: audioCoverPicture.data,
+              image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+              image_format: audioCoverPicture.format,
+            } : undefined,
+            location: {
+              address: fsDirectoryReadFile.path,
+            },
+          });
+          // emit event
+          this.emit(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, mediaTrack);
+        }));
 
-    readDirectoryEmitter.on('error', (error) => {
-      debug('addTracksFromDirectory - encountered error');
-      debug(error);
-    });
-
-    readDirectoryEmitter.on('file', async (fsDirReadFileEventData: FSDirReadFileEventData, fsDirReadNext) => {
-      debug('addTracksFromDirectory - found file - %s', fsDirReadFileEventData.path);
-      // read metadata
-      const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(fsDirReadFileEventData.path);
-      // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
-      const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
-      // prepare media track
-      const mediaTrack = new MediaLocalTrack({
-        id: uuidv4(),
-        track_name: audioMetadata.common.title || 'unknown track',
-        track_artists: audioMetadata.common.artists || ['unknown artist'],
-        track_album_name: audioMetadata.common.album || 'unknown album',
-        track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
-        track_cover_picture: audioCoverPicture ? {
-          image_data: audioCoverPicture.data,
-          image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-          image_format: audioCoverPicture.format,
-        } : undefined,
-        location: {
-          address: fsDirReadFileEventData.path,
-        },
+        debug('addTracksFromDirectory - finished processing - %o', fsDirectorySelectionResponse.directory_read.stats);
+      })
+      .catch((error) => {
+        debug('addTracksFromDirectory - encountered error');
+        debug(error);
       });
-      // emit event
-      this.emit(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, mediaTrack);
-      // proceed to next
-      fsDirReadNext();
-    });
-
-    readDirectoryEmitter.on('finished', (fsDirReadStats: FSDirReadStats) => {
-      debug('addTracksFromDirectory - finished processing - %o', fsDirReadStats);
-    });
   }
 
   removeMediaTrack(): boolean {

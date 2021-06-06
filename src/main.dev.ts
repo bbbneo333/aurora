@@ -17,6 +17,7 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
+import * as _ from 'lodash';
 
 import {
   app,
@@ -29,8 +30,12 @@ import {
   IAppMain,
   IAppBuilder,
   IAppModule,
-  AppSyncMessageHandler,
 } from './interfaces';
+
+import {
+  AppSyncMessageHandler,
+  AppAsyncMessageHandler,
+} from './types';
 
 import {
   MenuBuilder,
@@ -39,6 +44,8 @@ import {
 import {
   FileSystemModule,
 } from './main/modules';
+
+const debug = require('debug')('app:main');
 
 class App implements IAppMain {
   readonly env?: string;
@@ -67,6 +74,13 @@ class App implements IAppMain {
     this.registerBuilders();
     this.registerModules();
     this.registerEvents();
+
+    debug('app instantiated - %o', {
+      env: this.env,
+      platform: this.platform,
+      debug: this.debug,
+      chromiumVersion: _.get(process, 'versions.chrome'),
+    });
   }
 
   quit(): void {
@@ -75,8 +89,16 @@ class App implements IAppMain {
 
   registerSyncMessageHandler(messageChannel: string, messageHandler: AppSyncMessageHandler, messageHandlerCtx?: any): void {
     ipcMain.on(messageChannel, (event, ...args) => {
+      debug('ipc (sync) - received message - channel - %s', messageChannel);
       // eslint-disable-next-line no-param-reassign
       event.returnValue = messageHandler.apply(messageHandlerCtx, args);
+    });
+  }
+
+  registerAsyncMessageHandler(messageChannel: string, messageHandler: AppAsyncMessageHandler, messageHandlerCtx?: any): void {
+    ipcMain.handle(messageChannel, (_event, ...args) => {
+      debug('ipc (async) - received message - channel - %s', messageChannel);
+      return messageHandler.apply(messageHandlerCtx, args);
     });
   }
 
@@ -86,6 +108,14 @@ class App implements IAppMain {
       : path.join(__dirname, '../assets');
 
     return path.join(appAssetsPath, ...paths);
+  }
+
+  getCurrentWindow(): BrowserWindow {
+    if (!this.mainWindow) {
+      throw new Error('App encountered error at getCurrentWindow - App currently has no current window');
+    }
+
+    return this.mainWindow;
   }
 
   private installSourceMapSupport(): void {
@@ -137,7 +167,7 @@ class App implements IAppMain {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-        enableRemoteModule: true,
+        enableRemoteModule: false,
       },
     });
 

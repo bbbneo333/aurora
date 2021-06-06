@@ -1,7 +1,7 @@
-import {ipcRenderer} from 'electron';
 import LocalizedStrings, {LocalizedStringsMethods} from 'react-localization';
 
 import {AppEnums} from '../enums';
+import AppService from './app.service';
 
 class I18nService {
   private readonly localeAssetPath = 'locales';
@@ -20,7 +20,7 @@ class I18nService {
   }
 
   private getLocaleFile(locale: string): object {
-    const localeRaw = ipcRenderer.sendSync(AppEnums.IPCCommChannels.FSReadAsset, [this.localeAssetPath, `${locale}.json`], {
+    const localeRaw = AppService.sendSyncMessage(AppEnums.IPCCommChannels.FSReadAsset, [this.localeAssetPath, `${locale}.json`], {
       encoding: 'utf8',
     });
     return JSON.parse(localeRaw);
