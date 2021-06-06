@@ -26,18 +26,6 @@ export interface FSDirReadStats {
 
 class SystemService {
   /**
-   * Reads file at provided path and parsed it using the utf8 encoding
-   * Read happens synchronously
-   *
-   * @function readFile
-   * @param {String} filePath
-   * @returns {String}
-   */
-  readFile(filePath: string): string {
-    return fs.readFileSync(filePath, 'utf8');
-  }
-
-  /**
    * Reads directory structure at provided path
    * Read happens asynchronously, interested links are emitted via EventEmitter
    *

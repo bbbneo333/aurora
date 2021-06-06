@@ -15,18 +15,30 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import path from 'path';
-import {app, shell, BrowserWindow} from 'electron';
 import {autoUpdater} from 'electron-updater';
 import log from 'electron-log';
 
 import {
-  IAppBuilder,
+  app,
+  ipcMain,
+  shell,
+  BrowserWindow,
+} from 'electron';
+
+import {
   IAppMain,
+  IAppBuilder,
+  IAppModule,
+  AppSyncMessageHandler,
 } from './interfaces';
 
 import {
   MenuBuilder,
 } from './main/builders';
+
+import {
+  FileSystemModule,
+} from './main/modules';
 
 class App implements IAppMain {
   readonly env?: string;
@@ -40,6 +52,7 @@ class App implements IAppMain {
   private readonly enableAutoUpdater = false;
   private readonly htmlFilePath = path.join(__dirname, 'index.html');
   private readonly builders: IAppBuilder[] = [];
+  private readonly modules: IAppModule[] = [];
 
   constructor() {
     this.env = process.env.NODE_ENV;
@@ -52,11 +65,27 @@ class App implements IAppMain {
     this.installSourceMapSupport();
     this.installDebugSupport();
     this.registerBuilders();
+    this.registerModules();
     this.registerEvents();
   }
 
   quit(): void {
     app.quit();
+  }
+
+  registerSyncMessageHandler(messageChannel: string, messageHandler: AppSyncMessageHandler, messageHandlerCtx?: any): void {
+    ipcMain.on(messageChannel, (event, ...args) => {
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = messageHandler.apply(messageHandlerCtx, args);
+    });
+  }
+
+  getAssetPath(...paths: string[]): string {
+    const appAssetsPath = app.isPackaged
+      ? path.join(this.resourcesPath, 'assets')
+      : path.join(__dirname, '../assets');
+
+    return path.join(appAssetsPath, ...paths);
   }
 
   private installSourceMapSupport(): void {
@@ -83,14 +112,6 @@ class App implements IAppMain {
     return extensionInstaller
       .default(extensions.map(name => extensionInstaller[name]), this.forceExtensionDownload)
       .catch(console.log);
-  }
-
-  private getAssetPath(...paths: string[]): string {
-    const appAssetsPath = app.isPackaged
-      ? path.join(this.resourcesPath, 'assets')
-      : path.join(__dirname, '../assets');
-
-    return path.join(appAssetsPath, ...paths);
   }
 
   private registerAutoUpdater() {
@@ -183,6 +204,12 @@ class App implements IAppMain {
   private registerBuilders(): void {
     this.builders.push(
       new MenuBuilder(this),
+    );
+  }
+
+  private registerModules(): void {
+    this.modules.push(
+      new FileSystemModule(this),
     );
   }
 

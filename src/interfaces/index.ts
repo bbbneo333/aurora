@@ -1,6 +1,8 @@
 import {
-  IAppBuilder,
   IAppMain,
+  IAppBuilder,
+  IAppModule,
+  AppSyncMessageHandler,
 } from './app.interfaces';
 
 import {
@@ -12,11 +14,13 @@ import {
   IMediaLibraryService,
   IMediaPlaybackService,
   IMediaProvider,
+  IMediaSettingsComponent,
 } from './media.interfaces';
 
 export {
-  IAppBuilder,
   IAppMain,
+  IAppBuilder,
+  IAppModule,
   IMediaTrack,
   IMediaTrackCoverPicture,
   IMediaPlayback,
@@ -25,4 +29,6 @@ export {
   IMediaLibraryService,
   IMediaPlaybackService,
   IMediaProvider,
+  IMediaSettingsComponent,
+  AppSyncMessageHandler,
 };
