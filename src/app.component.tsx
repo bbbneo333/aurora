@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, Switch} from 'react-router-dom';
+import {Route, HashRouter as Router, Switch} from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
 
@@ -18,7 +18,7 @@ const cx = classNames.bind(styles);
 
 // register media providers
 const mediaLocalProvider = new MediaLocalProvider();
-MediaProviderService.addMediaProvider(mediaLocalProvider);
+MediaProviderService.registerMediaProvider(mediaLocalProvider);
 
 function AppContentHeader() {
   return (
@@ -32,6 +32,9 @@ function AppContentBrowser() {
   return (
     <div className={cx('app-content-browser-container')}>
       <Switch>
+        <Route path={Routes.SETTINGS}>
+          <AppPages.SettingsComponent/>
+        </Route>
         <Route path={Routes.HOME}>
           <AppPages.HomeComponent/>
         </Route>
@@ -82,9 +85,11 @@ function AppMediaPlayer() {
 
 export function AppComponent() {
   return (
-    <div className={cx('app-container')}>
-      <AppStage/>
-      <AppMediaPlayer/>
-    </div>
+    <Router>
+      <div className={cx('app-container')}>
+        <AppStage/>
+        <AppMediaPlayer/>
+      </div>
+    </Router>
   );
 }

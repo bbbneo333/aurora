@@ -1,4 +1,5 @@
 {
-  "action_add_tracks": "Add Tracks",
-  "action_remove_track": "Remove Track"
+  "action_remove_track": "Remove Track",
+  "link_home": "Home",
+  "link_settings": "Settings"
 }

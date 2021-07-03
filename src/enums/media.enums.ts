@@ -36,10 +36,6 @@ export enum MediaTrackCoverPictureImageDataType {
   Buffer = 'media/track/coverPictureImageDataType/buffer',
 }
 
-export enum MediaProviderUpdateEvent {
-  AddedProvider = 'media/provider/added',
-}
-
-export enum MediaLibraryUpdateEvent {
-  AddedTrack = 'media/library/trackAdded',
+export enum MediaProviderRegistryActions {
+  AddProvider = 'media/providerRegistry/add',
 }

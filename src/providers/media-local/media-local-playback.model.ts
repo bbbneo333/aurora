@@ -3,20 +3,20 @@ import {Howl} from 'howler';
 
 import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
 
-import {MediaLocalTrack} from './media-local-track.model';
+import {IMediaLocalTrack} from './media-local.interfaces';
 import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_playback');
 
 export class MediaLocalPlayback implements IMediaPlayback {
-  private readonly mediaTrack: MediaLocalTrack;
+  private readonly mediaTrack: IMediaLocalTrack;
   private readonly mediaPlaybackLocalAudio: any;
   private mediaPlaybackId: number | undefined;
 
-  constructor(mediaTrack: MediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
+  constructor(mediaTrack: IMediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
     this.mediaTrack = mediaTrack;
     this.mediaPlaybackLocalAudio = new Howl({
-      src: mediaTrack.location.address,
+      src: mediaTrack.extra.location.address,
       volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
       // important - in order to support MediaSession, we need to used HTML5 audio
       html5: true,

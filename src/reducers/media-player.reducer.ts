@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import {MediaEnums} from '../enums';
 import {IMediaPlayback, IMediaTrack} from '../interfaces';
 
-export interface MediaPlayerState {
+export type MediaPlayerState = {
   mediaTracks: IMediaTrack[];
   mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState;
   mediaPlaybackCurrentMediaTrack?: IMediaTrack;
@@ -12,12 +12,12 @@ export interface MediaPlayerState {
   mediaPlaybackVolumeMaxLimit: number,
   mediaPlaybackVolumeCurrent: number,
   mediaPlaybackVolumeMuted: boolean,
-}
+};
 
-export interface MediaPlayerStateAction {
+export type MediaPlayerStateAction = {
   type: MediaEnums.MediaPlayerActions,
   data?: any,
-}
+};
 
 const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],

@@ -11,10 +11,10 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
-import {
-  IAppBuilder,
-  IAppMain,
-} from '../../interfaces';
+import {AppEnums} from '../../enums';
+import {IAppBuilder, IAppMain} from '../../interfaces';
+
+import {DatastoreModule} from '../modules';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -33,7 +33,7 @@ export default class MenuBuilder implements IAppBuilder {
       this.setupDevelopmentEnvironment(mainWindow);
     }
 
-    const menuTemplate = this.app.platform === 'darwin'
+    const menuTemplate = this.app.platform === AppEnums.Platforms.Darwin
       ? this.buildDarwinTemplate(mainWindow)
       : this.buildDefaultTemplate(mainWindow);
 
@@ -154,6 +154,16 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
+          label: 'Remove Datastores and Reload',
+          accelerator: 'Command+Shift+R',
+          click: () => {
+            const datastore = this.app.getModule(DatastoreModule);
+
+            datastore.removeDatastores();
+            browserWindow.webContents.reload();
+          },
+        },
+        {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
           click: () => {
@@ -266,6 +276,16 @@ export default class MenuBuilder implements IAppBuilder {
               label: '&Reload',
               accelerator: 'Ctrl+R',
               click: () => {
+                browserWindow.webContents.reload();
+              },
+            },
+            {
+              label: 'Remove Datastores and Reload',
+              accelerator: 'Ctrl+Shift+R',
+              click: () => {
+                const datastore = this.app.getModule(DatastoreModule);
+
+                datastore.removeDatastores();
                 browserWindow.webContents.reload();
               },
             },

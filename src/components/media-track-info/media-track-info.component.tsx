@@ -23,7 +23,9 @@ export function MediaTrackInfoComponent(props: {
       </span>
       <span className={cx('media-track-info-subtitle')}>
         {/* TODO: Add implementation for navigating to artist page when user clicks on an individual artist */}
-        {mediaTrack.track_artists.join(', ')}
+        {mediaTrack.track_artists
+          .map(track_artist => track_artist.artist_name)
+          .join(', ')}
       </span>
     </div>
   );

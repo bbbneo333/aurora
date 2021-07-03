@@ -3,18 +3,18 @@ import * as _ from 'lodash';
 import {MediaEnums} from '../enums';
 import {IMediaTrack} from '../interfaces';
 
-export interface MediaLibraryState {
+export type MediaLibraryState = {
   mediaTracks: IMediaTrack[];
-}
+};
+
+export type MediaLibraryStateAction = {
+  type: MediaEnums.MediaLibraryActions,
+  data?: any,
+};
 
 const mediaLibraryInitialState: MediaLibraryState = {
   mediaTracks: [],
 };
-
-export interface MediaLibraryStateAction {
-  type: MediaEnums.MediaLibraryActions,
-  data?: any,
-}
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
   switch (action.type) {

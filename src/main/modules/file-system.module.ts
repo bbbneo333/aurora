@@ -1,18 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 import {dialog} from 'electron';
-import * as _ from 'lodash';
 
 import {AppEnums} from '../../enums';
-import {IAppMain, IAppModule} from '../../interfaces';
 
 import {
-  FSAssetReadOptions,
-  FSDirectorySelectionOptions,
-  FSDirectoryReadOptions,
-  FSDirectoryReadResponse,
-  FSDirectorySelectionResponse,
-} from '../../types';
+  IAppMain,
+  IAppModule,
+  IFSAssetReadOptions,
+  IFSDirectoryReadOptions,
+  IFSDirectoryReadResponse,
+} from '../../interfaces';
 
 export class FileSystemModule implements IAppModule {
   private readonly app: IAppMain;
@@ -24,37 +22,27 @@ export class FileSystemModule implements IAppModule {
 
   private registerMessageHandlers() {
     this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadAsset, this.readAsset, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.FSSelectDirectory, this.selectDirectory, this);
+    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectDirectory, this.selectDirectory, this);
+    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.FSReadDirectory, this.readDirectory, this);
   }
 
-  private readAsset(fsAssetPath: string[], fsAssetReadOptions: FSAssetReadOptions = {}) {
+  private readAsset(fsAssetPath: string[], fsAssetReadOptions: IFSAssetReadOptions = {}) {
     const assetResourcePath = this.app.getAssetPath(...fsAssetPath);
     return fs.readFileSync(assetResourcePath, fsAssetReadOptions.encoding);
   }
 
-  private async selectDirectory(fsDirSelectionOptions: FSDirectorySelectionOptions = {}): Promise<FSDirectorySelectionResponse> {
-    // prompt user to select a directory, in case user cancels the operation, procedure returns undefined
-    // limitation - we only have support for reading a single directory for now (openDirectory will make sure only single directory is allowed to be selected)
+  private selectDirectory(): string | undefined {
+    // prompt user to select a directory, showOpenDialogSync will either returns string[] or undefined (in case user cancels the operation)
+    // important - this will only select a single directory (openDirectory will make sure only single directory is allowed to be selected)
     // @see - https://www.electronjs.org/docs/api/dialog#dialogshowopendialogsyncbrowserwindow-options
-    const selectedDirectories = dialog.showOpenDialogSync(this.app.getCurrentWindow(), {
+    const fsSelectedDirectories = dialog.showOpenDialogSync(this.app.getCurrentWindow(), {
       properties: ['openDirectory'],
     });
-    if (!selectedDirectories || _.isEmpty(selectedDirectories)) {
-      return undefined;
-    }
 
-    // read the selected directory
-    const selectedDirectoryRead = await this.readDirectory(selectedDirectories[0], {
-      fileExtensions: fsDirSelectionOptions.readFileExtensions,
-    });
-
-    return {
-      directory: selectedDirectories[0],
-      directory_read: selectedDirectoryRead,
-    };
+    return fsSelectedDirectories ? fsSelectedDirectories[0] : undefined;
   }
 
-  private readDirectory(fsDirPath: string, fsDirReadOptions: FSDirectoryReadOptions = {}): Promise<FSDirectoryReadResponse> {
+  private readDirectory(fsDirPath: string, fsDirReadOptions: IFSDirectoryReadOptions = {}): Promise<IFSDirectoryReadResponse> {
     const dirReadFiles: {
       path: string,
     }[] = [];

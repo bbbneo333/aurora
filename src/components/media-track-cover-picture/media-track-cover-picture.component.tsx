@@ -33,7 +33,7 @@ export function MediaTrackCoverPictureComponent(props: {
     ? (
       <div className={cx('media-track-cover-picture-container')}>
         <img
-          alt={mediaTrack.track_album_name}
+          alt={mediaTrack.track_album.album_name}
           src={mediaTrackCoverPictureImageSrc}
         />
       </div>

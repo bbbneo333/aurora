@@ -42,6 +42,8 @@ import {
 } from './main/builders';
 
 import {
+  CryptoModule,
+  DatastoreModule,
   FileSystemModule,
 } from './main/modules';
 
@@ -110,12 +112,27 @@ class App implements IAppMain {
     return path.join(appAssetsPath, ...paths);
   }
 
+  getDataPath(...paths: string[]): string {
+    return path.join(app.getPath('appData'), 'Aurora', ...paths);
+  }
+
   getCurrentWindow(): BrowserWindow {
     if (!this.mainWindow) {
       throw new Error('App encountered error at getCurrentWindow - App currently has no current window');
     }
 
     return this.mainWindow;
+  }
+
+  getModule<T>(type: {
+    new(data: any): T,
+  }): T {
+    const module = this.modules.find(m => m instanceof type);
+    if (!module) {
+      throw new Error(`App encountered error at getModule - Module not found - ${type.name}`);
+    }
+
+    return module as T;
   }
 
   private installSourceMapSupport(): void {
@@ -239,6 +256,8 @@ class App implements IAppMain {
 
   private registerModules(): void {
     this.modules.push(
+      new CryptoModule(this),
+      new DatastoreModule(this),
       new FileSystemModule(this),
     );
   }

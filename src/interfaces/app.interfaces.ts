@@ -18,7 +18,11 @@ export interface IAppMain {
 
   getAssetPath(...paths: string[]): string;
 
+  getDataPath(...paths: string[]): string;
+
   getCurrentWindow(): BrowserWindow;
+
+  getModule<T>(type: new (data: any) => T): T;
 }
 
 export interface IAppBuilder {

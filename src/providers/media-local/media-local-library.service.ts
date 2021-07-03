@@ -1,6 +1,3 @@
-import {TypedEmitter} from 'tiny-typed-emitter';
-import {v4 as uuidv4} from 'uuid';
-
 import {
   IAudioMetadata,
   IPicture,
@@ -8,73 +5,86 @@ import {
   selectCover,
 } from 'music-metadata';
 
-import {IMediaLibraryEvents, IMediaLibraryService} from '../../interfaces';
 import {AppEnums, MediaEnums} from '../../enums';
-import {AppService} from '../../services';
-import {FSDirectorySelectionResponse} from '../../types';
+import {IFSDirectoryReadResponse} from '../../interfaces';
+import {AppService, MediaProviderService, MediaLibraryService} from '../../services';
 
-import {MediaLocalTrack} from './media-local-track.model';
+import {IMediaLocalLibraryService, IMediaLocalSettings} from './media-local.interfaces';
+import MediaLocalConstants from './media-local.constants.json';
 import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_library');
 
-export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> implements IMediaLibraryService {
-  readonly mediaTrackSupportedFileTypes = [
+class MediaLocalLibraryService implements IMediaLocalLibraryService {
+  private readonly mediaTrackSupportedFileTypes = [
     MediaEnums.MediaFileExtensions.MP3,
     MediaEnums.MediaFileExtensions.FLAC,
     MediaEnums.MediaFileExtensions.M4A,
     MediaEnums.MediaFileExtensions.WAV,
   ];
 
-  addMediaTracks(): void {
-    AppService
-      .sendAsyncMessage(AppEnums.IPCCommChannels.FSSelectDirectory, {
-        readFileExtensions: this.mediaTrackSupportedFileTypes,
-      })
-      .then(async (fsDirectorySelectionResponse: FSDirectorySelectionResponse) => {
-        if (!fsDirectorySelectionResponse) {
-          // user either cancelled the selection or no selected directories could be obtained, abort
-          return;
-        }
+  async syncMediaTracks() {
+    const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
 
-        await Promise.all(fsDirectorySelectionResponse.directory_read.files.map(async (fsDirectoryReadFile) => {
-          debug('addTracksFromDirectory - found file - %s', fsDirectoryReadFile.path);
-          // read metadata
-          const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(fsDirectoryReadFile.path);
-          // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
-          const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
-          // prepare media track
-          const mediaTrack = new MediaLocalTrack({
-            id: uuidv4(),
-            track_name: audioMetadata.common.title || 'unknown track',
-            track_artists: audioMetadata.common.artists || ['unknown artist'],
-            track_album_name: audioMetadata.common.album || 'unknown album',
-            track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
-            track_cover_picture: audioCoverPicture ? {
-              image_data: audioCoverPicture.data,
-              image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-              image_format: audioCoverPicture.format,
-            } : undefined,
-            location: {
-              address: fsDirectoryReadFile.path,
-            },
-          });
-          // emit event
-          this.emit(MediaEnums.MediaLibraryUpdateEvent.AddedTrack, mediaTrack);
-        }));
-
-        debug('addTracksFromDirectory - finished processing - %o', fsDirectorySelectionResponse.directory_read.stats);
-      })
-      .catch((error) => {
-        debug('addTracksFromDirectory - encountered error');
-        debug(error);
-      });
+    await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
   }
 
-  removeMediaTrack(): boolean {
-    // we don't need any special implementation for removing media item
-    // simply acknowledge
+  async removeMediaTrack(): Promise<boolean> {
     return true;
+  }
+
+  private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
+    const fsDirectoryReadResponse: IFSDirectoryReadResponse = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
+      fileExtensions: this.mediaTrackSupportedFileTypes,
+    });
+
+    await Promise.mapSeries(fsDirectoryReadResponse.files, async (fsDirectoryReadFile) => {
+      debug('addTracksFromDirectory - found file - %s', fsDirectoryReadFile.path);
+      // read metadata
+      const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(fsDirectoryReadFile.path);
+      // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
+      const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
+      // generate local id - we are using location of the file to uniquely identify the track
+      const mediaTrackId = MediaLocalLibraryService.getMediaTrackId(fsDirectoryReadFile.path);
+      // add media track
+      await MediaLibraryService.insertMediaTrack(MediaLocalConstants.Provider, {
+        provider_id: mediaTrackId,
+        track_name: audioMetadata.common.title || 'unknown track',
+        track_number: audioMetadata.common.track.no || 0,
+        track_artists: audioMetadata.common.artists ? audioMetadata.common.artists.map(audioArtist => ({
+          artist_name: audioArtist,
+        })) : [{
+          artist_name: 'unknown artist',
+        }],
+        track_album: {
+          album_name: audioMetadata.common.album || 'unknown album',
+          album_artist: {
+            artist_name: audioMetadata.common.artists ? audioMetadata.common.artists[0] : 'unknown artist',
+          },
+          album_cover_picture: audioCoverPicture ? {
+            image_data: audioCoverPicture.data,
+            image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+            image_format: audioCoverPicture.format,
+          } : undefined,
+        },
+        track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
+        track_cover_picture: audioCoverPicture ? {
+          image_data: audioCoverPicture.data,
+          image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+          image_format: audioCoverPicture.format,
+        } : undefined,
+        extra: {
+          location: {
+            address: fsDirectoryReadFile.path,
+          },
+        },
+      });
+    });
+    debug('addTracksFromDirectory - finished processing - %o', fsDirectoryReadResponse.stats);
+  }
+
+  private static getMediaTrackId(mediaTrackInput: string): string {
+    return AppService.sendSyncMessage(AppEnums.IPCCommChannels.CryptoGenerateSHA256Hash, mediaTrackInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
@@ -85,3 +95,5 @@ export class MediaLocalLibraryService extends TypedEmitter<IMediaLibraryEvents> 
     return selectCover(audioMetadata.common.picture);
   }
 }
+
+export default new MediaLocalLibraryService();

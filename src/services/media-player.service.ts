@@ -1,9 +1,8 @@
 import {MediaEnums} from '../enums';
 import {IMediaTrack} from '../interfaces';
+import store from '../store';
 
 import MediaProviderService from './media-provider.service';
-
-import store from '../store';
 
 const debug = require('debug')('app:service:media_player_service');
 
@@ -53,8 +52,8 @@ class MediaPlayerService {
       // request media provider to load the track
       debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
 
-      const mediaProvider = MediaProviderService.getMediaProvider(mediaTrack.provider);
-      const mediaPlayback = mediaProvider.mediaPlaybackService.playMediaTrack(mediaTrack, {
+      const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
+      const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
         mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
         mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
       });
