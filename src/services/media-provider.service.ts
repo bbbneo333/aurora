@@ -9,9 +9,15 @@ class MediaProviderService {
   registerMediaProvider(mediaProvider: IMediaProvider) {
     debug('registerMediaProvider - registering media provider - %s', mediaProvider.mediaProviderIdentifier);
 
-    MediaProviderService.addProviderToDatastore(mediaProvider)
+    this.addProviderToDatastore(mediaProvider)
       .then(() => {
-        MediaProviderService.addProviderToLocalStore(mediaProvider);
+        this.addProviderToLocalStore(mediaProvider);
+
+        if (mediaProvider.onMediaProviderRegistered) {
+          debug('registerMediaProvider - invoking onMediaProviderRegistered for provider - %s', mediaProvider.mediaProviderIdentifier);
+          mediaProvider.onMediaProviderRegistered();
+        }
+
         debug('registerMediaProvider - registered media provider - %s', mediaProvider.mediaProviderIdentifier);
       });
   }
@@ -39,14 +45,24 @@ class MediaProviderService {
   }
 
   async updateMediaProviderSettings(mediaProviderIdentifier: string, mediaProviderSettings: object): Promise<void> {
+    debug('updateMediaProviderSettings - getting existing settings for - %s', mediaProviderIdentifier);
+    const mediaProvider = this.getMediaProvider(mediaProviderIdentifier);
+    const mediaProviderExistingSettings = await this.getMediaProviderSettings(mediaProviderIdentifier);
+
     debug('updateMediaProviderSettings - updating settings for - %s, %o', mediaProviderIdentifier, mediaProviderSettings);
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
       settings: mediaProviderSettings,
     });
+
+    if (mediaProvider.onMediaProviderSettingsUpdated) {
+      debug('updateMediaProviderSettings - invoking onMediaProviderSettingsUpdated for provider - %s', mediaProviderIdentifier);
+      mediaProvider.onMediaProviderSettingsUpdated(mediaProviderExistingSettings, mediaProviderSettings);
+    }
+
     debug('updateMediaProviderSettings - updated settings - %s', mediaProviderIdentifier);
   }
 
-  private static async addProviderToDatastore(mediaProvider: IMediaProvider): Promise<void> {
+  private async addProviderToDatastore(mediaProvider: IMediaProvider): Promise<void> {
     // check if we already have an existing entry for the provider in the datastore, do nothing if entry already exists
     if (await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProvider.mediaProviderIdentifier)) {
       return;
@@ -64,7 +80,7 @@ class MediaProviderService {
     });
   }
 
-  private static addProviderToLocalStore(mediaProvider: IMediaProvider): void {
+  private addProviderToLocalStore(mediaProvider: IMediaProvider): void {
     store.dispatch({
       type: MediaEnums.MediaProviderRegistryActions.AddProvider,
       data: {

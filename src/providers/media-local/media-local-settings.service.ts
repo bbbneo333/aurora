@@ -1,9 +1,9 @@
-import {IMediaSettingsComponent} from '../../interfaces';
+import {IMediaSettingsComponent, IMediaSettingsService} from '../../interfaces';
 
-import {IMediaLocalSettingsService, IMediaLocalSettings} from './media-local.interfaces';
+import {IMediaLocalSettings} from './media-local.interfaces';
 import {MediaLocalSettingsComponent} from './media-local-settings.component';
 
-class MediaLocalSettingsService implements IMediaLocalSettingsService {
+class MediaLocalSettingsService implements IMediaSettingsService {
   getDefaultSettings(): IMediaLocalSettings {
     return {
       library: {

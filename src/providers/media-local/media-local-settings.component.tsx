@@ -18,6 +18,7 @@ enum MediaLocalSettingsStateActionType {
 
 type MediaLocalSettingsState = {
   settings: IMediaLocalSettings | undefined,
+  dirty: boolean,
   loading: boolean,
   loaded: boolean,
   saving: boolean,
@@ -52,12 +53,12 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
       return {
         ...state,
         saving: true,
-        saved: false,
       };
     }
     case MediaLocalSettingsStateActionType.SettingsSaved: {
       return {
         ...state,
+        dirty: false,
         saving: false,
         saved: true,
       };
@@ -66,11 +67,9 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
       // data.selectedDirectory - directory which needs to be added
       const {selectedDirectory} = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
-      let settingsRequiresSave = false;
 
       if (!directories.includes(selectedDirectory)) {
         directories.push(selectedDirectory);
-        settingsRequiresSave = true;
       }
 
       return {
@@ -80,19 +79,17 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
             directories,
           },
         },
-        saved: settingsRequiresSave,
+        dirty: true,
       };
     }
     case MediaLocalSettingsStateActionType.RemoveDirectory: {
       // data.directory - directory which needs to be removed
       const {directory} = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
-      let settingsRequiresSave = false;
 
       if (directories.includes(directory)) {
         // important - pull will mutate the original array
         _.pull(directories, directory);
-        settingsRequiresSave = true;
       }
 
       return {
@@ -102,7 +99,7 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
             directories,
           },
         },
-        saved: settingsRequiresSave,
+        dirty: true,
       };
     }
     default:
@@ -117,10 +114,13 @@ function openDirectorySelectionDialog(): string | undefined {
 export function MediaLocalSettingsComponent() {
   const [{
     settings,
+    dirty,
     loading,
     saving,
+    saved,
   }, mediaLocalSettingsDispatch] = useReducer(mediaLocalSettingsStateReducer, {
     settings: undefined,
+    dirty: false,
     loading: false,
     loaded: false,
     saving: false,
@@ -145,7 +145,7 @@ export function MediaLocalSettingsComponent() {
   }, []);
 
   useEffect(() => {
-    if (!settings) {
+    if (!settings || !dirty) {
       return;
     }
 
@@ -192,44 +192,47 @@ export function MediaLocalSettingsComponent() {
     <div>
       These are Local Provider settings
       <br/>
-      Selected Directories:
-      <br/>
-      {settings.library.directories.map(directory => (
-        <div key={directory}>
-          <span>{directory}</span>
-          <button
-            type="submit"
-            onClick={() => {
+      <div>
+        Selected Directories:
+        <br/>
+        {settings.library.directories.map(directory => (
+          <div key={directory}>
+            <span>{directory}</span>
+            <button
+              type="submit"
+              onClick={() => {
+                mediaLocalSettingsDispatch({
+                  type: MediaLocalSettingsStateActionType.RemoveDirectory,
+                  data: {
+                    directory,
+                  },
+                });
+              }}
+            >
+              Remove Directory
+            </button>
+            <br/>
+          </div>
+        ))}
+
+        <button
+          type="submit"
+          onClick={() => {
+            const selectedDirectory = openDirectorySelectionDialog();
+            if (selectedDirectory) {
               mediaLocalSettingsDispatch({
-                type: MediaLocalSettingsStateActionType.RemoveDirectory,
+                type: MediaLocalSettingsStateActionType.AddDirectory,
                 data: {
-                  directory,
+                  selectedDirectory,
                 },
               });
-            }}
-          >
-            Remove Directory
-          </button>
-          <br/>
-        </div>
-      ))}
-
-      <button
-        type="submit"
-        onClick={() => {
-          const selectedDirectory = openDirectorySelectionDialog();
-          if (selectedDirectory) {
-            mediaLocalSettingsDispatch({
-              type: MediaLocalSettingsStateActionType.AddDirectory,
-              data: {
-                selectedDirectory,
-              },
-            });
-          }
-        }}
-      >
-        Add Directory
-      </button>
+            }
+          }}
+        >
+          Add Directory
+        </button>
+      </div>
+      {saved && <div>Settings were saved successfully!</div>}
     </div>
   );
 }

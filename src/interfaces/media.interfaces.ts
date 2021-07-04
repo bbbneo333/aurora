@@ -161,4 +161,8 @@ export interface IMediaProvider {
   mediaLibraryService: IMediaLibraryService;
   mediaPlaybackService: IMediaPlaybackService;
   mediaSettingsService: IMediaSettingsService;
+
+  onMediaProviderRegistered?(): void;
+
+  onMediaProviderSettingsUpdated?(existingSettings: object, updatedSettings: object): void;
 }

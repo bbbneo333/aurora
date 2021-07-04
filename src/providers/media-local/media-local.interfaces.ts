@@ -1,18 +1,6 @@
 import {
-  IMediaLibraryService,
-  IMediaPlaybackService,
-  IMediaSettingsService,
   IMediaTrack,
 } from '../../interfaces';
-
-export interface IMediaLocalLibraryService extends IMediaLibraryService {
-}
-
-export interface IMediaLocalPlaybackService extends IMediaPlaybackService {
-}
-
-export interface IMediaLocalSettingsService extends IMediaSettingsService {
-}
 
 export interface IMediaLocalSettings {
   library: {

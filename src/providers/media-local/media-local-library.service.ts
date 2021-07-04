@@ -6,16 +6,16 @@ import {
 } from 'music-metadata';
 
 import {AppEnums, MediaEnums} from '../../enums';
-import {IFSDirectoryReadResponse} from '../../interfaces';
+import {IFSDirectoryReadResponse, IMediaLibraryService} from '../../interfaces';
 import {AppService, MediaProviderService, MediaLibraryService} from '../../services';
 
-import {IMediaLocalLibraryService, IMediaLocalSettings} from './media-local.interfaces';
+import {IMediaLocalSettings} from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
 import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_library');
 
-class MediaLocalLibraryService implements IMediaLocalLibraryService {
+class MediaLocalLibraryService implements IMediaLibraryService {
   private readonly mediaTrackSupportedFileTypes = [
     MediaEnums.MediaFileExtensions.MP3,
     MediaEnums.MediaFileExtensions.FLAC,
@@ -23,14 +23,30 @@ class MediaLocalLibraryService implements IMediaLocalLibraryService {
     MediaEnums.MediaFileExtensions.WAV,
   ];
 
-  async syncMediaTracks() {
+  async removeMediaTrack(): Promise<boolean> {
+    return true;
+  }
+
+  onProviderRegistered(): void {
+    debug('onProviderRegistered - received');
+    this.syncMediaTracks()
+      .then(() => {
+        debug('onProviderRegistered - sync completed');
+      });
+  }
+
+  onProviderSettingsUpdated(existingSettings: object, updatedSettings: object): void {
+    debug('onProviderSettingsUpdated - received - existing settings - %o, updated settings - %o', existingSettings, updatedSettings);
+    this.syncMediaTracks()
+      .then(() => {
+        debug('onProviderSettingsUpdated - sync completed');
+      });
+  }
+
+  private async syncMediaTracks() {
     const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
 
     await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
-  }
-
-  async removeMediaTrack(): Promise<boolean> {
-    return true;
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {

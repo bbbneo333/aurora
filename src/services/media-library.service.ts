@@ -23,12 +23,19 @@ class MediaLibraryService {
     const mediaTrackData = await this.checkAndInsertMediaTrack(mediaProviderIdentifier, mediaTrackProviderData);
     const mediaTrack = await this.buildMediaTrack(mediaTrackData);
 
-    store.dispatch({
-      type: MediaEnums.MediaLibraryActions.AddTrack,
-      data: {
-        mediaTrack,
-      },
-    });
+    // only adding to store if not already exists
+    // TODO: This needs to be removed once views are requesting track list manually via getMediaTracks
+    if (!store.getState()
+      .mediaLibrary
+      .mediaTracks
+      .find(m => m.id === mediaTrack.id)) {
+      store.dispatch({
+        type: MediaEnums.MediaLibraryActions.AddTrack,
+        data: {
+          mediaTrack,
+        },
+      });
+    }
 
     return mediaTrack;
   }
@@ -98,8 +105,9 @@ class MediaLibraryService {
       provider: mediaProviderIdentifier,
       provider_id: mediaArtistProviderData.provider_id,
       artist_name: mediaArtistProviderData.artist_name,
-      artist_display_picture: mediaArtistProviderData.artist_feature_picture,
-      artist_feature_picture: mediaArtistProviderData.artist_feature_picture,
+      // TODO: Add back support for MediaPicture once BufferImage processing issue is fixed
+      // artist_display_picture: mediaArtistProviderData.artist_feature_picture,
+      // artist_feature_picture: mediaArtistProviderData.artist_feature_picture,
       extra: mediaArtistProviderData.extra,
     });
   }
@@ -121,7 +129,8 @@ class MediaLibraryService {
       provider_id: mediaAlbumProviderData.provider_id,
       album_name: mediaAlbumProviderData.album_name,
       album_artist_id: mediaAlbumArtistData.id,
-      album_cover_picture: mediaAlbumProviderData.album_cover_picture,
+      // TODO: Add back support for MediaPicture once BufferImage processing issue is fixed
+      // album_cover_picture: mediaAlbumProviderData.album_cover_picture,
       extra: mediaAlbumProviderData.extra,
     });
   }
@@ -145,7 +154,8 @@ class MediaLibraryService {
       track_name: mediaTrackProviderData.track_name,
       track_number: mediaTrackProviderData.track_number,
       track_duration: mediaTrackProviderData.track_duration,
-      track_cover_picture: mediaTrackProviderData.track_cover_picture,
+      // TODO: Add back support for MediaPicture once BufferImage processing issue is fixed
+      // track_cover_picture: mediaTrackProviderData.track_cover_picture,
       track_artist_ids: mediaArtistDataList.map(mediaArtistData => (mediaArtistData.id)),
       track_album_id: mediaAlbumData.id,
       extra: mediaTrackProviderData.extra,
