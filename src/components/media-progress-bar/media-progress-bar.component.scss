@@ -4,6 +4,8 @@
 
 .media-progress-container:not(.disabled):hover,
 .media-progress-container:not(.disabled).dragging {
+  cursor: pointer;
+
   .media-progress-bar {
     background-color: white;
   }

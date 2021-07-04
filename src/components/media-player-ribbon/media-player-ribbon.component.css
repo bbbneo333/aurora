@@ -44,7 +44,8 @@
 
 .media-player-control {
   text-align: center;
-  margin: 5px 10px;
+  padding: 5px;
+  margin: 2px;
   transition: color .1s ease;
   /*background-color: green;*/
 }
@@ -59,7 +60,7 @@
 }
 
 .media-player-control.media-player-control-md {
-  font-size: 20px;
+  font-size: 18px;
   color: #8c8c8c;
 }
 
