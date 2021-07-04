@@ -1,6 +1,5 @@
 module.exports = {
   rules: {
-    '@typescript-eslint/object-curly-spacing': ['error', 'never'],
     '@typescript-eslint/lines-between-class-members': [
       'error',
       'always',

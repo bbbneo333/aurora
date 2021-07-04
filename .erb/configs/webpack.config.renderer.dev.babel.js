@@ -1,14 +1,19 @@
+/**
+ * Webpack config for development electron renderer process
+ */
+
 import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';
 import chalk from 'chalk';
-import { merge } from 'webpack-merge';
-import { spawn, execSync } from 'child_process';
-import baseConfig from './webpack.config.base';
-import CheckNodeEnv from '../scripts/CheckNodeEnv';
+import {merge} from 'webpack-merge';
+import {spawn, execSync} from 'child_process';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
-// When an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
+import baseConfig from './webpack.config.base';
+import CheckNodeEnv from '../scripts/CheckNodeEnv';
+
+// when an ESLint server is running, we can't set the NODE_ENV so we'll check if it's
 // at the dev webpack config is not accidentally run in a production environment
 if (process.env.NODE_ENV === 'production') {
   CheckNodeEnv('development');
@@ -18,40 +23,27 @@ const port = process.env.PORT || 1212;
 const publicPath = `http://localhost:${port}/dist`;
 const dllDir = path.join(__dirname, '../dll');
 const manifest = path.resolve(dllDir, 'renderer.json');
-const requiredByDLLConfig = module.parent.filename.includes(
-  'webpack.config.renderer.dev.dll'
-);
+const requiredByDLLConfig = module.parent.filename.includes('webpack.config.renderer.dev.dll');
 
-/**
- * Warn if the DLL is not built
- */
+// warn if the DLL is not built
 if (!requiredByDLLConfig && !(fs.existsSync(dllDir) && fs.existsSync(manifest))) {
-  console.log(
-    chalk.black.bgYellow.bold(
-      'The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'
-    )
-  );
+  console.log(chalk.black.bgYellow.bold('The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'));
   execSync('yarn postinstall');
 }
 
 export default merge(baseConfig, {
   devtool: 'inline-source-map',
-
   mode: 'development',
-
   target: 'electron-renderer',
-
   entry: [
     'core-js',
     'regenerator-runtime/runtime',
     require.resolve('../../src/index.tsx'),
   ],
-
   output: {
     publicPath: `http://localhost:${port}/dist/`,
     filename: 'renderer.dev.js',
   },
-
   module: {
     rules: [
       {
@@ -75,6 +67,12 @@ export default merge(baseConfig, {
             loader: 'style-loader',
           },
           {
+            loader: '@teamsupercell/typings-for-css-modules-loader',
+            options: {
+              disableLocalsExport: true,
+            },
+          },
+          {
             loader: 'css-loader',
             options: {
               sourceMap: true,
@@ -87,6 +85,12 @@ export default merge(baseConfig, {
         use: [
           {
             loader: 'style-loader',
+          },
+          {
+            loader: '@teamsupercell/typings-for-css-modules-loader',
+            options: {
+              disableLocalsExport: true,
+            },
           },
           {
             loader: 'css-loader',
@@ -108,6 +112,12 @@ export default merge(baseConfig, {
             loader: 'style-loader',
           },
           {
+            loader: '@teamsupercell/typings-for-css-modules-loader',
+            options: {
+              disableLocalsExport: true,
+            },
+          },
+          {
             loader: 'css-loader',
             options: {
               sourceMap: true,
@@ -127,6 +137,9 @@ export default merge(baseConfig, {
           },
           {
             loader: '@teamsupercell/typings-for-css-modules-loader',
+            options: {
+              disableLocalsExport: true,
+            },
           },
           {
             loader: 'css-loader',
@@ -211,17 +224,14 @@ export default merge(baseConfig, {
     ],
   },
   plugins: [
-
     requiredByDLLConfig
       ? null
       : new webpack.DllReferencePlugin({
-          context: path.join(__dirname, '../dll'),
-          manifest: require(manifest),
-          sourceType: 'var',
-        }),
-
+        context: path.join(__dirname, '../dll'),
+        manifest: require(manifest),
+        sourceType: 'var',
+      }),
     new webpack.NoEmitOnErrorsPlugin(),
-
     /**
      * Create global constants which can be configured at compile time.
      *
@@ -231,25 +241,21 @@ export default merge(baseConfig, {
      * NODE_ENV should be production so that modules do not perform certain
      * development checks
      *
-     * By default, use 'development' as NODE_ENV. This can be overriden with
+     * By default, use 'development' as NODE_ENV. This can be overridden with
      * 'staging', for example, by changing the ENV variables in the npm scripts
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
     }),
-
     new webpack.LoaderOptionsPlugin({
       debug: true,
     }),
-
     new ReactRefreshWebpackPlugin(),
   ],
-
   node: {
     __dirname: false,
     __filename: false,
   },
-
   devServer: {
     port,
     publicPath,
@@ -259,7 +265,7 @@ export default merge(baseConfig, {
     inline: true,
     lazy: false,
     hot: true,
-    headers: { 'Access-Control-Allow-Origin': '*' },
+    headers: {'Access-Control-Allow-Origin': '*'},
     contentBase: path.join(__dirname, 'dist'),
     watchOptions: {
       aggregateTimeout: 300,
@@ -271,14 +277,14 @@ export default merge(baseConfig, {
       disableDotRule: false,
     },
     before() {
-      console.log('Starting Main Process...');
-        spawn('npm', ['run', 'start:main'], {
-          shell: true,
-          env: process.env,
-          stdio: 'inherit',
-        })
-          .on('close', (code) => process.exit(code))
-          .on('error', (spawnError) => console.error(spawnError));
+      console.log('webpack:renderer - starting main process...');
+      spawn('npm', ['run', 'start:main'], {
+        shell: true,
+        env: process.env,
+        stdio: 'inherit',
+      })
+        .on('close', (code) => process.exit(code))
+        .on('error', (spawnError) => console.error(spawnError));
     },
   },
 });
