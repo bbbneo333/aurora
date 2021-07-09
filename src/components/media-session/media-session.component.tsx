@@ -73,9 +73,7 @@ export function MediaSessionComponent() {
     const mediaTrack = mediaPlayer.mediaPlaybackCurrentMediaTrack;
     const mediaSessionMetadata = new MediaMetadata({
       title: mediaTrack.track_name,
-      // TODO: Fix this, artist at [0] is assumed to be the main artist, but can be false
-      //  add support for mediaTrack.track_artist
-      artist: mediaTrack.track_artists[0].artist_name,
+      artist: mediaTrack.track_album.album_artist.artist_name,
       album: mediaTrack.track_album.album_name,
       artwork: [],
     });
