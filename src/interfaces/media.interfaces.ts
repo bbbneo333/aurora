@@ -11,8 +11,31 @@ export interface IMediaTrackData {
   readonly track_duration: number;
   readonly track_cover_picture?: IMediaPicture;
   readonly track_artist_ids: string[],
+  readonly removed: boolean;
   readonly track_album_id: string,
+  readonly sync: {
+    last_sync_key: string;
+    last_sync_at: number;
+  };
   readonly extra?: object;
+}
+
+export interface IMediaTrackDataFilterParams {
+  provider?: string;
+  provider_id?: string;
+  track_album_id?: string;
+  removed?: boolean,
+  sync?: {
+    last_sync_key: string;
+  },
+}
+
+export interface IMediaTrackDataUpdateParams {
+  removed?: boolean;
+  sync?: {
+    last_sync_key: string;
+    last_sync_at: number;
+  },
 }
 
 export interface IMediaAlbumData {
@@ -25,6 +48,13 @@ export interface IMediaAlbumData {
   readonly extra?: object;
 }
 
+export interface IMediaAlbumDataFilterParams {
+  provider?: string;
+  provider_id?: string;
+  album_name?: string;
+  album_artist_id?: string;
+}
+
 export interface IMediaArtistData {
   readonly id: string;
   readonly provider: string;
@@ -35,6 +65,12 @@ export interface IMediaArtistData {
   readonly extra?: object;
 }
 
+export interface IMediaArtistDataFilterParams {
+  provider?: string;
+  provider_id?: string;
+  artist_name?: string;
+}
+
 export interface IMediaTrackProviderData {
   readonly provider_id?: string;
   readonly track_name: string;
@@ -43,6 +79,9 @@ export interface IMediaTrackProviderData {
   readonly track_cover_picture?: IMediaPicture;
   readonly track_artists: IMediaArtistProviderData[];
   readonly track_album: IMediaAlbumProviderData;
+  readonly sync: {
+    sync_key: string;
+  };
   readonly extra?: object;
 }
 
@@ -132,7 +171,9 @@ export interface IMediaSettingsComponent extends React.FC<any> {
 }
 
 export interface IMediaLibraryService {
-  removeMediaTrack(mediaTrack: IMediaTrack): Promise<boolean>;
+  syncMediaTracks(): Promise<void>;
+
+  removeMediaTrack?(mediaTrack: IMediaTrack): Promise<boolean>;
 }
 
 export interface IMediaPlaybackService {
@@ -150,10 +191,20 @@ export interface IMediaProviderData {
   enabled: boolean;
   settings: object;
   options: object;
+  library: {
+    last_sync_key: string | null,
+    last_sync_started_at: number | null,
+    last_sync_finished_at: number | null,
+  },
 }
 
 export interface IMediaProviderDataUpdateParams {
   settings?: object;
+  library?: {
+    last_sync_key?: string | null,
+    last_sync_started_at?: number | null,
+    last_sync_finished_at?: number | null,
+  },
 }
 
 export interface IMediaProvider {

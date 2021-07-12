@@ -5,7 +5,6 @@
  */
 
 import {
-  shell,
   BrowserWindow,
   Menu,
   MenuItemConstructorOptions,
@@ -154,16 +153,6 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
-          label: 'Remove Datastores and Reload',
-          accelerator: 'Command+Shift+R',
-          click: () => {
-            const datastore = this.app.getModule(DatastoreModule);
-
-            datastore.removeDatastores();
-            browserWindow.webContents.reload();
-          },
-        },
-        {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
           click: () => {
@@ -217,29 +206,19 @@ export default class MenuBuilder implements IAppBuilder {
       label: 'Help',
       submenu: [
         {
-          label: 'Learn More',
-          click() {
-            shell.openExternal('https://electronjs.org');
+          label: 'Remove Datastores and Reload',
+          click: () => {
+            const datastore = this.app.getModule(DatastoreModule);
+
+            datastore.removeDatastores();
+            browserWindow.webContents.reload();
           },
         },
         {
-          label: 'Documentation',
-          click() {
-            shell.openExternal(
-              'https://github.com/electron/electron/tree/master/docs#readme',
-            );
-          },
-        },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
-          },
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
+          label: 'Compact Datastores',
+          click: () => {
+            const datastore = this.app.getModule(DatastoreModule);
+            datastore.compactDatastores();
           },
         },
       ],
@@ -247,7 +226,13 @@ export default class MenuBuilder implements IAppBuilder {
 
     const subMenuView = this.app.debug ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [
+      subMenuAbout,
+      subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      subMenuHelp,
+    ];
   }
 
   private buildDefaultTemplate(browserWindow: BrowserWindow): MenuItemConstructorOptions[] {
@@ -280,16 +265,6 @@ export default class MenuBuilder implements IAppBuilder {
               },
             },
             {
-              label: 'Remove Datastores and Reload',
-              accelerator: 'Ctrl+Shift+R',
-              click: () => {
-                const datastore = this.app.getModule(DatastoreModule);
-
-                datastore.removeDatastores();
-                browserWindow.webContents.reload();
-              },
-            },
-            {
               label: 'Toggle &Full Screen',
               accelerator: 'F11',
               click: () => {
@@ -318,29 +293,19 @@ export default class MenuBuilder implements IAppBuilder {
         label: 'Help',
         submenu: [
           {
-            label: 'Learn More',
-            click() {
-              shell.openExternal('https://electronjs.org');
+            label: 'Remove Datastores and Reload',
+            click: () => {
+              const datastore = this.app.getModule(DatastoreModule);
+
+              datastore.removeDatastores();
+              browserWindow.webContents.reload();
             },
           },
           {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/master/docs#readme',
-              );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
-            },
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
+            label: 'Compact Datastores',
+            click: () => {
+              const datastore = this.app.getModule(DatastoreModule);
+              datastore.compactDatastores();
             },
           },
         ],

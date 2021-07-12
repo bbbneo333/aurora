@@ -9,6 +9,8 @@ export enum IPCCommChannels {
   DSFindOne = 'ds:find_one',
   DSInsertOne = 'ds:insert_one',
   DSUpdateOne = 'ds:update_one',
+  DSRemoveOne = 'ds:remove_one',
+  DSRemove = 'ds:remove',
   // crypto
   CryptoGenerateSHA256Hash = 'crypto:generate_sha_256_hash',
 }

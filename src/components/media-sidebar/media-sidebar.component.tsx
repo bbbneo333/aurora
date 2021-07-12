@@ -12,9 +12,6 @@ const cx = classNames.bind(styles);
 export function MediaSidebarComponent() {
   return (
     <div className={cx('media-sidebar-container')}>
-      <NavLink exact to={Routes.HOME} activeClassName="selected">
-        {I18nService.getString('link_home')}
-      </NavLink>
       <NavLink exact to={Routes.SETTINGS} activeClassName="selected">
         {I18nService.getString('link_settings')}
       </NavLink>

@@ -1,12 +1,21 @@
 import {AppEnums} from '../enums';
-import {IMediaArtistData} from '../interfaces';
+import {IMediaArtistDataFilterParams, IMediaArtistData} from '../interfaces';
 import AppService from '../services/app.service';
 
 class MediaArtistDatastore {
   private readonly mediaArtistDatastoreName = 'media_artists';
 
   constructor() {
-    AppService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaArtistDatastoreName);
+    AppService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaArtistDatastoreName, {
+      indexes: [{
+        field: 'id',
+        unique: true,
+      }, {
+        field: 'provider_id',
+      }, {
+        field: 'artist_name',
+      }],
+    });
   }
 
   findMediaArtistById(mediaArtistId: string): Promise<IMediaArtistData | undefined> {
@@ -15,18 +24,8 @@ class MediaArtistDatastore {
     });
   }
 
-  findMediaArtistByProvider(mediaArtistProvider: string, mediaArtistProviderId: string): Promise<IMediaArtistData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, {
-      provider: mediaArtistProvider,
-      provider_id: mediaArtistProviderId,
-    });
-  }
-
-  findMediaArtistByName(mediaArtistProvider: string, mediaArtistName: string): Promise<IMediaArtistData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, {
-      provider: mediaArtistProvider,
-      artist_name: mediaArtistName,
-    });
+  findMediaArtist(mediaArtistFilterParams: IMediaArtistDataFilterParams): Promise<IMediaArtistData | undefined> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterParams);
   }
 
   insertMediaArtist(mediaArtistData: IMediaArtistData): Promise<IMediaArtistData> {

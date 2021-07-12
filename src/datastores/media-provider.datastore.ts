@@ -6,7 +6,12 @@ class MediaProviderDatastore {
   private readonly mediaProviderDatastoreName = 'media_providers';
 
   constructor() {
-    AppService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaProviderDatastoreName);
+    AppService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaProviderDatastoreName, {
+      indexes: [{
+        field: 'identifier',
+        unique: true,
+      }],
+    });
   }
 
   findMediaProviderByIdentifier(mediaProviderIdentifier: string): Promise<IMediaProviderData | undefined> {

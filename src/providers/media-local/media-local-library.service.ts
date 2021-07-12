@@ -23,10 +23,6 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     MediaEnums.MediaFileExtensions.WAV,
   ];
 
-  async removeMediaTrack(): Promise<boolean> {
-    return true;
-  }
-
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
     this.syncMediaTracks()
@@ -43,13 +39,14 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       });
   }
 
-  private async syncMediaTracks() {
+  async syncMediaTracks() {
     const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-
-    await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
+    const mediaSyncKey = await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
+    await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory, mediaSyncKey));
+    await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider, mediaSyncKey);
   }
 
-  private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
+  private async addTracksFromDirectory(mediaLibraryDirectory: string, mediaSyncKey: string): Promise<void> {
     const fsDirectoryReadResponse: IFSDirectoryReadResponse = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
       fileExtensions: this.mediaTrackSupportedFileTypes,
     });
@@ -89,6 +86,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
           image_format: audioCoverPicture.format,
         } : undefined,
+        sync: {
+          sync_key: mediaSyncKey,
+        },
         extra: {
           location: {
             address: fsDirectoryReadFile.path,

@@ -12,6 +12,7 @@ class MediaProviderService {
     this.addProviderToDatastore(mediaProvider)
       .then(() => {
         this.addProviderToLocalStore(mediaProvider);
+        this.initializeLibraryInLocalStore(mediaProvider);
 
         if (mediaProvider.onMediaProviderRegistered) {
           debug('registerMediaProvider - invoking onMediaProviderRegistered for provider - %s', mediaProvider.mediaProviderIdentifier);
@@ -77,6 +78,11 @@ class MediaProviderService {
       enabled: true,
       settings: mediaProviderDefaultSettings,
       options: {},
+      library: {
+        last_sync_key: null,
+        last_sync_started_at: null,
+        last_sync_finished_at: null,
+      },
     });
   }
 
@@ -85,6 +91,15 @@ class MediaProviderService {
       type: MediaEnums.MediaProviderRegistryActions.AddProvider,
       data: {
         mediaProvider,
+      },
+    });
+  }
+
+  private initializeLibraryInLocalStore(mediaProvider: IMediaProvider): void {
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.Initialize,
+      data: {
+        mediaProviderIdentifier: mediaProvider.mediaProviderIdentifier,
       },
     });
   }

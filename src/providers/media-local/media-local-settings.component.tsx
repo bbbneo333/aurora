@@ -67,9 +67,11 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
       // data.selectedDirectory - directory which needs to be added
       const {selectedDirectory} = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
+      let directoriesAreUpdated = false;
 
       if (!directories.includes(selectedDirectory)) {
         directories.push(selectedDirectory);
+        directoriesAreUpdated = true;
       }
 
       return {
@@ -79,17 +81,19 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
             directories,
           },
         },
-        dirty: true,
+        dirty: directoriesAreUpdated,
       };
     }
     case MediaLocalSettingsStateActionType.RemoveDirectory: {
       // data.directory - directory which needs to be removed
       const {directory} = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
+      let directoriesAreUpdated = false;
 
       if (directories.includes(directory)) {
         // important - pull will mutate the original array
         _.pull(directories, directory);
+        directoriesAreUpdated = true;
       }
 
       return {
@@ -99,7 +103,7 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
             directories,
           },
         },
-        dirty: true,
+        dirty: directoriesAreUpdated,
       };
     }
     default:

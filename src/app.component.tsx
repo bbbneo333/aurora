@@ -35,9 +35,6 @@ function AppContentBrowser() {
         <Route path={Routes.SETTINGS}>
           <AppPages.SettingsComponent/>
         </Route>
-        <Route path={Routes.HOME}>
-          <AppPages.HomeComponent/>
-        </Route>
       </Switch>
     </div>
   );
