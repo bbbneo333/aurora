@@ -7,6 +7,7 @@ export enum MediaFileExtensions {
 
 export enum MediaLibraryActions {
   Initialize = 'media/library/initialize',
+  InitializeSafe = 'media/library/initializeSafe',
   StartSync = 'media/library/startSync',
   FinishSync = 'media/library/finishSync',
   AddTrack = 'media/library/addTrack',
@@ -46,5 +47,6 @@ export enum MediaTrackCoverPictureImageDataType {
 }
 
 export enum MediaProviderRegistryActions {
-  AddProvider = 'media/providerRegistry/add',
+  AddProvider = 'media/providerRegistry/addProvider',
+  AddProviderSafe = 'media/providerRegistry/addProviderSafe',
 }

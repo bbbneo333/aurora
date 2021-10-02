@@ -48,6 +48,18 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         [action.data.mediaProviderIdentifier]: mediaProviderLibraryInitialState,
       };
     }
+    case MediaEnums.MediaLibraryActions.InitializeSafe: {
+      // data.mediaProviderIdentifier
+      if (!_.isEmpty(state[action.data.mediaProviderIdentifier])) {
+        // library has been already initialized, do nothing
+        return state;
+      }
+
+      return {
+        ...state,
+        [action.data.mediaProviderIdentifier]: mediaProviderLibraryInitialState,
+      };
+    }
     case MediaEnums.MediaLibraryActions.StartSync: {
       // data.mediaProviderIdentifier
       const mediaProviderLibrary = loadMediaProviderLibrary(state, action.data.mediaProviderIdentifier);

@@ -88,7 +88,7 @@ class MediaProviderService {
 
   private addProviderToLocalStore(mediaProvider: IMediaProvider): void {
     store.dispatch({
-      type: MediaEnums.MediaProviderRegistryActions.AddProvider,
+      type: MediaEnums.MediaProviderRegistryActions.AddProviderSafe,
       data: {
         mediaProvider,
       },
@@ -97,7 +97,7 @@ class MediaProviderService {
 
   private initializeLibraryInLocalStore(mediaProvider: IMediaProvider): void {
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.Initialize,
+      type: MediaEnums.MediaLibraryActions.InitializeSafe,
       data: {
         mediaProviderIdentifier: mediaProvider.mediaProviderIdentifier,
       },
