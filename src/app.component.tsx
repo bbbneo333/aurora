@@ -1,18 +1,23 @@
 import React from 'react';
-import {Route, HashRouter as Router, Switch} from 'react-router-dom';
 import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
 
-import {Routes} from './constants';
+import {
+  Route,
+  HashRouter as Router,
+  Switch,
+  NavLink,
+} from 'react-router-dom';
+
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
-import {MediaProviderService} from './services';
+import {I18nService, MediaProviderService} from './services';
 
 import * as AppComponents from './components';
-import * as AppPages from './pages';
 
 import './app.global.css';
 import styles from './app.component.css';
+import routes from './app.routes';
 
 const cx = classNames.bind(styles);
 
@@ -20,10 +25,37 @@ const cx = classNames.bind(styles);
 const mediaLocalProvider = new MediaLocalProvider();
 MediaProviderService.registerMediaProvider(mediaLocalProvider);
 
+// app > app > content > header > rows [navigator, page header, user]
+
+function AppContentHeaderPage() {
+  return (
+    <div className={cx('app-content-header-page-container')}>
+      <Switch>
+        {routes.map(route => route.header && (
+          <Route
+            key={`route-${route.path}`}
+            path={route.path}
+          >
+            {
+              React.createElement(route.header, {
+                key: `route-${route.path}`,
+              })
+            }
+          </Route>
+        ))}
+      </Switch>
+    </div>
+  );
+}
+
+// app > stage > content > columns [header, browser]
+
 function AppContentHeader() {
   return (
     <div className={cx('app-content-header-container')}>
-      <AppComponents.MediaContentHeaderComponent/>
+      <AppComponents.MediaContentHeaderNavigatorComponent/>
+      <AppContentHeaderPage/>
+      <AppComponents.MediaContentHeaderUserComponent/>
     </div>
   );
 }
@@ -32,10 +64,33 @@ function AppContentBrowser() {
   return (
     <div className={cx('app-content-browser-container')}>
       <Switch>
-        <Route path={Routes.SETTINGS}>
-          <AppPages.SettingsComponent/>
-        </Route>
+        {routes.map(route => (
+          <Route
+            key={`route-${route.path}`}
+            path={route.path}
+          >
+            {
+              React.createElement(route.main, {
+                key: `route-${route.path}`,
+              })
+            }
+          </Route>
+        ))}
       </Switch>
+    </div>
+  );
+}
+
+// app > stage > rows [sidebar, content]
+
+function AppSidebar() {
+  return (
+    <div className={cx('app-sidebar-container')}>
+      {routes.map(route => (
+        <NavLink exact to={route.path} activeClassName="selected">
+          {I18nService.getString(route.t_name)}
+        </NavLink>
+      ))}
     </div>
   );
 }
@@ -49,13 +104,7 @@ function AppContent() {
   );
 }
 
-function AppSidebar() {
-  return (
-    <div className={cx('app-sidebar-container')}>
-      <AppComponents.MediaSidebarComponent/>
-    </div>
-  );
-}
+// app > stage
 
 function AppStage() {
   return (
@@ -65,6 +114,8 @@ function AppStage() {
     </div>
   );
 }
+
+// app > media player
 
 function AppMediaPlayer() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
@@ -79,6 +130,8 @@ function AppMediaPlayer() {
     </div>
   );
 }
+
+// app > columns [stage, media player]
 
 export function AppComponent() {
   return (

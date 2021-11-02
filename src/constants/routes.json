@@ -1,3 +1,4 @@
 {
-  "SETTINGS": "/settings"
+  "Library": "/library",
+  "Settings": "/settings"
 }

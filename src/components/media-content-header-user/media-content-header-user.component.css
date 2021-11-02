@@ -1,0 +1,16 @@
+.media-content-header-user {
+  display: flex;
+  flex-direction: row;
+}
+
+.media-content-user {
+  background-color: #181818;
+  color: #fff;
+  display: flex;
+  align-self: center;
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin: 0 15px;
+  width: 150px;
+  line-height: 100%;
+}
