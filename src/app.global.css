@@ -19,7 +19,7 @@
   --selected-bg-color: #282828;
   --selected-text-color: #fff;
   --selectable-item-transition: background-color 200ms ease, color 200ms ease;
-  --titlebar-overlay-height: 40px;
+  --titlebar-overlay-height: 60px;
 }
 
 #title-bar-overlay {

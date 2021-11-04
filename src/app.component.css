@@ -44,12 +44,12 @@
   height: 45px;
   background-repeat: no-repeat;
   background-position: center;
-  margin: 20px 0;
 }
 
 .app-sidebar-navigation-list {
   display: flex;
   flex-direction: column;
+  margin: 20px 0;
 }
 
 .app-sidebar-navigation-item {
