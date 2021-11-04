@@ -4,8 +4,8 @@
 }
 
 .media-content-user {
-  background-color: #181818;
-  color: #fff;
+  background-color: var(--dark-bg-color);
+  color: var(--light-text-color);
   display: flex;
   align-self: center;
   padding: 8px 12px;

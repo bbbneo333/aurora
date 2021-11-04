@@ -4,3 +4,19 @@
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
 @import '~bootstrap/dist/css/bootstrap.css';
+
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans&display=swap');
+
+* {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+:root {
+  --dark-bg-color: #121212;
+  --light-bg-color: #282828;
+  --dark-text-color: #b3b3b3;
+  --light-text-color: #fff;
+  --selected-bg-color: #282828;
+  --selected-text-color: #fff;
+  --selectable-item-transition: background-color 200ms ease, color 200ms ease;
+}

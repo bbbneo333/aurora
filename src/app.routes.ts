@@ -5,7 +5,8 @@ export type AppRoute = {
   path: string,
   main: () => JSX.Element,
   header?: () => JSX.Element,
-  t_name: string,
+  tName: string,
+  fIcon: string,
 };
 
 export default [
@@ -13,11 +14,13 @@ export default [
     path: Routes.Library,
     main: AppPages.LibraryComponent,
     header: AppPages.LibraryHeaderComponent,
-    t_name: 'link_library',
+    tName: 'link_library',
+    fIcon: 'fas fa-layer-group',
   },
   {
     path: Routes.Settings,
     main: AppPages.SettingsComponent,
-    t_name: 'link_settings',
+    tName: 'link_settings',
+    fIcon: 'fas fa-cog',
   },
 ] as AppRoute[];

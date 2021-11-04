@@ -4,10 +4,12 @@
 }
 
 .media-content-navigate-button {
-  background-color: #181818;
-  color: #fff;
+  background-color: var(--dark-bg-color);
+  color: var(--light-text-color);
   display: flex;
   align-self: center;
+  align-items: center;
+  justify-items: center;
   padding: 8px 12px;
   border-radius: 50%;
   margin: 0 15px;

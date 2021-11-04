@@ -16,13 +16,17 @@
   flex: 1 0 0;
   display: flex;
   flex-flow: row;
+  background-color: var(--light-bg-color);
+  color: var(--light-text-color);
 }
 
 /*app > stage > rows [sidebar, content]*/
 
 .app-sidebar-container {
   width: 30%;
-  border-right: 2px solid;
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
+  padding: 10px;
 }
 
 .app-content-container {
@@ -31,23 +35,58 @@
   flex-direction: column;
 }
 
+/*app > stage > sidebar*/
+
+.app-sidebar-navigation-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-sidebar-navigation-item {
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: row;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
+  color: var(--dark-text-color);
+  transition: var(--selectable-item-transition);
+}
+
+.app-sidebar-navigation-item:hover {
+  color: var(--selected-text-color);
+}
+
+.app-sidebar-navigation-item.selected {
+  background-color: var(--selected-bg-color);
+}
+
+.app-sidebar-navigation-item-icon {
+  margin-right: 10px;
+}
+
 /*app > stage > content > columns [header, browser]*/
 
 .app-content-header-container {
   display: flex;
   flex: 0 0 50px;
-  border-bottom: 2px solid;
+  /* TODO: Needs to be removed */
+  border-bottom: 2px solid var(--dark-bg-color);
 }
 
 .app-content-browser-container {
   flex: 1 0 0;
   overflow-y: scroll;
+  padding: 20px;
 }
 
 /*app > app > content > header > rows [navigator, page header, user]*/
 
 .app-content-header-page-container {
   width: 100%;
+  display: flex;
+  align-self: center;
+  margin: 10px;
 }
 
 /*app > media player*/

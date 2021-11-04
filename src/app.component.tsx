@@ -17,7 +17,7 @@ import * as AppComponents from './components';
 
 import './app.global.css';
 import styles from './app.component.css';
-import routes from './app.routes';
+import routes, {AppRoute} from './app.routes';
 
 const cx = classNames.bind(styles);
 
@@ -25,7 +25,7 @@ const cx = classNames.bind(styles);
 const mediaLocalProvider = new MediaLocalProvider();
 MediaProviderService.registerMediaProvider(mediaLocalProvider);
 
-// app > app > content > header > rows [navigator, page header, user]
+// app > stage > content > header > rows [navigator, page header, user]
 
 function AppContentHeaderPage() {
   return (
@@ -55,7 +55,8 @@ function AppContentHeader() {
     <div className={cx('app-content-header-container')}>
       <AppComponents.MediaContentHeaderNavigatorComponent/>
       <AppContentHeaderPage/>
-      <AppComponents.MediaContentHeaderUserComponent/>
+      {/* TODO: Add back MediaContentHeaderUserComponent once implemented */}
+      {/* <AppComponents.MediaContentHeaderUserComponent/> */}
     </div>
   );
 }
@@ -81,16 +82,38 @@ function AppContentBrowser() {
   );
 }
 
+// app > stage > sidebar
+
+function AppSidebarNavigationLink(props: {route: AppRoute}) {
+  const {route} = props;
+
+  return (
+    <NavLink
+      exact
+      to={route.path}
+      activeClassName={cx('selected')}
+      className={cx('app-sidebar-navigation-item')}
+    >
+      <span className={cx('app-sidebar-navigation-item-icon')}>
+        <i className={route.fIcon}/>
+      </span>
+      <span className={cx('app-sidebar-navigation-item-label')}>
+        {I18nService.getString(route.tName)}
+      </span>
+    </NavLink>
+  );
+}
+
 // app > stage > rows [sidebar, content]
 
 function AppSidebar() {
   return (
     <div className={cx('app-sidebar-container')}>
-      {routes.map(route => (
-        <NavLink exact to={route.path} activeClassName="selected">
-          {I18nService.getString(route.t_name)}
-        </NavLink>
-      ))}
+      <div className={cx('app-sidebar-navigation-list')}>
+        {routes.map(route => (
+          <AppSidebarNavigationLink route={route}/>
+        ))}
+      </div>
     </div>
   );
 }
