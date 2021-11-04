@@ -181,6 +181,8 @@ class App implements IAppMain {
       width: 1024,
       height: 728,
       icon: this.getAssetPath('icon.png'),
+      titleBarStyle: 'hiddenInset',
+      frame: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,

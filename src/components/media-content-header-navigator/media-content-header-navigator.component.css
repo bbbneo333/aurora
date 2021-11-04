@@ -11,7 +11,7 @@
   align-items: center;
   justify-items: center;
   padding: 8px 12px;
-  border-radius: 50%;
+  border-radius: 100%;
   margin: 0 15px;
   line-height: 100%;
   -webkit-text-stroke: 1px var(--dark-bg-color);

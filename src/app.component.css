@@ -16,8 +16,6 @@
   flex: 1 0 0;
   display: flex;
   flex-flow: row;
-  background-color: var(--light-bg-color);
-  color: var(--light-text-color);
 }
 
 /*app > stage > rows [sidebar, content]*/
@@ -26,13 +24,15 @@
   width: 30%;
   background-color: var(--dark-bg-color);
   color: var(--dark-text-color);
-  padding: 10px;
+  padding: var(--titlebar-overlay-height) 10px 10px;
 }
 
 .app-content-container {
   width: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--light-bg-color);
+  color: var(--light-text-color);
 }
 
 /*app > stage > sidebar*/
@@ -80,8 +80,7 @@
 .app-content-header-container {
   display: flex;
   flex: 0 0 50px;
-  /* TODO: Needs to be removed */
-  border-bottom: 2px solid var(--dark-bg-color);
+  height: var(--titlebar-overlay-height);
 }
 
 .app-content-browser-container {

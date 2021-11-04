@@ -13,10 +13,20 @@
 
 :root {
   --dark-bg-color: #121212;
-  --light-bg-color: #282828;
+  --light-bg-color: #1d1d1d;
   --dark-text-color: #b3b3b3;
   --light-text-color: #fff;
   --selected-bg-color: #282828;
   --selected-text-color: #fff;
   --selectable-item-transition: background-color 200ms ease, color 200ms ease;
+  --titlebar-overlay-height: 40px;
+}
+
+#title-bar-overlay {
+  width: 100%;
+  top: 0;
+  height: var(--titlebar-overlay-height);
+  left: 0;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
 }
