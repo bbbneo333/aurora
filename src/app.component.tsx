@@ -109,9 +109,10 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
 function AppSidebar() {
   return (
     <div className={cx('app-sidebar-container')}>
+      <div className={cx('app-sidebar-logo')}/>
       <div className={cx('app-sidebar-navigation-list')}>
         {routes.map(route => (
-          <AppSidebarNavigationLink route={route}/>
+          <AppSidebarNavigationLink key={route.path} route={route}/>
         ))}
       </div>
     </div>

@@ -37,6 +37,16 @@
 
 /*app > stage > sidebar*/
 
+.app-sidebar-logo {
+  background-image: url('../assets/logo-wide.png');
+  background-size: contain;
+  width: 100%;
+  height: 45px;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 20px 0;
+}
+
 .app-sidebar-navigation-list {
   display: flex;
   flex-direction: column;
