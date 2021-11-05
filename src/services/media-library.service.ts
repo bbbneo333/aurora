@@ -182,7 +182,7 @@ class MediaLibraryService {
     return Promise.all(mediaTrackDataList.map(mediaTrackData => this.buildMediaTrack(mediaTrackData, loadMediaTracks)));
   }
 
-  private async buildMediaAlbum(mediaAlbum: string | IMediaAlbumData, loadMediaAlbum = false): Promise<IMediaAlbum> {
+  private async buildMediaAlbum(mediaAlbum: string|IMediaAlbumData, loadMediaAlbum = false): Promise<IMediaAlbum> {
     let mediaAlbumData;
     if (typeof mediaAlbum === 'string') {
       mediaAlbumData = await MediaAlbumDatastore.findMediaAlbumById(mediaAlbum);
@@ -200,7 +200,7 @@ class MediaLibraryService {
 
     if (loadMediaAlbum) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddAlbum,
+        type: MediaEnums.MediaLibraryActions.AddAlbumSafe,
         data: {
           mediaAlbum: mediaAlbumBuilt,
         },
@@ -210,11 +210,11 @@ class MediaLibraryService {
     return mediaAlbumBuilt;
   }
 
-  private async buildMediaAlbums(mediaAlbums: string[] | IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
+  private async buildMediaAlbums(mediaAlbums: string[]|IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
     return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
   }
 
-  private async buildMediaArtist(mediaArtist: string | IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
+  private async buildMediaArtist(mediaArtist: string|IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
     // info - no further processing required for MediaArtistData -> MediaArtist
     let mediaArtistData;
     if (typeof mediaArtist === 'string') {
@@ -229,7 +229,7 @@ class MediaLibraryService {
 
     if (loadMediaArtist) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddArtist,
+        type: MediaEnums.MediaLibraryActions.AddArtistSafe,
         data: {
           mediaArtist: mediaArtistData,
         },
@@ -239,7 +239,7 @@ class MediaLibraryService {
     return mediaArtistData;
   }
 
-  private async buildMediaArtists(mediaArtists: string[] | IMediaArtistData[], loadMediaArtists = false): Promise<IMediaArtist[]> {
+  private async buildMediaArtists(mediaArtists: string[]|IMediaArtistData[], loadMediaArtists = false): Promise<IMediaArtist[]> {
     return Promise.all(mediaArtists.map((mediaArtist: any) => this.buildMediaArtist(mediaArtist, loadMediaArtists)));
   }
 

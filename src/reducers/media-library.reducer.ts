@@ -26,12 +26,6 @@ const mediaLibraryInitialState: MediaLibraryState = {
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
   switch (action.type) {
-    case MediaEnums.MediaLibraryActions.Initialize: {
-      // data.mediaProviderIdentifier
-      // TODO: To be implemented
-
-      return state;
-    }
     case MediaEnums.MediaLibraryActions.InitializeSafe: {
       // data.mediaProviderIdentifier
       // TODO: To be implemented
@@ -93,12 +87,14 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbumTracks,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddAlbum: {
+    case MediaEnums.MediaLibraryActions.AddAlbumSafe: {
       // data.mediaAlbum: MediaAlbum - album which needs to be added
       const {mediaAlbum} = action.data;
       const {mediaAlbums} = state;
 
-      mediaAlbums.push(mediaAlbum);
+      if (_.isNil(mediaAlbums.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
+        mediaAlbums.push(mediaAlbum);
+      }
 
       return {
         ...state,
@@ -119,12 +115,14 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbumTracks: mediaAlbumTracks,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddArtist: {
+    case MediaEnums.MediaLibraryActions.AddArtistSafe: {
       // data.mediaArtist: MediaArtist - artist which needs to be added
       const {mediaArtist} = action.data;
       const {mediaArtists} = state;
 
-      mediaArtists.push(mediaArtist);
+      if (_.isNil(mediaArtists.find(exMediaArtist => exMediaArtist.id === mediaArtist.id))) {
+        mediaArtists.push(mediaArtist);
+      }
 
       return {
         ...state,

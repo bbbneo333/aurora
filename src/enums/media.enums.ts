@@ -6,16 +6,15 @@ export enum MediaFileExtensions {
 }
 
 export enum MediaLibraryActions {
-  Initialize = 'media/library/initialize',
   InitializeSafe = 'media/library/initializeSafe',
   StartSync = 'media/library/startSync',
   FinishSync = 'media/library/finishSync',
   AddTrack = 'media/library/addTrack',
   RemoveTrack = 'media/library/removeTrack',
-  AddAlbum = 'media/library/addAlbum',
+  AddAlbumSafe = 'media/library/addAlbumSafe',
   RemoveAlbum = 'media/library/removeAlbum',
   LoadAlbum = 'media/library/loadAlbum',
-  AddArtist = 'media/library/addArtist',
+  AddArtistSafe = 'media/library/addArtistSafe',
   RemoveArtist = 'media/library/removeArtist',
   LoadArtist = 'media/library/loadArtist',
 }
