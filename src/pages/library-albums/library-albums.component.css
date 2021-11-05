@@ -1,0 +1,40 @@
+.library-album-tile {
+  background-color: var(--dark-card-bg-color);
+  border-radius: 4px;
+  transition: var(--selectable-item-transition);
+}
+
+.library-album-tile:hover {
+  background-color: var(--selected-bg-color);
+}
+
+.library-album-tile-body {
+  padding: 16px;
+}
+
+.library-album-tile-link {
+}
+
+.library-album-tile:hover .library-album-tile-link {
+  color: var(--light-text-color);
+}
+
+.library-album-tile-cover {
+  margin-bottom: 16px;
+}
+
+.library-album-tile-cover-picture {
+  height: 100%;
+  width: 100%;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
+}
+
+.library-album-tile-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.library-album-tile-subtitle {
+  font-size: smaller;
+  color: var(--dark-text-color);
+}

@@ -1,0 +1,11 @@
+.media-cover-picture {
+  height: 100px;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-cover-picture > img {
+  width: 100%;
+}

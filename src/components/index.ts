@@ -6,4 +6,4 @@ export {MediaProgressBarComponent} from './media-progress-bar/media-progress-bar
 export {MediaSessionComponent} from './media-session/media-session.component';
 export {MediaTrackComponent} from './media-track/media-track.component';
 export {MediaTrackInfoComponent} from './media-track-info/media-track-info.component';
-export {MediaTrackCoverPictureComponent} from './media-track-cover-picture/media-track-cover-picture.component';
+export {MediaCoverPictureComponent} from './media-cover-picture/media-cover-picture.component';

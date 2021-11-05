@@ -18,7 +18,7 @@ const cx = classNames.bind(styles);
 
 export function LibraryComponent() {
   return (
-    <div className={cx('library-content-browser-container', 'scrollable')}>
+    <div className={cx('library-content-browser-container')}>
       <Switch>
         {routes.map(route => (
           <Route
@@ -45,10 +45,9 @@ function LibraryHeaderNavigationLink(props: {route: LibraryRoute}) {
 
   return (
     <NavLink
-      exact
       to={route.path}
       activeClassName={cx('selected')}
-      className={cx('library-header-navigation-item')}
+      className={cx('library-header-navigation-item', 'app-nav-link')}
     >
       <span className={cx('library-header-navigation-item-label')}>
         {I18nService.getString(route.tName)}

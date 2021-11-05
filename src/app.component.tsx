@@ -65,7 +65,7 @@ function AppContentHeader() {
 
 function AppContentBrowser() {
   return (
-    <div className={cx('app-content-browser-container', 'scrollable')}>
+    <div className={cx('app-content-browser-container', 'app-scrollable')}>
       <Switch>
         {routes.map(route => (
           <Route
@@ -96,7 +96,7 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
     <NavLink
       to={route.path}
       activeClassName={cx('selected')}
-      className={cx('app-sidebar-navigation-item')}
+      className={cx('app-sidebar-navigation-item', 'app-nav-link')}
     >
       <span className={cx('app-sidebar-navigation-item-icon')}>
         <i className={route.fIcon}/>
@@ -112,7 +112,7 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
 
 function AppSidebar() {
   return (
-    <div className={cx('app-sidebar-container', 'scrollable')}>
+    <div className={cx('app-sidebar-container', 'app-scrollable')}>
       <div className={cx('app-sidebar-logo')}/>
       <div className={cx('app-sidebar-navigation-list')}>
         {routes.map(route => (

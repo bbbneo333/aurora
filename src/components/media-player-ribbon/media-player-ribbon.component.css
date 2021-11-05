@@ -21,6 +21,11 @@
   align-items: center;
 }
 
+.media-player-track-cover-image {
+  height: 70px;
+  width: 70px;
+}
+
 .media-player-track-info-container {
   margin: 5px 10px;
 }

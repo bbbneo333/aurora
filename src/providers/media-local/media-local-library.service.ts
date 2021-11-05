@@ -25,6 +25,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
+    debug('onProviderRegistered - starting sync');
     this.syncMediaTracks()
       .then(() => {
         debug('onProviderRegistered - sync completed');
@@ -107,7 +108,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     return parseFile(filePath);
   }
 
-  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture | null {
+  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture|null {
     return selectCover(audioMetadata.common.picture);
   }
 }

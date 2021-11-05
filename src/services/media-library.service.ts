@@ -262,9 +262,8 @@ class MediaLibraryService {
       provider: mediaProviderIdentifier,
       provider_id: mediaArtistProviderData.provider_id,
       artist_name: mediaArtistProviderData.artist_name,
-      // TODO: Add back support for MediaPicture once BufferImage processing issue is fixed
-      // artist_display_picture: mediaArtistProviderData.artist_feature_picture,
-      // artist_feature_picture: mediaArtistProviderData.artist_feature_picture,
+      artist_display_picture: mediaArtistProviderData.artist_feature_picture,
+      artist_feature_picture: mediaArtistProviderData.artist_feature_picture,
       extra: mediaArtistProviderData.extra,
     });
   }
@@ -298,8 +297,7 @@ class MediaLibraryService {
       provider_id: mediaAlbumProviderData.provider_id,
       album_name: mediaAlbumProviderData.album_name,
       album_artist_id: mediaAlbumArtistData.id,
-      // TODO: Add back support for MediaPicture once BufferImage processing issue is fixed
-      // album_cover_picture: mediaAlbumProviderData.album_cover_picture,
+      album_cover_picture: mediaAlbumProviderData.album_cover_picture,
       extra: mediaAlbumProviderData.extra,
     });
   }
@@ -338,8 +336,7 @@ class MediaLibraryService {
       track_name: mediaTrackProviderData.track_name,
       track_number: mediaTrackProviderData.track_number,
       track_duration: mediaTrackProviderData.track_duration,
-      // TODO: Add back support for MediaPicture once BufferImage processing issue is fixed
-      // track_cover_picture: mediaTrackProviderData.track_cover_picture,
+      track_cover_picture: mediaTrackProviderData.track_cover_picture,
       track_artist_ids: mediaArtistDataList.map(mediaArtistData => (mediaArtistData.id)),
       track_album_id: mediaAlbumData.id,
       removed: false,

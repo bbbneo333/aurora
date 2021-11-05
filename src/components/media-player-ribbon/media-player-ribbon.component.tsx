@@ -11,7 +11,7 @@ import {DateTimeUtils} from '../../utils';
 import {MediaButtonComponent} from '../media-button/media-button.component';
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
 import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
-import {MediaTrackCoverPictureComponent} from '../media-track-cover-picture/media-track-cover-picture.component';
+import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -21,10 +21,10 @@ export function MediaPlayerRibbonComponent() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
   const mediaPlaybackVolumeMidThreshold = useRef<number>(mediaPlayer.mediaPlaybackVolumeMaxLimit / 2);
-  const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
+  const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number|undefined>(undefined);
 
   // TODO: Add implementation for setMediaVolumeDragStartValue
-  const [mediaVolumeDragStartValue] = useState<number | undefined>(undefined);
+  const [mediaVolumeDragStartValue] = useState<number|undefined>(undefined);
 
   const handleOnMediaProgressDragUpdate = useCallback((value) => {
     setMediaProgressDragValue(value);
@@ -69,9 +69,13 @@ export function MediaPlayerRibbonComponent() {
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-info-container')}>
                 <Col className={cx('col-12', 'media-player-info-column')}>
-                  <MediaTrackCoverPictureComponent
-                    mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
-                  />
+                  {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_cover_picture && (
+                    <MediaCoverPictureComponent
+                      mediaPicture={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_cover_picture}
+                      mediaPictureAltText={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album.album_name}
+                      className={cx('media-player-track-cover-image')}
+                    />
+                  )}
                   <MediaTrackInfoComponent
                     mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
                     infoContainerClassName={cx('media-player-track-info-container')}

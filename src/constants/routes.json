@@ -2,5 +2,6 @@
   "Library": "/library",
   "LibraryArtists": "/library/artists",
   "LibraryAlbums": "/library/albums",
+  "LibraryAlbum": "/library/albums/:albumId",
   "Settings": "/settings"
 }
