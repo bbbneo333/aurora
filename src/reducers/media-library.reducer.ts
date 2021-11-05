@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import {MediaEnums} from '../enums';
 import {IMediaAlbum, IMediaArtist, IMediaTrack} from '../interfaces';
 
-export type MediaProviderLibraryState = {
+export type MediaLibraryState = {
   mediaAlbums: IMediaAlbum[],
   mediaArtists: IMediaArtist[],
   mediaSelectedAlbum?: IMediaAlbum,
@@ -13,86 +13,58 @@ export type MediaProviderLibraryState = {
   mediaIsSyncing: boolean,
 };
 
-export type MediaLibraryState = Record<string, MediaProviderLibraryState>;
-
 export type MediaLibraryStateAction = {
   type: MediaEnums.MediaLibraryActions,
   data?: any,
 };
 
-const mediaLibraryInitialState: MediaLibraryState = {};
-const mediaProviderLibraryInitialState: MediaProviderLibraryState = {
+const mediaLibraryInitialState: MediaLibraryState = {
   mediaAlbums: [],
   mediaArtists: [],
   mediaIsSyncing: false,
 };
 
-function loadMediaProviderLibrary(state: MediaLibraryState, mediaProviderIdentifier: string): MediaProviderLibraryState {
-  const mediaProviderLibrary = state[mediaProviderIdentifier];
-  if (!mediaProviderLibrary) {
-    throw new Error(`MediaLibraryReducer encountered error at loadMediaProviderLibrary - Library not initialized - ${mediaProviderIdentifier}`);
-  }
-  return mediaProviderLibrary;
-}
-
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
   switch (action.type) {
     case MediaEnums.MediaLibraryActions.Initialize: {
       // data.mediaProviderIdentifier
-      if (!_.isEmpty(state[action.data.mediaProviderIdentifier])) {
-        throw new Error(`MediaLibraryReducer encountered error at Initialize - Library already initialized - ${action.data.mediaProviderIdentifier}`);
-      }
+      // TODO: To be implemented
 
-      return {
-        ...state,
-        [action.data.mediaProviderIdentifier]: mediaProviderLibraryInitialState,
-      };
+      return state;
     }
     case MediaEnums.MediaLibraryActions.InitializeSafe: {
       // data.mediaProviderIdentifier
-      if (!_.isEmpty(state[action.data.mediaProviderIdentifier])) {
-        // library has been already initialized, do nothing
-        return state;
-      }
+      // TODO: To be implemented
 
-      return {
-        ...state,
-        [action.data.mediaProviderIdentifier]: mediaProviderLibraryInitialState,
-      };
+      return state;
     }
     case MediaEnums.MediaLibraryActions.StartSync: {
       // data.mediaProviderIdentifier
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, action.data.mediaProviderIdentifier);
-      mediaProviderLibrary.mediaIsSyncing = true;
 
       return {
         ...state,
-        [action.data.mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaIsSyncing: true,
       };
     }
     case MediaEnums.MediaLibraryActions.FinishSync: {
       // data.mediaProviderIdentifier
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, action.data.mediaProviderIdentifier);
-      if (!mediaProviderLibrary.mediaIsSyncing) {
+      if (!state.mediaIsSyncing) {
         throw new Error(`MediaLibraryReducer encountered error at StopSync - Sync not started yet - ${action.data.mediaProviderIdentifier}`);
       }
-      mediaProviderLibrary.mediaIsSyncing = false;
 
       return {
         ...state,
-        [action.data.mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaIsSyncing: false,
       };
     }
     case MediaEnums.MediaLibraryActions.AddTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be added
       const {mediaTrack} = action.data;
-      const mediaProviderIdentifier = mediaTrack.provider;
-
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, mediaProviderIdentifier);
+      const {mediaSelectedAlbum} = state;
+      let {mediaSelectedAlbumTracks} = state;
 
       // location #1 - mediaSelectedAlbumTracks (if selected album was found)
-      let {mediaSelectedAlbumTracks} = mediaProviderLibrary;
-      if (mediaProviderLibrary.mediaSelectedAlbum && mediaProviderLibrary.mediaSelectedAlbum.id === mediaTrack.track_album.id) {
+      if (mediaSelectedAlbum && mediaSelectedAlbum.id === mediaTrack.track_album.id) {
         mediaSelectedAlbumTracks = mediaSelectedAlbumTracks || [];
 
         // only add the track if it does not already exists
@@ -100,43 +72,37 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
           mediaSelectedAlbumTracks.push(mediaTrack);
         }
       }
-      mediaProviderLibrary.mediaSelectedAlbumTracks = mediaSelectedAlbumTracks;
 
       return {
         ...state,
-        [mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaSelectedAlbumTracks,
       };
     }
     case MediaEnums.MediaLibraryActions.RemoveTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be removed
       const {mediaTrack} = action.data;
-      const mediaProviderIdentifier = mediaTrack.provider;
-
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, mediaProviderIdentifier);
+      let {mediaSelectedAlbumTracks} = state;
 
       // location #1 - mediaSelectedAlbumTracks
-      let {mediaSelectedAlbumTracks} = mediaProviderLibrary;
       if (!_.isEmpty(mediaSelectedAlbumTracks)) {
         mediaSelectedAlbumTracks = _.filter(mediaSelectedAlbumTracks, mediaAlbumTrack => mediaAlbumTrack.id !== mediaTrack.id);
       }
-      mediaProviderLibrary.mediaSelectedAlbumTracks = mediaSelectedAlbumTracks;
 
       return {
         ...state,
-        [mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaSelectedAlbumTracks,
       };
     }
     case MediaEnums.MediaLibraryActions.AddAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be added
       const {mediaAlbum} = action.data;
-      const mediaProviderIdentifier = mediaAlbum.provider;
+      const {mediaAlbums} = state;
 
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, mediaProviderIdentifier);
-      mediaProviderLibrary.mediaAlbums.push(mediaAlbum);
+      mediaAlbums.push(mediaAlbum);
 
       return {
         ...state,
-        [mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaAlbums,
       };
     }
     case MediaEnums.MediaLibraryActions.LoadAlbum: {
@@ -146,28 +112,23 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaAlbum,
         mediaAlbumTracks,
       } = action.data;
-      const mediaProviderIdentifier = mediaAlbum.provider;
-
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, mediaProviderIdentifier);
-      mediaProviderLibrary.mediaSelectedAlbum = mediaAlbum;
-      mediaProviderLibrary.mediaSelectedAlbumTracks = mediaAlbumTracks;
 
       return {
         ...state,
-        [mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaSelectedAlbum: mediaAlbum,
+        mediaSelectedAlbumTracks: mediaAlbumTracks,
       };
     }
     case MediaEnums.MediaLibraryActions.AddArtist: {
       // data.mediaArtist: MediaArtist - artist which needs to be added
       const {mediaArtist} = action.data;
-      const mediaProviderIdentifier = mediaArtist.provider;
+      const {mediaArtists} = state;
 
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, mediaProviderIdentifier);
-      mediaProviderLibrary.mediaArtists.push(mediaArtist);
+      mediaArtists.push(mediaArtist);
 
       return {
         ...state,
-        [mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaArtists,
       };
     }
     case MediaEnums.MediaLibraryActions.LoadArtist: {
@@ -177,15 +138,11 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaArtist,
         mediaArtistAlbums,
       } = action.data;
-      const mediaProviderIdentifier = mediaArtist.provider;
-
-      const mediaProviderLibrary = loadMediaProviderLibrary(state, mediaProviderIdentifier);
-      mediaProviderLibrary.mediaSelectedArtist = mediaArtist;
-      mediaProviderLibrary.mediaSelectedArtistAlbums = mediaArtistAlbums;
 
       return {
         ...state,
-        [mediaProviderIdentifier]: mediaProviderLibrary,
+        mediaSelectedArtist: mediaArtist,
+        mediaSelectedArtistAlbums: mediaArtistAlbums,
       };
     }
     default:
