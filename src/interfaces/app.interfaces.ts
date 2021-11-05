@@ -23,6 +23,8 @@ export interface IAppMain {
   getCurrentWindow(): BrowserWindow;
 
   getModule<T>(type: new (data: any) => T): T;
+
+  openPath(path: string): void;
 }
 
 export interface IAppBuilder {

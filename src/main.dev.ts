@@ -135,6 +135,20 @@ class App implements IAppMain {
     return module as T;
   }
 
+  openPath(pathToOpen: string): void {
+    shell
+      .openPath(pathToOpen)
+      .then((errorMessage) => {
+        // returns Promise<String
+        // resolves with a string containing the error message corresponding to
+        // the failure if a failure occurred, otherwise ""
+        // @see - https://www.electronjs.org/docs/latest/api/shell
+        if (!_.isEmpty(errorMessage)) {
+          debug('encountered error at openPath when opening - %s, error - %s', pathToOpen, errorMessage);
+        }
+      });
+  }
+
   private installSourceMapSupport(): void {
     if (this.env !== 'production') {
       return;

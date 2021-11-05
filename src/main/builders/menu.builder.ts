@@ -17,7 +17,7 @@ import {DatastoreModule} from '../modules';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
-  submenu?: DarwinMenuItemConstructorOptions[] | Menu;
+  submenu?: DarwinMenuItemConstructorOptions[]|Menu;
 }
 
 export default class MenuBuilder implements IAppBuilder {
@@ -60,7 +60,7 @@ export default class MenuBuilder implements IAppBuilder {
     });
   }
 
-  private buildDarwinTemplate(browserWindow: BrowserWindow): MenuItemConstructorOptions[] {
+  private buildDarwinTemplate(browserWindow: BrowserWindow): DarwinMenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: 'Electron',
       submenu: [
@@ -142,7 +142,7 @@ export default class MenuBuilder implements IAppBuilder {
         },
       ],
     };
-    const subMenuViewDev: MenuItemConstructorOptions = {
+    const subMenuViewDev: DarwinMenuItemConstructorOptions = {
       label: 'View',
       submenu: [
         {
@@ -168,7 +168,7 @@ export default class MenuBuilder implements IAppBuilder {
         },
       ],
     };
-    const subMenuViewProd: MenuItemConstructorOptions = {
+    const subMenuViewProd: DarwinMenuItemConstructorOptions = {
       label: 'View',
       submenu: [
         {
@@ -202,11 +202,18 @@ export default class MenuBuilder implements IAppBuilder {
         },
       ],
     };
-    const subMenuHelp: MenuItemConstructorOptions = {
-      label: 'Help',
+    const subMenuDebug: DarwinMenuItemConstructorOptions = {
+      label: 'Debug',
       submenu: [
         {
-          label: 'Remove Datastores and Reload',
+          label: 'Open Application Data Folder',
+          click: () => {
+            const appDataPath = this.app.getDataPath();
+            this.app.openPath(appDataPath);
+          },
+        },
+        {
+          label: 'Remove DataStores and Reload',
           click: () => {
             const datastore = this.app.getModule(DatastoreModule);
 
@@ -215,7 +222,7 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
-          label: 'Compact Datastores',
+          label: 'Compact DataStores',
           click: () => {
             const datastore = this.app.getModule(DatastoreModule);
             datastore.compactDatastores();
@@ -225,91 +232,112 @@ export default class MenuBuilder implements IAppBuilder {
     };
 
     const subMenuView = this.app.debug ? subMenuViewDev : subMenuViewProd;
-
-    return [
+    const subMenuList = [
       subMenuAbout,
       subMenuEdit,
       subMenuView,
       subMenuWindow,
-      subMenuHelp,
     ];
+    if (this.app.debug) {
+      subMenuList.push(subMenuDebug);
+    }
+
+    return subMenuList;
   }
 
   private buildDefaultTemplate(browserWindow: BrowserWindow): MenuItemConstructorOptions[] {
-    return [
-      {
-        label: '&File',
-        submenu: [
-          {
-            label: '&Open',
-            accelerator: 'Ctrl+O',
+    const subMenuFile: MenuItemConstructorOptions = {
+      label: '&File',
+      submenu: [
+        {
+          label: '&Open',
+          accelerator: 'Ctrl+O',
+        },
+        {
+          label: '&Close',
+          accelerator: 'Ctrl+W',
+          click: () => {
+            browserWindow.close();
           },
-          {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
-            click: () => {
-              browserWindow.close();
-            },
+        },
+      ],
+    };
+    const subMenuViewDev: MenuItemConstructorOptions = {
+      label: '&View',
+      submenu: [
+        {
+          label: '&Reload',
+          accelerator: 'Ctrl+R',
+          click: () => {
+            browserWindow.webContents.reload();
           },
-        ],
-      },
-      {
-        label: '&View',
-        submenu: this.app.debug
-          ? [
-            {
-              label: '&Reload',
-              accelerator: 'Ctrl+R',
-              click: () => {
-                browserWindow.webContents.reload();
-              },
-            },
-            {
-              label: 'Toggle &Full Screen',
-              accelerator: 'F11',
-              click: () => {
-                browserWindow.setFullScreen(!browserWindow.isFullScreen());
-              },
-            },
-            {
-              label: 'Toggle &Developer Tools',
-              accelerator: 'Alt+Ctrl+I',
-              click: () => {
-                browserWindow.webContents.toggleDevTools();
-              },
-            },
-          ]
-          : [
-            {
-              label: 'Toggle &Full Screen',
-              accelerator: 'F11',
-              click: () => {
-                browserWindow.setFullScreen(!browserWindow.isFullScreen());
-              },
-            },
-          ],
-      },
-      {
-        label: 'Help',
-        submenu: [
-          {
-            label: 'Remove Datastores and Reload',
-            click: () => {
-              const datastore = this.app.getModule(DatastoreModule);
+        },
+        {
+          label: 'Toggle &Full Screen',
+          accelerator: 'F11',
+          click: () => {
+            browserWindow.setFullScreen(!browserWindow.isFullScreen());
+          },
+        },
+        {
+          label: 'Toggle &Developer Tools',
+          accelerator: 'Alt+Ctrl+I',
+          click: () => {
+            browserWindow.webContents.toggleDevTools();
+          },
+        },
+      ],
+    };
+    const subMenuViewProd: MenuItemConstructorOptions = {
+      label: '&View',
+      submenu: [
+        {
+          label: 'Toggle &Full Screen',
+          accelerator: 'F11',
+          click: () => {
+            browserWindow.setFullScreen(!browserWindow.isFullScreen());
+          },
+        },
+      ],
+    };
+    const subMenuDebug: MenuItemConstructorOptions = {
+      label: 'Debug',
+      submenu: [
+        {
+          label: 'Open Application Data Folder',
+          click: () => {
+            const appDataPath = this.app.getDataPath();
+            this.app.openPath(appDataPath);
+          },
+        },
+        {
+          label: 'Remove DataStores and Reload',
+          click: () => {
+            const datastore = this.app.getModule(DatastoreModule);
 
-              datastore.removeDatastores();
-              browserWindow.webContents.reload();
-            },
+            datastore.removeDatastores();
+            browserWindow.webContents.reload();
           },
-          {
-            label: 'Compact Datastores',
-            click: () => {
-              const datastore = this.app.getModule(DatastoreModule);
-              datastore.compactDatastores();
-            },
+        },
+        {
+          label: 'Compact DataStores',
+          click: () => {
+            const datastore = this.app.getModule(DatastoreModule);
+            datastore.compactDatastores();
           },
-        ],
-      },
+        },
+      ],
+    };
+
+    const subMenuList = [
+      subMenuFile,
     ];
+    if (this.app.debug) {
+      subMenuList.push(subMenuViewDev, subMenuDebug);
+    } else {
+      subMenuList.push(subMenuViewProd);
+    }
+
+    return subMenuList;
   }
 }
