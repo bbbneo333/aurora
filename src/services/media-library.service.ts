@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-import {MediaEnums} from '../enums';
+import {AppEnums, MediaEnums} from '../enums';
 import {DatastoreUtils} from '../utils';
 
 import {
@@ -17,16 +17,21 @@ import {
   IMediaArtist,
   IMediaArtistData,
   IMediaArtistProviderData,
+  IMediaPicture,
   IMediaTrack,
   IMediaTrackData,
   IMediaTrackDataUpdateParams,
   IMediaTrackProviderData,
 } from '../interfaces';
 
+import AppService from './app.service';
 import MediaProviderService from './media-provider.service';
 import store from '../store';
 
 class MediaLibraryService {
+  private readonly mediaPictureScaleWidth = 500;
+  private readonly mediaPictureScaleHeight = 500;
+
   async insertMediaTrack(mediaProviderIdentifier: string, mediaTrackProviderData: IMediaTrackProviderData): Promise<IMediaTrack> {
     const mediaTrackData = await this.checkAndInsertMediaTrack(mediaProviderIdentifier, mediaTrackProviderData);
     return this.buildMediaTrack(mediaTrackData, true);
@@ -262,8 +267,8 @@ class MediaLibraryService {
       provider: mediaProviderIdentifier,
       provider_id: mediaArtistProviderData.provider_id,
       artist_name: mediaArtistProviderData.artist_name,
-      artist_display_picture: mediaArtistProviderData.artist_feature_picture,
-      artist_feature_picture: mediaArtistProviderData.artist_feature_picture,
+      artist_display_picture: await this.processPicture(mediaArtistProviderData.artist_feature_picture),
+      artist_feature_picture: await this.processPicture(mediaArtistProviderData.artist_feature_picture),
       extra: mediaArtistProviderData.extra,
     });
   }
@@ -297,7 +302,7 @@ class MediaLibraryService {
       provider_id: mediaAlbumProviderData.provider_id,
       album_name: mediaAlbumProviderData.album_name,
       album_artist_id: mediaAlbumArtistData.id,
-      album_cover_picture: mediaAlbumProviderData.album_cover_picture,
+      album_cover_picture: await this.processPicture(mediaAlbumProviderData.album_cover_picture),
       extra: mediaAlbumProviderData.extra,
     });
   }
@@ -336,7 +341,7 @@ class MediaLibraryService {
       track_name: mediaTrackProviderData.track_name,
       track_number: mediaTrackProviderData.track_number,
       track_duration: mediaTrackProviderData.track_duration,
-      track_cover_picture: mediaTrackProviderData.track_cover_picture,
+      track_cover_picture: await this.processPicture(mediaTrackProviderData.track_cover_picture),
       track_artist_ids: mediaArtistDataList.map(mediaArtistData => (mediaArtistData.id)),
       track_album_id: mediaAlbumData.id,
       removed: false,
@@ -346,6 +351,29 @@ class MediaLibraryService {
       },
       extra: mediaTrackProviderData.extra,
     });
+  }
+
+  private async processPicture(mediaPicture?: IMediaPicture): Promise<IMediaPicture|undefined> {
+    // this accepts a MediaPicture and returns a serializable instance of MediaPicture which can be stored and
+    // further processed system wide after deserializing
+    if (!mediaPicture) {
+      return undefined;
+    }
+    if (mediaPicture.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Buffer) {
+      const imageCachePath: string = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
+        width: this.mediaPictureScaleWidth,
+        height: this.mediaPictureScaleHeight,
+      });
+
+      return {
+        ...mediaPicture,
+        image_data: imageCachePath,
+        image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Path,
+      };
+    }
+
+    // image data type does not needs any processing, return as is
+    return mediaPicture;
   }
 }
 

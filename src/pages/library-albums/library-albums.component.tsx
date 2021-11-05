@@ -17,34 +17,36 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
   const {mediaAlbum} = props;
 
   return (
-    <div className={cx('library-album-tile')}>
-      <NavLink
-        exact
-        to={StringUtils.buildFromMappings(Routes.LibraryAlbum, {
-          albumId: mediaAlbum.id,
-        })}
-        className={cx('library-album-tile-link', 'app-nav-link')}
-      >
-        <div className={cx('library-album-tile-body')}>
-          {mediaAlbum.album_cover_picture && (
-            <div className={cx('library-album-tile-cover')}>
-              <MediaCoverPictureComponent
-                mediaPicture={mediaAlbum.album_cover_picture}
-                mediaPictureAltText={mediaAlbum.album_name}
-                className={cx('library-album-tile-cover-picture')}
-              />
-            </div>
-          )}
-          <div className={cx('library-album-tile-info')}>
-            <div className={cx('library-album-tile-title')}>
-              {mediaAlbum.album_name}
-            </div>
-            <div className={cx('library-album-tile-subtitle')}>
-              {mediaAlbum.album_artist.artist_name}
+    <div className="col-sm-3">
+      <div className={cx('library-album-tile')}>
+        <NavLink
+          exact
+          to={StringUtils.buildFromMappings(Routes.LibraryAlbum, {
+            albumId: mediaAlbum.id,
+          })}
+          className={cx('library-album-tile-link', 'app-nav-link')}
+        >
+          <div className={cx('library-album-tile-body')}>
+            {mediaAlbum.album_cover_picture && (
+              <div className={cx('library-album-tile-cover')}>
+                <MediaCoverPictureComponent
+                  mediaPicture={mediaAlbum.album_cover_picture}
+                  mediaPictureAltText={mediaAlbum.album_name}
+                  className={cx('library-album-tile-cover-picture')}
+                />
+              </div>
+            )}
+            <div className={cx('library-album-tile-info')}>
+              <div className={cx('library-album-tile-title')}>
+                {mediaAlbum.album_name}
+              </div>
+              <div className={cx('library-album-tile-subtitle')}>
+                {mediaAlbum.album_artist.artist_name}
+              </div>
             </div>
           </div>
-        </div>
-      </NavLink>
+        </NavLink>
+      </div>
     </div>
   );
 }
@@ -56,9 +58,10 @@ export function LibraryAlbumsComponent() {
     <div className="container">
       <div className="row library-album-row">
         {mediaAlbums.map(mediaAlbum => (
-          <div className="col-sm-3">
-            <LibraryAlbumTile key={mediaAlbum.id} mediaAlbum={mediaAlbum}/>
-          </div>
+          <LibraryAlbumTile
+            key={mediaAlbum.id}
+            mediaAlbum={mediaAlbum}
+          />
         ))}
       </div>
     </div>

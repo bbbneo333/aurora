@@ -37,15 +37,8 @@ import {
   AppAsyncMessageHandler,
 } from './types';
 
-import {
-  MenuBuilder,
-} from './main/builders';
-
-import {
-  CryptoModule,
-  DatastoreModule,
-  FileSystemModule,
-} from './main/modules';
+import * as AppBuilders from './main/builders';
+import * as AppModules from './main/modules';
 
 const debug = require('debug')('app:main');
 
@@ -62,6 +55,8 @@ class App implements IAppMain {
   private readonly htmlFilePath = path.join(__dirname, 'index.html');
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
+  private readonly windowWidth = 1100;
+  private readonly windowHeight = 720;
 
   constructor() {
     this.env = process.env.NODE_ENV;
@@ -192,8 +187,8 @@ class App implements IAppMain {
 
     const mainWindow = new BrowserWindow({
       show: false,
-      width: 1024,
-      height: 728,
+      width: this.windowWidth,
+      height: this.windowHeight,
       icon: this.getAssetPath('icon.png'),
       titleBarStyle: 'hiddenInset',
       frame: false,
@@ -265,17 +260,15 @@ class App implements IAppMain {
   }
 
   private registerBuilders(): void {
-    this.builders.push(
-      new MenuBuilder(this),
-    );
+    const builders = _.map(AppBuilders, AppBuilder => new AppBuilder(this));
+    debug('registering builders - %o', _.map(builders, builder => builder.constructor.name));
+    this.builders.push(...builders);
   }
 
   private registerModules(): void {
-    this.modules.push(
-      new CryptoModule(this),
-      new DatastoreModule(this),
-      new FileSystemModule(this),
-    );
+    const modules = _.map(AppModules, AppModule => new AppModule(this));
+    debug('registering modules - %o', _.map(modules, module => module.constructor.name));
+    this.modules.push(...modules);
   }
 
   private runBuilders(mainWindow: BrowserWindow): void {

@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import * as _ from 'lodash';
 
 import {MediaEnums} from '../../enums';
 import {IMediaPicture} from '../../interfaces';
@@ -24,14 +23,8 @@ export function MediaCoverPictureComponent(props: {
   let mediaCoverPictureImageSrc;
 
   switch (mediaPicture.image_data_type) {
-    case MediaEnums.MediaTrackCoverPictureImageDataType.Buffer: {
-      // TODO: Fix issue with serialization when storing Buffer data with NeDb
-      //  Our persistence layer does not supports Buffer natively, because of this we receive data in invalid format
-      //  This is a temporary hack to covert the serialized data ({0: int, 1: int, ...}) to Buffer
-      const mediaPictureRawBuffer = _.map(mediaPicture.image_data, bufferPoint => bufferPoint);
-      const mediaPictureBuffer = Buffer.from(mediaPictureRawBuffer);
-
-      mediaCoverPictureImageSrc = `data:${mediaPicture.image_format};base64,${mediaPictureBuffer.toString('base64')}`;
+    case MediaEnums.MediaTrackCoverPictureImageDataType.Path: {
+      mediaCoverPictureImageSrc = mediaPicture.image_data;
       break;
     }
     default:

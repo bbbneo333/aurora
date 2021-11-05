@@ -13,6 +13,8 @@ export enum IPCCommChannels {
   DSRemove = 'ds:remove',
   // crypto
   CryptoGenerateSHA256Hash = 'crypto:generate_sha_256_hash',
+  // media
+  MediaScaleAndCacheImage = 'media:scale_and_cache_image',
 }
 
 export enum Platforms {

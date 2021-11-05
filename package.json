@@ -200,6 +200,7 @@
     "electron-updater": "^4.3.4",
     "history": "^5.0.0",
     "howler": "^2.2.1",
+    "jimp": "^0.16.1",
     "lodash": "^4.17.15",
     "moment": "^2.29.1",
     "music-metadata": "^7.8.5",

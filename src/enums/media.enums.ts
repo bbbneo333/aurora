@@ -43,6 +43,7 @@ export enum MediaPlayerPlaybackState {
 
 export enum MediaTrackCoverPictureImageDataType {
   Buffer = 'media/track/coverPictureImageDataType/buffer',
+  Path = 'media/track/coverPictureImageDataType/path',
 }
 
 export enum MediaProviderRegistryActions {
