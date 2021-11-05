@@ -1,4 +1,6 @@
 {
   "Library": "/library",
+  "LibraryArtists": "/library/artists",
+  "LibraryAlbums": "/library/albums",
   "Settings": "/settings"
 }

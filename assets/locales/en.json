@@ -1,4 +1,6 @@
 {
   "link_library": "Library",
+  "link_library_artists": "Artists",
+  "link_library_albums": "Albums",
   "link_settings": "Settings"
 }

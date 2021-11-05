@@ -4,6 +4,7 @@ import {useSelector} from 'react-redux';
 
 import {
   Route,
+  Redirect,
   HashRouter as Router,
   Switch,
   NavLink,
@@ -12,6 +13,7 @@ import {
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
+import {Routes} from './constants';
 
 import * as AppComponents from './components';
 
@@ -77,6 +79,9 @@ function AppContentBrowser() {
             }
           </Route>
         ))}
+        <Route exact path="/">
+          <Redirect to={Routes.Library}/>
+        </Route>
       </Switch>
     </div>
   );
@@ -89,7 +94,6 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
 
   return (
     <NavLink
-      exact
       to={route.path}
       activeClassName={cx('selected')}
       className={cx('app-sidebar-navigation-item')}
