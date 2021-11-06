@@ -32,9 +32,13 @@
 .library-album-tile-title {
   font-weight: bold;
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .library-album-tile-subtitle {
   font-size: smaller;
   color: var(--dark-text-color);
+  white-space: nowrap;
+  overflow: hidden;
 }
