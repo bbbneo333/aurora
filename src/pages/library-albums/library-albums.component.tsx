@@ -21,7 +21,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
       <div className={cx('library-album-tile')}>
         <NavLink
           exact
-          to={StringUtils.buildFromMappings(Routes.LibraryAlbum, {
+          to={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
             albumId: mediaAlbum.id,
           })}
           className={cx('library-album-tile-link', 'app-nav-link')}

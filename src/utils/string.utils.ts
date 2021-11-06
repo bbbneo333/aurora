@@ -4,6 +4,9 @@ export function generateId(): string {
   return uuidv4();
 }
 
-export function buildFromMappings(base: string, mappings: Record<string, string>): string {
-  return base.replace(/{(\w*)}/g, (...args) => mappings[args[1]]);
+export function buildRouteFromMappings(base: string, mappings: Record<string, string>): string {
+  // accepts a route in format - /path/to/something/:resourceId
+  // where mappings = {resourceId: 'foo'}
+  // returns - /path/to/something/foo
+  return base.replace(/:(\w*)/g, (...args) => mappings[args[1]]);
 }

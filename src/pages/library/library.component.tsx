@@ -22,6 +22,7 @@ export function LibraryComponent() {
       <Switch>
         {routes.map(route => (
           <Route
+            exact
             key={`route-${route.path}`}
             path={route.path}
           >
@@ -43,6 +44,10 @@ export function LibraryComponent() {
 function LibraryHeaderNavigationLink(props: {route: LibraryRoute}) {
   const {route} = props;
 
+  if (!route.tHeaderName) {
+    return (<></>);
+  }
+
   return (
     <NavLink
       to={route.path}
@@ -50,7 +55,7 @@ function LibraryHeaderNavigationLink(props: {route: LibraryRoute}) {
       className={cx('library-header-navigation-item', 'app-nav-link')}
     >
       <span className={cx('library-header-navigation-item-label')}>
-        {I18nService.getString(route.tName)}
+        {I18nService.getString(route.tHeaderName)}
       </span>
     </NavLink>
   );

@@ -14,12 +14,13 @@
 :root {
   --dark-bg-color: #121212;
   --dark-card-bg-color: #181818;
+  --dark-selectable-outline-color: #383838;
   --light-bg-color: #1d1d1d;
   --dark-text-color: #b3b3b3;
   --light-text-color: #fff;
   --selected-bg-color: #282828;
   --selected-text-color: #fff;
-  --selectable-item-transition: background-color 200ms ease, color 200ms ease;
+  --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
   --titlebar-overlay-height: 60px;
 }
 

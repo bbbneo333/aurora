@@ -15,4 +15,10 @@
   margin: 0 15px;
   line-height: 100%;
   -webkit-text-stroke: 1px var(--dark-bg-color);
+  transition: var(--selectable-item-transition);
+  border: 2px solid var(--dark-bg-color);
+}
+
+.media-content-navigate-button:hover {
+  border-color: var(--dark-selectable-outline-color);
 }

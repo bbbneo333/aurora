@@ -99,10 +99,10 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
       className={cx('app-sidebar-navigation-item', 'app-nav-link')}
     >
       <span className={cx('app-sidebar-navigation-item-icon')}>
-        <i className={route.fIcon}/>
+        <i className={route.fSidebarLinkIcon}/>
       </span>
       <span className={cx('app-sidebar-navigation-item-label')}>
-        {I18nService.getString(route.tName)}
+        {I18nService.getString(route.tSidebarLinkName)}
       </span>
     </NavLink>
   );
