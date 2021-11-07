@@ -3,8 +3,8 @@
   flex-flow: row;
   align-items: center;
   height: 100%;
-  color: white;
-  background-color: #181818;
+  color: var(--light-text-color);
+  background-color: var(--dark-music-player-bg-color);
   padding: 10px;
   user-select: none;
 }
@@ -36,8 +36,7 @@
 
 .media-player-controls-container {
   text-align: center;
-  color: white;
-  /*background-color: rebeccapurple;*/
+  color: var(--light-text-color);
 }
 
 .media-player-controls-column {
@@ -51,30 +50,29 @@
   text-align: center;
   padding: 5px;
   margin: 2px;
-  transition: color .1s ease;
-  /*background-color: green;*/
+  transition: var(--selectable-item-transition);
 }
 
 .media-player-control:not([disabled]):hover {
-  color: white;
+  color: var(--light-text-color);
 }
 
 .media-player-control.media-player-control-sm {
   font-size: 15px;
-  color: #8c8c8c;
+  color: var(--dark-button-color);
 }
 
 .media-player-control.media-player-control-md {
   font-size: 18px;
-  color: #8c8c8c;
+  color: var(--dark-button-color);
 }
 
 .media-player-control.media-player-control-lg {
   font-size: 30px;
+  color: var(--light-button-color);
 }
 
 .media-player-progress-container {
-  /*background-color: gray;*/
 }
 
 .media-player-progress-column {
@@ -90,13 +88,12 @@
 }
 
 .media-player-progress-counter {
-  color: #8c8c8c;
+  color: var(--dark-text-color);
   width: 15%;
   font-size: 10px;
-  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
-  /*background-color: green;*/
+  letter-spacing: 1px;
 }
 
 .media-player-progress-counter.start {

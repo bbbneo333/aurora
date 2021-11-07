@@ -78,7 +78,7 @@ export function MediaPlayerRibbonComponent() {
                   )}
                   <MediaTrackInfoComponent
                     mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
-                    infoContainerClassName={cx('media-player-track-info-container')}
+                    className={cx('media-player-track-info-container')}
                   />
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="far fa-heart"/>

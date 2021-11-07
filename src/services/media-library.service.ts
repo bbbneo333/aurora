@@ -121,18 +121,17 @@ class MediaLibraryService {
     await mediaLibraryService.syncMediaTracks();
   }
 
-  loadMediaAlbum(mediaAlbum: IMediaAlbum): void {
+  loadMediaAlbum(mediaAlbumId: string): void {
     MediaTrackDatastore
       .findMediaTracks({
-        provider: mediaAlbum.provider,
-        track_album_id: mediaAlbum.id,
+        track_album_id: mediaAlbumId,
         removed: false,
       })
       .then(async (mediaAlbumTrackDataList) => {
         store.dispatch({
           type: MediaEnums.MediaLibraryActions.LoadAlbum,
           data: {
-            mediaAlbum,
+            mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
             mediaAlbumTracks: await this.buildMediaTracks(mediaAlbumTrackDataList),
           },
         });

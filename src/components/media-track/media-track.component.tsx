@@ -1,54 +1,75 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
+import classNames from 'classnames/bind';
 
 import {MediaEnums} from '../../enums';
 import {IMediaTrack} from '../../interfaces';
 import {RootState} from '../../reducers';
-import {I18nService, MediaLibraryService, MediaPlayerService} from '../../services';
+import {MediaPlayerService} from '../../services';
+import {DateTimeUtils} from '../../utils';
+
+import {MediaTrackInfoComponent} from '..';
+
+import styles from './media-track.component.css';
+
+const cx = classNames.bind(styles);
 
 export function MediaTrackComponent(props: {
   mediaTrack: IMediaTrack,
 }) {
-  const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
+  const {
+    mediaTrack,
+  } = props;
 
-  const {mediaTrack} = props;
+  const {
+    mediaPlaybackState,
+    mediaPlaybackCurrentMediaTrack,
+  } = useSelector((state: RootState) => state.mediaPlayer);
 
-  const isMediaTrackPlaying = mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
-    && mediaPlayer.mediaPlaybackCurrentMediaTrack
-    && mediaPlayer.mediaPlaybackCurrentMediaTrack.id === mediaTrack.id;
+  const isMediaTrackPlaying = mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
+    && mediaPlaybackCurrentMediaTrack
+    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id;
 
   return (
-    <li>
-      {isMediaTrackPlaying
-        ? (
-          <button
-            type="submit"
-            onClick={() => MediaPlayerService.pauseMediaPlayer()}
-          >
-            <i className="fas fa-pause"/>
-          </button>
-        )
-        : (
-          <button
-            type="submit"
-            onClick={() => MediaPlayerService.playMediaTrack(mediaTrack)}
-          >
-            <i className="fas fa-play-circle"/>
-          </button>
-        )}
-      {mediaTrack.track_name}
-      <button
-        type="submit"
-        onClick={() => {
-          if (isMediaTrackPlaying) {
-            MediaPlayerService.stopMediaPlayer();
-          }
-
-          MediaLibraryService.removeMediaTrack(mediaTrack);
-        }}
-      >
-        {I18nService.getString('action_remove_track')}
-      </button>
-    </li>
+    <div className={cx('col-12')}>
+      <div className={cx('media-track')}>
+        <div className="row">
+          <div className={cx('col-1', 'media-track-action-column')}>
+            {
+              isMediaTrackPlaying
+                ? (
+                  <button
+                    type="submit"
+                    className={cx('media-track-play-button')}
+                    onClick={() => MediaPlayerService.pauseMediaPlayer()}
+                  >
+                    <i className="fas fa-pause"/>
+                  </button>
+                )
+                : (
+                  <button
+                    type="submit"
+                    className={cx('media-track-pause-button')}
+                    onClick={() => MediaPlayerService.playMediaTrack(mediaTrack)}
+                  >
+                    <i className="fas fa-play"/>
+                  </button>
+                )
+            }
+          </div>
+          <div className={cx('col-10', 'media-track-info-column')}>
+            <MediaTrackInfoComponent
+              mediaTrack={mediaTrack}
+              className={cx('media-track-info')}
+            />
+          </div>
+          <div className={cx('col-1', 'media-track-duration-column')}>
+            <div className={cx('media-track-duration')}>
+              {DateTimeUtils.formatSecondsToMinutes(mediaTrack.track_duration)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

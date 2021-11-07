@@ -2,5 +2,6 @@
   "link_library": "Library",
   "link_library_artists": "Artists",
   "link_library_albums": "Albums",
-  "link_settings": "Settings"
+  "link_settings": "Settings",
+  "label_library_album_header": "Album"
 }

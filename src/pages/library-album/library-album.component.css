@@ -1,0 +1,23 @@
+.library-album-header {
+  margin-bottom: 20px;
+}
+
+.library-album-header-info-column {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  justify-items: flex-start;
+}
+
+.library-album-header-label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #e0e0e0;
+}
+
+.library-album-header-name {
+  font-size: 54px;
+  line-height: 60px;
+  font-weight: bold;
+}

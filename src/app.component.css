@@ -23,6 +23,7 @@
 .app-sidebar-container {
   width: 30%;
   min-width: 250px;
+  max-width: 350px;
   background-color: var(--dark-bg-color);
   color: var(--dark-text-color);
   padding: var(--titlebar-overlay-height) 10px 10px;
@@ -54,10 +55,10 @@
 }
 
 .app-sidebar-navigation-item {
+  font-size: 15px;
   padding: 10px 15px;
   display: flex;
   flex-direction: row;
-  font-weight: bold;
   border-radius: 5px;
   color: var(--dark-text-color);
   transition: var(--selectable-item-transition);
@@ -86,7 +87,6 @@
 
 .app-content-browser-container {
   flex: 1 0 0;
-  overflow-y: scroll;
   padding: 20px;
 }
 
