@@ -28,6 +28,7 @@ export function MediaTrackInfoComponent(props: {
         {mediaTrack.track_artists.map(mediaArtist => (
           <NavLink
             exact
+            key={mediaArtist.id}
             to={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
               artistId: mediaArtist.id,
             })}
