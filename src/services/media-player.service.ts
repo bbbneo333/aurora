@@ -101,6 +101,7 @@ class MediaPlayerService {
       mediaPlayer,
     } = store.getState();
     const {
+      mediaPlaybackState,
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
     } = mediaPlayer;
@@ -117,9 +118,12 @@ class MediaPlayerService {
           return;
         }
 
-        requestAnimationFrame(() => {
-          this.reportMediaPlaybackProgress();
-        });
+        // only request progress update if track is currently playing
+        if (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
+          requestAnimationFrame(() => {
+            this.reportMediaPlaybackProgress();
+          });
+        }
       });
   }
 
