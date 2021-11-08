@@ -112,7 +112,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       return {
         ...state,
         mediaSelectedAlbum: mediaAlbum,
-        mediaSelectedAlbumTracks: mediaAlbumTracks,
+        mediaSelectedAlbumTracks: _.sortBy(mediaAlbumTracks, (mediaAlbumTrack: IMediaTrack) => mediaAlbumTrack.track_number),
       };
     }
     case MediaEnums.MediaLibraryActions.AddArtistSafe: {
