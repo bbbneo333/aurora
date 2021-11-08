@@ -65,7 +65,7 @@ export function MediaSessionComponent() {
 
   useEffect(() => {
     if (!navigator.mediaSession
-      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlayerPlaybackState.Playing
+      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlaybackState.Playing
       || !mediaPlayer.mediaPlaybackCurrentMediaTrack) {
       return;
     }
@@ -90,7 +90,7 @@ export function MediaSessionComponent() {
     if (!navigator.mediaSession
       || !navigator.mediaSession.setPositionState
       || !mediaPlayer.mediaPlaybackCurrentMediaTrack
-      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlayerPlaybackState.Playing) {
+      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlaybackState.Playing) {
       return;
     }
 

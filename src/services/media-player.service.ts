@@ -355,9 +355,35 @@ class MediaPlayerService {
       requestAnimationFrame(() => {
         this.reportMediaPlaybackProgress();
       });
+    } else if (mediaPlaybackCurrentPlayingInstance.checkIfLoading()) {
+      debug('reportMediaPlaybackProgress - media playback loading, waiting...');
+
+      // first update the playback state
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+      });
+
+      // re-request update
+      requestAnimationFrame(() => {
+        this.reportMediaPlaybackProgress();
+      });
+    } else if (mediaPlaybackCurrentPlayingInstance.checkIfEnded()) {
+      debug('reportMediaPlaybackProgress - media playback ended, playing next...');
+
+      // first stop the current playing track (only the state)
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.StopPlayer,
+      });
+
+      // request next track
+      this.playNext();
     } else {
-      debug('reportMediaPlaybackProgress - media instance not playing, aborting...');
+      debug('reportMediaPlaybackProgress - media instance did not reported valid state, aborting...');
     }
+  }
+
+  private playNext() {
+    // TODO: Add implementation for playing next track in the queue here
   }
 }
 

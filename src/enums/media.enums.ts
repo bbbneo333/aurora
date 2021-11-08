@@ -34,11 +34,12 @@ export enum MediaPlayerActions {
   UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
 }
 
-export enum MediaPlayerPlaybackState {
-  Playing = 'media/player/playing',
-  Paused = 'media/player/paused',
-  Loading = 'media/player/loading',
-  Idle = 'media/player/idle',
+export enum MediaPlaybackState {
+  Loading = 'media/playback/loading',
+  Playing = 'media/playback/playing',
+  Paused = 'media/playback/paused',
+  Stopped = 'media/playback/stopped',
+  Ended = 'media/playback/ended',
 }
 
 export enum MediaTrackCoverPictureImageDataType {

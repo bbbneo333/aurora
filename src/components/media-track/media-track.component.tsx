@@ -26,7 +26,7 @@ export function MediaTrackComponent(props: {
     mediaPlaybackCurrentMediaTrack,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
-  const isMediaTrackPlaying = mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
+  const isMediaTrackPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
     && mediaPlaybackCurrentMediaTrack
     && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id;
 

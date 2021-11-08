@@ -95,7 +95,7 @@ export function MediaPlayerRibbonComponent() {
                   <div className={cx('media-player-control', 'media-player-control-md')}>
                     <i className="fas fa-step-backward"/>
                   </div>
-                  {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
+                  {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
                     ? (
                       <MediaButtonComponent
                         className={cx('media-player-control', 'media-player-control-lg')}
@@ -108,7 +108,7 @@ export function MediaPlayerRibbonComponent() {
                     )
                     : (
                       <MediaButtonComponent
-                        disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
+                        disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
                         className={cx('media-player-control', 'media-player-control-lg')}
                         onButtonSubmit={() => {
                           MediaPlayerService.resumeMediaPlayer();
@@ -134,7 +134,7 @@ export function MediaPlayerRibbonComponent() {
                   </div>
                   <div className={cx('media-player-progress-bar-container')}>
                     <MediaProgressBarComponent
-                      disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
+                      disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
                       value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
                       maxValue={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration}
                       onDragUpdate={handleOnMediaProgressDragUpdate}

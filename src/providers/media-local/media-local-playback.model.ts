@@ -11,7 +11,8 @@ const debug = require('debug')('app:provider:media_local:media_playback');
 export class MediaLocalPlayback implements IMediaPlayback {
   private readonly mediaTrack: IMediaLocalTrack;
   private readonly mediaPlaybackLocalAudio: any;
-  private mediaPlaybackId: number | undefined;
+  private mediaPlaybackId: number|undefined;
+  private mediaPlaybackEnded = false;
 
   constructor(mediaTrack: IMediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
     this.mediaTrack = mediaTrack;
@@ -20,10 +21,17 @@ export class MediaLocalPlayback implements IMediaPlayback {
       volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
       // important - in order to support MediaSession, we need to used HTML5 audio
       html5: true,
+      // events
+      onend: (mediaPlaybackAudioId: number) => {
+        debug('audio event %s - playback id - %d', 'end', mediaPlaybackAudioId);
+        this.mediaPlaybackEnded = true;
+      },
     });
   }
 
   play(): Promise<boolean> {
+    this.mediaPlaybackEnded = false;
+
     return new Promise((resolve) => {
       this.mediaPlaybackLocalAudio.once('play', (mediaPlaybackAudioId: number) => {
         debug('audio event %s - playback id - %d', 'play', mediaPlaybackAudioId);
@@ -37,8 +45,16 @@ export class MediaLocalPlayback implements IMediaPlayback {
     });
   }
 
+  checkIfLoading(): boolean {
+    return this.mediaPlaybackLocalAudio.state() === 'loading';
+  }
+
   checkIfPlaying(): boolean {
     return this.mediaPlaybackLocalAudio.playing();
+  }
+
+  checkIfEnded(): boolean {
+    return this.mediaPlaybackEnded;
   }
 
   getPlaybackProgress(): number {
