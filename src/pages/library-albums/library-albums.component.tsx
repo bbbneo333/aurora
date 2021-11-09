@@ -17,7 +17,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
   const {mediaAlbum} = props;
 
   return (
-    <div className="col-sm-3">
+    <div className="col-sm-3 mb-3">
       <div className={cx('library-album-tile')}>
         <NavLink
           exact
