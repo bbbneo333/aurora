@@ -8,7 +8,7 @@ import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
 import {DateTimeUtils} from '../../utils';
 
-import {MediaTrackInfoComponent} from '..';
+import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
 
 import styles from './media-track.component.css';
 

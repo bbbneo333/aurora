@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 
-import {MediaCoverPictureComponent, MediaTrackComponent} from '../../components';
+import {MediaCoverPictureComponent, MediaTrackArtistLinkComponent, MediaTrackComponent} from '../../components';
 import {IMediaTrack} from '../../interfaces';
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService} from '../../services';
@@ -62,6 +62,9 @@ export function LibraryAlbumComponent() {
               </div>
               <div className={cx('library-album-header-name')}>
                 {mediaSelectedAlbum.album_name}
+              </div>
+              <div className={cx('library-album-header-info')}>
+                <MediaTrackArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
               </div>
             </div>
           </div>

@@ -32,7 +32,7 @@ const mediaAlbumInsertionComparator = (
   mediaAlbumB: IMediaAlbum,
 ) => (mediaNameSanitizerForComparator(mediaAlbumA.album_name) < mediaNameSanitizerForComparator(mediaAlbumB.album_name) ? -1 : 1);
 
-const mediaArtisInsertionComparator = (
+const mediaArtistInsertionComparator = (
   mediaArtistA: IMediaArtist,
   mediaArtistB: IMediaArtist,
 ) => (mediaNameSanitizerForComparator(mediaArtistA.artist_name) < mediaNameSanitizerForComparator(mediaArtistB.artist_name) ? -1 : 1);
@@ -139,7 +139,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       const {mediaArtists} = state;
 
       if (_.isNil(mediaArtists.find(exMediaArtist => exMediaArtist.id === mediaArtist.id))) {
-        ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, mediaArtisInsertionComparator);
+        ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, mediaArtistInsertionComparator);
       }
 
       return {

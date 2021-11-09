@@ -21,3 +21,7 @@
   line-height: 60px;
   font-weight: bold;
 }
+
+.library-album-header-info {
+  color: var(--dark-text-color);
+}

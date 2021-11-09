@@ -5,5 +5,5 @@ export {MediaPlayerRibbonComponent} from './media-player-ribbon/media-player-rib
 export {MediaProgressBarComponent} from './media-progress-bar/media-progress-bar.component';
 export {MediaSessionComponent} from './media-session/media-session.component';
 export {MediaTrackComponent} from './media-track/media-track.component';
-export {MediaTrackInfoComponent} from './media-track-info/media-track-info.component';
+export {MediaTrackInfoComponent, MediaTrackArtistLinkComponent} from './media-track-info/media-track-info.component';
 export {MediaCoverPictureComponent} from './media-cover-picture/media-cover-picture.component';

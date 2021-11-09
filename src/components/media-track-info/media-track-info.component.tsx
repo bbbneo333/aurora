@@ -3,12 +3,30 @@ import classNames from 'classnames/bind';
 import {NavLink} from 'react-router-dom';
 
 import {Routes} from '../../constants';
-import {IMediaTrack} from '../../interfaces';
+import {IMediaArtist, IMediaTrack} from '../../interfaces';
 import {StringUtils} from '../../utils';
 
 import styles from './media-track-info.component.css';
 
 const cx = classNames.bind(styles);
+
+export function MediaTrackArtistLinkComponent(props: {mediaArtist: IMediaArtist}) {
+  const {
+    mediaArtist,
+  } = props;
+
+  return (
+    <NavLink
+      exact
+      to={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
+        artistId: mediaArtist.id,
+      })}
+      className={cx('media-track-artist-link', 'app-nav-link')}
+    >
+      {mediaArtist.artist_name}
+    </NavLink>
+  );
+}
 
 export function MediaTrackInfoComponent(props: {
   mediaTrack: IMediaTrack,
@@ -26,16 +44,10 @@ export function MediaTrackInfoComponent(props: {
       </span>
       <span className={cx('media-track-info-subtitle')}>
         {mediaTrack.track_artists.map(mediaArtist => (
-          <NavLink
-            exact
+          <MediaTrackArtistLinkComponent
             key={mediaArtist.id}
-            to={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
-              artistId: mediaArtist.id,
-            })}
-            className={cx('media-track-artist-link', 'app-nav-link')}
-          >
-            {mediaArtist.artist_name}
-          </NavLink>
+            mediaArtist={mediaArtist}
+          />
         ))}
       </span>
     </div>
