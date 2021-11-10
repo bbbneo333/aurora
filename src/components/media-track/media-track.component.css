@@ -24,6 +24,7 @@
 
 .media-track-duration-column {
   display: flex;
+  justify-content: center;
   align-items: center;
 }
 

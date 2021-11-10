@@ -126,7 +126,7 @@ export function MediaPlayerRibbonComponent() {
               <Row className={cx('media-player-progress-container')}>
                 <Col className={cx('col-12', 'media-player-progress-column')}>
                   <div className={cx('media-player-progress-counter', 'start')}>
-                    {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
+                    {DateTimeUtils.formatSecondsToDuration(mediaProgressDragValue !== undefined
                       ? mediaProgressDragValue
                       : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
                   </div>
@@ -140,7 +140,7 @@ export function MediaPlayerRibbonComponent() {
                     />
                   </div>
                   <div className={cx('media-player-progress-counter', 'end')}>
-                    {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
+                    {DateTimeUtils.formatSecondsToDuration(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
                   </div>
                 </Col>
               </Row>

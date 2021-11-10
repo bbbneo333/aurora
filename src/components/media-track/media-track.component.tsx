@@ -65,7 +65,7 @@ export function MediaTrackComponent(props: {
           </div>
           <div className={cx('col-1', 'media-track-duration-column')}>
             <div className={cx('media-track-duration')}>
-              {DateTimeUtils.formatSecondsToMinutes(mediaTrack.track_duration)}
+              {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
             </div>
           </div>
         </div>
