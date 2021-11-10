@@ -1,14 +1,15 @@
 /**
- * Build config for electron renderer process
+ * Webpack config for production electron renderer process
  */
 
 import path from 'path';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import { merge } from 'webpack-merge';
+import {merge} from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
+
 import baseConfig from './webpack.config.base';
 import CheckNodeEnv from '../scripts/CheckNodeEnv';
 import DeleteSourceMaps from '../scripts/DeleteSourceMaps';
@@ -16,29 +17,24 @@ import DeleteSourceMaps from '../scripts/DeleteSourceMaps';
 CheckNodeEnv('production');
 DeleteSourceMaps();
 
-const devtoolsConfig = process.env.DEBUG_PROD === 'true' ? {
-  devtool: 'source-map'
-} : {};
+const devtoolsConfig = process.env.DEBUG_PROD === 'true'
+  ? {devtool: 'source-map'}
+  : {};
 
 export default merge(baseConfig, {
   ...devtoolsConfig,
-
   mode: 'production',
-
   target: 'electron-renderer',
-
   entry: [
     'core-js',
     'regenerator-runtime/runtime',
     path.join(__dirname, '../../src/index.tsx'),
   ],
-
   output: {
     path: path.join(__dirname, '../../src/dist'),
     publicPath: './dist/',
     filename: 'renderer.prod.js',
   },
-
   module: {
     rules: [
       {
@@ -47,12 +43,13 @@ export default merge(baseConfig, {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              // `./dist` can't be inerhited for publicPath for styles. Otherwise generated paths will be ./dist/dist
+              // `./dist` can't be inherited for publicPath for styles
+              // otherwise generated paths will be ./dist/dist
               publicPath: './',
             },
           },
           'css-loader',
-          'sass-loader'
+          'sass-loader',
         ],
       },
       // WOFF Font
@@ -122,7 +119,6 @@ export default merge(baseConfig, {
       },
     ],
   },
-
   optimization: {
     minimize: true,
     minimizer:
@@ -133,7 +129,6 @@ export default merge(baseConfig, {
         new CssMinimizerPlugin(),
       ],
   },
-
   plugins: [
     /**
      * Create global constants which can be configured at compile time.
@@ -152,7 +147,6 @@ export default merge(baseConfig, {
     new MiniCssExtractPlugin({
       filename: 'style.css',
     }),
-
     new BundleAnalyzerPlugin({
       analyzerMode:
         process.env.OPEN_ANALYZER === 'true' ? 'server' : 'disabled',

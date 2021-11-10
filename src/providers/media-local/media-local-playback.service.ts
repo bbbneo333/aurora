@@ -1,10 +1,12 @@
 import {IMediaPlayback, IMediaPlaybackOptions, IMediaPlaybackService} from '../../interfaces';
 
+import {IMediaLocalTrack} from './media-local.interfaces';
 import {MediaLocalPlayback} from './media-local-playback.model';
-import {MediaLocalTrack} from './media-local-track.model';
 
-export class MediaLocalPlaybackService implements IMediaPlaybackService {
-  playMediaTrack(mediaTrack: MediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions): IMediaPlayback {
+class MediaLocalPlaybackService implements IMediaPlaybackService {
+  playMediaTrack(mediaTrack: IMediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions): IMediaPlayback {
     return new MediaLocalPlayback(mediaTrack, mediaPlaybackOptions);
   }
 }
+
+export default new MediaLocalPlaybackService();

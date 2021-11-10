@@ -1,0 +1,24 @@
+.media-content-navigator {
+  display: flex;
+  flex-direction: row;
+}
+
+.media-content-navigate-button {
+  background-color: var(--dark-bg-color);
+  color: var(--light-text-color);
+  display: flex;
+  align-self: center;
+  align-items: center;
+  justify-items: center;
+  padding: 8px 12px;
+  border-radius: 100%;
+  margin: 0 15px;
+  line-height: 100%;
+  -webkit-text-stroke: 1px var(--dark-bg-color);
+  transition: var(--selectable-item-transition);
+  border: 2px solid var(--dark-bg-color);
+}
+
+.media-content-navigate-button:hover {
+  border-color: var(--dark-selectable-outline-color);
+}

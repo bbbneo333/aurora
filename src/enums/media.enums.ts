@@ -6,8 +6,17 @@ export enum MediaFileExtensions {
 }
 
 export enum MediaLibraryActions {
+  InitializeSafe = 'media/library/initializeSafe',
+  StartSync = 'media/library/startSync',
+  FinishSync = 'media/library/finishSync',
   AddTrack = 'media/library/addTrack',
   RemoveTrack = 'media/library/removeTrack',
+  AddAlbumSafe = 'media/library/addAlbumSafe',
+  RemoveAlbum = 'media/library/removeAlbum',
+  LoadAlbum = 'media/library/loadAlbum',
+  AddArtistSafe = 'media/library/addArtistSafe',
+  RemoveArtist = 'media/library/removeArtist',
+  LoadArtist = 'media/library/loadArtist',
 }
 
 export enum MediaPlayerActions {
@@ -25,21 +34,20 @@ export enum MediaPlayerActions {
   UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
 }
 
-export enum MediaPlayerPlaybackState {
-  Playing = 'media/player/playing',
-  Paused = 'media/player/paused',
-  Loading = 'media/player/loading',
-  Idle = 'media/player/idle',
+export enum MediaPlaybackState {
+  Loading = 'media/playback/loading',
+  Playing = 'media/playback/playing',
+  Paused = 'media/playback/paused',
+  Stopped = 'media/playback/stopped',
+  Ended = 'media/playback/ended',
 }
 
 export enum MediaTrackCoverPictureImageDataType {
   Buffer = 'media/track/coverPictureImageDataType/buffer',
+  Path = 'media/track/coverPictureImageDataType/path',
 }
 
-export enum MediaProviderUpdateEvent {
-  AddedProvider = 'media/provider/added',
-}
-
-export enum MediaLibraryUpdateEvent {
-  AddedTrack = 'media/library/trackAdded',
+export enum MediaProviderRegistryActions {
+  AddProvider = 'media/providerRegistry/addProvider',
+  AddProviderSafe = 'media/providerRegistry/addProviderSafe',
 }

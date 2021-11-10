@@ -11,7 +11,7 @@ import {DateTimeUtils} from '../../utils';
 import {MediaButtonComponent} from '../media-button/media-button.component';
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
 import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
-import {MediaTrackCoverPictureComponent} from '../media-track-cover-picture/media-track-cover-picture.component';
+import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -21,10 +21,10 @@ export function MediaPlayerRibbonComponent() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
 
   const mediaPlaybackVolumeMidThreshold = useRef<number>(mediaPlayer.mediaPlaybackVolumeMaxLimit / 2);
-  const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
+  const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number|undefined>(undefined);
 
   // TODO: Add implementation for setMediaVolumeDragStartValue
-  const [mediaVolumeDragStartValue] = useState<number | undefined>(undefined);
+  const [mediaVolumeDragStartValue] = useState<number|undefined>(undefined);
 
   const handleOnMediaProgressDragUpdate = useCallback((value) => {
     setMediaProgressDragValue(value);
@@ -62,22 +62,21 @@ export function MediaPlayerRibbonComponent() {
   ]);
 
   return (
-    <div className={cx('media-player-container', {
-      active: mediaPlayer.mediaPlaybackCurrentMediaTrack,
-    })}
-    >
-      {mediaPlayer.mediaPlaybackCurrentMediaTrack && (
-        <Container fluid>
-          <Row className={cx('media-player-content')}>
+    mediaPlayer.mediaPlaybackCurrentMediaTrack
+      ? (
+        <Container fluid className={cx('h-100')}>
+          <Row className={cx('media-player-container')}>
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-info-container')}>
                 <Col className={cx('col-12', 'media-player-info-column')}>
-                  <MediaTrackCoverPictureComponent
-                    mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
+                  <MediaCoverPictureComponent
+                    mediaPicture={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album.album_cover_picture}
+                    mediaPictureAltText={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album.album_name}
+                    className={cx('media-player-track-cover-image')}
                   />
                   <MediaTrackInfoComponent
                     mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
-                    infoContainerClassName={cx('media-player-track-info-container')}
+                    className={cx('media-player-track-info-container')}
                   />
                   <div className={cx('media-player-control', 'media-player-control-sm')}>
                     <i className="far fa-heart"/>
@@ -94,7 +93,7 @@ export function MediaPlayerRibbonComponent() {
                   <div className={cx('media-player-control', 'media-player-control-md')}>
                     <i className="fas fa-step-backward"/>
                   </div>
-                  {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Playing
+                  {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
                     ? (
                       <MediaButtonComponent
                         className={cx('media-player-control', 'media-player-control-lg')}
@@ -107,7 +106,7 @@ export function MediaPlayerRibbonComponent() {
                     )
                     : (
                       <MediaButtonComponent
-                        disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
+                        disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
                         className={cx('media-player-control', 'media-player-control-lg')}
                         onButtonSubmit={() => {
                           MediaPlayerService.resumeMediaPlayer();
@@ -127,13 +126,13 @@ export function MediaPlayerRibbonComponent() {
               <Row className={cx('media-player-progress-container')}>
                 <Col className={cx('col-12', 'media-player-progress-column')}>
                   <div className={cx('media-player-progress-counter', 'start')}>
-                    {DateTimeUtils.formatSecondsToMinutes(mediaProgressDragValue !== undefined
+                    {DateTimeUtils.formatSecondsToDuration(mediaProgressDragValue !== undefined
                       ? mediaProgressDragValue
                       : (mediaPlayer.mediaPlaybackCurrentMediaProgress || 0))}
                   </div>
                   <div className={cx('media-player-progress-bar-container')}>
                     <MediaProgressBarComponent
-                      disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlayerPlaybackState.Loading}
+                      disabled={mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
                       value={mediaPlayer.mediaPlaybackCurrentMediaProgress}
                       maxValue={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration}
                       onDragUpdate={handleOnMediaProgressDragUpdate}
@@ -141,7 +140,7 @@ export function MediaPlayerRibbonComponent() {
                     />
                   </div>
                   <div className={cx('media-player-progress-counter', 'end')}>
-                    {DateTimeUtils.formatSecondsToMinutes(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
+                    {DateTimeUtils.formatSecondsToDuration(mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration)}
                   </div>
                 </Col>
               </Row>
@@ -183,7 +182,9 @@ export function MediaPlayerRibbonComponent() {
             </Col>
           </Row>
         </Container>
-      )}
-    </div>
+      )
+      : (
+        <></>
+      )
   );
 }

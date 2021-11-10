@@ -1,27 +1,153 @@
-import {TypedEmitter} from 'tiny-typed-emitter';
+import React from 'react';
 
 import {MediaEnums} from '../enums';
 
-export interface IMediaTrackCoverPicture {
-  image_data: any,
-  image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType,
-  image_format: string,
+export interface IMediaTrackData {
+  readonly id: string;
+  readonly provider: string;
+  readonly provider_id?: string;
+  readonly track_name: string;
+  readonly track_number: number;
+  readonly track_duration: number;
+  readonly track_cover_picture?: IMediaPicture;
+  readonly track_artist_ids: string[],
+  readonly removed: boolean;
+  readonly track_album_id: string,
+  readonly sync: {
+    last_sync_key: string;
+    last_sync_at: number;
+  };
+  readonly extra?: object;
+}
+
+export interface IMediaTrackDataFilterParams {
+  provider?: string;
+  provider_id?: string;
+  track_album_id?: string;
+  removed?: boolean,
+  sync?: {
+    last_sync_key: string;
+  },
+}
+
+export interface IMediaTrackDataUpdateParams {
+  removed?: boolean;
+  sync?: {
+    last_sync_key: string;
+    last_sync_at: number;
+  },
+}
+
+export interface IMediaAlbumData {
+  readonly id: string;
+  readonly provider: string;
+  readonly provider_id?: string;
+  readonly album_name: string;
+  readonly album_artist_id: string;
+  readonly album_cover_picture?: IMediaPicture;
+  readonly extra?: object;
+}
+
+export interface IMediaAlbumDataFilterParams {
+  provider?: string;
+  provider_id?: string;
+  album_name?: string;
+  album_artist_id?: string;
+}
+
+export interface IMediaArtistData {
+  readonly id: string;
+  readonly provider: string;
+  readonly provider_id?: string;
+  readonly artist_name: string;
+  readonly artist_display_picture?: IMediaPicture;
+  readonly artist_feature_picture?: IMediaPicture;
+  readonly extra?: object;
+}
+
+export interface IMediaArtistDataFilterParams {
+  provider?: string;
+  provider_id?: string;
+  artist_name?: string;
+}
+
+export interface IMediaTrackProviderData {
+  readonly provider_id?: string;
+  readonly track_name: string;
+  readonly track_number: number;
+  readonly track_duration: number;
+  readonly track_cover_picture?: IMediaPicture;
+  readonly track_artists: IMediaArtistProviderData[];
+  readonly track_album: IMediaAlbumProviderData;
+  readonly sync: {
+    sync_key: string;
+  };
+  readonly extra?: object;
+}
+
+export interface IMediaAlbumProviderData {
+  readonly provider_id?: string;
+  readonly album_name: string;
+  readonly album_artist: IMediaArtistProviderData;
+  readonly album_cover_picture?: IMediaPicture;
+  readonly extra?: object;
+}
+
+export interface IMediaArtistProviderData {
+  readonly provider_id?: string;
+  readonly artist_name: string;
+  readonly artist_display_picture?: IMediaPicture;
+  readonly artist_feature_picture?: IMediaPicture;
+  readonly extra?: object;
 }
 
 export interface IMediaTrack {
+  readonly id: string;
   readonly provider: string;
-  id: any;
-  track_name: string;
-  track_artists: string[],
-  track_album_name: string;
-  track_duration: number;
-  track_cover_picture?: IMediaTrackCoverPicture;
+  readonly provider_id?: string;
+  readonly track_name: string;
+  readonly track_number: number;
+  readonly track_duration: number;
+  readonly track_cover_picture?: IMediaPicture;
+  readonly track_artists: IMediaArtist[];
+  readonly track_album: IMediaAlbum;
+  readonly extra?: object;
+}
+
+export interface IMediaAlbum {
+  readonly id: string;
+  readonly provider: string;
+  readonly provider_id?: string;
+  readonly album_name: string;
+  readonly album_artist: IMediaArtist;
+  readonly album_cover_picture?: IMediaPicture;
+  readonly extra?: object;
+}
+
+export interface IMediaArtist {
+  readonly id: string;
+  readonly provider: string;
+  readonly provider_id?: string;
+  readonly artist_name: string;
+  readonly artist_display_picture?: IMediaPicture;
+  readonly artist_feature_picture?: IMediaPicture;
+  readonly extra?: object;
+}
+
+export interface IMediaPicture {
+  image_data: any;
+  image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType;
+  image_format: string;
 }
 
 export interface IMediaPlayback {
   play(): Promise<boolean>;
 
+  checkIfLoading(): boolean;
+
   checkIfPlaying(): boolean;
+
+  checkIfEnded(): boolean;
 
   getPlaybackProgress(): number;
 
@@ -45,22 +171,53 @@ export interface IMediaPlaybackOptions {
   mediaPlaybackMaxVolume: number;
 }
 
-export interface IMediaLibraryEvents {
-  [MediaEnums.MediaLibraryUpdateEvent.AddedTrack]: (mediaTrack: IMediaTrack) => void;
+export interface IMediaSettingsComponent extends React.FC<any> {
 }
 
-export interface IMediaLibraryService extends TypedEmitter<IMediaLibraryEvents> {
-  addMediaTracks(): void;
+export interface IMediaLibraryService {
+  syncMediaTracks(): Promise<void>;
 
-  removeMediaTrack(mediaTrack: IMediaTrack): boolean;
+  removeMediaTrack?(mediaTrack: IMediaTrack): Promise<boolean>;
 }
 
 export interface IMediaPlaybackService {
   playMediaTrack(mediaTrack: IMediaTrack, mediaPlaybackOptions: IMediaPlaybackOptions): IMediaPlayback;
 }
 
+export interface IMediaSettingsService {
+  getDefaultSettings(): any;
+
+  getSettingsComponent(): IMediaSettingsComponent|undefined;
+}
+
+export interface IMediaProviderData {
+  identifier: string;
+  enabled: boolean;
+  settings: object;
+  options: object;
+  library: {
+    last_sync_key: string|null,
+    last_sync_started_at: number|null,
+    last_sync_finished_at: number|null,
+  },
+}
+
+export interface IMediaProviderDataUpdateParams {
+  settings?: object;
+  library?: {
+    last_sync_key?: string|null,
+    last_sync_started_at?: number|null,
+    last_sync_finished_at?: number|null,
+  },
+}
+
 export interface IMediaProvider {
-  mediaProviderNamespace: string;
+  mediaProviderIdentifier: string;
   mediaLibraryService: IMediaLibraryService;
   mediaPlaybackService: IMediaPlaybackService;
+  mediaSettingsService: IMediaSettingsService;
+
+  onMediaProviderRegistered?(): void;
+
+  onMediaProviderSettingsUpdated?(existingSettings: object, updatedSettings: object): void;
 }

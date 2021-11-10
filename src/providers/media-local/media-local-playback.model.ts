@@ -1,30 +1,37 @@
 // @ts-ignore
 import {Howl} from 'howler';
-import Promise from 'bluebird';
 
 import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
 
-import {MediaLocalTrack} from './media-local-track.model';
+import {IMediaLocalTrack} from './media-local.interfaces';
 import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_playback');
 
 export class MediaLocalPlayback implements IMediaPlayback {
-  private readonly mediaTrack: MediaLocalTrack;
+  private readonly mediaTrack: IMediaLocalTrack;
   private readonly mediaPlaybackLocalAudio: any;
-  private mediaPlaybackId: number | undefined;
+  private mediaPlaybackId: number|undefined;
+  private mediaPlaybackEnded = false;
 
-  constructor(mediaTrack: MediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
+  constructor(mediaTrack: IMediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
     this.mediaTrack = mediaTrack;
     this.mediaPlaybackLocalAudio = new Howl({
-      src: mediaTrack.location.address,
+      src: mediaTrack.extra.location.address,
       volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
       // important - in order to support MediaSession, we need to used HTML5 audio
       html5: true,
+      // events
+      onend: (mediaPlaybackAudioId: number) => {
+        debug('audio event %s - playback id - %d', 'end', mediaPlaybackAudioId);
+        this.mediaPlaybackEnded = true;
+      },
     });
   }
 
   play(): Promise<boolean> {
+    this.mediaPlaybackEnded = false;
+
     return new Promise((resolve) => {
       this.mediaPlaybackLocalAudio.once('play', (mediaPlaybackAudioId: number) => {
         debug('audio event %s - playback id - %d', 'play', mediaPlaybackAudioId);
@@ -38,8 +45,16 @@ export class MediaLocalPlayback implements IMediaPlayback {
     });
   }
 
+  checkIfLoading(): boolean {
+    return this.mediaPlaybackLocalAudio.state() === 'loading';
+  }
+
   checkIfPlaying(): boolean {
     return this.mediaPlaybackLocalAudio.playing();
+  }
+
+  checkIfEnded(): boolean {
+    return this.mediaPlaybackEnded;
   }
 
   getPlaybackProgress(): number {
@@ -49,8 +64,13 @@ export class MediaLocalPlayback implements IMediaPlayback {
   seekPlayback(mediaPlaybackSeekPosition: number): Promise<boolean> {
     return new Promise((resolve) => {
       this.mediaPlaybackLocalAudio.once('seek', (mediaPlaybackAudioId: number) => {
-        debug('audio event %s - playback id - %d', 'seek', mediaPlaybackAudioId);
-        resolve(true);
+        // TODO: Hack - When using HTML5 audio, seek is fired even before audio actually starts playing (checkIfPlaying() remains false)
+        //  We are reporting a success after a 100 ms delay which during testing always gave positive results (checkIfPlaying() remained true)
+        //  Check this unresolved issue - https://github.com/goldfire/howler.js/issues/1235
+        setTimeout(() => {
+          debug('audio event %s - playback id - %d, playing ? - %s', 'seek', mediaPlaybackAudioId, this.checkIfPlaying());
+          resolve(true);
+        }, 100);
       });
 
       debug('seeking track id - %s, playback id - %d, seek position - %d', this.mediaTrack.id, this.mediaPlaybackId, mediaPlaybackSeekPosition);

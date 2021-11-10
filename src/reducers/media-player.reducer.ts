@@ -3,25 +3,25 @@ import * as _ from 'lodash';
 import {MediaEnums} from '../enums';
 import {IMediaPlayback, IMediaTrack} from '../interfaces';
 
-export interface MediaPlayerState {
+export type MediaPlayerState = {
   mediaTracks: IMediaTrack[];
-  mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState;
+  mediaPlaybackState: MediaEnums.MediaPlaybackState;
   mediaPlaybackCurrentMediaTrack?: IMediaTrack;
   mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: IMediaPlayback;
   mediaPlaybackVolumeMaxLimit: number,
   mediaPlaybackVolumeCurrent: number,
   mediaPlaybackVolumeMuted: boolean,
-}
+};
 
-export interface MediaPlayerStateAction {
+export type MediaPlayerStateAction = {
   type: MediaEnums.MediaPlayerActions,
   data?: any,
-}
+};
 
 const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],
-  mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
+  mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
   mediaPlaybackCurrentMediaTrack: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
@@ -62,7 +62,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
 
       return {
         ...state,
-        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Loading,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
         mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
@@ -75,7 +75,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
 
       return {
         ...state,
-        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Loading,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Loading,
       };
     }
     case MediaEnums.MediaPlayerActions.Play: {
@@ -86,23 +86,21 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
 
       return {
         ...state,
-        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Playing,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Playing,
         mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress || 0,
       };
     }
     case MediaEnums.MediaPlayerActions.PausePlayer: {
       return {
         ...state,
-        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Paused,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Paused,
       };
     }
     case MediaEnums.MediaPlayerActions.StopPlayer: {
       return {
         ...state,
-        mediaPlaybackState: MediaEnums.MediaPlayerPlaybackState.Idle,
-        mediaPlaybackCurrentMediaTrack: undefined,
-        mediaPlaybackCurrentMediaProgress: undefined,
-        mediaPlaybackCurrentPlayingInstance: undefined,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
+        mediaPlaybackCurrentMediaProgress: 0,
       };
     }
     case MediaEnums.MediaPlayerActions.UpdatePlaybackProgress: {

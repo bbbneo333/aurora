@@ -4,8 +4,10 @@
 
 .media-progress-container:not(.disabled):hover,
 .media-progress-container:not(.disabled).dragging {
+  cursor: pointer;
+
   .media-progress-bar {
-    background-color: white;
+    background-color: var(--light-button-color);
   }
 
   .media-progress-handler {
@@ -32,7 +34,9 @@
 
 .media-progress-container.disabled {
   .media-progress-bar-container {
-    background-color: #8c8c8c9e;
+    // TODO: Find a way to apply alpha channel to CSS variable
+    //  Right now it's a hard coded value using dark-button-color
+    background-color: #b3b3b39e;
   }
 }
 
@@ -40,7 +44,9 @@
   display: flex;
   height: 4px;
   overflow: hidden;
-  background-color: #8c8c8c45;
+  // TODO: Find a way to apply alpha channel to CSS variable
+  //  Right now it's a hard coded value using dark-button-color
+  background-color: #b3b3b345;
   border-radius: 0.25rem;
   transition: background-color .5s ease;
 }
@@ -52,7 +58,7 @@
   overflow: hidden;
   text-align: center;
   white-space: nowrap;
-  background-color: #8c8c8c;
+  background-color: var(--dark-button-color);
   transition: width .1s ease, background-color .1s ease;
 }
 
@@ -62,7 +68,7 @@
   width: 12px;
   top: -4px;
   left: 0;
-  background-color: #e9ecef;
+  background-color: var(--light-button-color);
   border-radius: 50%;
   margin-left: -6px;
   opacity: 0;

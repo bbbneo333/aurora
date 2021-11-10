@@ -1,4 +1,4 @@
-.media-track-info-container {
+.media-track-info {
   display: flex;
   flex-flow: column;
   align-items: flex-start;
@@ -7,11 +7,26 @@
 }
 
 .media-track-info-title {
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 15px;
+  color: var(--light-text-color);
 }
 
 .media-track-info-subtitle {
-  font-size: 12px;
-  font-weight: 200;
+  font-size: 13px;
+  color: var(--dark-text-color);
+}
+
+.media-track-artist-link {
+  font-size: inherit;
+  color: inherit !important;
+  padding: 0;
+  text-decoration: none;
+  transition: var(--selectable-item-transition);
+  background: none;
+  border: none;
+}
+
+.media-track-artist-link:hover {
+  color: var(--light-text-color) !important;
+  text-decoration: underline;
 }

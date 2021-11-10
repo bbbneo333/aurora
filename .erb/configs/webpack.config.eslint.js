@@ -1,3 +1,7 @@
+/**
+ * Webpack config used by eslint
+ */
+
 /* eslint import/no-unresolved: off, import/no-self-import: off */
 require('@babel/register');
 

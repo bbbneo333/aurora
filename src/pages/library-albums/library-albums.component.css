@@ -1,0 +1,51 @@
+.library-album-tile {
+  background-color: var(--dark-card-bg-color);
+  border-radius: 4px;
+  transition: var(--selectable-item-transition);
+  height: 100%;
+}
+
+.library-album-tile:hover {
+  background-color: var(--selected-bg-color);
+}
+
+.library-album-tile-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+.library-album-tile-link {
+}
+
+.library-album-tile:hover .library-album-tile-link {
+  color: var(--light-text-color);
+}
+
+.library-album-tile-cover {
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.library-album-tile-cover-picture {
+  height: 100%;
+  width: 100%;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
+  /* size for placeholder icon */
+  font-size: 50px;
+}
+
+.library-album-tile-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.library-album-tile-subtitle {
+  font-size: smaller;
+  color: var(--dark-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+}

@@ -65,7 +65,7 @@ export function MediaSessionComponent() {
 
   useEffect(() => {
     if (!navigator.mediaSession
-      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlayerPlaybackState.Playing
+      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlaybackState.Playing
       || !mediaPlayer.mediaPlaybackCurrentMediaTrack) {
       return;
     }
@@ -73,8 +73,8 @@ export function MediaSessionComponent() {
     const mediaTrack = mediaPlayer.mediaPlaybackCurrentMediaTrack;
     const mediaSessionMetadata = new MediaMetadata({
       title: mediaTrack.track_name,
-      artist: mediaTrack.track_artists[0],
-      album: mediaTrack.track_album_name,
+      artist: mediaTrack.track_album.album_artist.artist_name,
+      album: mediaTrack.track_album.album_name,
       artwork: [],
     });
 
@@ -90,7 +90,7 @@ export function MediaSessionComponent() {
     if (!navigator.mediaSession
       || !navigator.mediaSession.setPositionState
       || !mediaPlayer.mediaPlaybackCurrentMediaTrack
-      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlayerPlaybackState.Playing) {
+      || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlaybackState.Playing) {
       return;
     }
 

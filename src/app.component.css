@@ -1,0 +1,112 @@
+/*app > columns [stage, media player]*/
+
+.app-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/*app > stage*/
+
+.app-stage-container {
+  flex: 1 0 0;
+  display: flex;
+  flex-flow: row;
+}
+
+/*app > stage > rows [sidebar, content]*/
+
+.app-sidebar-container {
+  width: 30%;
+  min-width: 250px;
+  max-width: 350px;
+  background-color: var(--dark-bg-color);
+  color: var(--dark-text-color);
+  padding: var(--titlebar-overlay-height) 10px 10px;
+}
+
+.app-content-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--light-bg-color);
+  color: var(--light-text-color);
+}
+
+/*app > stage > sidebar*/
+
+.app-sidebar-logo {
+  background-image: url('../assets/logo-wide.png');
+  background-size: contain;
+  width: 100%;
+  height: 45px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.app-sidebar-navigation-list {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.app-sidebar-navigation-item {
+  font-size: 15px;
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: row;
+  border-radius: 5px;
+  color: var(--dark-text-color);
+  transition: var(--selectable-item-transition);
+}
+
+.app-sidebar-navigation-item:hover {
+  color: var(--selected-text-color);
+}
+
+.app-sidebar-navigation-item.selected {
+  background-color: var(--selected-bg-color);
+  color: var(--light-text-color);
+}
+
+.app-sidebar-navigation-item-icon {
+  margin-right: 10px;
+}
+
+/*app > stage > content > columns [header, browser]*/
+
+.app-content-header-container {
+  display: flex;
+  flex: 0 0 50px;
+  height: var(--titlebar-overlay-height);
+}
+
+.app-content-browser-container {
+  flex: 1 0 0;
+  padding: 20px;
+}
+
+/*app > app > content > header > rows [navigator, page header, user]*/
+
+.app-content-header-page-container {
+  width: 100%;
+  display: flex;
+  align-self: center;
+  margin: 10px;
+}
+
+/*app > media player*/
+
+.app-media-player-container {
+  flex: 0 0 100px;
+  margin-bottom: -100px;
+  transition: margin-bottom .4s ease;
+}
+
+.app-media-player-container.active {
+  margin-bottom: 0;
+}

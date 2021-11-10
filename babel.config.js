@@ -14,7 +14,7 @@ const productionPlugins = [
 ];
 
 module.exports = (api) => {
-  // See docs about api at https://babeljs.io/docs/en/config-files#apicache
+  // @see - https://babeljs.io/docs/en/config-files#apicache
 
   const development = api.env(developmentEnvironments);
 
@@ -23,39 +23,33 @@ module.exports = (api) => {
       // @babel/preset-env will automatically target our browserslist targets
       require('@babel/preset-env'),
       require('@babel/preset-typescript'),
-      [require('@babel/preset-react'), { development }],
+      [require('@babel/preset-react'), {development}],
     ],
     plugins: [
-      // Stage 0
+      // stage - 0
       require('@babel/plugin-proposal-function-bind'),
 
-      // Stage 1
+      // stage - 1
       require('@babel/plugin-proposal-export-default-from'),
       require('@babel/plugin-proposal-logical-assignment-operators'),
-      [require('@babel/plugin-proposal-optional-chaining'), { loose: false }],
-      [
-        require('@babel/plugin-proposal-pipeline-operator'),
-        { proposal: 'minimal' },
-      ],
-      [
-        require('@babel/plugin-proposal-nullish-coalescing-operator'),
-        { loose: false },
-      ],
+      [require('@babel/plugin-proposal-optional-chaining'), {loose: false}],
+      [require('@babel/plugin-proposal-pipeline-operator'), {proposal: 'minimal'}],
+      [require('@babel/plugin-proposal-nullish-coalescing-operator'), {loose: false}],
       require('@babel/plugin-proposal-do-expressions'),
 
-      // Stage 2
-      [require('@babel/plugin-proposal-decorators'), { legacy: true }],
+      // stage - 2
+      [require('@babel/plugin-proposal-decorators'), {legacy: true}],
       require('@babel/plugin-proposal-function-sent'),
       require('@babel/plugin-proposal-export-namespace-from'),
       require('@babel/plugin-proposal-numeric-separator'),
       require('@babel/plugin-proposal-throw-expressions'),
 
-      // Stage 3
+      // stage - 3
       require('@babel/plugin-syntax-dynamic-import'),
       require('@babel/plugin-syntax-import-meta'),
 
-      // In the original implementation, following plugin had been registered with loose: true
-      // But in order to turn off the warnings, that option was remove
+      // in the original implementation, following plugin had been registered with loose: true
+      // But in order to turn off the warnings, that option was removed
       [require('@babel/plugin-proposal-class-properties')],
 
       require('@babel/plugin-proposal-json-strings'),
