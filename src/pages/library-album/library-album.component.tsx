@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import classNames from 'classnames/bind';
 import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
+import * as _ from 'lodash';
 
 import {MediaCoverPictureComponent, MediaTrackArtistLinkComponent, MediaTrackComponent} from '../../components';
 import {IMediaTrack} from '../../interfaces';
@@ -42,21 +43,24 @@ export function LibraryAlbumComponent() {
     return (<></>);
   }
 
+  const mediaAlbumHasCover = !_.isNil(mediaSelectedAlbum.album_cover_picture);
+  const mediaAlbumHeaderColumnWidth = mediaAlbumHasCover ? 'col-8' : 'col-12';
+
   return (
     <div className={cx('library-album')}>
       <div className="container-fluid">
         <div className={cx('library-album-header')}>
           <div className="row">
-            <div className={cx('col-3', 'library-album-header-cover-column')}>
-              {mediaSelectedAlbum.album_cover_picture && (
+            {mediaAlbumHasCover && (
+              <div className={cx('col-3', 'library-album-header-cover-column')}>
                 <MediaCoverPictureComponent
                   mediaPicture={mediaSelectedAlbum.album_cover_picture}
                   mediaPictureAltText={mediaSelectedAlbum.album_name}
                   className={cx('library-album-cover-picture')}
                 />
-              )}
-            </div>
-            <div className={cx('col-8', 'library-album-header-info-column')}>
+              </div>
+            )}
+            <div className={cx(mediaAlbumHeaderColumnWidth, 'library-album-header-info-column')}>
               <div className={cx('library-album-header-label')}>
                 {I18nService.getString('label_library_album_header')}
               </div>

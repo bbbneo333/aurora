@@ -55,8 +55,10 @@ class App implements IAppMain {
   private readonly htmlFilePath = path.join(__dirname, 'index.html');
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
-  private readonly windowWidth = 1100;
+  private readonly windowWidth = 1200;
   private readonly windowHeight = 720;
+  private readonly windowMinWidth = 1024;
+  private readonly windowMinHeight = 620;
 
   constructor() {
     this.env = process.env.NODE_ENV;
@@ -189,6 +191,8 @@ class App implements IAppMain {
       show: false,
       width: this.windowWidth,
       height: this.windowHeight,
+      minWidth: this.windowMinWidth,
+      minHeight: this.windowMinHeight,
       icon: this.getAssetPath('icon.png'),
       titleBarStyle: 'hiddenInset',
       frame: false,

@@ -9,3 +9,8 @@
 .media-cover-picture > img {
   width: 100%;
 }
+
+.media-cover-placeholder-icon {
+  font-size: inherit;
+  color: var(--dark-text-color);
+}

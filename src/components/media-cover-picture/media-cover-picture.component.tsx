@@ -9,7 +9,7 @@ import styles from './media-cover-picture.component.css';
 const cx = classNames.bind(styles);
 
 export function MediaCoverPictureComponent(props: {
-  mediaPicture: IMediaPicture,
+  mediaPicture?: IMediaPicture,
   mediaPictureAltText: string,
   className?: string,
 }) {
@@ -18,6 +18,16 @@ export function MediaCoverPictureComponent(props: {
     mediaPictureAltText,
     className,
   } = props;
+
+  if (!mediaPicture) {
+    return (
+      <div className={cx('media-cover-picture', className)}>
+        <div className={cx('media-cover-placeholder')}>
+          <i className={cx('media-cover-placeholder-icon', 'fas fa-compact-disc')}/>
+        </div>
+      </div>
+    );
+  }
 
   // determine image source for the cover image based on the cover picture and image data type provided
   let mediaCoverPictureImageSrc;

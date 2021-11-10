@@ -24,6 +24,8 @@
 .media-player-track-cover-image {
   height: 70px;
   width: 70px;
+  /* size for placeholder icon */
+  font-size: 30px;
 }
 
 .media-player-track-info-container {

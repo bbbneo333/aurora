@@ -27,15 +27,13 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
           className={cx('library-album-tile-link', 'app-nav-link')}
         >
           <div className={cx('library-album-tile-body')}>
-            {mediaAlbum.album_cover_picture && (
-              <div className={cx('library-album-tile-cover')}>
-                <MediaCoverPictureComponent
-                  mediaPicture={mediaAlbum.album_cover_picture}
-                  mediaPictureAltText={mediaAlbum.album_name}
-                  className={cx('library-album-tile-cover-picture')}
-                />
-              </div>
-            )}
+            <div className={cx('library-album-tile-cover')}>
+              <MediaCoverPictureComponent
+                mediaPicture={mediaAlbum.album_cover_picture}
+                mediaPictureAltText={mediaAlbum.album_name}
+                className={cx('library-album-tile-cover-picture')}
+              />
+            </div>
             <div className={cx('library-album-tile-info')}>
               <div className={cx('library-album-tile-title')}>
                 {mediaAlbum.album_name}

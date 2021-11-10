@@ -69,13 +69,11 @@ export function MediaPlayerRibbonComponent() {
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-info-container')}>
                 <Col className={cx('col-12', 'media-player-info-column')}>
-                  {mediaPlayer.mediaPlaybackCurrentMediaTrack.track_cover_picture && (
-                    <MediaCoverPictureComponent
-                      mediaPicture={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_cover_picture}
-                      mediaPictureAltText={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album.album_name}
-                      className={cx('media-player-track-cover-image')}
-                    />
-                  )}
+                  <MediaCoverPictureComponent
+                    mediaPicture={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album.album_cover_picture}
+                    mediaPictureAltText={mediaPlayer.mediaPlaybackCurrentMediaTrack.track_album.album_name}
+                    className={cx('media-player-track-cover-image')}
+                  />
                   <MediaTrackInfoComponent
                     mediaTrack={mediaPlayer.mediaPlaybackCurrentMediaTrack}
                     className={cx('media-player-track-info-container')}
