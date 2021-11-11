@@ -11,6 +11,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
@@ -81,9 +82,7 @@ class MediaPlayerService {
         },
       });
 
-      requestAnimationFrame(() => {
-        self.reportMediaPlaybackProgress();
-      });
+      self.reportMediaPlaybackProgress();
 
       return true;
     }
@@ -100,6 +99,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackState,
       mediaPlaybackCurrentMediaTrack,
@@ -110,6 +110,10 @@ class MediaPlayerService {
       return;
     }
 
+    // update playback progress state to the requested one right away
+    // this is being done in order to prevent delay between seek request and actual audio seek success response
+    this.updateMediaPlaybackProgress(mediaTrackSeekPosition);
+
     mediaPlaybackCurrentPlayingInstance
       .seekPlayback(mediaTrackSeekPosition)
       .then((mediaPlaybackSeeked) => {
@@ -118,8 +122,9 @@ class MediaPlayerService {
           return;
         }
 
-        // only request progress update if track is currently playing
         if (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
+          // only request progress update if track is currently playing
+          // this is being done in order to avoid progress updates if track is already ended
           requestAnimationFrame(() => {
             this.reportMediaPlaybackProgress();
           });
@@ -186,9 +191,7 @@ class MediaPlayerService {
           },
         });
 
-        requestAnimationFrame(() => {
-          this.reportMediaPlaybackProgress();
-        });
+        this.reportMediaPlaybackProgress();
       });
   }
 
@@ -330,6 +333,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentMediaProgress,
@@ -346,13 +350,7 @@ class MediaPlayerService {
 
     if (mediaPlaybackExistingProgress !== mediaPlaybackProgress) {
       debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);
-
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
-        data: {
-          mediaPlaybackProgress,
-        },
-      });
+      this.updateMediaPlaybackProgress(mediaPlaybackProgress);
     }
 
     if (mediaPlaybackCurrentPlayingInstance.checkIfPlaying()) {
@@ -384,6 +382,15 @@ class MediaPlayerService {
     } else {
       debug('reportMediaPlaybackProgress - media instance did not reported valid state, aborting...');
     }
+  }
+
+  private updateMediaPlaybackProgress(mediaPlaybackProgress: number) {
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
+      data: {
+        mediaPlaybackProgress,
+      },
+    });
   }
 
   private playNext() {
