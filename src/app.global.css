@@ -25,6 +25,7 @@
   --selected-text-color: #fff;
   --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
   --titlebar-overlay-height: 60px;
+  --scrollable-scrollbar-width: 15px;
 }
 
 #title-bar-overlay {
@@ -46,7 +47,7 @@
 }
 
 .app-scrollable::-webkit-scrollbar {
-  width: 15px;
+  width: var(--scrollable-scrollbar-width);
   background-color: transparent;
 }
 

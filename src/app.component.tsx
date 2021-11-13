@@ -89,6 +89,12 @@ function AppContentBrowser() {
 
 // app > stage > sidebar
 
+function AppSidebarQuickAccess() {
+  return (
+    <div className={cx('app-sidebar-quick-access', 'app-scrollable')}/>
+  );
+}
+
 function AppSidebarNavigationLink(props: {route: AppRoute}) {
   const {route} = props;
 
@@ -108,17 +114,32 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
   );
 }
 
+function AppSidebarNavigationList() {
+  return (
+    <div className={cx('app-sidebar-navigation-list')}>
+      {routes.map(route => (
+        <AppSidebarNavigationLink key={route.path} route={route}/>
+      ))}
+    </div>
+  );
+}
+
+function AppSidebarBrandingLogo() {
+  return (
+    // TODO: Add app logo / branding here
+    // <div className={cx('app-sidebar-logo')}/>
+    <></>
+  );
+}
+
 // app > stage > rows [sidebar, content]
 
 function AppSidebar() {
   return (
-    <div className={cx('app-sidebar-container', 'app-scrollable')}>
-      <div className={cx('app-sidebar-logo')}/>
-      <div className={cx('app-sidebar-navigation-list')}>
-        {routes.map(route => (
-          <AppSidebarNavigationLink key={route.path} route={route}/>
-        ))}
-      </div>
+    <div className={cx('app-sidebar-container')}>
+      <AppSidebarBrandingLogo/>
+      <AppSidebarNavigationList/>
+      <AppSidebarQuickAccess/>
     </div>
   );
 }

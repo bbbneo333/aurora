@@ -26,7 +26,9 @@
   max-width: 350px;
   background-color: var(--dark-bg-color);
   color: var(--dark-text-color);
-  padding: var(--titlebar-overlay-height) 10px 10px;
+  padding-top: var(--titlebar-overlay-height);
+  display: flex;
+  flex-direction: column;
 }
 
 .app-content-container {
@@ -51,7 +53,7 @@
 .app-sidebar-navigation-list {
   display: flex;
   flex-direction: column;
-  margin: 20px 0;
+  padding: 10px;
 }
 
 .app-sidebar-navigation-item {
@@ -75,6 +77,11 @@
 
 .app-sidebar-navigation-item-icon {
   margin-right: 10px;
+}
+
+.app-sidebar-quick-access {
+  flex: 1 0 0;
+  padding: 0 4px 0 calc(var(--scrollable-scrollbar-width) + 4px);
 }
 
 /*app > stage > content > columns [header, browser]*/
