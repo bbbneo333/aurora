@@ -392,6 +392,24 @@ class MediaPlayerService {
       });
   }
 
+  playPreviousTrack(): void {
+    this.stopMediaPlayer();
+    this.playPrevious();
+  }
+
+  playNextTrack(): void {
+    this.stopMediaPlayer();
+    this.playNext();
+  }
+
+  hasPreviousTrack(): boolean {
+    return !_.isNil(this.getPreviousFromList());
+  }
+
+  hasNextTrack(): boolean {
+    return !_.isNil(this.getNextFromList());
+  }
+
   private async loadAndPlayMediaTrack(mediaTrack: IMediaTrack): Promise<boolean> {
     const {
       mediaPlayer,
@@ -499,7 +517,7 @@ class MediaPlayerService {
     });
   }
 
-  private playNext(): void {
+  private getPreviousFromList(): IMediaTrack|undefined {
     const {
       mediaPlayer,
     } = store.getState();
@@ -509,24 +527,71 @@ class MediaPlayerService {
       mediaPlaybackCurrentMediaTrack,
     } = mediaPlayer;
 
-    debug('playNext - attempting to play next - track list length - %d, current media track - %s', mediaTracks.length, mediaPlaybackCurrentMediaTrack?.id);
-
-    let mediaNextTrack;
+    let mediaTrack;
     if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
-      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.id === mediaPlaybackCurrentMediaTrack.id);
-      if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer < mediaTracks.length) {
-        mediaNextTrack = mediaTracks[mediaCurrentTrackPointer + 1];
+      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, track => track.id === mediaPlaybackCurrentMediaTrack.id);
+      if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer > 0) {
+        mediaTrack = mediaTracks[mediaCurrentTrackPointer - 1];
       }
     }
-    if (!mediaNextTrack) {
+
+    return mediaTrack;
+  }
+
+  private playPrevious(): void {
+    debug('playPrevious - attempting to play previous...');
+
+    const mediaTrack = this.getPreviousFromList();
+    if (!mediaTrack) {
+      debug('playPrevious - media previous track could not be obtained, skipping play previous...');
+      return;
+    }
+
+    debug('playNext - found track to play - %s', mediaTrack.id);
+
+    this
+      .loadAndPlayMediaTrack(mediaTrack)
+      .then((mediaPlayed) => {
+        if (!mediaPlayed) {
+          // TODO: Handle cases where media could not be played
+        }
+      });
+  }
+
+  private getNextFromList(): IMediaTrack|undefined {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentMediaTrack,
+    } = mediaPlayer;
+
+    let mediaTrack;
+    if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
+      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, track => track.id === mediaPlaybackCurrentMediaTrack.id);
+      if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer < mediaTracks.length - 1) {
+        mediaTrack = mediaTracks[mediaCurrentTrackPointer + 1];
+      }
+    }
+
+    return mediaTrack;
+  }
+
+  private playNext(): void {
+    debug('playNext - attempting to play next...');
+
+    const mediaTrack = this.getNextFromList();
+    if (!mediaTrack) {
       debug('playNext - media next track could not be obtained, skipping play next...');
       return;
     }
 
-    debug('playNext - found track to play next - %s', mediaNextTrack.id);
+    debug('playNext - found track to play - %s', mediaTrack.id);
 
     this
-      .loadAndPlayMediaTrack(mediaNextTrack)
+      .loadAndPlayMediaTrack(mediaTrack)
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played

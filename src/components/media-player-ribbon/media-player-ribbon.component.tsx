@@ -87,12 +87,21 @@ export function MediaPlayerRibbonComponent() {
             <Col className={cx('col-md-4 col-xl-6')}>
               <Row className={cx('media-player-controls-container')}>
                 <Col className={cx('col-12', 'media-player-controls-column')}>
-                  <div className={cx('media-player-control', 'media-player-control-sm')}>
+                  <MediaButtonComponent
+                    disabled
+                    className={cx('media-player-control', 'media-player-control-sm')}
+                  >
                     <i className="fas fa-random"/>
-                  </div>
-                  <div className={cx('media-player-control', 'media-player-control-md')}>
+                  </MediaButtonComponent>
+                  <MediaButtonComponent
+                    className={cx('media-player-control', 'media-player-control-md')}
+                    disabled={!MediaPlayerService.hasPreviousTrack()}
+                    onButtonSubmit={() => {
+                      MediaPlayerService.playPreviousTrack();
+                    }}
+                  >
                     <i className="fas fa-step-backward"/>
-                  </div>
+                  </MediaButtonComponent>
                   {mediaPlayer.mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
                     ? (
                       <MediaButtonComponent
@@ -115,12 +124,21 @@ export function MediaPlayerRibbonComponent() {
                         <i className="fas fa-play-circle"/>
                       </MediaButtonComponent>
                     )}
-                  <div className={cx('media-player-control', 'media-player-control-md')}>
+                  <MediaButtonComponent
+                    className={cx('media-player-control', 'media-player-control-md')}
+                    disabled={!MediaPlayerService.hasNextTrack()}
+                    onButtonSubmit={() => {
+                      MediaPlayerService.playNextTrack();
+                    }}
+                  >
                     <i className="fas fa-step-forward"/>
-                  </div>
-                  <div className={cx('media-player-control', 'media-player-control-sm')}>
+                  </MediaButtonComponent>
+                  <MediaButtonComponent
+                    disabled
+                    className={cx('media-player-control', 'media-player-control-sm')}
+                  >
                     <i className="fas fa-redo-alt"/>
-                  </div>
+                  </MediaButtonComponent>
                 </Col>
               </Row>
               <Row className={cx('media-player-progress-container')}>
