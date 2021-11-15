@@ -70,7 +70,7 @@ class MediaPlayerService {
 
     if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
       // resume media playback if we are playing same tracklist
-      if (mediaPlaybackCurrentTrackList && mediaTrackList && mediaPlaybackCurrentTrackList.id === mediaTrackList.id) {
+      if (mediaPlaybackCurrentTrackList?.id === mediaTrackList?.id) {
         debug('playMediaTrack - resuming - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
         this.resumeMediaPlayer();
         return;
@@ -104,8 +104,58 @@ class MediaPlayerService {
       });
   }
 
-  playMediaTrackFromList(mediaTracks: IMediaTrack, mediaTrackId: string, mediaTrackList?: MediaTrackList): void {
-    debug('playMediaTrackFromList received - %o - %s - %s', mediaTracks, mediaTrackId, mediaTrackList);
+  playMediaTrackFromList(mediaTracks: IMediaTrack[], mediaTrackId: string, mediaTrackList?: MediaTrackList): void {
+    if (_.isEmpty(mediaTracks)) {
+      throw new Error('MediaPlayerService encountered error at playMediaTracks - Empty track list was provided');
+    }
+
+    const mediaTrack = mediaTracks.find(track => track.id === mediaTrackId);
+    if (!mediaTrack) {
+      throw new Error('MediaPlayerService encountered error at playMediaTracks - Provided media track does not exists in the list');
+    }
+
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentTrackList,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
+
+    if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
+      // resume media playback if we are playing same tracklist
+      if (mediaPlaybackCurrentTrackList?.id === mediaTrackList?.id && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
+        debug('playMediaTrack - resuming - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+        this.resumeMediaPlayer();
+        return;
+      }
+
+      // stop media player
+      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.stopMediaPlayer();
+    }
+
+    // add tracks to the queue
+    // important - setting tracks will remove all existing ones
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks,
+        mediaTrackList,
+      },
+    });
+
+    // request media provider to load the track
+    debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
+    this
+      .loadAndPlayMediaTrack(mediaTrack)
+      .then((mediaPlayed) => {
+        if (!mediaPlayed) {
+          // TODO: Handle cases where media could not be played
+        }
+      });
   }
 
   seekMediaTrack(mediaTrackSeekPosition: number): void {

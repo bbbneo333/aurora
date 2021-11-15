@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
+import * as _ from 'lodash';
 
+import {useMediaTrackList} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {IMediaTrack} from '../../interfaces';
 import {RootState} from '../../reducers';
@@ -24,9 +26,32 @@ export function MediaTrackComponent(props: {
   const {
     mediaPlaybackState,
     mediaPlaybackCurrentMediaTrack,
+    mediaPlaybackCurrentTrackList,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
+  const {
+    mediaTracks,
+    mediaTrackList,
+  } = useMediaTrackList();
+
+  const handleOnMediaTrackPlayButtonClick = useCallback(() => {
+    if (!_.isEmpty(mediaTracks)) {
+      MediaPlayerService.playMediaTrackFromList(mediaTracks, mediaTrack.id, mediaTrackList);
+    } else {
+      MediaPlayerService.playMediaTrack(mediaTrack);
+    }
+  }, [
+    mediaTrack,
+    mediaTracks,
+    mediaTrackList,
+  ]);
+
+  const handleOnMediaTrackPauseButtonClick = useCallback(() => {
+    MediaPlayerService.pauseMediaPlayer();
+  }, []);
+
   const isMediaTrackPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
+    && (mediaTrackList?.id === mediaPlaybackCurrentTrackList?.id)
     && mediaPlaybackCurrentMediaTrack
     && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id;
 
@@ -41,7 +66,7 @@ export function MediaTrackComponent(props: {
                   <button
                     type="submit"
                     className={cx('media-track-play-button')}
-                    onClick={() => MediaPlayerService.pauseMediaPlayer()}
+                    onClick={handleOnMediaTrackPauseButtonClick}
                   >
                     <i className="fas fa-pause"/>
                   </button>
@@ -50,7 +75,7 @@ export function MediaTrackComponent(props: {
                   <button
                     type="submit"
                     className={cx('media-track-pause-button')}
-                    onClick={() => MediaPlayerService.playMediaTrack(mediaTrack)}
+                    onClick={handleOnMediaTrackPlayButtonClick}
                   >
                     <i className="fas fa-play"/>
                   </button>

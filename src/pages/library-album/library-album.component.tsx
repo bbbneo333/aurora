@@ -4,24 +4,13 @@ import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import * as _ from 'lodash';
 
-import {MediaCoverPictureComponent, MediaTrackArtistLinkComponent, MediaTrackComponent} from '../../components';
-import {IMediaTrack} from '../../interfaces';
+import {MediaCoverPictureComponent, MediaTrackArtistLinkComponent, MediaTrackListComponent} from '../../components';
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService} from '../../services';
 
 import styles from './library-album.component.css';
 
 const cx = classNames.bind(styles);
-
-function LibraryAlbumTrackComponent(props: {mediaTrack: IMediaTrack}) {
-  const {
-    mediaTrack,
-  } = props;
-
-  return (
-    <MediaTrackComponent mediaTrack={mediaTrack}/>
-  );
-}
 
 export function LibraryAlbumComponent() {
   const {
@@ -75,14 +64,12 @@ export function LibraryAlbumComponent() {
         </div>
         <div className={cx('library-album-actions')}/>
         <div className={cx('library-album-tracklist')}>
-          <div className="row">
-            {mediaSelectedAlbumTracks.map(mediaTrack => (
-              <LibraryAlbumTrackComponent
-                key={mediaTrack.id}
-                mediaTrack={mediaTrack}
-              />
-            ))}
-          </div>
+          <MediaTrackListComponent
+            mediaTracks={mediaSelectedAlbumTracks}
+            mediaTrackList={{
+              id: mediaSelectedAlbum.id,
+            }}
+          />
         </div>
       </div>
     </div>
