@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import {MediaEnums} from '../enums';
 import {IMediaAlbum, IMediaArtist, IMediaTrack} from '../interfaces';
-import {ArrayUtils} from '../utils';
+import {ArrayUtils, MediaUtils} from '../utils';
 
 export type MediaLibraryState = {
   mediaAlbums: IMediaAlbum[],
@@ -24,23 +24,6 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaArtists: [],
   mediaIsSyncing: false,
 };
-
-const mediaNameSanitizerForComparator = (mediaName: string): string => mediaName.replace(/[^A-Z0-9]/ig, '');
-
-const mediaAlbumInsertionComparator = (
-  mediaAlbumA: IMediaAlbum,
-  mediaAlbumB: IMediaAlbum,
-) => (mediaNameSanitizerForComparator(mediaAlbumA.album_name) < mediaNameSanitizerForComparator(mediaAlbumB.album_name) ? -1 : 1);
-
-const mediaArtistInsertionComparator = (
-  mediaArtistA: IMediaArtist,
-  mediaArtistB: IMediaArtist,
-) => (mediaNameSanitizerForComparator(mediaArtistA.artist_name) < mediaNameSanitizerForComparator(mediaArtistB.artist_name) ? -1 : 1);
-
-const mediaTrackInsertComparator = (
-  mediaTrackA: IMediaTrack,
-  mediaTrackB: IMediaTrack,
-) => (mediaTrackA.track_number < mediaTrackB.track_number ? -1 : 1);
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
   switch (action.type) {
@@ -81,7 +64,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
 
         // only add the track if it does not already exists
         if (_.isNil(mediaSelectedAlbumTracks.find(mediaAlbumTrack => mediaAlbumTrack.id === mediaTrack.id))) {
-          ArrayUtils.updateSortedArray<IMediaTrack>(mediaSelectedAlbumTracks, mediaTrack, mediaTrackInsertComparator);
+          ArrayUtils.updateSortedArray<IMediaTrack>(mediaSelectedAlbumTracks, mediaTrack, MediaUtils.mediaTrackInsertComparator);
         }
       }
 
@@ -111,7 +94,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       const {mediaAlbums} = state;
 
       if (_.isNil(mediaAlbums.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
-        ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, mediaAlbumInsertionComparator);
+        ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, MediaUtils.mediaAlbumInsertionComparator);
       }
 
       return {
@@ -130,7 +113,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       return {
         ...state,
         mediaSelectedAlbum: mediaAlbum,
-        mediaSelectedAlbumTracks: _.sortBy(mediaAlbumTracks, (mediaAlbumTrack: IMediaTrack) => mediaAlbumTrack.track_number),
+        mediaSelectedAlbumTracks: MediaUtils.mediaAlbumTrackSort(mediaAlbumTracks),
       };
     }
     case MediaEnums.MediaLibraryActions.AddArtistSafe: {
@@ -139,7 +122,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       const {mediaArtists} = state;
 
       if (_.isNil(mediaArtists.find(exMediaArtist => exMediaArtist.id === mediaArtist.id))) {
-        ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, mediaArtistInsertionComparator);
+        ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, MediaUtils.mediaArtistInsertionComparator);
       }
 
       return {

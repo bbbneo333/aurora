@@ -116,9 +116,13 @@ class MediaLibraryService {
     });
   }
 
-  async syncMediaTracks(mediaProviderIdentifier: string): Promise<void> {
-    const {mediaLibraryService} = await MediaProviderService.getMediaProvider(mediaProviderIdentifier);
-    await mediaLibraryService.syncMediaTracks();
+  async getMediaAlbumTracks(mediaAlbumId: string): Promise<IMediaTrack[]> {
+    const mediaAlbumTrackDataList = await MediaTrackDatastore.findMediaTracks({
+      track_album_id: mediaAlbumId,
+      removed: false,
+    });
+
+    return this.buildMediaTracks(mediaAlbumTrackDataList);
   }
 
   loadMediaAlbum(mediaAlbumId: string): void {
@@ -138,22 +142,27 @@ class MediaLibraryService {
       });
   }
 
-  loadMediaArtist(mediaArtist: IMediaArtist): void {
-    MediaAlbumDatastore
-      .findMediaAlbums({
-        provider: mediaArtist.provider,
-        album_artist_id: mediaArtist.id,
-      })
-      .then(async (mediaAlbumDataList) => {
-        store.dispatch({
-          type: MediaEnums.MediaLibraryActions.LoadAlbum,
-          data: {
-            mediaArtist,
-            mediaArtistAlbums: await this.buildMediaAlbums(mediaAlbumDataList),
-          },
-        });
-      });
-  }
+  // async syncMediaTracks(mediaProviderIdentifier: string): Promise<void> {
+  //   const {mediaLibraryService} = await MediaProviderService.getMediaProvider(mediaProviderIdentifier);
+  //   await mediaLibraryService.syncMediaTracks();
+  // }
+
+  // loadMediaArtist(mediaArtist: IMediaArtist): void {
+  //   MediaAlbumDatastore
+  //     .findMediaAlbums({
+  //       provider: mediaArtist.provider,
+  //       album_artist_id: mediaArtist.id,
+  //     })
+  //     .then(async (mediaAlbumDataList) => {
+  //       store.dispatch({
+  //         type: MediaEnums.MediaLibraryActions.LoadAlbum,
+  //         data: {
+  //           mediaArtist,
+  //           mediaArtistAlbums: await this.buildMediaAlbums(mediaAlbumDataList),
+  //         },
+  //       });
+  //     });
+  // }
 
   private async removeUnSyncTracks(mediaProviderIdentifier: string, mediaSyncKey: string): Promise<void> {
     await MediaTrackDatastore.removeMediaTracks({
@@ -214,9 +223,9 @@ class MediaLibraryService {
     return mediaAlbumBuilt;
   }
 
-  private async buildMediaAlbums(mediaAlbums: string[]|IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
-    return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
-  }
+  // private async buildMediaAlbums(mediaAlbums: string[]|IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
+  //   return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
+  // }
 
   private async buildMediaArtist(mediaArtist: string|IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
     // info - no further processing required for MediaArtistData -> MediaArtist

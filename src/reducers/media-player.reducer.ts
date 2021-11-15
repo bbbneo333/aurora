@@ -3,10 +3,15 @@ import * as _ from 'lodash';
 import {MediaEnums} from '../enums';
 import {IMediaPlayback, IMediaTrack} from '../interfaces';
 
+export type MediaTrackList = {
+  id: string,
+};
+
 export type MediaPlayerState = {
   mediaTracks: IMediaTrack[];
   mediaPlaybackState: MediaEnums.MediaPlaybackState;
   mediaPlaybackCurrentMediaTrack?: IMediaTrack;
+  mediaPlaybackCurrentTrackList?: MediaTrackList,
   mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: IMediaPlayback;
   mediaPlaybackVolumeMaxLimit: number,
@@ -23,6 +28,7 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],
   mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
   mediaPlaybackCurrentMediaTrack: undefined,
+  mediaPlaybackCurrentTrackList: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
   mediaPlaybackVolumeMaxLimit: 100,
@@ -32,17 +38,20 @@ const mediaPlayerInitialState: MediaPlayerState = {
 
 export default (state: MediaPlayerState = mediaPlayerInitialState, action: MediaPlayerStateAction): MediaPlayerState => {
   switch (action.type) {
-    case MediaEnums.MediaPlayerActions.ClearTracks: {
-      return {
-        ...state,
-        mediaTracks: [],
-      };
-    }
-    case MediaEnums.MediaPlayerActions.AddTrack: {
+    case MediaEnums.MediaPlayerActions.SetTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be added
       return {
         ...state,
-        mediaTracks: [...state.mediaTracks, action.data.mediaTrack],
+        mediaTracks: [action.data.mediaTrack],
+      };
+    }
+    case MediaEnums.MediaPlayerActions.SetTracks: {
+      // data.mediaTracks: MediaTrack - tracks which needs to be added
+      // data.mediaTrackList: MediaTrackList - tracklist from which media is being added
+      return {
+        ...state,
+        mediaTracks: action.data.mediaTracks,
+        mediaPlaybackCurrentTrackList: action.data.mediaTrackList,
       };
     }
     case MediaEnums.MediaPlayerActions.RemoveTrack: {

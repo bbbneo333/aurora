@@ -1,5 +1,8 @@
+import * as _ from 'lodash';
+
 import {MediaEnums} from '../enums';
 import {IMediaTrack} from '../interfaces';
+import {MediaTrackList} from '../reducers/media-player.reducer';
 import store from '../store';
 
 import MediaProviderService from './media-provider.service';
@@ -15,84 +18,94 @@ class MediaPlayerService {
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
-      mediaPlaybackVolumeMaxLimit,
-      mediaPlaybackVolumeCurrent,
     } = mediaPlayer;
 
-    const self = this;
-
-    async function play() {
-      if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
-        // resume media playback if we are playing same track
-        if (mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
-          debug('playMediaTrack - resuming - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-          return self.resumeMediaPlayer();
-        }
-
-        // stop media player
-        debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-        const mediaPlaybackStopped = await mediaPlaybackCurrentPlayingInstance.stopPlayback();
-        if (!mediaPlaybackStopped) {
-          return false;
-        }
+    if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
+      // resume media playback if we are playing same track
+      if (mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
+        debug('playMediaTrack - resuming - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+        this.resumeMediaPlayer();
+        return;
       }
 
-      // playing a new media track would always clear off the queue
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.ClearTracks,
-      });
-
-      // add track to the queue
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.AddTrack,
-        data: {
-          mediaTrack,
-        },
-      });
-
-      // request media provider to load the track
-      debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
-
-      const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
-      const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
-        mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
-        mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
-      });
-
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.LoadTrack,
-        data: {
-          mediaTrackId: mediaTrack.id,
-          mediaPlayingInstance: mediaPlayback,
-        },
-      });
-
-      // request media provider to play the track
-      debug('playMediaTrack - playing - media track id - %s', mediaTrack.id);
-
-      const mediaPlayed = await mediaPlayback.play();
-      if (!mediaPlayed) {
-        return false;
-      }
-
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.Play,
-        data: {
-          mediaPlaybackProgress: mediaPlayback.getPlaybackProgress(),
-        },
-      });
-
-      self.reportMediaPlaybackProgress();
-
-      return true;
+      // stop media player
+      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.stopMediaPlayer();
     }
 
-    play()
+    // add track to the queue
+    // important - setting track will remove all existing ones
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTrack,
+      data: {
+        mediaTrack,
+      },
+    });
+
+    // request media provider to load the track
+    debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
+    this
+      .loadAndPlayMediaTrack(mediaTrack)
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played
         }
       });
+  }
+
+  playMediaTracks(mediaTracks: IMediaTrack[], mediaTrackList?: MediaTrackList): void {
+    if (_.isEmpty(mediaTracks)) {
+      throw new Error('MediaPlayerService encountered error at playMediaTracks - Empty track list was provided');
+    }
+
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentTrackList,
+      mediaPlaybackCurrentPlayingInstance,
+    } = mediaPlayer;
+
+    if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
+      // resume media playback if we are playing same tracklist
+      if (mediaPlaybackCurrentTrackList && mediaTrackList && mediaPlaybackCurrentTrackList.id === mediaTrackList.id) {
+        debug('playMediaTrack - resuming - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+        this.resumeMediaPlayer();
+        return;
+      }
+
+      // stop media player
+      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.stopMediaPlayer();
+    }
+
+    // add tracks to the queue
+    // important - setting tracks will remove all existing ones
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks,
+        mediaTrackList,
+      },
+    });
+
+    // request media provider to load the track
+    // we will always be playing the initial track first from the list
+    const mediaTrack = mediaTracks[0];
+    debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
+    this
+      .loadAndPlayMediaTrack(mediaTrack)
+      .then((mediaPlayed) => {
+        if (!mediaPlayed) {
+          // TODO: Handle cases where media could not be played
+        }
+      });
+  }
+
+  playMediaTrackFromList(mediaTracks: IMediaTrack, mediaTrackId: string, mediaTrackList?: MediaTrackList): void {
+    debug('playMediaTrackFromList received - %o - %s - %s', mediaTracks, mediaTrackId, mediaTrackList);
   }
 
   seekMediaTrack(mediaTrackSeekPosition: number): void {
@@ -329,7 +342,50 @@ class MediaPlayerService {
       });
   }
 
-  private reportMediaPlaybackProgress() {
+  private async loadAndPlayMediaTrack(mediaTrack: IMediaTrack): Promise<boolean> {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackVolumeCurrent,
+      mediaPlaybackVolumeMaxLimit,
+    } = mediaPlayer;
+
+    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
+    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
+      mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
+      mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
+    });
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.LoadTrack,
+      data: {
+        mediaTrackId: mediaTrack.id,
+        mediaPlayingInstance: mediaPlayback,
+      },
+    });
+
+    // request media provider to play the track
+    debug('playMediaTrack - playing - media track id - %s', mediaTrack.id);
+
+    const mediaPlayed = await mediaPlayback.play();
+    if (!mediaPlayed) {
+      return false;
+    }
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.Play,
+      data: {
+        mediaPlaybackProgress: mediaPlayback.getPlaybackProgress(),
+      },
+    });
+
+    this.reportMediaPlaybackProgress();
+    return true;
+  }
+
+  private reportMediaPlaybackProgress(): void {
     const {
       mediaPlayer,
     } = store.getState();
@@ -384,7 +440,7 @@ class MediaPlayerService {
     }
   }
 
-  private updateMediaPlaybackProgress(mediaPlaybackProgress: number) {
+  private updateMediaPlaybackProgress(mediaPlaybackProgress: number): void {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
       data: {
@@ -393,8 +449,39 @@ class MediaPlayerService {
     });
   }
 
-  private playNext() {
-    // TODO: Add implementation for playing next track in the queue here
+  private playNext(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentMediaTrack,
+    } = mediaPlayer;
+
+    debug('playNext - attempting to play next - track list length - %d, current media track - %s', mediaTracks.length, mediaPlaybackCurrentMediaTrack?.id);
+
+    let mediaNextTrack;
+    if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
+      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.id === mediaPlaybackCurrentMediaTrack.id);
+      if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer < mediaTracks.length) {
+        mediaNextTrack = mediaTracks[mediaCurrentTrackPointer + 1];
+      }
+    }
+    if (!mediaNextTrack) {
+      debug('playNext - media next track could not be obtained, skipping play next...');
+      return;
+    }
+
+    debug('playNext - found track to play next - %s', mediaNextTrack.id);
+
+    this
+      .loadAndPlayMediaTrack(mediaNextTrack)
+      .then((mediaPlayed) => {
+        if (!mediaPlayed) {
+          // TODO: Handle cases where media could not be played
+        }
+      });
   }
 }
 
