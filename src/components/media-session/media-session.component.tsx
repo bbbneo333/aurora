@@ -54,12 +54,12 @@ export function MediaSessionComponent() {
 
     mediaSession.setActionHandler('previoustrack', () => {
       debug('received action - %s', 'previoustrack');
-      // TODO: Add support for changing to previous track once we have playback queue support
+      MediaPlayerService.playPreviousTrack();
     });
 
     mediaSession.setActionHandler('nexttrack', () => {
       debug('received action - %s', 'nexttrack');
-      // TODO: Add support for changing to next track once we have playback queue support
+      MediaPlayerService.playNextTrack();
     });
   }, []);
 

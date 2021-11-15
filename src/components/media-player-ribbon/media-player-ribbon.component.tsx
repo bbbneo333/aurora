@@ -33,15 +33,18 @@ export function MediaPlayerRibbonComponent() {
   }, [
     setMediaProgressDragValue,
   ]);
+
   const handleOnMediaProgressDragCommit = useCallback((value) => {
     MediaPlayerService.seekMediaTrack(value);
     setMediaProgressDragValue(undefined);
   }, [
     setMediaProgressDragValue,
   ]);
+
   const handleOnVolumeChangeDragCommit = useCallback((value) => {
     MediaPlayerService.changeMediaPlayerVolume(value);
   }, []);
+
   const handleOnVolumeButtonSubmit = useCallback(() => {
     // in case the drag brought down the volume all the way to 0, we will try to raise the volume to either:
     // (a) maximum value from where the first drag started originally started, or
@@ -59,6 +62,24 @@ export function MediaPlayerRibbonComponent() {
     mediaPlayer.mediaPlaybackVolumeCurrent,
     mediaPlayer.mediaPlaybackVolumeMaxLimit,
     mediaPlayer.mediaPlaybackVolumeMuted,
+  ]);
+
+  const handleOnMediaPlayPreviousButtonSubmit = useCallback(() => {
+    // if the track has progressed for more than 30% of it's duration
+    // or if we don't have any previous track in the queue
+    // we will be seeking current track to 0
+    // otherwise, we will be playing the next track
+    if ((mediaPlayer.mediaPlaybackCurrentMediaTrack
+        && mediaPlayer.mediaPlaybackCurrentMediaProgress
+        && ((mediaPlayer.mediaPlaybackCurrentMediaProgress / mediaPlayer.mediaPlaybackCurrentMediaTrack.track_duration) * 100) > 30)
+      || !MediaPlayerService.hasPreviousTrack()) {
+      MediaPlayerService.seekMediaTrack(0);
+    } else {
+      MediaPlayerService.playPreviousTrack();
+    }
+  }, [
+    mediaPlayer.mediaPlaybackCurrentMediaTrack,
+    mediaPlayer.mediaPlaybackCurrentMediaProgress,
   ]);
 
   return (
@@ -95,10 +116,7 @@ export function MediaPlayerRibbonComponent() {
                   </MediaButtonComponent>
                   <MediaButtonComponent
                     className={cx('media-player-control', 'media-player-control-md')}
-                    disabled={!MediaPlayerService.hasPreviousTrack()}
-                    onButtonSubmit={() => {
-                      MediaPlayerService.playPreviousTrack();
-                    }}
+                    onButtonSubmit={handleOnMediaPlayPreviousButtonSubmit}
                   >
                     <i className="fas fa-step-backward"/>
                   </MediaButtonComponent>
