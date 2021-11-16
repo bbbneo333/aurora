@@ -4,25 +4,26 @@ import {LibraryArtistsComponent} from '../library-artists/library-artists.compon
 import {LibraryAlbumsComponent} from '../library-albums/library-albums.component';
 import {LibraryAlbumComponent} from '../library-album/library-album.component';
 
-export type LibraryRoute = {
-  path: string,
-  main: () => JSX.Element,
-  tHeaderName?: string,
-};
-
 export default [
   {
     path: Routes.LibraryArtists,
-    main: LibraryArtistsComponent,
+    component: LibraryArtistsComponent,
     tHeaderName: 'link_library_artists',
+    exact: true,
   },
   {
     path: Routes.LibraryAlbums,
-    main: LibraryAlbumsComponent,
+    component: LibraryAlbumsComponent,
     tHeaderName: 'link_library_albums',
+    exact: true,
   },
   {
     path: Routes.LibraryAlbum,
-    main: LibraryAlbumComponent,
+    component: LibraryAlbumComponent,
+    exact: true,
   },
-] as LibraryRoute[];
+  {
+    path: Routes.Library,
+    redirect: Routes.LibraryAlbums,
+  },
+];

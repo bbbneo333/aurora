@@ -1,25 +1,18 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
+import {HashRouter as Router, NavLink} from 'react-router-dom';
 
-import {
-  Route,
-  Redirect,
-  HashRouter as Router,
-  Switch,
-  NavLink,
-} from 'react-router-dom';
-
+import {RouterSwitchComponent} from './components';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
-import {Routes} from './constants';
 
 import * as AppComponents from './components';
 
 import './app.global.css';
 import styles from './app.component.css';
-import routes, {AppRoute} from './app.routes';
+import routes from './app.routes';
 
 const cx = classNames.bind(styles);
 
@@ -32,20 +25,7 @@ MediaProviderService.registerMediaProvider(mediaLocalProvider);
 function AppContentHeaderPage() {
   return (
     <div className={cx('app-content-header-page-container')}>
-      <Switch>
-        {routes.map(route => route.header && (
-          <Route
-            key={`route-${route.path}`}
-            path={route.path}
-          >
-            {
-              React.createElement(route.header, {
-                key: `route-${route.path}`,
-              })
-            }
-          </Route>
-        ))}
-      </Switch>
+      <RouterSwitchComponent routes={routes.header}/>
     </div>
   );
 }
@@ -66,23 +46,7 @@ function AppContentHeader() {
 function AppContentBrowser() {
   return (
     <div className={cx('app-content-browser-container', 'app-scrollable')}>
-      <Switch>
-        {routes.map(route => (
-          <Route
-            key={`route-${route.path}`}
-            path={route.path}
-          >
-            {
-              React.createElement(route.main, {
-                key: `route-${route.path}`,
-              })
-            }
-          </Route>
-        ))}
-        <Route exact path="/">
-          <Redirect to={Routes.Library}/>
-        </Route>
-      </Switch>
+      <RouterSwitchComponent routes={routes.main}/>
     </div>
   );
 }
@@ -95,7 +59,13 @@ function AppSidebarQuickAccess() {
   );
 }
 
-function AppSidebarNavigationLink(props: {route: AppRoute}) {
+function AppSidebarNavigationLink(props: {
+  route: {
+    path: string,
+    fSidebarLinkIcon: string,
+    tSidebarLinkName: string,
+  }
+}) {
   const {route} = props;
 
   return (
@@ -117,7 +87,7 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
 function AppSidebarNavigationList() {
   return (
     <div className={cx('app-sidebar-navigation-list')}>
-      {routes.map(route => (
+      {routes.sidebar.map(route => (
         <AppSidebarNavigationLink key={route.path} route={route}/>
       ))}
     </div>

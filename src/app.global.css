@@ -22,6 +22,8 @@
   --dark-button-color: #b3b3b3;
   --light-text-color: #fff;
   --light-button-color: #e9ecef;
+  --light-toggle-active-color: #009233;
+  --light-toggle-color: #1db954;
   --selected-bg-color: #282828;
   --selected-text-color: #fff;
   --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
@@ -63,5 +65,4 @@
 
 .app-nav-link {
   text-decoration: none;
-  color: var(--light-text-color);
 }
