@@ -53,8 +53,7 @@
   opacity: 1;
 }
 
-.library-album-play-button,
-.library-album-pause-button {
+.library-album-tile-action-button {
   border: none;
   color: var(--light-button-color);
   background-color: #1db954;
@@ -62,6 +61,11 @@
   padding: 10px 15px;
   border-radius: 50%;
   box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
+  transition: var(--selectable-item-transition);
+}
+
+.library-album-tile-action-button:hover {
+  background-color: #009233;
 }
 
 .library-album-tile-title {

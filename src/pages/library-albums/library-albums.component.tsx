@@ -1,9 +1,9 @@
-import React, {MouseEvent as ReactMouseEvent, useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {NavLink} from 'react-router-dom';
 
-import {MediaCoverPictureComponent} from '../../components';
+import {MediaButtonComponent, MediaCoverPictureComponent} from '../../components';
 import {Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
 import {IMediaAlbum} from '../../interfaces';
@@ -27,7 +27,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
     && mediaPlaybackCurrentTrackList
     && mediaPlaybackCurrentTrackList.id === mediaAlbum.id;
 
-  const handleOnLibraryAlbumPlayButtonClick = useCallback((e: ReactMouseEvent) => {
+  const handleOnLibraryAlbumPlayButtonClick = useCallback((e: Event) => {
     MediaLibraryService
       .getMediaAlbumTracks(mediaAlbum.id)
       .then((mediaAlbumTracks) => {
@@ -46,7 +46,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
     mediaAlbum,
   ]);
 
-  const handleOnLibraryAlbumPauseButtonClick = useCallback((e: ReactMouseEvent) => {
+  const handleOnLibraryAlbumPauseButtonClick = useCallback((e: Event) => {
     MediaPlayerService.pauseMediaPlayer();
 
     // this action button resides within a link which opens up an album
@@ -79,22 +79,20 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
                 {
                   isMediaAlbumPlaying
                     ? (
-                      <button
-                        type="submit"
-                        className={cx('library-album-play-button')}
-                        onClick={handleOnLibraryAlbumPauseButtonClick}
+                      <MediaButtonComponent
+                        className={cx('library-album-tile-action-button')}
+                        onButtonSubmit={handleOnLibraryAlbumPauseButtonClick}
                       >
                         <i className="fas fa-pause"/>
-                      </button>
+                      </MediaButtonComponent>
                     )
                     : (
-                      <button
-                        type="submit"
-                        className={cx('library-album-pause-button')}
-                        onClick={handleOnLibraryAlbumPlayButtonClick}
+                      <MediaButtonComponent
+                        className={cx('library-album-tile-action-button')}
+                        onButtonSubmit={handleOnLibraryAlbumPlayButtonClick}
                       >
                         <i className="fas fa-play"/>
-                      </button>
+                      </MediaButtonComponent>
                     )
                 }
               </div>
