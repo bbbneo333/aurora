@@ -188,11 +188,16 @@ class MediaPlayerService {
         if (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
           // only request progress update if track is currently playing
           // this is being done in order to avoid progress updates if track is already ended
-          requestAnimationFrame(() => {
-            this.reportMediaPlaybackProgress();
-          });
+          this.startMediaProgressReporting();
         }
       });
+  }
+
+  startMediaProgressReporting() {
+    // using setTimeout instead of requestAnimationFrame as setTimeout also works when app is in background
+    setTimeout(() => {
+      this.reportMediaPlaybackProgress();
+    });
   }
 
   pauseMediaPlayer(): void {
@@ -460,7 +465,6 @@ class MediaPlayerService {
 
     const {
       mediaPlaybackCurrentMediaTrack,
-      mediaPlaybackCurrentMediaProgress,
       mediaPlaybackCurrentPlayingInstance,
     } = mediaPlayer;
 
@@ -469,18 +473,11 @@ class MediaPlayerService {
       return;
     }
 
-    const mediaPlaybackExistingProgress = mediaPlaybackCurrentMediaProgress || 0;
     const mediaPlaybackProgress = mediaPlaybackCurrentPlayingInstance.getPlaybackProgress();
-
-    if (mediaPlaybackExistingProgress !== mediaPlaybackProgress) {
-      debug('reportMediaPlaybackProgress - reporting progress - existing - %d, new - %d', mediaPlaybackExistingProgress, mediaPlaybackProgress);
-      this.updateMediaPlaybackProgress(mediaPlaybackProgress);
-    }
+    this.updateMediaPlaybackProgress(mediaPlaybackProgress);
 
     if (mediaPlaybackCurrentPlayingInstance.checkIfPlaying()) {
-      requestAnimationFrame(() => {
-        this.reportMediaPlaybackProgress();
-      });
+      this.startMediaProgressReporting();
     } else if (mediaPlaybackCurrentPlayingInstance.checkIfLoading()) {
       debug('reportMediaPlaybackProgress - media playback loading, waiting...');
 
@@ -490,9 +487,7 @@ class MediaPlayerService {
       });
 
       // re-request update
-      requestAnimationFrame(() => {
-        this.reportMediaPlaybackProgress();
-      });
+      this.startMediaProgressReporting();
     } else if (mediaPlaybackCurrentPlayingInstance.checkIfEnded()) {
       debug('reportMediaPlaybackProgress - media playback ended, playing next...');
 
@@ -509,6 +504,20 @@ class MediaPlayerService {
   }
 
   private updateMediaPlaybackProgress(mediaPlaybackProgress: number): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentMediaProgress = 0,
+    } = mediaPlayer;
+
+    if (mediaPlaybackCurrentMediaProgress === mediaPlaybackProgress) {
+      return;
+    }
+
+    debug('updateMediaPlaybackProgress - updating progress - existing - %d, new - %d', mediaPlaybackCurrentMediaProgress, mediaPlaybackProgress);
+
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
       data: {
