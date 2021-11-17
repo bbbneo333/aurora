@@ -78,6 +78,14 @@
   color: var(--light-button-color);
 }
 
+.media-player-toggle.active {
+  color: var(--light-toggle-active-color);
+}
+
+.media-player-toggle.active:hover {
+  color: var(--light-toggle-color);
+}
+
 .media-player-progress-container {
 }
 

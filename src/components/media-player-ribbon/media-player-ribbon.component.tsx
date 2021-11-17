@@ -2,7 +2,9 @@ import React, {useCallback, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {Col, Container, Row} from 'react-bootstrap';
+import {NavLink} from 'react-router-dom';
 
+import {Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
 import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
@@ -109,8 +111,12 @@ export function MediaPlayerRibbonComponent() {
               <Row className={cx('media-player-controls-container')}>
                 <Col className={cx('col-12', 'media-player-controls-column')}>
                   <MediaButtonComponent
-                    disabled
-                    className={cx('media-player-control', 'media-player-control-sm')}
+                    className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', {
+                      active: mediaPlayer.mediaPlaybackQueueOnShuffle,
+                    })}
+                    onButtonSubmit={() => {
+                      MediaPlayerService.toggleShuffle();
+                    }}
                   >
                     <i className="fas fa-random"/>
                   </MediaButtonComponent>
@@ -184,9 +190,13 @@ export function MediaPlayerRibbonComponent() {
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-side-container')}>
                 <Col className={cx('col-md-10 col-lg-8', 'media-player-side-controls-column')}>
-                  <div className={cx('media-player-control', 'media-player-control-sm')}>
+                  <NavLink
+                    to={Routes.PlayerQueue}
+                    activeClassName={cx('active')}
+                    className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', 'app-nav-link')}
+                  >
                     <i className="fas fa-list"/>
-                  </div>
+                  </NavLink>
                   <MediaButtonComponent
                     className={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
                     onButtonSubmit={handleOnVolumeButtonSubmit}

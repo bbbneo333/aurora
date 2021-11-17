@@ -2,8 +2,7 @@ import React from 'react';
 // import classNames from 'classnames/bind';
 
 import {MediaTrackListProvider} from '../../contexts';
-import {IMediaTrack} from '../../interfaces';
-import {MediaTrackList} from '../../reducers/media-player.reducer';
+import {IMediaTrack, IMediaTrackList} from '../../interfaces';
 
 import {MediaTrackComponent} from '../media-track/media-track.component';
 
@@ -13,7 +12,7 @@ import {MediaTrackComponent} from '../media-track/media-track.component';
 
 export function MediaTrackListComponent(props: {
   mediaTracks: IMediaTrack[],
-  mediaTrackList?: MediaTrackList,
+  mediaTrackList?: IMediaTrackList,
 }) {
   const {
     mediaTracks,

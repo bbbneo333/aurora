@@ -1,8 +1,7 @@
 import * as _ from 'lodash';
 
 import {MediaEnums} from '../enums';
-import {IMediaTrack} from '../interfaces';
-import {MediaTrackList} from '../reducers/media-player.reducer';
+import {IMediaTrack, IMediaTrackList} from '../interfaces';
 import store from '../store';
 
 import MediaProviderService from './media-provider.service';
@@ -53,7 +52,7 @@ class MediaPlayerService {
       });
   }
 
-  playMediaTracks(mediaTracks: IMediaTrack[], mediaTrackList?: MediaTrackList): void {
+  playMediaTracks(mediaTracks: IMediaTrack[], mediaTrackList?: IMediaTrackList): void {
     if (_.isEmpty(mediaTracks)) {
       throw new Error('MediaPlayerService encountered error at playMediaTracks - Empty track list was provided');
     }
@@ -104,7 +103,7 @@ class MediaPlayerService {
       });
   }
 
-  playMediaTrackFromList(mediaTracks: IMediaTrack[], mediaTrackId: string, mediaTrackList?: MediaTrackList): void {
+  playMediaTrackFromList(mediaTracks: IMediaTrack[], mediaTrackId: string, mediaTrackList?: IMediaTrackList): void {
     if (_.isEmpty(mediaTracks)) {
       throw new Error('MediaPlayerService encountered error at playMediaTracks - Empty track list was provided');
     }
@@ -149,6 +148,34 @@ class MediaPlayerService {
 
     // request media provider to load the track
     debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
+    this
+      .loadAndPlayMediaTrack(mediaTrack)
+      .then((mediaPlayed) => {
+        if (!mediaPlayed) {
+          // TODO: Handle cases where media could not be played
+        }
+      });
+  }
+
+  playMediaTrackFromQueue(mediaTrack: IMediaTrack) {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentMediaTrack,
+    } = mediaPlayer;
+
+    // if the current media track is same as provided one, simply resume and conclude
+    if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
+      this.resumeMediaPlayer();
+      return;
+    }
+
+    // stop current playing instance
+    this.stopMediaPlayer();
+
+    // load up and play found track from queue
     this
       .loadAndPlayMediaTrack(mediaTrack)
       .then((mediaPlayed) => {
@@ -267,6 +294,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
@@ -294,6 +322,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
@@ -341,6 +370,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
@@ -371,6 +401,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
@@ -413,6 +444,23 @@ class MediaPlayerService {
 
   hasNextTrack(): boolean {
     return !_.isNil(this.getNextFromList());
+  }
+
+  toggleShuffle(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackQueueOnShuffle,
+    } = mediaPlayer;
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetShuffle,
+      data: {
+        mediaPlaybackQueueShuffle: !mediaPlaybackQueueOnShuffle,
+      },
+    });
   }
 
   private async loadAndPlayMediaTrack(mediaTrack: IMediaTrack): Promise<boolean> {

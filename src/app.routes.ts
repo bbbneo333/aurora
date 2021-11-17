@@ -12,6 +12,10 @@ export default {
       component: AppPages.SettingsComponent,
     },
     {
+      path: Routes.Player,
+      component: AppPages.PlayerComponent,
+    },
+    {
       path: '/',
       redirect: Routes.Library,
     },
@@ -20,6 +24,10 @@ export default {
     {
       path: Routes.Library,
       component: AppPages.LibraryHeaderComponent,
+    },
+    {
+      path: Routes.PlayerQueue,
+      component: AppPages.PlayerHeaderComponent,
     },
   ],
   sidebar: [

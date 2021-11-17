@@ -18,15 +18,18 @@ const cx = classNames.bind(styles);
 
 export function MediaTrackComponent(props: {
   mediaTrack: IMediaTrack,
+  handleOnPlayButtonClick?: () => void,
+  isPlaying?: boolean,
 }) {
   const {
     mediaTrack,
+    handleOnPlayButtonClick,
+    isPlaying,
   } = props;
 
   const {
     mediaPlaybackState,
     mediaPlaybackCurrentMediaTrack,
-    mediaPlaybackCurrentTrackList,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
   const {
@@ -35,12 +38,15 @@ export function MediaTrackComponent(props: {
   } = useMediaTrackList();
 
   const handleOnMediaTrackPlayButtonClick = useCallback(() => {
-    if (!_.isEmpty(mediaTracks)) {
+    if (handleOnPlayButtonClick) {
+      handleOnPlayButtonClick();
+    } else if (!_.isEmpty(mediaTracks)) {
       MediaPlayerService.playMediaTrackFromList(mediaTracks, mediaTrack.id, mediaTrackList);
     } else {
       MediaPlayerService.playMediaTrack(mediaTrack);
     }
   }, [
+    handleOnPlayButtonClick,
     mediaTrack,
     mediaTracks,
     mediaTrackList,
@@ -50,10 +56,10 @@ export function MediaTrackComponent(props: {
     MediaPlayerService.pauseMediaPlayer();
   }, []);
 
-  const isMediaTrackPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
-    && (mediaTrackList?.id === mediaPlaybackCurrentTrackList?.id)
+  const isMediaTrackPlaying = isPlaying || (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
     && mediaPlaybackCurrentMediaTrack
-    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id;
+    && mediaPlaybackCurrentMediaTrack.tracklist_id === mediaTrackList?.id
+    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id);
 
   return (
     <div className={cx('col-12')}>

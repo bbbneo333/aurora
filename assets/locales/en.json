@@ -3,5 +3,7 @@
   "link_library_artists": "Artists",
   "link_library_albums": "Albums",
   "link_settings": "Settings",
-  "label_library_album_header": "Album"
+  "link_player_queue": "Queue",
+  "label_library_album_header": "Album",
+  "label_player_queue_header": "Queue"
 }

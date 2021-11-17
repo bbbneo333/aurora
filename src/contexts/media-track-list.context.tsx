@@ -1,8 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import {IMediaTrack} from '../interfaces';
-import {MediaTrackList} from '../reducers/media-player.reducer';
+import {IMediaTrack, IMediaTrackList} from '../interfaces';
 
 const mediaTrackListInitialState = {
   mediaTracks: [],
@@ -11,13 +10,13 @@ const mediaTrackListInitialState = {
 
 const MediaTrackListContext = React.createContext<{
   mediaTracks: IMediaTrack[],
-  mediaTrackList?: MediaTrackList,
+  mediaTrackList?: IMediaTrackList,
 }>(mediaTrackListInitialState);
 
 export function MediaTrackListProvider(props: {
   children: PropTypes.ReactNodeArray,
   mediaTracks: IMediaTrack[],
-  mediaTrackList?: MediaTrackList,
+  mediaTrackList?: IMediaTrackList,
 }) {
   const {
     children,

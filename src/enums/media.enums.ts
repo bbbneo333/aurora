@@ -32,6 +32,7 @@ export enum MediaPlayerActions {
   UpdatePlaybackVolume = 'media/player/updatePlaybackVolume',
   MutePlaybackVolume = 'media/player/mutePlaybackVolume',
   UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
+  SetShuffle = 'media/player/setShuffle',
 }
 
 export enum MediaPlaybackState {

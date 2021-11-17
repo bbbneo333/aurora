@@ -114,6 +114,15 @@ export interface IMediaTrack {
   readonly extra?: object;
 }
 
+export interface IMediaTrackList {
+  id: string,
+}
+
+export interface IMediaQueueTrack extends IMediaTrack {
+  tracklist_id: string,
+  queue_entry_id: string,
+}
+
 export interface IMediaAlbum {
   readonly id: string;
   readonly provider: string;
