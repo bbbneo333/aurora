@@ -20,7 +20,7 @@ export enum MediaLibraryActions {
 }
 
 export enum MediaPlayerActions {
-  SetTrack = 'media/player/addTrack',
+  SetTrack = 'media/player/setTrack',
   SetTracks = 'media/player/setTracks',
   RemoveTrack = 'media/player/removeTrack',
   LoadTrack = 'media/player/loadTrack',
