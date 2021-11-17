@@ -9,6 +9,10 @@ import MediaProviderService from './media-provider.service';
 const debug = require('debug')('app:service:media_player_service');
 
 class MediaPlayerService {
+  private mediaProgressReportRetryCount = 15;
+  private mediaProgressReportRetryDelayMS = 150;
+  private mediaProgressReportCurrentRetryCount = 0;
+
   playMediaTrack(mediaTrack: IMediaTrack): void {
     const {
       mediaPlayer,
@@ -221,6 +225,9 @@ class MediaPlayerService {
   }
 
   startMediaProgressReporting() {
+    // reset the retry count so that we can retry again in case of further failures
+    this.mediaProgressReportCurrentRetryCount = 0;
+
     // using setTimeout instead of requestAnimationFrame as setTimeout also works when app is in background
     setTimeout(() => {
       this.reportMediaPlaybackProgress();
@@ -546,7 +553,7 @@ class MediaPlayerService {
 
       // request next track
       this.playNext();
-    } else {
+    } else if (!this.retryMediaProgressReporting()) {
       debug('reportMediaPlaybackProgress - media instance did not reported valid state, aborting...');
     }
   }
@@ -572,6 +579,21 @@ class MediaPlayerService {
         mediaPlaybackProgress,
       },
     });
+  }
+
+  private retryMediaProgressReporting(): boolean {
+    if (!(this.mediaProgressReportCurrentRetryCount < this.mediaProgressReportRetryCount)) {
+      return false;
+    }
+
+    this.mediaProgressReportCurrentRetryCount += 1;
+    debug('retryMediaProgressReporting - retrying - current count - %d, total count - %d', this.mediaProgressReportCurrentRetryCount, this.mediaProgressReportRetryCount);
+
+    setTimeout(() => {
+      this.reportMediaPlaybackProgress();
+    }, this.mediaProgressReportRetryDelayMS);
+
+    return true;
   }
 
   private getPreviousFromList(): IMediaTrack|undefined {
