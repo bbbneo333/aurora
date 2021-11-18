@@ -5,6 +5,7 @@
   height: 100%;
   color: var(--light-text-color);
   background-color: var(--dark-music-player-bg-color);
+  border-top: 1px solid var(--dark-music-player-border-color);
   padding: 10px;
   user-select: none;
 }
