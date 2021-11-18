@@ -56,7 +56,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
   }, []);
 
   return (
-    <div className="col-sm-3 mb-3">
+    <div className="col-3 col-xl-2 mb-3">
       <div className={cx('library-album-tile', {
         playing: isMediaAlbumPlaying,
       })}
