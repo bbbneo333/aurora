@@ -69,6 +69,7 @@ export function LibraryAlbumComponent() {
             mediaTrackList={{
               id: mediaSelectedAlbum.id,
             }}
+            showCovers={false}
           />
         </div>
       </div>
