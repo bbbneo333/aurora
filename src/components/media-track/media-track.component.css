@@ -11,7 +11,7 @@
 .media-track-action-column {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .media-track-play-button,
@@ -24,8 +24,8 @@
 
 .media-track-duration-column {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .media-track-duration {
