@@ -2,7 +2,6 @@ import React, {useCallback, useRef, useState} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {Col, Container, Row} from 'react-bootstrap';
-import {NavLink} from 'react-router-dom';
 
 import {Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
@@ -14,6 +13,7 @@ import {MediaButtonComponent} from '../media-button/media-button.component';
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
 import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
 import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
+import {RouterLinkToggle} from '../router-link-toggle/router-link-toggle.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -190,13 +190,13 @@ export function MediaPlayerRibbonComponent() {
             <Col className={cx('col-md-4 col-xl-3')}>
               <Row className={cx('media-player-side-container')}>
                 <Col className={cx('col-md-10 col-lg-8', 'media-player-side-controls-column')}>
-                  <NavLink
+                  <RouterLinkToggle
                     to={Routes.PlayerQueue}
                     activeClassName={cx('active')}
                     className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', 'app-nav-link')}
                   >
                     <i className="fas fa-list"/>
-                  </NavLink>
+                  </RouterLinkToggle>
                   <MediaButtonComponent
                     className={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
                     onButtonSubmit={handleOnVolumeButtonSubmit}

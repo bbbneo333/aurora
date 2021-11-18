@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
-import {HashRouter as Router, NavLink} from 'react-router-dom';
+import {MemoryRouter as Router, NavLink} from 'react-router-dom';
 
 import {RouterSwitchComponent} from './components';
 import {MediaLocalProvider} from './providers';

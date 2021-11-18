@@ -10,3 +10,4 @@ export {MediaTrackListComponent} from './media-track-list/media-track-list.compo
 export {MediaTrackInfoComponent, MediaTrackArtistLinkComponent} from './media-track-info/media-track-info.component';
 export {MediaCoverPictureComponent} from './media-cover-picture/media-cover-picture.component';
 export {RouterSwitchComponent} from './router-switch/router-switch.component';
+export {RouterLinkToggle} from './router-link-toggle/router-link-toggle.component';
