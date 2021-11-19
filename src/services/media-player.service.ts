@@ -46,9 +46,8 @@ class MediaPlayerService {
     });
 
     // request media provider to load the track
-    debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
     this
-      .loadAndPlayMediaTrack(mediaTrack)
+      .loadAndPlayMediaTrack()
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played
@@ -95,11 +94,8 @@ class MediaPlayerService {
     });
 
     // request media provider to load the track
-    // we will always be playing the initial track first from the list
-    const mediaTrack = mediaTracks[0];
-    debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
     this
-      .loadAndPlayMediaTrack(mediaTrack)
+      .loadAndPlayMediaTrack()
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played
@@ -151,9 +147,8 @@ class MediaPlayerService {
     });
 
     // request media provider to load the track
-    debug('playMediaTrack - loading - media track id - %s', mediaTrack.id);
     this
-      .loadAndPlayMediaTrack(mediaTrack)
+      .loadAndPlayMediaTrack()
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played
@@ -465,23 +460,30 @@ class MediaPlayerService {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.SetShuffle,
       data: {
-        mediaPlaybackQueueShuffle: !mediaPlaybackQueueOnShuffle,
+        mediaPlaybackQueueOnShuffle: !mediaPlaybackQueueOnShuffle,
       },
     });
   }
 
-  private async loadAndPlayMediaTrack(mediaTrack: IMediaTrack): Promise<boolean> {
+  private async loadAndPlayMediaTrack(mediaTrack?: IMediaTrack): Promise<boolean> {
     const {
       mediaPlayer,
     } = store.getState();
 
     const {
+      mediaTracks,
       mediaPlaybackVolumeCurrent,
       mediaPlaybackVolumeMaxLimit,
     } = mediaPlayer;
 
-    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
-    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
+    // if no media track was explicitly provided, will load from the first one present in current track list
+    const mediaTrackToLoad = mediaTrack || mediaTracks[0];
+    if (!mediaTrackToLoad) {
+      throw new Error('MediaPlayerService encountered error at loadAndPlayMediaTrack - Could not find any track to load');
+    }
+
+    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrackToLoad.provider);
+    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrackToLoad, {
       mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
       mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
     });
@@ -489,13 +491,13 @@ class MediaPlayerService {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.LoadTrack,
       data: {
-        mediaTrackId: mediaTrack.id,
+        mediaTrackId: mediaTrackToLoad.id,
         mediaPlayingInstance: mediaPlayback,
       },
     });
 
     // request media provider to play the track
-    debug('playMediaTrack - playing - media track id - %s', mediaTrack.id);
+    debug('loadAndPlayMediaTrack - requesting to play - media track id - %s', mediaTrackToLoad.id);
 
     const mediaPlayed = await mediaPlayback.play();
     if (!mediaPlayed) {
@@ -596,7 +598,7 @@ class MediaPlayerService {
     return true;
   }
 
-  private getPreviousFromList(): IMediaTrack|undefined {
+  private getPreviousFromList(): IMediaTrack | undefined {
     const {
       mediaPlayer,
     } = store.getState();
@@ -637,7 +639,7 @@ class MediaPlayerService {
       });
   }
 
-  private getNextFromList(): IMediaTrack|undefined {
+  private getNextFromList(): IMediaTrack | undefined {
     const {
       mediaPlayer,
     } = store.getState();
