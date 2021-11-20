@@ -81,10 +81,10 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       const {mediaTracks, mediaTrackList} = action.data;
       const {mediaPlaybackQueueOnShuffle} = state;
 
-      const mediaListTracks = getMediaQueueTracksForTrackList(mediaTracks, mediaTrackList);
+      const mediaQueueTracksForTrackList = getMediaQueueTracksForTrackList(mediaTracks, mediaTrackList);
       const mediaQueueTracks = mediaPlaybackQueueOnShuffle
-        ? getShuffledMediaTracks(mediaListTracks)
-        : getSortedMediaTracks(mediaListTracks);
+        ? getShuffledMediaTracks(mediaQueueTracksForTrackList)
+        : getSortedMediaTracks(mediaQueueTracksForTrackList);
 
       return {
         ...state,

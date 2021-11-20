@@ -148,7 +148,7 @@ class MediaPlayerService {
 
     // request media provider to load the track
     this
-      .loadAndPlayMediaTrack()
+      .loadAndPlayMediaTrack(mediaTrack)
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played
