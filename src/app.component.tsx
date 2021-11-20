@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
 import {MemoryRouter as Router, NavLink} from 'react-router-dom';
 
-import {RouterSwitchComponent} from './components';
+import {Icon, RouterSwitchComponent} from './components';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
@@ -62,23 +62,29 @@ function AppSidebarQuickAccess() {
 function AppSidebarNavigationLink(props: {
   route: {
     path: string,
-    fSidebarLinkIcon: string,
-    tSidebarLinkName: string,
+    icon: string,
+    name: string,
   }
 }) {
-  const {route} = props;
+  const {
+    route: {
+      icon,
+      name,
+      path,
+    },
+  } = props;
 
   return (
     <NavLink
-      to={route.path}
+      to={path}
       activeClassName={cx('selected')}
       className={cx('app-sidebar-navigation-item', 'app-nav-link')}
     >
       <span className={cx('app-sidebar-navigation-item-icon')}>
-        <i className={route.fSidebarLinkIcon}/>
+        <Icon name={icon}/>
       </span>
       <span className={cx('app-sidebar-navigation-item-label')}>
-        {I18nService.getString(route.tSidebarLinkName)}
+        {I18nService.getString(name)}
       </span>
     </NavLink>
   );

@@ -3,13 +3,14 @@ import {Col, Row} from 'react-bootstrap';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 
-import {Routes} from '../../constants';
+import {Icons, Routes} from '../../constants';
 import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
 
-import {RouterLinkToggle} from '../router-link-toggle/router-link-toggle.component';
+import {Icon} from '../icon/icon.component';
 import {MediaButtonComponent} from '../media-button/media-button.component';
 import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
+import {RouterLinkToggle} from '../router-link-toggle/router-link-toggle.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -51,6 +52,17 @@ export function MediaPlayerSide() {
     mediaPlaybackVolumeMuted,
   ]);
 
+  let mediaVolumeButtonIcon;
+  if (!mediaPlaybackVolumeMuted && mediaPlaybackVolumeCurrent !== 0) {
+    if (mediaPlaybackVolumeCurrent >= mediaPlaybackVolumeMidThreshold.current) {
+      mediaVolumeButtonIcon = Icons.PlayerVolume1;
+    } else {
+      mediaVolumeButtonIcon = Icons.PlayerVolume2;
+    }
+  } else {
+    mediaVolumeButtonIcon = Icons.PlayerVolumeMuted;
+  }
+
   if (!mediaPlaybackCurrentPlayingInstance) {
     return (<></>);
   }
@@ -63,23 +75,13 @@ export function MediaPlayerSide() {
           activeClassName={cx('active')}
           className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', 'app-nav-link')}
         >
-          <i className="fas fa-list"/>
+          <Icon name={Icons.PlayerQueue}/>
         </RouterLinkToggle>
         <MediaButtonComponent
           className={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
           onButtonSubmit={handleOnVolumeButtonSubmit}
         >
-          <i className={cx('fas', {
-            'fa-volume-up': !mediaPlaybackVolumeMuted
-              && mediaPlaybackVolumeCurrent !== 0
-              && mediaPlaybackVolumeCurrent > mediaPlaybackVolumeMidThreshold.current,
-            'fa-volume-down': !mediaPlaybackVolumeMuted
-              && mediaPlaybackVolumeCurrent !== 0
-              && mediaPlaybackVolumeCurrent <= mediaPlaybackVolumeMidThreshold.current,
-            'fa-volume-mute': mediaPlaybackVolumeMuted
-              || mediaPlaybackVolumeCurrent === 0,
-          })}
-          />
+          <Icon name={mediaVolumeButtonIcon}/>
         </MediaButtonComponent>
         <div className={cx('media-player-volume-bar-container')}>
           <MediaProgressBarComponent

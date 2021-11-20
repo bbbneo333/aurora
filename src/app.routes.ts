@@ -1,4 +1,4 @@
-import {Routes} from './constants';
+import {Icons, Routes} from './constants';
 import * as AppPages from './pages';
 
 export default {
@@ -33,13 +33,13 @@ export default {
   sidebar: [
     {
       path: Routes.Library,
-      tSidebarLinkName: 'link_library',
-      fSidebarLinkIcon: 'fas fa-layer-group',
+      name: 'link_library',
+      icon: Icons.LinkLibrary,
     },
     {
       path: Routes.Settings,
-      tSidebarLinkName: 'link_settings',
-      fSidebarLinkIcon: 'fas fa-cog',
+      name: 'link_settings',
+      icon: Icons.LinkSettings,
     },
   ],
 };

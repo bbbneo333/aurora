@@ -3,8 +3,10 @@ import {Col, Row} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
 
+import {Icons} from '../../constants';
 import {RootState} from '../../reducers';
 
+import {Icon} from '../icon/icon.component';
 import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
 import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
 
@@ -34,7 +36,7 @@ export function MediaPlayerInfo() {
           className={cx('media-player-track-info-container')}
         />
         <div className={cx('media-player-control', 'media-player-control-sm')}>
-          <i className="far fa-heart"/>
+          <Icon name={Icons.MediaLike}/>
         </div>
       </Col>
     </Row>

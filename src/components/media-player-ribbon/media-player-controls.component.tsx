@@ -3,10 +3,12 @@ import {Col, Row} from 'react-bootstrap';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 
+import {Icons} from '../../constants';
 import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
 import {MediaEnums} from '../../enums';
 
+import {Icon} from '../icon/icon.component';
 import {MediaButtonComponent} from '../media-button/media-button.component';
 
 import styles from './media-player-ribbon.component.css';
@@ -50,13 +52,13 @@ export function MediaPlayerControls() {
             MediaPlayerService.toggleShuffle();
           }}
         >
-          <i className="fas fa-random"/>
+          <Icon name={Icons.PlayerShuffle}/>
         </MediaButtonComponent>
         <MediaButtonComponent
           className={cx('media-player-control', 'media-player-control-md')}
           onButtonSubmit={handleOnMediaPlayPreviousButtonSubmit}
         >
-          <i className="fas fa-step-backward"/>
+          <Icon name={Icons.PlayerPrevious}/>
         </MediaButtonComponent>
         {mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
           ? (
@@ -66,7 +68,7 @@ export function MediaPlayerControls() {
                 MediaPlayerService.pauseMediaPlayer();
               }}
             >
-              <i className="fas fa-pause-circle"/>
+              <Icon name={Icons.PlayerPause}/>
             </MediaButtonComponent>
           )
           : (
@@ -77,7 +79,7 @@ export function MediaPlayerControls() {
                 MediaPlayerService.resumeMediaPlayer();
               }}
             >
-              <i className="fas fa-play-circle"/>
+              <Icon name={Icons.PlayerPlay}/>
             </MediaButtonComponent>
           )}
         <MediaButtonComponent
@@ -87,13 +89,13 @@ export function MediaPlayerControls() {
             MediaPlayerService.playNextTrack();
           }}
         >
-          <i className="fas fa-step-forward"/>
+          <Icon name={Icons.PlayerNext}/>
         </MediaButtonComponent>
         <MediaButtonComponent
           disabled
           className={cx('media-player-control', 'media-player-control-sm')}
         >
-          <i className="fas fa-redo-alt"/>
+          <Icon name={Icons.PlayerRepeat}/>
         </MediaButtonComponent>
       </Col>
     </Row>

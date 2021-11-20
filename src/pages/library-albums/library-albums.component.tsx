@@ -3,8 +3,8 @@ import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {NavLink} from 'react-router-dom';
 
-import {MediaButtonComponent, MediaCoverPictureComponent} from '../../components';
-import {Layout, Routes} from '../../constants';
+import {Icon, MediaButtonComponent, MediaCoverPictureComponent} from '../../components';
+import {Icons, Layout, Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
 import {IMediaAlbum} from '../../interfaces';
 import {RootState} from '../../reducers';
@@ -83,7 +83,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
                         className={cx('library-album-tile-action-button')}
                         onButtonSubmit={handleOnLibraryAlbumPauseButtonClick}
                       >
-                        <i className="fas fa-pause"/>
+                        <Icon name={Icons.MediaPause}/>
                       </MediaButtonComponent>
                     )
                     : (
@@ -91,7 +91,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
                         className={cx('library-album-tile-action-button')}
                         onButtonSubmit={handleOnLibraryAlbumPlayButtonClick}
                       >
-                        <i className="fas fa-play"/>
+                        <Icon name={Icons.MediaPlay}/>
                       </MediaButtonComponent>
                     )
                 }

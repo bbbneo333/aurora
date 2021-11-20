@@ -3,6 +3,7 @@ import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import * as _ from 'lodash';
 
+import {Icons} from '../../constants';
 import {useMediaTrackList} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {IMediaTrack} from '../../interfaces';
@@ -10,6 +11,7 @@ import {RootState} from '../../reducers';
 import {MediaPlayerService} from '../../services';
 import {DateTimeUtils} from '../../utils';
 
+import {Icon} from '../icon/icon.component';
 import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
 import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
 
@@ -76,19 +78,19 @@ export function MediaTrackComponent(props: {
                 ? (
                   <button
                     type="submit"
-                    className={cx('media-track-play-button')}
+                    className={cx('media-track-action-button')}
                     onClick={handleOnMediaTrackPauseButtonClick}
                   >
-                    <i className="fas fa-pause"/>
+                    <Icon name={Icons.MediaPause}/>
                   </button>
                 )
                 : (
                   <button
                     type="submit"
-                    className={cx('media-track-pause-button')}
+                    className={cx('media-track-action-button')}
                     onClick={handleOnMediaTrackPlayButtonClick}
                   >
-                    <i className="fas fa-play"/>
+                    <Icon name={Icons.MediaPlay}/>
                   </button>
                 )
             }

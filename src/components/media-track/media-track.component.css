@@ -18,8 +18,7 @@
   max-width: 50px;
 }
 
-.media-track-play-button,
-.media-track-pause-button {
+.media-track-action-button {
   background: none;
   border: none;
   color: var(--dark-button-color);
