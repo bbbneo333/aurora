@@ -1,3 +1,7 @@
+import Layout from './layout.json';
 import Routes from './routes.json';
 
-export {Routes};
+export {
+  Layout,
+  Routes,
+};

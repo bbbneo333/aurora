@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import {NavLink} from 'react-router-dom';
 
 import {MediaButtonComponent, MediaCoverPictureComponent} from '../../components';
-import {Routes} from '../../constants';
+import {Layout, Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
 import {IMediaAlbum} from '../../interfaces';
 import {RootState} from '../../reducers';
@@ -56,7 +56,7 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
   }, []);
 
   return (
-    <div className="col-3 col-xl-2 mb-3">
+    <div className={cx(Layout.Grid.LibraryAlbumTile, 'mb-3')}>
       <div className={cx('library-album-tile', {
         playing: isMediaAlbumPlaying,
       })}
