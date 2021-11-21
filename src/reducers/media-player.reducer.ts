@@ -21,6 +21,7 @@ export type MediaPlayerState = {
   mediaPlaybackVolumeCurrent: number,
   mediaPlaybackVolumeMuted: boolean,
   mediaPlaybackQueueOnShuffle: boolean,
+  mediaPlaybackQueueRepeatType?: MediaEnums.MediaPlaybackRepeatType,
 };
 
 export type MediaPlayerStateAction = {
@@ -39,6 +40,7 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaPlaybackVolumeCurrent: 100,
   mediaPlaybackVolumeMuted: false,
   mediaPlaybackQueueOnShuffle: false,
+  mediaPlaybackQueueRepeatType: undefined,
 };
 
 const getMediaQueueTracksForTrackList = (
@@ -205,6 +207,15 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaTracks: mediaQueueTracks,
         mediaPlaybackQueueOnShuffle,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.SetRepeat: {
+      // data.mediaPlaybackQueueRepeatType: MediaEnums.MediaPlaybackRepeatType | undefined - repeat type
+      const {mediaPlaybackQueueRepeatType} = action.data;
+
+      return {
+        ...state,
+        mediaPlaybackQueueRepeatType,
       };
     }
     default:

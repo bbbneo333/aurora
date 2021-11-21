@@ -87,6 +87,24 @@
   color: var(--light-toggle-color);
 }
 
+.media-player-repeat-toggle {
+  position: relative;
+}
+
+.media-player-repeat-track-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+  opacity: 0;
+  transition: var(--slide-in-item-transition);
+}
+
+.media-player-repeat-track-indicator.active {
+  opacity: 1;
+  right: -2px;
+}
+
 .media-player-progress-container {
 }
 

@@ -43,7 +43,7 @@
   position: absolute;
   right: 12px;
   bottom: -42px;
-  transition: bottom 200ms ease, opacity 300ms ease;
+  transition: var(--slide-in-item-transition);
   opacity: 0;
   z-index: 2;
 }

@@ -2,6 +2,7 @@ import React, {useCallback} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
+import * as _ from 'lodash';
 
 import {Icons} from '../../constants';
 import {RootState} from '../../reducers';
@@ -21,6 +22,7 @@ export function MediaPlayerControls() {
     mediaPlaybackCurrentMediaTrack,
     mediaPlaybackCurrentMediaProgress,
     mediaPlaybackQueueOnShuffle,
+    mediaPlaybackQueueRepeatType,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
   const handleOnMediaPlayPreviousButtonSubmit = useCallback(() => {
@@ -92,10 +94,20 @@ export function MediaPlayerControls() {
           <Icon name={Icons.PlayerNext}/>
         </MediaButtonComponent>
         <MediaButtonComponent
-          disabled
-          className={cx('media-player-control', 'media-player-control-sm')}
+          className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', 'media-player-repeat-toggle', {
+            active: !_.isNil(mediaPlaybackQueueRepeatType),
+          })}
+          onButtonSubmit={() => {
+            MediaPlayerService.toggleRepeat();
+          }}
         >
           <Icon name={Icons.PlayerRepeat}/>
+          <span className={cx('media-player-repeat-track-indicator', {
+            active: mediaPlaybackQueueRepeatType === MediaEnums.MediaPlaybackRepeatType.Track,
+          })}
+          >
+            1
+          </span>
         </MediaButtonComponent>
       </Col>
     </Row>

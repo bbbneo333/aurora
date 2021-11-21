@@ -33,6 +33,7 @@ export enum MediaPlayerActions {
   MutePlaybackVolume = 'media/player/mutePlaybackVolume',
   UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
   SetShuffle = 'media/player/setShuffle',
+  SetRepeat = 'media/player/setRepeat',
 }
 
 export enum MediaPlaybackState {
@@ -41,6 +42,11 @@ export enum MediaPlaybackState {
   Paused = 'media/playback/paused',
   Stopped = 'media/playback/stopped',
   Ended = 'media/playback/ended',
+}
+
+export enum MediaPlaybackRepeatType {
+  Track = 'media/playbackRepeat/track',
+  Queue = 'media/playbackRepeat/queue',
 }
 
 export enum MediaTrackCoverPictureImageDataType {
