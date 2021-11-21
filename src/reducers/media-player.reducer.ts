@@ -1,17 +1,27 @@
 import * as _ from 'lodash';
 
 import {MediaEnums} from '../enums';
-import {IMediaPlayback, IMediaTrack} from '../interfaces';
+import {ArrayUtils, StringUtils} from '../utils';
+
+import {
+  IMediaPlayback,
+  IMediaQueueTrack,
+  IMediaTrack,
+  IMediaTrackList,
+} from '../interfaces';
 
 export type MediaPlayerState = {
-  mediaTracks: IMediaTrack[];
+  mediaTracks: IMediaQueueTrack[];
   mediaPlaybackState: MediaEnums.MediaPlaybackState;
-  mediaPlaybackCurrentMediaTrack?: IMediaTrack;
+  mediaPlaybackCurrentMediaTrack?: IMediaQueueTrack;
+  mediaPlaybackCurrentTrackList?: IMediaTrackList,
   mediaPlaybackCurrentMediaProgress?: number;
   mediaPlaybackCurrentPlayingInstance?: IMediaPlayback;
   mediaPlaybackVolumeMaxLimit: number,
   mediaPlaybackVolumeCurrent: number,
   mediaPlaybackVolumeMuted: boolean,
+  mediaPlaybackQueueOnShuffle: boolean,
+  mediaPlaybackQueueRepeatType?: MediaEnums.MediaPlaybackRepeatType,
 };
 
 export type MediaPlayerStateAction = {
@@ -23,26 +33,65 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaTracks: [],
   mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
   mediaPlaybackCurrentMediaTrack: undefined,
+  mediaPlaybackCurrentTrackList: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
   mediaPlaybackVolumeMaxLimit: 100,
   mediaPlaybackVolumeCurrent: 100,
   mediaPlaybackVolumeMuted: false,
+  mediaPlaybackQueueOnShuffle: false,
+  mediaPlaybackQueueRepeatType: undefined,
 };
+
+const getMediaQueueTracksForTrackList = (
+  mediaTracks: IMediaTrack[],
+  mediaTrackList: IMediaTrackList,
+): IMediaQueueTrack[] => mediaTracks.map((mediaTrack, mediaTrackPointer) => ({
+  ...mediaTrack,
+  tracklist_id: mediaTrackList.id,
+  queue_entry_id: StringUtils.generateId(),
+  queue_insertion_index: mediaTrackPointer,
+}));
+
+const getMediaQueueTrack = (mediaTrack: IMediaTrack): IMediaQueueTrack => ({
+  ...mediaTrack,
+  tracklist_id: mediaTrack.track_album.id,
+  queue_entry_id: StringUtils.generateId(),
+  queue_insertion_index: 0,
+});
+
+const getShuffledMediaTracks = (
+  mediaTracks: IMediaQueueTrack[],
+): IMediaQueueTrack[] => ArrayUtils.shuffleArray(mediaTracks);
+
+const getSortedMediaTracks = (
+  mediaTracks: IMediaQueueTrack[],
+): IMediaQueueTrack[] => _.sortBy(mediaTracks, mediaTrack => mediaTrack.queue_insertion_index);
 
 export default (state: MediaPlayerState = mediaPlayerInitialState, action: MediaPlayerStateAction): MediaPlayerState => {
   switch (action.type) {
-    case MediaEnums.MediaPlayerActions.ClearTracks: {
-      return {
-        ...state,
-        mediaTracks: [],
-      };
-    }
-    case MediaEnums.MediaPlayerActions.AddTrack: {
+    case MediaEnums.MediaPlayerActions.SetTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be added
       return {
         ...state,
-        mediaTracks: [...state.mediaTracks, action.data.mediaTrack],
+        mediaTracks: [getMediaQueueTrack(action.data.mediaTrack)],
+      };
+    }
+    case MediaEnums.MediaPlayerActions.SetTracks: {
+      // data.mediaTracks: MediaTrack - tracks which needs to be added
+      // data.mediaTrackList: MediaTrackList - tracklist from which media is being added
+      const {mediaTracks, mediaTrackList} = action.data;
+      const {mediaPlaybackQueueOnShuffle} = state;
+
+      const mediaQueueTracksForTrackList = getMediaQueueTracksForTrackList(mediaTracks, mediaTrackList);
+      const mediaQueueTracks = mediaPlaybackQueueOnShuffle
+        ? getShuffledMediaTracks(mediaQueueTracksForTrackList)
+        : getSortedMediaTracks(mediaQueueTracksForTrackList);
+
+      return {
+        ...state,
+        mediaTracks: mediaQueueTracks,
+        mediaPlaybackCurrentTrackList: action.data.mediaTrackList,
       };
     }
     case MediaEnums.MediaPlayerActions.RemoveTrack: {
@@ -131,6 +180,42 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       return {
         ...state,
         mediaPlaybackVolumeMuted: false,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.SetShuffle: {
+      // data.mediaPlaybackQueueOnShuffle: boolean - shuffle state
+      const {mediaPlaybackQueueOnShuffle} = action.data;
+      const {mediaPlaybackCurrentMediaTrack, mediaTracks} = state;
+
+      // important - when shuffle is requested, only the tracks except the current one are shuffled
+      // the current one then is always placed first and rest of the list is filled with shuffled tracks
+      let mediaQueueTracks: IMediaQueueTrack[] = [];
+      if (mediaPlaybackQueueOnShuffle) {
+        if (mediaPlaybackCurrentMediaTrack) {
+          const mediaTracksToShuffle = _.filter(mediaTracks, mediaTrack => mediaTrack.queue_entry_id !== mediaPlaybackCurrentMediaTrack.queue_entry_id);
+          const mediaTracksShuffled = getShuffledMediaTracks(mediaTracksToShuffle);
+
+          mediaQueueTracks = [mediaPlaybackCurrentMediaTrack, ...mediaTracksShuffled];
+        } else {
+          mediaQueueTracks = getShuffledMediaTracks(mediaTracks);
+        }
+      } else {
+        mediaQueueTracks = getSortedMediaTracks(mediaTracks);
+      }
+
+      return {
+        ...state,
+        mediaTracks: mediaQueueTracks,
+        mediaPlaybackQueueOnShuffle,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.SetRepeat: {
+      // data.mediaPlaybackQueueRepeatType: MediaEnums.MediaPlaybackRepeatType | undefined - repeat type
+      const {mediaPlaybackQueueRepeatType} = action.data;
+
+      return {
+        ...state,
+        mediaPlaybackQueueRepeatType,
       };
     }
     default:

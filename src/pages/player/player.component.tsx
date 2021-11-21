@@ -3,23 +3,23 @@ import classNames from 'classnames/bind';
 
 import {MediaHeaderNavigationLinkComponent, RouterSwitchComponent} from '../../components';
 
-import styles from './library.component.css';
-import routes from './library.routes';
+import styles from './player.component.css';
+import routes from './player.routes';
 
 const cx = classNames.bind(styles);
 
-export function LibraryComponent() {
+export function PlayerComponent() {
   return (
-    <div className={cx('library-content-browser-container')}>
+    <div className={cx('player-content-browser-container')}>
       <RouterSwitchComponent routes={routes}/>
     </div>
   );
 }
 
-export function LibraryHeaderComponent() {
+export function PlayerHeaderComponent() {
   return (
-    <div className={cx('library-header')}>
-      <div className={cx('library-header-navigation-list')}>
+    <div className={cx('player-header')}>
+      <div className={cx('player-header-navigation-list')}>
         {routes.map(route => route.tHeaderName && (
           <MediaHeaderNavigationLinkComponent
             key={route.path}

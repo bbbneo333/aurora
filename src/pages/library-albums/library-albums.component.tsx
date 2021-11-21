@@ -1,13 +1,15 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import {NavLink} from 'react-router-dom';
 
-import {MediaCoverPictureComponent} from '../../components';
-import {Routes} from '../../constants';
+import {Icon, MediaButtonComponent, MediaCoverPictureComponent} from '../../components';
+import {Icons, Layout, Routes} from '../../constants';
+import {MediaEnums} from '../../enums';
 import {IMediaAlbum} from '../../interfaces';
 import {RootState} from '../../reducers';
-import {StringUtils} from '../../utils';
+import {MediaLibraryService, MediaPlayerService} from '../../services';
+import {MediaUtils, StringUtils} from '../../utils';
 
 import styles from './library-albums.component.css';
 
@@ -16,9 +18,49 @@ const cx = classNames.bind(styles);
 function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
   const {mediaAlbum} = props;
 
+  const {
+    mediaPlaybackState,
+    mediaPlaybackCurrentTrackList,
+  } = useSelector((state: RootState) => state.mediaPlayer);
+
+  const isMediaAlbumPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
+    && mediaPlaybackCurrentTrackList
+    && mediaPlaybackCurrentTrackList.id === mediaAlbum.id;
+
+  const handleOnLibraryAlbumPlayButtonClick = useCallback((e: Event) => {
+    MediaLibraryService
+      .getMediaAlbumTracks(mediaAlbum.id)
+      .then((mediaAlbumTracks) => {
+        const mediaAlbumTracksSorted = MediaUtils.mediaAlbumTrackSort(mediaAlbumTracks);
+
+        MediaPlayerService.playMediaTracks(mediaAlbumTracksSorted, {
+          id: mediaAlbum.id,
+        });
+      });
+
+    // this action button resides within a link which opens up an album
+    // stop propagation to prevent that
+    e.preventDefault();
+    e.stopPropagation();
+  }, [
+    mediaAlbum,
+  ]);
+
+  const handleOnLibraryAlbumPauseButtonClick = useCallback((e: Event) => {
+    MediaPlayerService.pauseMediaPlayer();
+
+    // this action button resides within a link which opens up an album
+    // stop propagation to prevent that
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
   return (
-    <div className="col-sm-3 mb-3">
-      <div className={cx('library-album-tile')}>
+    <div className={cx(Layout.Grid.LibraryAlbumTile, 'mb-3')}>
+      <div className={cx('library-album-tile', {
+        playing: isMediaAlbumPlaying,
+      })}
+      >
         <NavLink
           exact
           to={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
@@ -33,6 +75,27 @@ function LibraryAlbumTile(props: {mediaAlbum: IMediaAlbum}) {
                 mediaPictureAltText={mediaAlbum.album_name}
                 className={cx('library-album-tile-cover-picture')}
               />
+              <div className={cx('library-album-tile-cover-action')}>
+                {
+                  isMediaAlbumPlaying
+                    ? (
+                      <MediaButtonComponent
+                        className={cx('library-album-tile-action-button')}
+                        onButtonSubmit={handleOnLibraryAlbumPauseButtonClick}
+                      >
+                        <Icon name={Icons.MediaPause}/>
+                      </MediaButtonComponent>
+                    )
+                    : (
+                      <MediaButtonComponent
+                        className={cx('library-album-tile-action-button')}
+                        onButtonSubmit={handleOnLibraryAlbumPlayButtonClick}
+                      >
+                        <Icon name={Icons.MediaPlay}/>
+                      </MediaButtonComponent>
+                    )
+                }
+              </div>
             </div>
             <div className={cx('library-album-tile-info')}>
               <div className={cx('library-album-tile-title')}>

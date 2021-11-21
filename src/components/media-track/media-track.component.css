@@ -14,18 +14,27 @@
   justify-content: center;
 }
 
-.media-track-play-button,
-.media-track-pause-button {
+.media-track-cover {
+  max-width: 50px;
+}
+
+.media-track-action-button {
   background: none;
   border: none;
   color: var(--dark-button-color);
   font-size: 14px;
 }
 
+.media-track-info-column {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .media-track-duration-column {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .media-track-duration {

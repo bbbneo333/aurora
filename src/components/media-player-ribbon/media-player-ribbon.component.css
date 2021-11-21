@@ -5,6 +5,7 @@
   height: 100%;
   color: var(--light-text-color);
   background-color: var(--dark-music-player-bg-color);
+  border-top: 1px solid var(--dark-music-player-border-color);
   padding: 10px;
   user-select: none;
 }
@@ -22,14 +23,14 @@
 }
 
 .media-player-track-cover-image {
-  height: 70px;
-  width: 70px;
+  height: 70px !important;
+  width: 70px !important;
   /* size for placeholder icon */
   font-size: 30px;
 }
 
 .media-player-track-info-container {
-  margin: 5px 10px;
+  margin: 15px;
 }
 
 .media-track-like-column {
@@ -55,6 +56,10 @@
   transition: var(--selectable-item-transition);
 }
 
+.media-player-control[disabled] {
+  color: var(--dark-disabled-button-color) !important;
+}
+
 .media-player-control:not([disabled]):hover {
   color: var(--light-text-color);
 }
@@ -72,6 +77,33 @@
 .media-player-control.media-player-control-lg {
   font-size: 30px;
   color: var(--light-button-color);
+}
+
+.media-player-toggle.active {
+  color: var(--light-toggle-active-color);
+}
+
+.media-player-toggle.active:hover {
+  color: var(--light-toggle-color);
+}
+
+.media-player-repeat-toggle {
+  position: relative;
+}
+
+.media-player-repeat-track-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  opacity: 0;
+  transition: var(--slide-in-item-transition);
+}
+
+.media-player-repeat-track-indicator.active {
+  opacity: 1;
+  right: -2px;
 }
 
 .media-player-progress-container {

@@ -20,8 +20,8 @@ export enum MediaLibraryActions {
 }
 
 export enum MediaPlayerActions {
-  ClearTracks = 'media/player/clearTracks',
-  AddTrack = 'media/player/addTrack',
+  SetTrack = 'media/player/setTrack',
+  SetTracks = 'media/player/setTracks',
   RemoveTrack = 'media/player/removeTrack',
   LoadTrack = 'media/player/loadTrack',
   LoadExistingTrack = 'media/player/loadExistingTrack',
@@ -32,6 +32,8 @@ export enum MediaPlayerActions {
   UpdatePlaybackVolume = 'media/player/updatePlaybackVolume',
   MutePlaybackVolume = 'media/player/mutePlaybackVolume',
   UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',
+  SetShuffle = 'media/player/setShuffle',
+  SetRepeat = 'media/player/setRepeat',
 }
 
 export enum MediaPlaybackState {
@@ -40,6 +42,11 @@ export enum MediaPlaybackState {
   Paused = 'media/playback/paused',
   Stopped = 'media/playback/stopped',
   Ended = 'media/playback/ended',
+}
+
+export enum MediaPlaybackRepeatType {
+  Track = 'media/playbackRepeat/track',
+  Queue = 'media/playbackRepeat/queue',
 }
 
 export enum MediaTrackCoverPictureImageDataType {

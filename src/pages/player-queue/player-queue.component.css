@@ -1,0 +1,20 @@
+.player-queue-section {
+  margin-bottom: 20px;
+}
+
+.player-queue-section-header {
+  color: var(--dark-text-color);
+  font-size: 15px;
+  padding: 10px 0;
+  font-weight: bold;
+}
+
+.player-queue-empty {
+  text-align: center;
+  font-size: 20px;
+  font-weight: normal;
+}
+
+.player-queue-section-content {
+  padding: 10px 0;
+}

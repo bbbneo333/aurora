@@ -15,16 +15,22 @@
   --dark-bg-color: #121212;
   --dark-card-bg-color: #181818;
   --dark-selectable-outline-color: #383838;
+  --dark-disabled-button-color: #383838;
   --dark-music-player-bg-color: #181818;
+  --dark-music-player-border-color: #282828;
   --light-bg-color: #1d1d1d;
   --dark-text-color: #b3b3b3;
   --dark-button-color: #b3b3b3;
   --light-text-color: #fff;
   --light-button-color: #e9ecef;
+  --light-toggle-active-color: #009233;
+  --light-toggle-color: #1db954;
   --selected-bg-color: #282828;
   --selected-text-color: #fff;
   --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
   --titlebar-overlay-height: 60px;
+  --scrollable-scrollbar-width: 15px;
+  --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease;
 }
 
 #title-bar-overlay {
@@ -46,7 +52,7 @@
 }
 
 .app-scrollable::-webkit-scrollbar {
-  width: 15px;
+  width: var(--scrollable-scrollbar-width);
   background-color: transparent;
 }
 
@@ -61,5 +67,4 @@
 
 .app-nav-link {
   text-decoration: none;
-  color: var(--light-text-color);
 }

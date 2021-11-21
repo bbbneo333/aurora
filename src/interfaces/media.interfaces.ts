@@ -114,6 +114,16 @@ export interface IMediaTrack {
   readonly extra?: object;
 }
 
+export interface IMediaTrackList {
+  id: string,
+}
+
+export interface IMediaQueueTrack extends IMediaTrack {
+  tracklist_id: string,
+  queue_entry_id: string,
+  queue_insertion_index: number,
+}
+
 export interface IMediaAlbum {
   readonly id: string;
   readonly provider: string;
@@ -187,7 +197,7 @@ export interface IMediaPlaybackService {
 export interface IMediaSettingsService {
   getDefaultSettings(): any;
 
-  getSettingsComponent(): IMediaSettingsComponent|undefined;
+  getSettingsComponent(): IMediaSettingsComponent | undefined;
 }
 
 export interface IMediaProviderData {
@@ -196,18 +206,18 @@ export interface IMediaProviderData {
   settings: object;
   options: object;
   library: {
-    last_sync_key: string|null,
-    last_sync_started_at: number|null,
-    last_sync_finished_at: number|null,
+    last_sync_key: string | null,
+    last_sync_started_at: number | null,
+    last_sync_finished_at: number | null,
   },
 }
 
 export interface IMediaProviderDataUpdateParams {
   settings?: object;
   library?: {
-    last_sync_key?: string|null,
-    last_sync_started_at?: number|null,
-    last_sync_finished_at?: number|null,
+    last_sync_key?: string | null,
+    last_sync_started_at?: number | null,
+    last_sync_finished_at?: number | null,
   },
 }
 

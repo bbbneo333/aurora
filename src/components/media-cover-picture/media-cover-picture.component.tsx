@@ -1,8 +1,11 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
+import {Icons} from '../../constants';
 import {MediaEnums} from '../../enums';
 import {IMediaPicture} from '../../interfaces';
+
+import {Icon} from '../icon/icon.component';
 
 import styles from './media-cover-picture.component.css';
 
@@ -23,7 +26,10 @@ export function MediaCoverPictureComponent(props: {
     return (
       <div className={cx('media-cover-picture', className)}>
         <div className={cx('media-cover-placeholder')}>
-          <i className={cx('media-cover-placeholder-icon', 'fas fa-compact-disc')}/>
+          <Icon
+            className={cx('media-cover-placeholder-icon')}
+            name={Icons.CoverAlbumPlaceholder}
+          />
         </div>
       </div>
     );

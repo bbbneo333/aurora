@@ -1,26 +1,45 @@
-import {Routes} from './constants';
+import {Icons, Routes} from './constants';
 import * as AppPages from './pages';
 
-export type AppRoute = {
-  path: string,
-  main: () => JSX.Element,
-  header?: () => JSX.Element,
-  tSidebarLinkName: string,
-  fSidebarLinkIcon: string,
+export default {
+  main: [
+    {
+      path: Routes.Library,
+      component: AppPages.LibraryComponent,
+    },
+    {
+      path: Routes.Settings,
+      component: AppPages.SettingsComponent,
+    },
+    {
+      path: Routes.Player,
+      component: AppPages.PlayerComponent,
+    },
+    {
+      path: '/',
+      redirect: Routes.Library,
+    },
+  ],
+  header: [
+    {
+      path: Routes.Library,
+      component: AppPages.LibraryHeaderComponent,
+    },
+    {
+      path: Routes.PlayerQueue,
+      component: AppPages.PlayerHeaderComponent,
+    },
+  ],
+  sidebar: [
+    {
+      path: Routes.Library,
+      name: 'link_library',
+      icon: Icons.LinkLibrary,
+    },
+    {
+      path: Routes.Settings,
+      name: 'link_settings',
+      icon: Icons.LinkSettings,
+    },
+  ],
 };
-
-export default [
-  {
-    path: Routes.Library,
-    main: AppPages.LibraryComponent,
-    header: AppPages.LibraryHeaderComponent,
-    tSidebarLinkName: 'link_library',
-    fSidebarLinkIcon: 'fas fa-layer-group',
-  },
-  {
-    path: Routes.Settings,
-    main: AppPages.SettingsComponent,
-    tSidebarLinkName: 'link_settings',
-    fSidebarLinkIcon: 'fas fa-cog',
-  },
-] as AppRoute[];

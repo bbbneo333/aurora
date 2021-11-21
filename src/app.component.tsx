@@ -1,25 +1,18 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 import {useSelector} from 'react-redux';
+import {MemoryRouter as Router, NavLink} from 'react-router-dom';
 
-import {
-  Route,
-  Redirect,
-  HashRouter as Router,
-  Switch,
-  NavLink,
-} from 'react-router-dom';
-
+import {Icon, RouterSwitchComponent} from './components';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
-import {Routes} from './constants';
 
 import * as AppComponents from './components';
 
 import './app.global.css';
 import styles from './app.component.css';
-import routes, {AppRoute} from './app.routes';
+import routes from './app.routes';
 
 const cx = classNames.bind(styles);
 
@@ -32,20 +25,7 @@ MediaProviderService.registerMediaProvider(mediaLocalProvider);
 function AppContentHeaderPage() {
   return (
     <div className={cx('app-content-header-page-container')}>
-      <Switch>
-        {routes.map(route => route.header && (
-          <Route
-            key={`route-${route.path}`}
-            path={route.path}
-          >
-            {
-              React.createElement(route.header, {
-                key: `route-${route.path}`,
-              })
-            }
-          </Route>
-        ))}
-      </Switch>
+      <RouterSwitchComponent routes={routes.header}/>
     </div>
   );
 }
@@ -66,45 +46,65 @@ function AppContentHeader() {
 function AppContentBrowser() {
   return (
     <div className={cx('app-content-browser-container', 'app-scrollable')}>
-      <Switch>
-        {routes.map(route => (
-          <Route
-            key={`route-${route.path}`}
-            path={route.path}
-          >
-            {
-              React.createElement(route.main, {
-                key: `route-${route.path}`,
-              })
-            }
-          </Route>
-        ))}
-        <Route exact path="/">
-          <Redirect to={Routes.Library}/>
-        </Route>
-      </Switch>
+      <RouterSwitchComponent routes={routes.main}/>
     </div>
   );
 }
 
 // app > stage > sidebar
 
-function AppSidebarNavigationLink(props: {route: AppRoute}) {
-  const {route} = props;
+function AppSidebarQuickAccess() {
+  return (
+    <div className={cx('app-sidebar-quick-access', 'app-scrollable')}/>
+  );
+}
+
+function AppSidebarNavigationLink(props: {
+  route: {
+    path: string,
+    icon: string,
+    name: string,
+  }
+}) {
+  const {
+    route: {
+      icon,
+      name,
+      path,
+    },
+  } = props;
 
   return (
     <NavLink
-      to={route.path}
+      to={path}
       activeClassName={cx('selected')}
       className={cx('app-sidebar-navigation-item', 'app-nav-link')}
     >
       <span className={cx('app-sidebar-navigation-item-icon')}>
-        <i className={route.fSidebarLinkIcon}/>
+        <Icon name={icon}/>
       </span>
       <span className={cx('app-sidebar-navigation-item-label')}>
-        {I18nService.getString(route.tSidebarLinkName)}
+        {I18nService.getString(name)}
       </span>
     </NavLink>
+  );
+}
+
+function AppSidebarNavigationList() {
+  return (
+    <div className={cx('app-sidebar-navigation-list')}>
+      {routes.sidebar.map(route => (
+        <AppSidebarNavigationLink key={route.path} route={route}/>
+      ))}
+    </div>
+  );
+}
+
+function AppSidebarBrandingLogo() {
+  return (
+    // TODO: Add app logo / branding here
+    // <div className={cx('app-sidebar-logo')}/>
+    <></>
   );
 }
 
@@ -112,13 +112,10 @@ function AppSidebarNavigationLink(props: {route: AppRoute}) {
 
 function AppSidebar() {
   return (
-    <div className={cx('app-sidebar-container', 'app-scrollable')}>
-      <div className={cx('app-sidebar-logo')}/>
-      <div className={cx('app-sidebar-navigation-list')}>
-        {routes.map(route => (
-          <AppSidebarNavigationLink key={route.path} route={route}/>
-        ))}
-      </div>
+    <div className={cx('app-sidebar-container')}>
+      <AppSidebarBrandingLogo/>
+      <AppSidebarNavigationList/>
+      <AppSidebarQuickAccess/>
     </div>
   );
 }

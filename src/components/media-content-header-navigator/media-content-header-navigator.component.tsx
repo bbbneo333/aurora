@@ -2,6 +2,10 @@ import React from 'react';
 import classNames from 'classnames/bind';
 import {useHistory} from 'react-router-dom';
 
+import {Icons} from '../../constants';
+
+import {Icon} from '../icon/icon.component';
+
 import styles from './media-content-header-navigator.component.css';
 
 const cx = classNames.bind(styles);
@@ -11,9 +15,14 @@ enum NavigationDirection {
   Right = 'right',
 }
 
-const NavigationHistoryDelta = {
+const NavigationDelta = {
   [NavigationDirection.Left]: -1,
   [NavigationDirection.Right]: +1,
+};
+
+const NavigationIcon = {
+  [NavigationDirection.Left]: Icons.NavigationBack,
+  [NavigationDirection.Right]: Icons.NavigationForward,
 };
 
 function MediaContentNavigateButton(props: {
@@ -24,17 +33,18 @@ function MediaContentNavigateButton(props: {
   } = props;
 
   const history = useHistory();
-  const historyDelta = NavigationHistoryDelta[direction];
+  const navigationDelta = NavigationDelta[direction];
+  const navigationIcon = NavigationIcon[direction];
 
   return (
     <button
       type="button"
       className={cx('media-content-navigate-button')}
       onClick={() => {
-        history.go(historyDelta);
+        history.go(navigationDelta);
       }}
     >
-      <i className={`fas fa-chevron-${direction}`}/>
+      <Icon name={navigationIcon}/>
     </button>
   );
 }

@@ -1,0 +1,20 @@
+{
+  "CoverAlbumPlaceholder": "fas fa-compact-disc",
+  "LinkLibrary": "fas fa-layer-group",
+  "LinkSettings": "fas fa-cog",
+  "MediaPlay": "fas fa-play",
+  "MediaPause": "fas fa-pause",
+  "MediaLike": "far fa-heart",
+  "NavigationBack": "fas fa-chevron-left",
+  "NavigationForward": "fas fa-chevron-right",
+  "PlayerShuffle": "fas fa-random",
+  "PlayerPrevious": "fas fa-step-backward",
+  "PlayerPlay": "fas fa-play-circle",
+  "PlayerPause": "fas fa-pause-circle",
+  "PlayerNext": "fas fa-step-forward",
+  "PlayerRepeat": "fas fa-redo-alt",
+  "PlayerQueue": "fas fa-list",
+  "PlayerVolume1": "fas fa-volume-up",
+  "PlayerVolume2": "fas fa-volume-down",
+  "PlayerVolumeMuted": "fas fa-volume-mute"
+}

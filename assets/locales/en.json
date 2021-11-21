@@ -3,5 +3,9 @@
   "link_library_artists": "Artists",
   "link_library_albums": "Albums",
   "link_settings": "Settings",
-  "label_library_album_header": "Album"
+  "link_player_queue": "Queue",
+  "label_library_album_header": "Album",
+  "label_player_queue_current_track": "Now playing",
+  "label_player_queue_upcoming_tracks": "Up next",
+  "label_player_queue_empty": "You got nothing playing right now"
 }

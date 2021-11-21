@@ -55,8 +55,8 @@ class App implements IAppMain {
   private readonly htmlFilePath = path.join(__dirname, 'index.html');
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
-  private readonly windowWidth = 1200;
-  private readonly windowHeight = 720;
+  private readonly windowWidth = 1024;
+  private readonly windowHeight = 780;
   private readonly windowMinWidth = 1024;
   private readonly windowMinHeight = 620;
 

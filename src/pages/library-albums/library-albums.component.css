@@ -17,6 +17,7 @@
 }
 
 .library-album-tile-link {
+  color: var(--light-text-color);
 }
 
 .library-album-tile:hover .library-album-tile-link {
@@ -26,6 +27,8 @@
 .library-album-tile-cover {
   margin-bottom: 16px;
   flex-grow: 1;
+  position: relative;
+  overflow: hidden;
 }
 
 .library-album-tile-cover-picture {
@@ -34,6 +37,36 @@
   box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
   /* size for placeholder icon */
   font-size: 50px;
+}
+
+.library-album-tile-cover-action {
+  position: absolute;
+  right: 12px;
+  bottom: -42px;
+  transition: var(--slide-in-item-transition);
+  opacity: 0;
+  z-index: 2;
+}
+
+.library-album-tile:hover .library-album-tile-cover-action,
+.library-album-tile.playing .library-album-tile-cover-action {
+  bottom: 12px;
+  opacity: 1;
+}
+
+.library-album-tile-action-button {
+  border: none;
+  color: var(--light-button-color);
+  background-color: var(--light-toggle-active-color);
+  font-size: 14px;
+  padding: 10px 15px;
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
+  transition: var(--selectable-item-transition);
+}
+
+.library-album-tile-action-button:hover {
+  background-color: var(--light-toggle-color);
 }
 
 .library-album-tile-title {
