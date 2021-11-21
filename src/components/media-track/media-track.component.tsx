@@ -19,17 +19,15 @@ import styles from './media-track.component.css';
 
 const cx = classNames.bind(styles);
 
-export function MediaTrackComponent(props: {
+function MediaTrackActionButton(props: {
   mediaTrack: IMediaTrack,
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
-  showCover?: boolean,
 }) {
   const {
     mediaTrack,
     handleOnPlayButtonClick,
     isPlaying,
-    showCover = true,
   } = props;
 
   const {
@@ -66,51 +64,71 @@ export function MediaTrackComponent(props: {
     && mediaPlaybackCurrentMediaTrack.tracklist_id === mediaTrackList?.id
     && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id);
 
-  const mediaTrackInfoColumnWidth = showCover ? 'col-9' : 'col-10';
+  return (
+    isMediaTrackPlaying
+      ? (
+        <button
+          type="submit"
+          className={cx('media-track-action-button')}
+          onClick={handleOnMediaTrackPauseButtonClick}
+        >
+          <Icon name={Icons.MediaPause}/>
+        </button>
+      )
+      : (
+        <button
+          type="submit"
+          className={cx('media-track-action-button')}
+          onClick={handleOnMediaTrackPlayButtonClick}
+        >
+          <Icon name={Icons.MediaPlay}/>
+        </button>
+      )
+  );
+}
+
+export function MediaTrackComponent(props: {
+  mediaTrack: IMediaTrack,
+  handleOnPlayButtonClick?: () => void,
+  isPlaying?: boolean,
+  showCover?: boolean,
+}) {
+  const {
+    mediaTrack,
+    handleOnPlayButtonClick,
+    isPlaying,
+    showCover = true,
+  } = props;
 
   return (
-    <div className={cx('col-12')}>
+    <div className={cx('col-12 mb-3')}>
       <div className={cx('media-track')}>
         <div className="row">
-          <div className={cx('col-1', 'media-track-action-column')}>
-            {
-              isMediaTrackPlaying
-                ? (
-                  <button
-                    type="submit"
-                    className={cx('media-track-action-button')}
-                    onClick={handleOnMediaTrackPauseButtonClick}
-                  >
-                    <Icon name={Icons.MediaPause}/>
-                  </button>
-                )
-                : (
-                  <button
-                    type="submit"
-                    className={cx('media-track-action-button')}
-                    onClick={handleOnMediaTrackPlayButtonClick}
-                  >
-                    <Icon name={Icons.MediaPlay}/>
-                  </button>
-                )
-            }
-          </div>
-          {showCover && (
-            <div className={cx('col-1', 'media-track-cover-column')}>
-              <MediaCoverPictureComponent
-                mediaPicture={mediaTrack.track_cover_picture}
-                mediaPictureAltText={mediaTrack.track_name}
-                className={cx('media-track-cover')}
+          <div className={cx('col-10', 'media-track-main-column')}>
+            <div className={cx('media-track-section')}>
+              <MediaTrackActionButton
+                mediaTrack={mediaTrack}
+                isPlaying={isPlaying}
+                handleOnPlayButtonClick={handleOnPlayButtonClick}
               />
             </div>
-          )}
-          <div className={cx(mediaTrackInfoColumnWidth, 'media-track-info-column')}>
-            <MediaTrackInfoComponent
-              mediaTrack={mediaTrack}
-              className={cx('media-track-info')}
-            />
+            {showCover && (
+              <div className={cx('media-track-section')}>
+                <MediaCoverPictureComponent
+                  mediaPicture={mediaTrack.track_cover_picture}
+                  mediaPictureAltText={mediaTrack.track_name}
+                  className={cx('media-track-cover')}
+                />
+              </div>
+            )}
+            <div className={cx('media-track-section')}>
+              <MediaTrackInfoComponent
+                mediaTrack={mediaTrack}
+                className={cx('media-track-info')}
+              />
+            </div>
           </div>
-          <div className={cx('col-1', 'media-track-duration-column')}>
+          <div className={cx('col-2', 'media-track-side-column')}>
             <div className={cx('media-track-duration')}>
               {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
             </div>

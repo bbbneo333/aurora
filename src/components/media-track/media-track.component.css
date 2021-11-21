@@ -8,10 +8,14 @@
   background-color: var(--selected-bg-color);
 }
 
-.media-track-action-column {
+.media-track-main-column {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+}
+
+.media-track-main-column .media-track-section:not(:last-child) {
+  margin-right: 20px;
 }
 
 .media-track-cover {
@@ -25,16 +29,10 @@
   font-size: 14px;
 }
 
-.media-track-info-column {
+.media-track-side-column {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-}
-
-.media-track-duration-column {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .media-track-duration {
