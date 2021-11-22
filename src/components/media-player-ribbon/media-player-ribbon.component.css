@@ -99,11 +99,13 @@
   font-weight: bold;
   opacity: 0;
   transition: var(--slide-in-item-transition);
+  transform: scale(0);
 }
 
 .media-player-repeat-track-indicator.active {
   opacity: 1;
   right: -2px;
+  transform: scale(1);
 }
 
 .media-player-progress-container {
