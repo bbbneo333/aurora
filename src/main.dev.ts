@@ -1,5 +1,3 @@
-/* eslint global-require: off, no-console: off */
-
 /**
  * This module executes inside of electron's main process. You can start
  * electron renderer process from here and communicate with the other processes
@@ -8,16 +6,26 @@
  * When running `yarn build` or `yarn build:main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  *
- * TODO: Using defaults, needs to be looked into before release
+ * TODO: Using defaults, following to be looked into before release
+ *  - Debug Support
+ *  - Auto Update Support
+ *  - Logging Support
+ *  - Source Map Support
  */
 
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import path from 'path';
-import {autoUpdater} from 'electron-updater';
-import log from 'electron-log';
+import electronUpdater from 'electron-updater';
+import electronLog from 'electron-log';
+import electronDebug from 'electron-debug';
 import * as _ from 'lodash';
+
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer';
 
 import {
   app,
@@ -40,6 +48,7 @@ import {
 import * as AppBuilders from './main/builders';
 import * as AppModules from './main/modules';
 
+const sourceMapSupport = require('source-map-support');
 const debug = require('debug')('app:main');
 
 class App implements IAppMain {
@@ -69,6 +78,7 @@ class App implements IAppMain {
     this.resourcesPath = process.resourcesPath;
 
     this.installSourceMapSupport();
+    this.configureLogger();
     this.installDebugSupport();
     this.registerBuilders();
     this.registerModules();
@@ -151,8 +161,11 @@ class App implements IAppMain {
       return;
     }
 
-    const sourceMapSupport = require('source-map-support');
     sourceMapSupport.install();
+  }
+
+  private configureLogger() {
+    electronLog.transports.file.level = 'info';
   }
 
   private installDebugSupport(): void {
@@ -160,16 +173,32 @@ class App implements IAppMain {
       return;
     }
 
-    require('electron-debug')();
+    electronDebug();
   }
 
-  private async installExtensions(): Promise<string> {
-    const extensionInstaller = require('electron-devtools-installer');
-    const extensions = ['REACT_DEVELOPER_TOOLS'];
+  private async installExtensions(): Promise<void> {
+    if (!this.debug) {
+      return;
+    }
 
-    return extensionInstaller
-      .default(extensions.map(name => extensionInstaller[name]), this.forceExtensionDownload)
-      .catch(console.log);
+    const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS];
+    debug('installing extensions - %o', extensions);
+
+    await installExtension(extensions, {
+      forceDownload: this.forceExtensionDownload,
+      loadExtensionOptions: {
+        // for reasons unknown (at least to me) extensions were not working, got them fixed after setting 'allowFileAccess' to 'true'
+        // @see (issue) - https://github.com/electron/electron/issues/23662#issuecomment-783805586
+        // @see (PR) - https://github.com/electron/electron/pull/25198
+        allowFileAccess: true,
+      },
+    })
+      .then(() => {
+        debug('extensions were installed successfully');
+      })
+      .catch((error) => {
+        debug('encountered error while installing extensions - %s', error);
+      });
   }
 
   private registerAutoUpdater() {
@@ -177,15 +206,25 @@ class App implements IAppMain {
       return;
     }
 
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
+    const {autoUpdater} = electronUpdater;
+
+    autoUpdater.logger = electronLog;
+    autoUpdater
+      .checkForUpdatesAndNotify()
+      .then((updateCheckResult) => {
+        if (updateCheckResult) {
+          debug('autoUpdater.checkForUpdatesAndNotify returned results - %o', updateCheckResult);
+        } else {
+          debug('autoUpdater.checkForUpdatesAndNotify returned no results');
+        }
+      })
+      .catch((updateCheckError) => {
+        debug('autoUpdater.encountered error at checkForUpdatesAndNotify - %s', updateCheckError);
+      });
   }
 
   private async createWindow(): Promise<BrowserWindow> {
-    if (this.debug) {
-      await this.installExtensions();
-    }
+    await this.installExtensions();
 
     const mainWindow = new BrowserWindow({
       show: false,
@@ -203,7 +242,11 @@ class App implements IAppMain {
       },
     });
 
-    mainWindow.loadURL(`file://${this.htmlFilePath}`);
+    mainWindow
+      .loadURL(`file://${this.htmlFilePath}`)
+      .then(() => {
+        debug('main window loaded HTML - %s', this.htmlFilePath);
+      });
 
     // @TODO: Use 'ready-to-show' event
     //    https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -252,7 +295,7 @@ class App implements IAppMain {
       .then(async () => {
         this.mainWindow = await this.createWindow();
       })
-      .catch(console.log);
+      .catch(debug);
 
     app.on('activate', async () => {
       // on macOS it's common to re-create a window in the app when the
