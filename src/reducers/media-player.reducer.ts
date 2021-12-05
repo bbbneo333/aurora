@@ -63,6 +63,12 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         mediaTracks: _.filter(state.mediaTracks, mediaTrack => mediaTrack.id !== action.data.mediaTrackId),
       };
     }
+    case MediaEnums.MediaPlayerActions.LoadingTrack: {
+      return {
+        ...state,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Loading,
+      };
+    }
     case MediaEnums.MediaPlayerActions.LoadTrack: {
       // data.mediaTrackId: string - track's id from the list which needs to be loaded
       // data.mediaPlayingInstance: any - playback instance
@@ -73,20 +79,10 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
 
       return {
         ...state,
-        mediaPlaybackState: MediaEnums.MediaPlaybackState.Loading,
+        mediaPlaybackState: MediaEnums.MediaPlaybackState.Paused,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
         mediaPlaybackCurrentMediaProgress: undefined,
         mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
-      };
-    }
-    case MediaEnums.MediaPlayerActions.LoadExistingTrack: {
-      if (!state.mediaPlaybackCurrentMediaTrack) {
-        throw new Error('MediaPlayerReducer encountered error at LoadExistingTrack - No existing loaded track was found');
-      }
-
-      return {
-        ...state,
-        mediaPlaybackState: MediaEnums.MediaPlaybackState.Loading,
       };
     }
     case MediaEnums.MediaPlayerActions.Play: {

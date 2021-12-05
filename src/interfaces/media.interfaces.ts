@@ -180,6 +180,7 @@ export interface IMediaPlayback {
 export interface IMediaPlaybackOptions {
   mediaPlaybackVolume: number;
   mediaPlaybackMaxVolume: number;
+  mediaPlaybackVolumeMuted: boolean;
 }
 
 export interface IMediaSettingsComponent extends React.FC<any> {

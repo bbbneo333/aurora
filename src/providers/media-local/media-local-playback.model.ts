@@ -11,7 +11,7 @@ const debug = require('debug')('app:provider:media_local:media_playback');
 export class MediaLocalPlayback implements IMediaPlayback {
   private readonly mediaTrack: IMediaLocalTrack;
   private readonly mediaPlaybackLocalAudio: any;
-  private mediaPlaybackId: number|undefined;
+  private mediaPlaybackId: number | undefined;
   private mediaPlaybackEnded = false;
 
   constructor(mediaTrack: IMediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
@@ -19,6 +19,7 @@ export class MediaLocalPlayback implements IMediaPlayback {
     this.mediaPlaybackLocalAudio = new Howl({
       src: mediaTrack.extra.location.address,
       volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
+      mute: mediaPlaybackOptions.mediaPlaybackVolumeMuted,
       // important - in order to support MediaSession, we need to used HTML5 audio
       html5: true,
       // events

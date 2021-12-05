@@ -72,7 +72,6 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
       if (mediaQueueTrack) {
         MediaPlayerService.loadMediaTrack(mediaQueueTrack);
         MediaPlayerService.seekMediaTrack(mediaPlaybackCurrentMediaProgress || 0);
-        MediaPlayerService.pauseMediaPlayer();
       }
     }
   }

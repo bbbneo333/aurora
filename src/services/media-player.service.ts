@@ -238,7 +238,7 @@ class MediaPlayerService {
     }
 
     store.dispatch({
-      type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+      type: MediaEnums.MediaPlayerActions.LoadingTrack,
     });
 
     mediaPlaybackCurrentPlayingInstance
@@ -417,17 +417,21 @@ class MediaPlayerService {
     const {
       mediaPlaybackVolumeCurrent,
       mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
     } = mediaPlayer;
 
     // loading a media track will always remove the track repeat
     this.removeTrackRepeat();
 
+    // request media playback instance for the provided track from the media provider
     const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
     const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
       mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
       mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
     });
 
+    // load the track
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.LoadTrack,
       data: {
@@ -667,7 +671,7 @@ class MediaPlayerService {
 
       // first update the playback state
       store.dispatch({
-        type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+        type: MediaEnums.MediaPlayerActions.LoadingTrack,
       });
 
       // re-request update
@@ -816,12 +820,8 @@ class MediaPlayerService {
       } else if (mediaPlaybackCurrentMediaTrack
         && mediaTracks[0]
         && mediaPlaybackCurrentMediaTrack.queue_entry_id !== mediaTracks[0].queue_entry_id) {
-        // important - loading the media tracks sets playback state in 'loading', explicitly request a pause to
-        // proceed further 'loading'
-
         debug('playNext - loading track - track id %s, queue entry id - %s', mediaTracks[0].id, mediaTracks[0].queue_entry_id);
         this.loadMediaTrack(mediaTracks[0]);
-        this.pauseMediaPlayer();
       }
     }
   }
