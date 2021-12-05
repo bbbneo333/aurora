@@ -21,6 +21,7 @@ export interface IMediaTrackData {
 }
 
 export interface IMediaTrackDataFilterParams {
+  id?: string,
   provider?: string;
   provider_id?: string;
   track_album_id?: string;

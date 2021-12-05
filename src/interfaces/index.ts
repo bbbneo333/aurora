@@ -2,6 +2,7 @@ import {
   IAppMain,
   IAppBuilder,
   IAppModule,
+  IAppStatePersistor,
 } from './app.interfaces';
 
 import {
@@ -42,6 +43,7 @@ export {
   IAppMain,
   IAppBuilder,
   IAppModule,
+  IAppStatePersistor,
   IFSAssetReadOptions,
   IFSDirectoryReadOptions,
   IFSDirectoryReadResponse,

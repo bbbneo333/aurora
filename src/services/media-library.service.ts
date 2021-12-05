@@ -42,7 +42,7 @@ class MediaLibraryService {
 
     // a media track can be removed via one of the following ways:
     // - if provider provides removeMediaTrack - then the media track will be removed completely
-    // - if provider does not provides removeMediaTrack - then the media track will be marked as removed and will not show up in the lists
+    // - if provider does not provide removeMediaTrack - then the media track will be marked as removed and will not show up in the list
     // provider then has the option to recover removed tracks via recoverRemovedTracks
     if (mediaLibraryService.removeMediaTrack) {
       const mediaTrackWasRemoved = await mediaLibraryService.removeMediaTrack(mediaTrack);
@@ -116,6 +116,16 @@ class MediaLibraryService {
     });
   }
 
+  // TODO: This needs to replaced by Provider based implementation
+  async getMediaTrack(mediaTrackId: string): Promise<IMediaTrack | undefined> {
+    const mediaTrackData = await MediaTrackDatastore.findMediaTrack({
+      id: mediaTrackId,
+    });
+
+    return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
+  }
+
+  // TODO: This needs to replaced by Provider based implementation
   async getMediaAlbumTracks(mediaAlbumId: string): Promise<IMediaTrack[]> {
     const mediaAlbumTrackDataList = await MediaTrackDatastore.findMediaTracks({
       track_album_id: mediaAlbumId,
@@ -195,7 +205,7 @@ class MediaLibraryService {
     return Promise.all(mediaTrackDataList.map(mediaTrackData => this.buildMediaTrack(mediaTrackData, loadMediaTracks)));
   }
 
-  private async buildMediaAlbum(mediaAlbum: string|IMediaAlbumData, loadMediaAlbum = false): Promise<IMediaAlbum> {
+  private async buildMediaAlbum(mediaAlbum: string | IMediaAlbumData, loadMediaAlbum = false): Promise<IMediaAlbum> {
     let mediaAlbumData;
     if (typeof mediaAlbum === 'string') {
       mediaAlbumData = await MediaAlbumDatastore.findMediaAlbumById(mediaAlbum);
@@ -227,7 +237,7 @@ class MediaLibraryService {
   //   return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
   // }
 
-  private async buildMediaArtist(mediaArtist: string|IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
+  private async buildMediaArtist(mediaArtist: string | IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
     // info - no further processing required for MediaArtistData -> MediaArtist
     let mediaArtistData;
     if (typeof mediaArtist === 'string') {
@@ -252,7 +262,7 @@ class MediaLibraryService {
     return mediaArtistData;
   }
 
-  private async buildMediaArtists(mediaArtists: string[]|IMediaArtistData[], loadMediaArtists = false): Promise<IMediaArtist[]> {
+  private async buildMediaArtists(mediaArtists: string[] | IMediaArtistData[], loadMediaArtists = false): Promise<IMediaArtist[]> {
     return Promise.all(mediaArtists.map((mediaArtist: any) => this.buildMediaArtist(mediaArtist, loadMediaArtists)));
   }
 
@@ -361,9 +371,9 @@ class MediaLibraryService {
     });
   }
 
-  private async processPicture(mediaPicture?: IMediaPicture): Promise<IMediaPicture|undefined> {
+  private async processPicture(mediaPicture?: IMediaPicture): Promise<IMediaPicture | undefined> {
     // this accepts a MediaPicture and returns a serializable instance of MediaPicture which can be stored and
-    // further processed system wide after deserializing
+    // further processed system-wide after deserializing
     if (!mediaPicture) {
       return undefined;
     }
@@ -380,7 +390,7 @@ class MediaLibraryService {
       };
     }
 
-    // image data type does not needs any processing, return as is
+    // image data type does not need any processing, return as is
     return mediaPicture;
   }
 }
