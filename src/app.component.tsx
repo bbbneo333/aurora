@@ -196,17 +196,17 @@ export function AppComponent() {
 
   return (
     <div className={cx('app-container')}>
-      {appStateIsLoading && (
-        <AppSplash/>
-      )}
-      {!appStateIsLoading && (
-        <Provider store={store}>
+      <Provider store={store}>
+        {appStateIsLoading && (
+          <AppSplash/>
+        )}
+        {!appStateIsLoading && (
           <Router>
             <AppStage/>
             <AppMediaPlayer/>
           </Router>
-        </Provider>
-      )}
+        )}
+      </Provider>
     </div>
   );
 }

@@ -47,8 +47,11 @@ async function loadAndStateForPersistors(state: RootState) {
     if (statePersistor) {
       debug('loading state - %s', stateKey);
       const stateValue = await loadStateFromStorage(stateKey, statePersistor);
-      debug('exhausting state - %s - %o', stateKey, stateValue);
-      await statePersistor.exhaust(stateValue);
+
+      if (stateValue) {
+        debug('exhausting state - %s - %o', stateKey, stateValue);
+        await statePersistor.exhaust(stateValue);
+      }
     }
   });
 }
