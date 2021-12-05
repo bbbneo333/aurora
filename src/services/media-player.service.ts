@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
+import {batch} from 'react-redux';
 
 import {MediaEnums} from '../enums';
 import store from '../store';
+import {ArrayUtils, StringUtils} from '../utils';
 
 import {
   IMediaPlayback,
@@ -44,12 +46,7 @@ class MediaPlayerService {
 
     // add track to the queue
     // important - setting track will remove all existing ones
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.SetTrack,
-      data: {
-        mediaTrack,
-      },
-    });
+    this.loadMediaTrackToQueue(mediaTrack);
 
     // request media provider to load the track
     this.loadAndPlayMediaTrack();
@@ -85,13 +82,7 @@ class MediaPlayerService {
 
     // add tracks to the queue
     // important - setting tracks will remove all existing ones
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.SetTracks,
-      data: {
-        mediaTracks,
-        mediaTrackList,
-      },
-    });
+    this.loadMediaTracksToQueue(mediaTracks, mediaTrackList);
 
     // request media provider to load the track
     this.loadAndPlayMediaTrack();
@@ -132,13 +123,7 @@ class MediaPlayerService {
 
     // add tracks to the queue
     // important - setting tracks will remove all existing ones
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.SetTracks,
-      data: {
-        mediaTracks,
-        mediaTrackList,
-      },
-    });
+    this.loadMediaTracksToQueue(mediaTracks, mediaTrackList);
 
     // request media provider to load the track
     this.loadAndPlayMediaTrack(mediaTrack);
@@ -242,6 +227,7 @@ class MediaPlayerService {
     const {
       mediaPlayer,
     } = store.getState();
+
     const {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentPlayingInstance,
@@ -252,7 +238,7 @@ class MediaPlayerService {
     }
 
     store.dispatch({
-      type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+      type: MediaEnums.MediaPlayerActions.LoadingTrack,
     });
 
     mediaPlaybackCurrentPlayingInstance
@@ -303,46 +289,7 @@ class MediaPlayerService {
   }
 
   changeMediaPlayerVolume(mediaPlaybackVolume: number): void {
-    const {
-      mediaPlayer,
-    } = store.getState();
-
-    const {
-      mediaPlaybackCurrentMediaTrack,
-      mediaPlaybackCurrentPlayingInstance,
-      mediaPlaybackVolumeMaxLimit,
-      mediaPlaybackVolumeMuted,
-    } = mediaPlayer;
-
-    async function changeVolume() {
-      if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
-        return false;
-      }
-
-      // raising the volume above 0 will unmute the muted audio as well
-      if (mediaPlaybackVolume > 0 && mediaPlaybackVolumeMuted) {
-        const mediaPlaybackVolumeUnMuted = await mediaPlaybackCurrentPlayingInstance.unmutePlaybackVolume();
-        if (!mediaPlaybackVolumeUnMuted) {
-          return false;
-        }
-      }
-      // change the volume
-      const mediaPlaybackVolumeChanged = await mediaPlaybackCurrentPlayingInstance.changePlaybackVolume(mediaPlaybackVolume, mediaPlaybackVolumeMaxLimit);
-      if (!mediaPlaybackVolumeChanged) {
-        return false;
-      }
-
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.UpdatePlaybackVolume,
-        data: {
-          mediaPlaybackVolume,
-        },
-      });
-
-      return true;
-    }
-
-    changeVolume()
+    this.changePlaybackVolumeAsync(mediaPlaybackVolume)
       .then((mediaPlaybackVolumeChanged) => {
         if (!mediaPlaybackVolumeChanged) {
           // TODO: Handle cases where media playback volume could not be changed
@@ -351,64 +298,20 @@ class MediaPlayerService {
   }
 
   muteMediaPlayerVolume(): void {
-    const {
-      mediaPlayer,
-    } = store.getState();
-
-    const {
-      mediaPlaybackCurrentMediaTrack,
-      mediaPlaybackCurrentPlayingInstance,
-      mediaPlaybackVolumeMuted,
-    } = mediaPlayer;
-
-    if (!mediaPlaybackCurrentMediaTrack
-      || !mediaPlaybackCurrentPlayingInstance
-      || mediaPlaybackVolumeMuted) {
-      return;
-    }
-
-    mediaPlaybackCurrentPlayingInstance
-      .mutePlaybackVolume()
-      .then((mediaPlaybackMuted) => {
-        if (!mediaPlaybackMuted) {
+    this.mutePlaybackVolumeAsync()
+      .then((mediaPlaybackVolumeMuted) => {
+        if (!mediaPlaybackVolumeMuted) {
           // TODO: Handle cases where media playback could not be muted
-          return;
         }
-
-        store.dispatch({
-          type: MediaEnums.MediaPlayerActions.MutePlaybackVolume,
-        });
       });
   }
 
   unmuteMediaPlayerVolume(): void {
-    const {
-      mediaPlayer,
-    } = store.getState();
-
-    const {
-      mediaPlaybackCurrentMediaTrack,
-      mediaPlaybackCurrentPlayingInstance,
-      mediaPlaybackVolumeMuted,
-    } = mediaPlayer;
-
-    if (!mediaPlaybackCurrentMediaTrack
-      || !mediaPlaybackCurrentPlayingInstance
-      || !mediaPlaybackVolumeMuted) {
-      return;
-    }
-
-    mediaPlaybackCurrentPlayingInstance
-      .unmutePlaybackVolume()
-      .then((mediaPlaybackUnMuted) => {
-        if (!mediaPlaybackUnMuted) {
+    this.unmutePlaybackVolumeAsync()
+      .then((mediaPlaybackVolumeUnmuted) => {
+        if (!mediaPlaybackVolumeUnmuted) {
           // TODO: Handle cases where media playback could not be un-muted
-          return;
         }
-
-        store.dispatch({
-          type: MediaEnums.MediaPlayerActions.UnmutePlaybackVolume,
-        });
       });
   }
 
@@ -437,13 +340,43 @@ class MediaPlayerService {
     } = store.getState();
 
     const {
+      mediaTracks,
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentTrackList,
       mediaPlaybackQueueOnShuffle,
     } = mediaPlayer;
 
+    const mediaPlaybackQueueShuffleEnabled = !mediaPlaybackQueueOnShuffle;
+
+    // important - when shuffle is requested, only the tracks except the current one are shuffled
+    // the current one then is always placed first and rest of the list is filled with shuffled tracks
+    let mediaQueueTracks: IMediaQueueTrack[] = [];
+    if (mediaPlaybackQueueShuffleEnabled) {
+      if (mediaPlaybackCurrentMediaTrack) {
+        const mediaTracksToShuffle = _.filter(mediaTracks, mediaTrack => mediaTrack.queue_entry_id !== mediaPlaybackCurrentMediaTrack.queue_entry_id);
+        const mediaTracksShuffled = this.getShuffledMediaTracks(mediaTracksToShuffle);
+
+        mediaQueueTracks = [mediaPlaybackCurrentMediaTrack, ...mediaTracksShuffled];
+      } else {
+        mediaQueueTracks = this.getShuffledMediaTracks(mediaTracks);
+      }
+    } else {
+      mediaQueueTracks = this.getSortedMediaTracks(mediaTracks);
+    }
+
+    // important - dispatch in batch to avoid re-renders
+    // we are going to update tracks first, then the shuffle state
+    batch(() => {
+      this.loadMediaQueueTracksToQueue(mediaQueueTracks, mediaPlaybackCurrentTrackList);
+      this.setShuffle(mediaPlaybackQueueShuffleEnabled);
+    });
+  }
+
+  setShuffle(mediaPlaybackQueueOnShuffle: boolean): void {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.SetShuffle,
       data: {
-        mediaPlaybackQueueOnShuffle: !mediaPlaybackQueueOnShuffle,
+        mediaPlaybackQueueOnShuffle,
       },
     });
   }
@@ -464,10 +397,58 @@ class MediaPlayerService {
       mediaPlaybackQueueUpdatedRepeatType = MediaEnums.MediaPlaybackRepeatType.Track;
     }
 
+    this.setRepeat(mediaPlaybackQueueUpdatedRepeatType);
+  }
+
+  setRepeat(mediaPlaybackQueueRepeatType?: MediaEnums.MediaPlaybackRepeatType): void {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.SetRepeat,
       data: {
-        mediaPlaybackQueueRepeatType: mediaPlaybackQueueUpdatedRepeatType,
+        mediaPlaybackQueueRepeatType,
+      },
+    });
+  }
+
+  loadMediaTrack(mediaTrack: IMediaTrack): IMediaPlayback {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackVolumeCurrent,
+      mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    // loading a media track will always remove the track repeat
+    this.removeTrackRepeat();
+
+    // request media playback instance for the provided track from the media provider
+    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
+    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
+      mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
+      mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
+    });
+
+    // load the track
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.LoadTrack,
+      data: {
+        mediaTrackId: mediaTrack.id,
+        mediaPlayingInstance: mediaPlayback,
+      },
+    });
+
+    return mediaPlayback;
+  }
+
+  loadMediaQueueTracksToQueue(mediaQueueTracks: IMediaQueueTrack[], mediaTrackList?: IMediaTrackList) {
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks: mediaQueueTracks,
+        mediaTrackList,
       },
     });
   }
@@ -518,34 +499,151 @@ class MediaPlayerService {
     return true;
   }
 
-  private loadMediaTrack(mediaTrack: IMediaTrack): IMediaPlayback {
+  private loadMediaTrackToQueue(mediaTrack: IMediaTrack) {
+    const mediaQueueTrack = {
+      ...mediaTrack,
+      tracklist_id: mediaTrack.track_album.id,
+      queue_entry_id: StringUtils.generateId(),
+      queue_insertion_index: 0,
+    };
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTrack,
+      data: {
+        mediaTrack: mediaQueueTrack,
+      },
+    });
+  }
+
+  private loadMediaTracksToQueue(mediaTracks: IMediaTrack[], mediaTrackList?: IMediaTrackList) {
     const {
       mediaPlayer,
     } = store.getState();
 
     const {
-      mediaPlaybackVolumeCurrent,
-      mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackQueueOnShuffle,
     } = mediaPlayer;
 
-    // loading a media track will always remove the track repeat
-    this.removeTrackRepeat();
+    const mediaQueueTracksForTrackList = mediaTracks.map((mediaTrack, mediaTrackPointer) => ({
+      ...mediaTrack,
+      tracklist_id: mediaTrackList ? mediaTrackList.id : mediaTrack.track_album.id,
+      queue_entry_id: StringUtils.generateId(),
+      queue_insertion_index: mediaTrackPointer,
+    }));
 
-    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
-    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
-      mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
-      mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
-    });
+    const mediaQueueTracks = mediaPlaybackQueueOnShuffle
+      ? this.getShuffledMediaTracks(mediaQueueTracksForTrackList)
+      : this.getSortedMediaTracks(mediaQueueTracksForTrackList);
 
+    this.loadMediaQueueTracksToQueue(mediaQueueTracks, mediaTrackList);
+  }
+
+  private async changePlaybackVolumeAsync(mediaPlaybackVolume: number): Promise<boolean> {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    if (mediaPlaybackVolume > 0 && mediaPlaybackVolumeMuted) {
+      // raising the volume above 0 will unmute the muted audio as well
+      // unmute playback
+      if (mediaPlaybackCurrentPlayingInstance) {
+        const mediaPlaybackVolumeUnmuted = await mediaPlaybackCurrentPlayingInstance.unmutePlaybackVolume();
+        if (!mediaPlaybackVolumeUnmuted) {
+          return false;
+        }
+      }
+      // update state
+      store.dispatch({
+        type: MediaEnums.MediaPlayerActions.UnmutePlaybackVolume,
+      });
+    }
+
+    if (mediaPlaybackCurrentPlayingInstance) {
+      // change playback volume
+      const mediaPlaybackVolumeChanged = mediaPlaybackCurrentPlayingInstance.changePlaybackVolume(
+        mediaPlaybackVolume,
+        mediaPlaybackVolumeMaxLimit,
+      );
+      if (!mediaPlaybackVolumeChanged) {
+        return false;
+      }
+    }
+
+    // update state
     store.dispatch({
-      type: MediaEnums.MediaPlayerActions.LoadTrack,
+      type: MediaEnums.MediaPlayerActions.UpdatePlaybackVolume,
       data: {
-        mediaTrackId: mediaTrack.id,
-        mediaPlayingInstance: mediaPlayback,
+        mediaPlaybackVolume,
       },
     });
 
-    return mediaPlayback;
+    return true;
+  }
+
+  private async mutePlaybackVolumeAsync(): Promise<boolean> {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    if (mediaPlaybackVolumeMuted) {
+      return true;
+    }
+
+    // mute playback
+    if (mediaPlaybackCurrentPlayingInstance) {
+      const mediaPlaybackVolumeWasMuted = mediaPlaybackCurrentPlayingInstance.mutePlaybackVolume();
+      if (!mediaPlaybackVolumeWasMuted) {
+        return false;
+      }
+    }
+
+    // update state
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.MutePlaybackVolume,
+    });
+
+    return true;
+  }
+
+  private async unmutePlaybackVolumeAsync(): Promise<boolean> {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackVolumeMuted) {
+      return true;
+    }
+
+    // unmute playback
+    if (mediaPlaybackCurrentPlayingInstance) {
+      const mediaPlaybackVolumeWasUnmuted = mediaPlaybackCurrentPlayingInstance.unmutePlaybackVolume();
+      if (!mediaPlaybackVolumeWasUnmuted) {
+        return false;
+      }
+    }
+
+    // update state
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.UnmutePlaybackVolume,
+    });
+
+    return true;
   }
 
   private reportMediaPlaybackProgress(): void {
@@ -573,7 +671,7 @@ class MediaPlayerService {
 
       // first update the playback state
       store.dispatch({
-        type: MediaEnums.MediaPlayerActions.LoadExistingTrack,
+        type: MediaEnums.MediaPlayerActions.LoadingTrack,
       });
 
       // re-request update
@@ -722,12 +820,8 @@ class MediaPlayerService {
       } else if (mediaPlaybackCurrentMediaTrack
         && mediaTracks[0]
         && mediaPlaybackCurrentMediaTrack.queue_entry_id !== mediaTracks[0].queue_entry_id) {
-        // important - loading the media tracks sets playback state in 'loading', explicitly request a pause to
-        // proceed further 'loading'
-
         debug('playNext - loading track - track id %s, queue entry id - %s', mediaTracks[0].id, mediaTracks[0].queue_entry_id);
         this.loadMediaTrack(mediaTracks[0]);
-        this.pauseMediaPlayer();
       }
     }
   }
@@ -749,6 +843,14 @@ class MediaPlayerService {
         },
       });
     }
+  }
+
+  private getShuffledMediaTracks(mediaTracks: IMediaQueueTrack[]): IMediaQueueTrack[] {
+    return ArrayUtils.shuffleArray(mediaTracks);
+  }
+
+  private getSortedMediaTracks(mediaTracks: IMediaQueueTrack[]): IMediaQueueTrack[] {
+    return _.sortBy(mediaTracks, mediaTrack => mediaTrack.queue_insertion_index);
   }
 }
 

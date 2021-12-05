@@ -21,6 +21,7 @@ export interface IMediaTrackData {
 }
 
 export interface IMediaTrackDataFilterParams {
+  id?: string,
   provider?: string;
   provider_id?: string;
   track_album_id?: string;
@@ -179,6 +180,7 @@ export interface IMediaPlayback {
 export interface IMediaPlaybackOptions {
   mediaPlaybackVolume: number;
   mediaPlaybackMaxVolume: number;
+  mediaPlaybackVolumeMuted: boolean;
 }
 
 export interface IMediaSettingsComponent extends React.FC<any> {

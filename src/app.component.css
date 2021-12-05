@@ -1,4 +1,10 @@
-/*app > columns [stage, media player]*/
+/*app > columns [splash, stage, media player]*/
+
+.app-splash-container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--light-bg-color);
+}
 
 .app-container {
   height: 100%;

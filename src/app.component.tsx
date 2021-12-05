@@ -1,14 +1,20 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
-import {useSelector} from 'react-redux';
+import {Provider, useSelector} from 'react-redux';
 import {MemoryRouter as Router, NavLink} from 'react-router-dom';
+import * as _ from 'lodash';
 
 import {Icon, RouterSwitchComponent} from './components';
+import {IAppStatePersistor} from './interfaces';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
 
 import * as AppComponents from './components';
+
+import statePersistors from './persistors';
+import store from './store';
+import {registerStatePersistor, loadState} from './store/persistor';
 
 import './app.global.css';
 import styles from './app.component.css';
@@ -19,6 +25,11 @@ const cx = classNames.bind(styles);
 // register media providers
 const mediaLocalProvider = new MediaLocalProvider();
 MediaProviderService.registerMediaProvider(mediaLocalProvider);
+
+// register state persistors
+_.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
+  registerStatePersistor(stateKey, statePersistor);
+});
 
 // app > stage > content > header > rows [navigator, page header, user]
 
@@ -129,6 +140,14 @@ function AppContent() {
   );
 }
 
+// app > splash
+
+function AppSplash() {
+  return (
+    <div className={cx('app-splash-container')}/>
+  );
+}
+
 // app > stage
 
 function AppStage() {
@@ -143,11 +162,13 @@ function AppStage() {
 // app > media player
 
 function AppMediaPlayer() {
-  const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
+  const {
+    mediaPlaybackCurrentMediaTrack,
+  } = useSelector((state: RootState) => state.mediaPlayer);
 
   return (
     <div className={cx('app-media-player-container', {
-      active: !!mediaPlayer.mediaPlaybackCurrentMediaTrack,
+      active: !!mediaPlaybackCurrentMediaTrack,
     })}
     >
       <AppComponents.MediaSessionComponent/>
@@ -156,15 +177,36 @@ function AppMediaPlayer() {
   );
 }
 
-// app > columns [stage, media player]
+// app > columns [splash | stage, media player]
 
 export function AppComponent() {
+  const [appStateIsLoading, setAppStateIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setAppStateIsLoading(true);
+
+    loadState(store)
+      .then(() => {
+        setAppStateIsLoading(false);
+      })
+      .catch((error) => {
+        throw new Error(`AppComponent encountered error while loading state - ${error.message}`);
+      });
+  }, []);
+
   return (
-    <Router>
-      <div className={cx('app-container')}>
-        <AppStage/>
-        <AppMediaPlayer/>
-      </div>
-    </Router>
+    <div className={cx('app-container')}>
+      <Provider store={store}>
+        {appStateIsLoading && (
+          <AppSplash/>
+        )}
+        {!appStateIsLoading && (
+          <Router>
+            <AppStage/>
+            <AppMediaPlayer/>
+          </Router>
+        )}
+      </Provider>
+    </div>
   );
 }
