@@ -27,10 +27,11 @@ export function MediaTrackListComponent(props: {
         mediaTracks={mediaTracks}
         mediaTrackList={mediaTrackList}
       >
-        {mediaTracks.map(mediaTrack => (
+        {mediaTracks.map((mediaTrack, mediaTrackPointer) => (
           <MediaTrackComponent
             key={mediaTrack.id}
             mediaTrack={mediaTrack}
+            mediaTrackPointer={mediaTrackPointer}
             showCover={showCovers}
           />
         ))}

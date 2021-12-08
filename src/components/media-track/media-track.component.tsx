@@ -2,8 +2,9 @@ import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import * as _ from 'lodash';
+import {useContextMenu} from 'react-contexify';
 
-import {Icons} from '../../constants';
+import {ContextMenus, Icons} from '../../constants';
 import {useMediaTrackList} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {IMediaTrack} from '../../interfaces';
@@ -89,49 +90,71 @@ function MediaTrackActionButton(props: {
 
 export function MediaTrackComponent(props: {
   mediaTrack: IMediaTrack,
+  mediaTrackPointer?: number,
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
   showCover?: boolean,
 }) {
   const {
     mediaTrack,
+    mediaTrackPointer,
     handleOnPlayButtonClick,
     isPlaying,
     showCover = true,
   } = props;
 
+  const {show} = useContextMenu();
+
+  const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
+    show(e, {
+      id: ContextMenus.MediaTrack,
+      props: {
+        mediaTrack,
+      },
+    });
+  }, [
+    show,
+    mediaTrack,
+  ]);
+
+  // mediaTrackPointer can be used for providing position for a MediaTrack within a list
+  // this information can be then used for setting accessibility control over our MediaTrack container
+  const mediaTrackAriaProps = !_.isNil(mediaTrackPointer) && {
+    role: 'row',
+    tabIndex: mediaTrackPointer + 1,
+    'aria-rowindex': mediaTrackPointer + 1,
+  };
+
   return (
-    <div className={cx('col-12 mb-3')}>
-      <div className={cx('media-track')}>
-        <div className="row">
-          <div className={cx('col-10', 'media-track-main-column')}>
-            <div className={cx('media-track-section')}>
-              <MediaTrackActionButton
-                mediaTrack={mediaTrack}
-                isPlaying={isPlaying}
-                handleOnPlayButtonClick={handleOnPlayButtonClick}
-              />
-            </div>
-            {showCover && (
-              <div className={cx('media-track-section')}>
-                <MediaCoverPictureComponent
-                  mediaPicture={mediaTrack.track_cover_picture}
-                  mediaPictureAltText={mediaTrack.track_name}
-                  className={cx('media-track-cover')}
-                />
-              </div>
-            )}
-            <div className={cx('media-track-section')}>
-              <MediaTrackInfoComponent
-                mediaTrack={mediaTrack}
-                className={cx('media-track-info')}
-              />
-            </div>
+    <div className={cx('col-12 mb-3', 'media-track')} onContextMenu={handleOnContextMenu} {...mediaTrackAriaProps}>
+      <div className="row">
+        <div className={cx('col-10', 'media-track-main-column')}>
+          <div className={cx('media-track-section')}>
+            <MediaTrackActionButton
+              mediaTrack={mediaTrack}
+              isPlaying={isPlaying}
+              handleOnPlayButtonClick={handleOnPlayButtonClick}
+            />
           </div>
-          <div className={cx('col-2', 'media-track-side-column')}>
-            <div className={cx('media-track-duration')}>
-              {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
+          {showCover && (
+            <div className={cx('media-track-section')}>
+              <MediaCoverPictureComponent
+                mediaPicture={mediaTrack.track_cover_picture}
+                mediaPictureAltText={mediaTrack.track_name}
+                className={cx('media-track-cover')}
+              />
             </div>
+          )}
+          <div className={cx('media-track-section')}>
+            <MediaTrackInfoComponent
+              mediaTrack={mediaTrack}
+              className={cx('media-track-info')}
+            />
+          </div>
+        </div>
+        <div className={cx('col-2', 'media-track-side-column')}>
+          <div className={cx('media-track-duration')}>
+            {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
           </div>
         </div>
       </div>

@@ -4,7 +4,13 @@ import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import * as _ from 'lodash';
 
-import {MediaCoverPictureComponent, MediaTrackArtistLinkComponent, MediaTrackListComponent} from '../../components';
+import {
+  MediaAlbumTrackContextMenu,
+  MediaCoverPictureComponent,
+  MediaTrackArtistLinkComponent,
+  MediaTrackListComponent,
+} from '../../components';
+
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService} from '../../services';
 
@@ -71,6 +77,7 @@ export function LibraryAlbumComponent() {
             }}
             showCovers={false}
           />
+          <MediaAlbumTrackContextMenu mediaAlbum={mediaSelectedAlbum}/>
         </div>
       </div>
     </div>

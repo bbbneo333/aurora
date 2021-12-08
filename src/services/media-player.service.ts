@@ -151,6 +151,10 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaTrack);
   }
 
+  addMediaTrackToQueue(mediaTrack: IMediaTrack) {
+    // TODO: Add support
+  }
+
   seekMediaTrack(mediaTrackSeekPosition: number): void {
     const {
       mediaPlayer,
