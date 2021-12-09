@@ -67,12 +67,6 @@ export default merge(baseConfig, {
             loader: 'style-loader',
           },
           {
-            loader: '@teamsupercell/typings-for-css-modules-loader',
-            options: {
-              disableLocalsExport: true,
-            },
-          },
-          {
             loader: 'css-loader',
             options: {
               sourceMap: true,
@@ -85,12 +79,6 @@ export default merge(baseConfig, {
         use: [
           {
             loader: 'style-loader',
-          },
-          {
-            loader: '@teamsupercell/typings-for-css-modules-loader',
-            options: {
-              disableLocalsExport: true,
-            },
           },
           {
             loader: 'css-loader',
@@ -112,12 +100,6 @@ export default merge(baseConfig, {
             loader: 'style-loader',
           },
           {
-            loader: '@teamsupercell/typings-for-css-modules-loader',
-            options: {
-              disableLocalsExport: true,
-            },
-          },
-          {
             loader: 'css-loader',
             options: {
               sourceMap: true,
@@ -134,12 +116,6 @@ export default merge(baseConfig, {
         use: [
           {
             loader: 'style-loader',
-          },
-          {
-            loader: '@teamsupercell/typings-for-css-modules-loader',
-            options: {
-              disableLocalsExport: true,
-            },
           },
           {
             loader: 'css-loader',
