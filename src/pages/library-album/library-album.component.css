@@ -2,10 +2,6 @@
   margin-bottom: 20px;
 }
 
-.library-album-header-cover-column {
-  min-width: 200px;
-}
-
 .library-album-header-info-column {
   display: flex;
   flex-direction: column;

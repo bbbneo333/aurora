@@ -11,6 +11,7 @@ import {
   MediaTrackListComponent,
 } from '../../components';
 
+import {Layout} from '../../constants';
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService} from '../../services';
 
@@ -39,7 +40,6 @@ export function LibraryAlbumComponent() {
   }
 
   const mediaAlbumHasCover = !_.isNil(mediaSelectedAlbum.album_cover_picture);
-  const mediaAlbumHeaderColumnWidth = mediaAlbumHasCover ? 'col-8' : 'col-12';
 
   return (
     <div className={cx('library-album')}>
@@ -47,7 +47,7 @@ export function LibraryAlbumComponent() {
         <div className={cx('library-album-header')}>
           <div className="row">
             {mediaAlbumHasCover && (
-              <div className={cx('col-3', 'library-album-header-cover-column')}>
+              <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
                 <MediaCoverPictureComponent
                   mediaPicture={mediaSelectedAlbum.album_cover_picture}
                   mediaPictureAltText={mediaSelectedAlbum.album_name}
@@ -55,7 +55,11 @@ export function LibraryAlbumComponent() {
                 />
               </div>
             )}
-            <div className={cx(mediaAlbumHeaderColumnWidth, 'library-album-header-info-column')}>
+            <div className={cx(
+              mediaAlbumHasCover ? Layout.Grid.LibraryAlbumHeaderInfoColumn : 'col-12',
+              'library-album-header-info-column',
+            )}
+            >
               <div className={cx('library-album-header-label')}>
                 {I18nService.getString('label_library_album_header')}
               </div>

@@ -1,5 +1,7 @@
 {
   "Grid": {
-    "LibraryAlbumTile": "col-4 col-md-3 col-xl-2"
+    "LibraryAlbumTile": "col-4 col-md-3 col-xl-2",
+    "LibraryAlbumHeaderCoverColumn": "col-4 col-xl-2",
+    "LibraryAlbumHeaderInfoColumn": "col-8 col-xl-10"
   }
 }
