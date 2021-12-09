@@ -82,26 +82,28 @@ export function MediaAlbumTile(props: {
                 mediaPictureAltText={mediaAlbum.album_name}
                 className={cx('album-tile-cover-picture')}
               />
-              <div className={cx('album-tile-cover-action')}>
-                {
-                  isMediaAlbumPlaying
-                    ? (
-                      <MediaButtonComponent
-                        className={cx('album-tile-action-button')}
-                        onButtonSubmit={handleOnLibraryAlbumPauseButtonClick}
-                      >
-                        <Icon name={Icons.MediaPause}/>
-                      </MediaButtonComponent>
-                    )
-                    : (
-                      <MediaButtonComponent
-                        className={cx('album-tile-action-button')}
-                        onButtonSubmit={handleOnLibraryAlbumPlayButtonClick}
-                      >
-                        <Icon name={Icons.MediaPlay}/>
-                      </MediaButtonComponent>
-                    )
-                }
+              <div className={cx('album-tile-cover-overlay')}>
+                <div className={cx('album-tile-cover-action')}>
+                  {
+                    isMediaAlbumPlaying
+                      ? (
+                        <MediaButtonComponent
+                          className={cx('album-tile-action-button')}
+                          onButtonSubmit={handleOnLibraryAlbumPauseButtonClick}
+                        >
+                          <Icon name={Icons.MediaPause}/>
+                        </MediaButtonComponent>
+                      )
+                      : (
+                        <MediaButtonComponent
+                          className={cx('album-tile-action-button')}
+                          onButtonSubmit={handleOnLibraryAlbumPlayButtonClick}
+                        >
+                          <Icon name={Icons.MediaPlay}/>
+                        </MediaButtonComponent>
+                      )
+                  }
+                </div>
               </div>
             </div>
             <div className={cx('album-tile-info')}>

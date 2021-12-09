@@ -31,7 +31,7 @@
   --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
   --titlebar-overlay-height: 60px;
   --scrollable-scrollbar-width: 15px;
-  --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease;
+  --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;
   /*v2*/
   --context-menu-color: #b3b3b3;
   --context-menu-bg-color: #282828;

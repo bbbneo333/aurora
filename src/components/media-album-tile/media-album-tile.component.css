@@ -28,7 +28,6 @@
   margin-bottom: 16px;
   flex-grow: 1;
   position: relative;
-  overflow: hidden;
 }
 
 .album-tile-cover-picture {
@@ -39,18 +38,27 @@
   font-size: 50px;
 }
 
-.album-tile-cover-action {
+.album-tile-cover-overlay {
   position: absolute;
-  right: 12px;
-  bottom: -42px;
+  overflow: hidden;
+  background-color: rebeccapurple;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  bottom: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+.album-tile-cover-action {
+  margin-bottom: -40px;
   transition: var(--slide-in-item-transition);
   opacity: 0;
-  z-index: 2;
 }
 
 .album-tile:hover .album-tile-cover-action,
 .album-tile.playing .album-tile-cover-action {
-  bottom: 12px;
+  margin-bottom: 0;
   opacity: 1;
 }
 
