@@ -377,15 +377,25 @@ class MediaLibraryService {
     if (!mediaPicture) {
       return undefined;
     }
+
     if (mediaPicture.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Buffer) {
-      const imageCachePath: string = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
+      const imageCached: {
+        path?: string,
+      } = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
         width: this.mediaPictureScaleWidth,
         height: this.mediaPictureScaleHeight,
       });
 
+      // imageCached: {processed: boolean, path?: string, error?: string}
+      // path would not be present if image could not be processed
+      // most likely due to corrupted image
+      if (!imageCached.path) {
+        return undefined;
+      }
+
       return {
         ...mediaPicture,
-        image_data: imageCachePath,
+        image_data: imageCached.path,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Path,
       };
     }
