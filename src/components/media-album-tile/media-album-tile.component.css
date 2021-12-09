@@ -1,37 +1,37 @@
-.library-album-tile {
+.album-tile {
   background-color: var(--dark-card-bg-color);
   border-radius: 4px;
   transition: var(--selectable-item-transition);
   height: 100%;
 }
 
-.library-album-tile:hover {
+.album-tile:hover {
   background-color: var(--selected-bg-color);
 }
 
-.library-album-tile-body {
+.album-tile-body {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: 16px;
 }
 
-.library-album-tile-link {
+.album-tile-link {
   color: var(--light-text-color);
 }
 
-.library-album-tile:hover .library-album-tile-link {
+.album-tile:hover .album-tile-link {
   color: var(--light-text-color);
 }
 
-.library-album-tile-cover {
+.album-tile-cover {
   margin-bottom: 16px;
   flex-grow: 1;
   position: relative;
   overflow: hidden;
 }
 
-.library-album-tile-cover-picture {
+.album-tile-cover-picture {
   height: 100%;
   width: 100%;
   box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
@@ -39,7 +39,7 @@
   font-size: 50px;
 }
 
-.library-album-tile-cover-action {
+.album-tile-cover-action {
   position: absolute;
   right: 12px;
   bottom: -42px;
@@ -48,13 +48,13 @@
   z-index: 2;
 }
 
-.library-album-tile:hover .library-album-tile-cover-action,
-.library-album-tile.playing .library-album-tile-cover-action {
+.album-tile:hover .album-tile-cover-action,
+.album-tile.playing .album-tile-cover-action {
   bottom: 12px;
   opacity: 1;
 }
 
-.library-album-tile-action-button {
+.album-tile-action-button {
   border: none;
   color: var(--light-button-color);
   background-color: var(--light-toggle-active-color);
@@ -65,18 +65,18 @@
   transition: var(--selectable-item-transition);
 }
 
-.library-album-tile-action-button:hover {
+.album-tile-action-button:hover {
   background-color: var(--light-toggle-color);
 }
 
-.library-album-tile-title {
+.album-tile-title {
   font-weight: bold;
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
 }
 
-.library-album-tile-subtitle {
+.album-tile-subtitle {
   font-size: smaller;
   color: var(--dark-text-color);
   white-space: nowrap;

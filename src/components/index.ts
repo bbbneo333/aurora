@@ -1,5 +1,6 @@
 export {Icon} from './icon/icon.component';
 export {MediaAlbumTrackContextMenu} from './media-album-track-context-menu/media-album-track-context-menu.component';
+export {MediaAlbumTile} from './media-album-tile/media-album-tile.component';
 export {MediaButtonComponent} from './media-button/media-button.component';
 export {MediaContentHeaderNavigatorComponent} from './media-content-header-navigator/media-content-header-navigator.component';
 export {MediaContentHeaderUserComponent} from './media-content-header-user/media-content-header-user.component';
