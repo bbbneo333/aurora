@@ -298,7 +298,7 @@ class App implements IAppMain {
       .catch(debug);
 
     app.on('activate', async () => {
-      // on macOS it's common to re-create a window in the app when the
+      // on macOS, it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open
       if (!this.mainWindow) {
         this.mainWindow = await this.createWindow();
