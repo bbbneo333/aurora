@@ -5,12 +5,21 @@ import {NavLink} from 'react-router-dom';
 import {Routes} from '../../constants';
 import {IMediaArtist, IMediaTrack} from '../../interfaces';
 import {StringUtils} from '../../utils';
+import {withSeparator} from '../../utils/render.utils';
 
 import styles from './media-track-info.component.css';
 
 const cx = classNames.bind(styles);
 
-export function MediaTrackArtistLinkComponent(props: {mediaArtist: IMediaArtist}) {
+function MediaTrackArtistLinkSeparator() {
+  return (
+    <span>,</span>
+  );
+}
+
+export function MediaTrackArtistLinkComponent(props: {
+  mediaArtist: IMediaArtist,
+}) {
   const {
     mediaArtist,
   } = props;
@@ -39,17 +48,23 @@ export function MediaTrackInfoComponent(props: {
 
   return (
     <div className={cx('media-track-info', className)}>
-      <span className={cx('media-track-info-title')}>
+      <div className={cx('media-track-info-title')}>
         {mediaTrack.track_name}
-      </span>
-      <span className={cx('media-track-info-subtitle')}>
-        {mediaTrack.track_artists.map(mediaArtist => (
-          <MediaTrackArtistLinkComponent
-            key={mediaArtist.id}
-            mediaArtist={mediaArtist}
-          />
-        ))}
-      </span>
+      </div>
+      <div className={cx('media-track-info-subtitle')}>
+        {
+          withSeparator(
+            mediaTrack.track_artists,
+            mediaArtist => (
+              <MediaTrackArtistLinkComponent
+                key={mediaArtist.id}
+                mediaArtist={mediaArtist}
+              />
+            ),
+            <MediaTrackArtistLinkSeparator/>,
+          )
+        }
+      </div>
     </div>
   );
 }
