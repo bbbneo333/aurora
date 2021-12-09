@@ -17,6 +17,7 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 
 import path from 'path';
+import fs from 'fs';
 import electronUpdater from 'electron-updater';
 import electronLog from 'electron-log';
 import electronDebug from 'electron-debug';
@@ -68,6 +69,7 @@ class App implements IAppMain {
   private readonly windowHeight = 780;
   private readonly windowMinWidth = 1024;
   private readonly windowMinHeight = 620;
+  private readonly dataPath: string;
 
   constructor() {
     this.env = process.env.NODE_ENV;
@@ -76,6 +78,7 @@ class App implements IAppMain {
     this.forceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
     this.startMinimized = process.env.START_MINIMIZED;
     this.resourcesPath = process.resourcesPath;
+    this.dataPath = this.debug ? 'Aurora-debug' : 'Aurora';
 
     this.installSourceMapSupport();
     this.configureLogger();
@@ -120,7 +123,7 @@ class App implements IAppMain {
   }
 
   getDataPath(...paths: string[]): string {
-    return path.join(app.getPath('appData'), 'Aurora', ...paths);
+    return path.join(app.getPath('appData'), this.dataPath, ...paths);
   }
 
   getCurrentWindow(): BrowserWindow {
@@ -154,6 +157,26 @@ class App implements IAppMain {
           debug('encountered error at openPath when opening - %s, error - %s', pathToOpen, errorMessage);
         }
       });
+  }
+
+  removeAppData() {
+    const appDataPath = this.getDataPath();
+    this.removeDirectorySafe(appDataPath);
+  }
+
+  private removeDirectorySafe(directory: string) {
+    try {
+      fs.rmdirSync(directory, {
+        recursive: true,
+      });
+      debug('removeDirectorySafe - directory was removed successfully - %s', directory);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        debug('removeDatastore - directory does not exists - %s', directory);
+      } else {
+        throw error;
+      }
+    }
   }
 
   private installSourceMapSupport(): void {

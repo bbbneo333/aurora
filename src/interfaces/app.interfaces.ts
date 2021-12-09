@@ -25,6 +25,8 @@ export interface IAppMain {
   getModule<T>(type: new (data: any) => T): T;
 
   openPath(path: string): void;
+
+  removeAppData(): void;
 }
 
 export interface IAppBuilder {
