@@ -41,7 +41,6 @@
 .album-tile-cover-overlay {
   position: absolute;
   overflow: hidden;
-  background-color: rebeccapurple;
   display: flex;
   justify-content: flex-end;
   padding: 10px;
