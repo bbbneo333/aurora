@@ -26,13 +26,13 @@ export function MediaPlayerControls() {
   } = useSelector((state: RootState) => state.mediaPlayer);
 
   const handleOnMediaPlayPreviousButtonSubmit = useCallback(() => {
-    // if the track has progressed for more than 30% of it's duration
+    // if the track has progressed for more than 15 seconds
     // or if we don't have any previous track in the queue
     // we will be seeking current track to 0
     // otherwise, we will be playing the next track
     if ((mediaPlaybackCurrentMediaTrack
         && mediaPlaybackCurrentMediaProgress
-        && ((mediaPlaybackCurrentMediaProgress / mediaPlaybackCurrentMediaTrack.track_duration) * 100) > 30)
+        && mediaPlaybackCurrentMediaProgress > 15)
       || !MediaPlayerService.hasPreviousTrack()) {
       MediaPlayerService.seekMediaTrack(0);
     } else {
