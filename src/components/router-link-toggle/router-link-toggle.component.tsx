@@ -8,6 +8,8 @@ import {
   useLocation,
 } from 'react-router-dom';
 
+import {AppBrowserHistory} from '../../types';
+
 type RouterLinkToggleComponentProps = Pick<NavLinkProps, 'children' | 'className' | 'activeClassName' | 'to'> & {
   fallbackPath?: string,
 };
@@ -22,13 +24,13 @@ export function RouterLinkToggle(props: RouterLinkToggleComponentProps) {
   } = props;
 
   const {pathname} = useLocation();
-  // important - we only have access to history.entries when using MemoryRouter
-  const {entries} = useHistory() as unknown as {entries: [string]};
+  const {entries} = useHistory() as AppBrowserHistory;
   const [togglePath, setTogglePath] = useState<string>(to);
 
   useEffect(() => {
     if (pathname === to) {
-      setTogglePath(entries[entries.length - 2] || fallbackPath);
+      const toLocation = entries[entries.length - 2];
+      setTogglePath(toLocation ? toLocation.pathname : fallbackPath);
     } else {
       setTogglePath(to);
     }

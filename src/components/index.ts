@@ -1,3 +1,4 @@
+export {BrowserScroll} from './browser-scroll/browser-scroll.component';
 export {Icon} from './icon/icon.component';
 export {MediaAlbumTrackContextMenu} from './media-album-track-context-menu/media-album-track-context-menu.component';
 export {MediaAlbumTile} from './media-album-tile/media-album-tile.component';

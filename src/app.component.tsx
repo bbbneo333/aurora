@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
 import {Provider, useSelector} from 'react-redux';
 import {MemoryRouter as Router, NavLink} from 'react-router-dom';
 import * as _ from 'lodash';
 
-import {Icon, RouterSwitchComponent} from './components';
+import {BrowserScroll, Icon, RouterSwitchComponent} from './components';
 import {IAppStatePersistor} from './interfaces';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
@@ -55,8 +55,11 @@ function AppContentHeader() {
 }
 
 function AppContentBrowser() {
+  const browserRef = useRef(null);
+
   return (
-    <div className={cx('app-content-browser-container', 'app-scrollable')}>
+    <div ref={browserRef} className={cx('app-content-browser-container', 'app-scrollable')}>
+      <BrowserScroll browserRef={browserRef}/>
       <RouterSwitchComponent routes={routes.main}/>
     </div>
   );

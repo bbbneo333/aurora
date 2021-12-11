@@ -19,6 +19,10 @@
   border: 2px solid var(--dark-bg-color);
 }
 
-.media-content-navigate-button:hover {
+.media-content-navigate-button.disabled {
+  color: var(--dark-disabled-button-color);
+}
+
+.media-content-navigate-button:not(.disabled):hover {
   border-color: var(--dark-selectable-outline-color);
 }
