@@ -319,9 +319,30 @@ class MediaPlayerService {
       });
   }
 
-  playPreviousTrack(): void {
-    this.stopMediaPlayer();
-    this.playPrevious();
+  playPreviousTrack(force?: boolean): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentMediaProgress,
+    } = mediaPlayer;
+
+    // we will be seeking current track to 0 if:
+    // - we don't have any previous track in the queue
+    // - or, action was not forced and the track has progressed for more than 15 seconds
+    // otherwise, we will be playing the previous track in queue
+
+    if (!this.hasPreviousTrack() || (!force
+      && mediaPlaybackCurrentMediaTrack
+      && mediaPlaybackCurrentMediaProgress
+      && mediaPlaybackCurrentMediaProgress > 15)) {
+      this.seekMediaTrack(0);
+    } else {
+      this.stopMediaPlayer();
+      this.playPrevious();
+    }
   }
 
   playNextTrack(): void {
