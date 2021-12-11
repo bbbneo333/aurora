@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 import classNames from 'classnames/bind';
 import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
-import * as _ from 'lodash';
 
 import {
   MediaAlbumTrackContextMenu,
@@ -39,27 +38,19 @@ export function LibraryAlbumComponent() {
     return (<></>);
   }
 
-  const mediaAlbumHasCover = !_.isNil(mediaSelectedAlbum.album_cover_picture);
-
   return (
     <div className={cx('library-album')}>
       <div className="container-fluid">
         <div className={cx('library-album-header')}>
           <div className="row">
-            {mediaAlbumHasCover && (
-              <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
-                <MediaCoverPictureComponent
-                  mediaPicture={mediaSelectedAlbum.album_cover_picture}
-                  mediaPictureAltText={mediaSelectedAlbum.album_name}
-                  className={cx('library-album-cover-picture')}
-                />
-              </div>
-            )}
-            <div className={cx(
-              mediaAlbumHasCover ? Layout.Grid.LibraryAlbumHeaderInfoColumn : 'col-12',
-              'library-album-header-info-column',
-            )}
-            >
+            <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
+              <MediaCoverPictureComponent
+                mediaPicture={mediaSelectedAlbum.album_cover_picture}
+                mediaPictureAltText={mediaSelectedAlbum.album_name}
+                className={cx('library-album-cover-picture')}
+              />
+            </div>
+            <div className={cx(Layout.Grid.LibraryAlbumHeaderInfoColumn, 'library-album-header-info-column')}>
               <div className={cx('library-album-header-label')}>
                 {I18nService.getString('label_library_album_header')}
               </div>

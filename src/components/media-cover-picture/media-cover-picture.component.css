@@ -1,4 +1,5 @@
 .media-cover-picture {
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
@@ -8,6 +9,22 @@
 
 .media-cover-picture > img {
   width: 100%;
+}
+
+/*a trick learned from https://mademyday.de/height-equals-width-with-pure-css*/
+/*to keep the aspect ratio for the cover image to 1:1*/
+
+.media-cover-picture::before {
+  content: "";
+  float: left;
+  padding-top: 100%;
+}
+
+.media-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  float: left;
 }
 
 .media-cover-placeholder-icon {

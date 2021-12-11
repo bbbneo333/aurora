@@ -2,6 +2,12 @@
   margin-bottom: 20px;
 }
 
+.library-album-cover-picture {
+  box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
+  /* size for placeholder icon */
+  font-size: 50px;
+}
+
 .library-album-header-info-column {
   display: flex;
   flex-direction: column;
