@@ -4,13 +4,19 @@ import {Provider, useSelector} from 'react-redux';
 import {MemoryRouter as Router, NavLink} from 'react-router-dom';
 import * as _ from 'lodash';
 
-import {BrowserScroll, Icon, RouterSwitchComponent} from './components';
+import {
+  BrowserNavigation,
+  BrowserScroll,
+  Icon,
+  RouterSwitchComponent,
+  MediaSessionComponent,
+  MediaPlayerRibbonComponent,
+} from './components';
+
 import {IAppStatePersistor} from './interfaces';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
-
-import * as AppComponents from './components';
 
 import statePersistors from './persistors';
 import store from './store';
@@ -46,10 +52,10 @@ function AppContentHeaderPage() {
 function AppContentHeader() {
   return (
     <div className={cx('app-content-header-container')}>
-      <AppComponents.MediaContentHeaderNavigatorComponent/>
+      <BrowserNavigation/>
       <AppContentHeaderPage/>
       {/* TODO: Add back MediaContentHeaderUserComponent once implemented */}
-      {/* <AppComponents.MediaContentHeaderUserComponent/> */}
+      {/* <MediaContentHeaderUserComponent/> */}
     </div>
   );
 }
@@ -174,8 +180,8 @@ function AppMediaPlayer() {
       active: !!mediaPlaybackCurrentMediaTrack,
     })}
     >
-      <AppComponents.MediaSessionComponent/>
-      <AppComponents.MediaPlayerRibbonComponent/>
+      <MediaSessionComponent/>
+      <MediaPlayerRibbonComponent/>
     </div>
   );
 }

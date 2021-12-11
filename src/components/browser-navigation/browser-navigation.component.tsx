@@ -7,7 +7,7 @@ import {Icons} from '../../constants';
 import {AppBrowserHistory} from '../../types';
 import {Icon} from '../icon/icon.component';
 
-import styles from './media-content-header-navigator.component.css';
+import styles from './browser-navigation.component.css';
 
 const cx = classNames.bind(styles);
 
@@ -26,7 +26,7 @@ const NavigationIcon = {
   [NavigationDirection.Forward]: Icons.NavigationForward,
 };
 
-function MediaContentNavigateButton(props: {
+function BrowserNavigationButton(props: {
   direction: NavigationDirection,
 }) {
   const {
@@ -56,7 +56,7 @@ function MediaContentNavigateButton(props: {
     <button
       disabled={navigationIsDisabled}
       type="button"
-      className={cx('media-content-navigate-button', {
+      className={cx('browser-navigation-button', {
         disabled: navigationIsDisabled,
       })}
       onClick={() => {
@@ -68,11 +68,11 @@ function MediaContentNavigateButton(props: {
   );
 }
 
-export function MediaContentHeaderNavigatorComponent() {
+export function BrowserNavigation() {
   return (
-    <div className={cx('media-content-navigator')}>
-      <MediaContentNavigateButton direction={NavigationDirection.Back}/>
-      <MediaContentNavigateButton direction={NavigationDirection.Forward}/>
+    <div className={cx('browser-navigation')}>
+      <BrowserNavigationButton direction={NavigationDirection.Back}/>
+      <BrowserNavigationButton direction={NavigationDirection.Forward}/>
     </div>
   );
 }
