@@ -126,35 +126,37 @@ export function MediaTrackComponent(props: {
   };
 
   return (
-    <div className={cx('col-12 mb-3', 'media-track')} onContextMenu={handleOnContextMenu} {...mediaTrackAriaProps}>
-      <div className="row">
-        <div className={cx('col-10', 'media-track-main-column')}>
-          <div className={cx('media-track-section')}>
-            <MediaTrackActionButton
-              mediaTrack={mediaTrack}
-              isPlaying={isPlaying}
-              handleOnPlayButtonClick={handleOnPlayButtonClick}
-            />
-          </div>
-          {showCover && (
+    <div className={cx('col-12 mb-3')} onContextMenu={handleOnContextMenu}>
+      <div className={cx('media-track')} {...mediaTrackAriaProps}>
+        <div className="row">
+          <div className={cx('col-10', 'media-track-main-column')}>
             <div className={cx('media-track-section')}>
-              <MediaCoverPictureComponent
-                mediaPicture={mediaTrack.track_cover_picture}
-                mediaPictureAltText={mediaTrack.track_name}
-                className={cx('media-track-cover')}
+              <MediaTrackActionButton
+                mediaTrack={mediaTrack}
+                isPlaying={isPlaying}
+                handleOnPlayButtonClick={handleOnPlayButtonClick}
               />
             </div>
-          )}
-          <div className={cx('media-track-section')}>
-            <MediaTrackInfoComponent
-              mediaTrack={mediaTrack}
-              className={cx('media-track-info')}
-            />
+            {showCover && (
+              <div className={cx('media-track-section')}>
+                <MediaCoverPictureComponent
+                  mediaPicture={mediaTrack.track_cover_picture}
+                  mediaPictureAltText={mediaTrack.track_name}
+                  className={cx('media-track-cover')}
+                />
+              </div>
+            )}
+            <div className={cx('media-track-section')}>
+              <MediaTrackInfoComponent
+                mediaTrack={mediaTrack}
+                className={cx('media-track-info')}
+              />
+            </div>
           </div>
-        </div>
-        <div className={cx('col-2', 'media-track-side-column')}>
-          <div className={cx('media-track-duration')}>
-            {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
+          <div className={cx('col-2', 'media-track-side-column')}>
+            <div className={cx('media-track-duration')}>
+              {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
+            </div>
           </div>
         </div>
       </div>
