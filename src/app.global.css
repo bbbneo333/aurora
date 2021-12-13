@@ -40,6 +40,10 @@
   --selectable-hovered-bg-color: #353535;
 }
 
+body {
+  user-select: none;
+}
+
 /*overlay using as a title bar*/
 
 #title-bar-overlay {

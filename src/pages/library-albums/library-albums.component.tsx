@@ -8,7 +8,7 @@ export function LibraryAlbumsComponent() {
   const {mediaAlbums} = useSelector((state: RootState) => state.mediaLibrary);
 
   return (
-    <div className="container">
+    <div className="container-fluid">
       <div className="row">
         {mediaAlbums.map(mediaAlbum => (
           <MediaAlbumTile

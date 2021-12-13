@@ -39,41 +39,39 @@ export function LibraryAlbumComponent() {
   }
 
   return (
-    <div className={cx('library-album')}>
-      <div className="container-fluid">
-        <div className={cx('library-album-header')}>
-          <div className="row">
-            <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
-              <MediaCoverPictureComponent
-                mediaPicture={mediaSelectedAlbum.album_cover_picture}
-                mediaPictureAltText={mediaSelectedAlbum.album_name}
-                className={cx('library-album-cover-picture')}
-              />
+    <div className="container-fluid">
+      <div className={cx('library-album-header')}>
+        <div className="row">
+          <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
+            <MediaCoverPictureComponent
+              mediaPicture={mediaSelectedAlbum.album_cover_picture}
+              mediaPictureAltText={mediaSelectedAlbum.album_name}
+              className={cx('library-album-cover-picture')}
+            />
+          </div>
+          <div className={cx(Layout.Grid.LibraryAlbumHeaderInfoColumn, 'library-album-header-info-column')}>
+            <div className={cx('library-album-header-label')}>
+              {I18nService.getString('label_library_album_header')}
             </div>
-            <div className={cx(Layout.Grid.LibraryAlbumHeaderInfoColumn, 'library-album-header-info-column')}>
-              <div className={cx('library-album-header-label')}>
-                {I18nService.getString('label_library_album_header')}
-              </div>
-              <div className={cx('library-album-header-name')}>
-                {mediaSelectedAlbum.album_name}
-              </div>
-              <div className={cx('library-album-header-info')}>
-                <MediaTrackArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
-              </div>
+            <div className={cx('library-album-header-name')}>
+              {mediaSelectedAlbum.album_name}
+            </div>
+            <div className={cx('library-album-header-info')}>
+              <MediaTrackArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
             </div>
           </div>
         </div>
-        <div className={cx('library-album-actions')}/>
-        <div className={cx('library-album-tracklist')}>
-          <MediaTrackListComponent
-            mediaTracks={mediaSelectedAlbumTracks}
-            mediaTrackList={{
-              id: mediaSelectedAlbum.id,
-            }}
-            showCovers={false}
-          />
-          <MediaAlbumTrackContextMenu mediaAlbum={mediaSelectedAlbum}/>
-        </div>
+      </div>
+      <div className={cx('library-album-actions')}/>
+      <div className={cx('library-album-tracklist')}>
+        <MediaTrackListComponent
+          mediaTracks={mediaSelectedAlbumTracks}
+          mediaTrackList={{
+            id: mediaSelectedAlbum.id,
+          }}
+          showCovers={false}
+        />
+        <MediaAlbumTrackContextMenu mediaAlbum={mediaSelectedAlbum}/>
       </div>
     </div>
   );

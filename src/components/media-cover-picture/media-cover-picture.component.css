@@ -5,6 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
 }
 
 .media-cover-picture > img {
