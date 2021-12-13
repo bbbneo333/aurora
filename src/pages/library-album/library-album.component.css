@@ -22,8 +22,7 @@
 }
 
 .library-album-header-name {
-  font-size: 54px;
-  line-height: 60px;
+  font-size: 36px;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
