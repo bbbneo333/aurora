@@ -122,9 +122,7 @@ function AppSidebarNavigationList() {
 
 function AppSidebarBrandingLogo() {
   return (
-    // TODO: Add app logo / branding here
-    // <div className={cx('app-sidebar-logo')}/>
-    <></>
+    <div className={cx('app-sidebar-logo')}/>
   );
 }
 

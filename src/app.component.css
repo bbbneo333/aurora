@@ -52,6 +52,7 @@
   background-size: contain;
   width: 100%;
   height: 45px;
+  margin-bottom: 10px;
   background-repeat: no-repeat;
   background-position: center;
 }
