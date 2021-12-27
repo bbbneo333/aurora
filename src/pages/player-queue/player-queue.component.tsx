@@ -67,10 +67,11 @@ export function PlayerQueueComponent() {
                 {I18nService.getString('label_player_queue_upcoming_tracks')}
               </div>
               <div className={cx('player-queue-section-content')}>
-                {mediaPlaybackUpcomingTracks.map(mediaTrack => (
+                {mediaPlaybackUpcomingTracks.map((mediaTrack, mediaTrackPointer) => (
                   <MediaTrackComponent
                     key={mediaTrack.id}
                     mediaTrack={mediaTrack}
+                    mediaTrackPointer={mediaTrackPointer}
                     handleOnPlayButtonClick={() => {
                       MediaPlayerService.playMediaTrackFromQueue(mediaTrack);
                     }}

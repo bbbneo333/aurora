@@ -22,11 +22,13 @@ const cx = classNames.bind(styles);
 
 function MediaTrackActionButton(props: {
   mediaTrack: IMediaTrack,
+  mediaTrackPointer?: number,
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
 }) {
   const {
     mediaTrack,
+    mediaTrackPointer,
     handleOnPlayButtonClick,
     isPlaying,
   } = props;
@@ -45,13 +47,19 @@ function MediaTrackActionButton(props: {
     if (handleOnPlayButtonClick) {
       handleOnPlayButtonClick();
     } else if (!_.isEmpty(mediaTracks)) {
-      MediaPlayerService.playMediaTrackFromList(mediaTracks, mediaTrack.id, mediaTrackList);
+      // when playing from a list, media track pointer is required to be provided
+      if (_.isNil(mediaTrackPointer)) {
+        throw new Error('MediaTrackActionButton encountered error while playing track - MediaTrack pointer was not provided');
+      }
+
+      MediaPlayerService.playMediaTrackFromList(mediaTracks, mediaTrackPointer, mediaTrackList);
     } else {
       MediaPlayerService.playMediaTrack(mediaTrack);
     }
   }, [
     handleOnPlayButtonClick,
     mediaTrack,
+    mediaTrackPointer,
     mediaTracks,
     mediaTrackList,
   ]);

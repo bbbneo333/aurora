@@ -64,7 +64,7 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
 
       return mediaTracksDeserialized;
     }, []);
-    MediaPlayerService.loadMediaQueueTracksToQueue(mediaQueueTracks, mediaPlaybackCurrentTrackList);
+    MediaPlayerService.loadMediaQueueTracks(mediaQueueTracks, mediaPlaybackCurrentTrackList);
 
     // load current playing track
     if (mediaPlaybackCurrentMediaTrack) {
