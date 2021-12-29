@@ -69,7 +69,7 @@ export function PlayerQueueComponent() {
               <div className={cx('player-queue-section-content')}>
                 {mediaPlaybackUpcomingTracks.map((mediaTrack, mediaTrackPointer) => (
                   <MediaTrackComponent
-                    key={mediaTrack.id}
+                    key={mediaTrack.queue_entry_id}
                     mediaTrack={mediaTrack}
                     mediaTrackPointer={mediaTrackPointer}
                     handleOnPlayButtonClick={() => {

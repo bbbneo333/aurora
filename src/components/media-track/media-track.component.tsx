@@ -141,6 +141,7 @@ export function MediaTrackComponent(props: {
             <div className={cx('media-track-section')}>
               <MediaTrackActionButton
                 mediaTrack={mediaTrack}
+                mediaTrackPointer={mediaTrackPointer}
                 isPlaying={isPlaying}
                 handleOnPlayButtonClick={handleOnPlayButtonClick}
               />

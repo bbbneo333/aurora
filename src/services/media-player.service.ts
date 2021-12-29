@@ -153,11 +153,21 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaQueueTrack);
   }
 
-  // addMediaTrackToQueue(mediaTrack: IMediaTrack) {
-  //   // TODO: Add support
-  // }
+  addMediaTrackToQueue(mediaTrack: IMediaTrack): void {
+    const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);
 
-  loadMediaTrack(mediaQueueTrack: IMediaTrack): IMediaPlayback {
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.AddTrack,
+      data: {
+        mediaTrack: mediaQueueTrack,
+      },
+    });
+
+    // TODO: Add support for sending notification
+    //  "Track was added to the queue"
+  }
+
+  loadMediaTrack(mediaQueueTrack: IMediaQueueTrack): IMediaPlayback {
     const {
       mediaPlayer,
     } = store.getState();
@@ -183,7 +193,7 @@ class MediaPlayerService {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.LoadTrack,
       data: {
-        mediaTrackId: mediaQueueTrack.id,
+        mediaQueueTrackEntryId: mediaQueueTrack.queue_entry_id,
         mediaPlayingInstance: mediaPlayback,
       },
     });
@@ -477,12 +487,7 @@ class MediaPlayerService {
   }
 
   private loadMediaTrackToQueue(mediaTrack: IMediaTrack): IMediaQueueTrack {
-    const mediaQueueTrack = {
-      ...mediaTrack,
-      tracklist_id: mediaTrack.track_album.id,
-      queue_entry_id: StringUtils.generateId(),
-      queue_insertion_index: 0,
-    };
+    const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);
 
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.SetTrack,
@@ -503,12 +508,10 @@ class MediaPlayerService {
       mediaPlaybackQueueOnShuffle,
     } = mediaPlayer;
 
-    const mediaQueueTracksForTrackList = mediaTracks.map((mediaTrack, mediaTrackPointer) => ({
-      ...mediaTrack,
-      tracklist_id: mediaTrackList ? mediaTrackList.id : mediaTrack.track_album.id,
-      queue_entry_id: StringUtils.generateId(),
-      queue_insertion_index: mediaTrackPointer,
-    }));
+    const mediaQueueTracksForTrackList = mediaTracks.map((
+      mediaTrack,
+      mediaTrackPointer,
+    ) => this.getMediaQueueTrack(mediaTrack, mediaTrackPointer, mediaTrackList));
 
     const mediaQueueTracks = mediaPlaybackQueueOnShuffle
       ? this.getShuffledMediaTracks(mediaQueueTracksForTrackList)
@@ -517,6 +520,15 @@ class MediaPlayerService {
     this.loadMediaQueueTracks(mediaQueueTracks, mediaTrackList);
 
     return mediaQueueTracks;
+  }
+
+  private getMediaQueueTrack(mediaTrack: IMediaTrack, mediaTrackPointer?: number, mediaTrackList?: IMediaTrackList): IMediaQueueTrack {
+    return {
+      ...mediaTrack,
+      tracklist_id: mediaTrackList ? mediaTrackList.id : mediaTrack.track_album.id,
+      queue_entry_id: StringUtils.generateId(),
+      queue_insertion_index: _.isNil(mediaTrackPointer) ? 0 : mediaTrackPointer,
+    };
   }
 
   private loadAndPlayMediaTrack(mediaQueueTrack?: IMediaQueueTrack): void {
@@ -778,7 +790,10 @@ class MediaPlayerService {
 
     let mediaTrack;
     if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
-      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, track => track.id === mediaPlaybackCurrentMediaTrack.id);
+      const mediaCurrentTrackPointer = _.findIndex(
+        mediaTracks,
+        track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id,
+      );
       if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer > 0) {
         mediaTrack = mediaTracks[mediaCurrentTrackPointer - 1];
       }
@@ -813,7 +828,10 @@ class MediaPlayerService {
 
     let mediaTrack;
     if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
-      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, track => track.id === mediaPlaybackCurrentMediaTrack.id);
+      const mediaCurrentTrackPointer = _.findIndex(
+        mediaTracks,
+        track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id,
+      );
       if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer < mediaTracks.length - 1) {
         mediaTrack = mediaTracks[mediaCurrentTrackPointer + 1];
       }
