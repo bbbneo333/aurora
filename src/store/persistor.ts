@@ -50,7 +50,8 @@ async function loadAndStateForPersistors(state: RootState) {
 
       if (stateValue) {
         debug('exhausting state - %s - %o', stateKey, stateValue);
-        await statePersistor.exhaust(stateValue);
+        const stateExisting = state[stateKey];
+        await statePersistor.exhaust(stateExisting, stateValue);
       }
     }
   });

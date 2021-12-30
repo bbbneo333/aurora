@@ -39,5 +39,5 @@ export interface IAppModule {
 export interface IAppStatePersistor {
   serialize?: (state: any) => Promise<any>,
   deserialize?: (state: any) => Promise<any>,
-  exhaust: (state: any) => Promise<any>,
+  exhaust: (stateExisting: any, stateStored: any) => Promise<any>,
 }
