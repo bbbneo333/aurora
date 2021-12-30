@@ -66,9 +66,9 @@ class App implements IAppMain {
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
   private readonly windowWidth = 1024;
-  private readonly windowHeight = 780;
+  private readonly windowHeight = 642;
   private readonly windowMinWidth = 1024;
-  private readonly windowMinHeight = 620;
+  private readonly windowMinHeight = 642;
   private readonly dataPath: string;
 
   constructor() {
