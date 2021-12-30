@@ -22,8 +22,6 @@ export enum MediaLibraryActions {
 export enum MediaPlayerActions {
   SetTrack = 'media/player/setTrack',
   SetTracks = 'media/player/setTracks',
-  AddTrack = 'media/player/addTrack',
-  RemoveTrack = 'media/player/removeTrack',
   LoadTrack = 'media/player/loadTrack',
   LoadingTrack = 'media/player/loadingTrack',
   Play = 'media/player/play',

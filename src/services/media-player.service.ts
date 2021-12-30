@@ -154,15 +154,63 @@ class MediaPlayerService {
   }
 
   addMediaTrackToQueue(mediaTrack: IMediaTrack): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentMediaTrack,
+      mediaTrackLastInsertedQueueId,
+    } = mediaPlayer;
+
     const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);
 
+    // #1 - determine the track after which the new track will be inserted
+    // by default, it will get inserted at start of the list
+    // if mediaTrackLastInsertedQueueId is present, track will be inserted after that track
+    // otherwise, if mediaPlaybackCurrentMediaTrack is present, track will be inserted after that track
+    let mediaTrackExistingPointer;
+    if (mediaTrackLastInsertedQueueId) {
+      mediaTrackExistingPointer = _.findIndex(mediaTracks, track => track.queue_entry_id === mediaTrackLastInsertedQueueId);
+    } else if (mediaPlaybackCurrentMediaTrack) {
+      mediaTrackExistingPointer = _.findIndex(mediaTracks, track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id);
+    }
+
+    // #2 - update the queue_insertion_index for the new track with that of obtained track
+    // this will be a simple increment as we are inserting it after the obtained track
+    let mediaTrackInsertPointer = 0;
+    if (!_.isNil(mediaTrackExistingPointer)) {
+      mediaTrackInsertPointer = mediaTrackExistingPointer + 1;
+
+      const mediaTrackExisting = mediaTracks[mediaTrackExistingPointer];
+      mediaQueueTrack.queue_insertion_index = mediaTrackExisting.queue_insertion_index + 1;
+    }
+
+    // #3 - insert the new track from the obtained pointer
+    mediaTracks.splice(mediaTrackInsertPointer, 0, mediaQueueTrack);
+
+    // #4 - update the queue_insertion_index for all the subsequent tracks in queue
+    // this is as well is going to be a simple increment over the previous value as have inserted only one track
+    for (let mediaTrackPointer = mediaTrackInsertPointer + 1; mediaTrackPointer < mediaTracks.length; mediaTrackPointer += 1) {
+      const mediaTrackFromQueue = mediaTracks[mediaTrackPointer];
+      if (mediaTrackFromQueue.queue_insertion_index >= mediaQueueTrack.queue_insertion_index) {
+        mediaTrackFromQueue.queue_insertion_index += 1;
+      }
+    }
+
+    // #5 - update state
+    // important to send the mediaTrackLastInsertedQueueId with that of track we inserted
+    // this is to keep track of the inserted track when we are inserting a new one in the list
     store.dispatch({
-      type: MediaEnums.MediaPlayerActions.AddTrack,
+      type: MediaEnums.MediaPlayerActions.SetTracks,
       data: {
-        mediaTrack: mediaQueueTrack,
+        mediaTracks,
+        mediaTrackLastInsertedQueueId: mediaQueueTrack.queue_entry_id,
       },
     });
 
+    // #6 - notify user
     // TODO: Add support for sending notification
     //  "Track was added to the queue"
   }

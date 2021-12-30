@@ -56,58 +56,22 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     }
     case MediaEnums.MediaPlayerActions.SetTracks: {
       // data.mediaTracks: IMediaQueueTrack[] - tracks which needs to be added
-      // data.mediaTrackList: MediaTrackList - tracklist from which media is being added
-      const {mediaTracks, mediaTrackList} = action.data;
-
-      return {
-        ...state,
-        mediaTracks,
-        mediaTrackLastInsertedQueueId: undefined,
-        mediaPlaybackCurrentTrackList: mediaTrackList,
-      };
-    }
-    case MediaEnums.MediaPlayerActions.AddTrack: {
-      // data.mediaTrack: IMediaQueueTrack - track which needs to be inserted
-      const {mediaTrack} = action.data;
-      if (!mediaTrack) {
-        throw new Error('MediaPlayerReducer encountered error at AddTrack - No media track was provided');
-      }
-
+      // data.mediaTrackList?: MediaTrackList - tracklist from which media is being added
+      // data.mediaTrackLastInsertedQueueId?: string - optional track queue id can be provided which keeps track of
+      // last inserted item in the queue
+      // important - if not provided, mediaTrackList will be reset
+      // important - if not provided, mediaTrackLastInsertedQueueId will be reset
       const {
         mediaTracks,
-        mediaPlaybackCurrentMediaTrack,
+        mediaTrackList,
         mediaTrackLastInsertedQueueId,
-      } = state;
-
-      // determine where media track will get inserted
-      // by default, it will get inserted at the end of the list
-      // if mediaTrackLastInsertedQueueId is present, track will be inserted after that track
-      // otherwise, if mediaPlaybackCurrentMediaTrack is present, track will be inserted after that track
-      let mediaTrackExistingPointer;
-      let mediaTrackInsertPointer = mediaTracks.length - 1;
-
-      if (mediaTrackLastInsertedQueueId) {
-        mediaTrackExistingPointer = _.findIndex(mediaTracks, track => track.queue_entry_id === mediaTrackLastInsertedQueueId);
-      } else if (mediaPlaybackCurrentMediaTrack) {
-        mediaTrackExistingPointer = _.findIndex(mediaTracks, track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id);
-      }
-      if (!_.isNil(mediaTrackExistingPointer)) {
-        mediaTrackInsertPointer = mediaTrackExistingPointer + 1;
-      }
-
-      mediaTracks.splice(mediaTrackInsertPointer, 0, mediaTrack);
+      } = action.data;
 
       return {
         ...state,
         mediaTracks,
-        mediaTrackLastInsertedQueueId: mediaTrack.queue_entry_id,
-      };
-    }
-    case MediaEnums.MediaPlayerActions.RemoveTrack: {
-      // data.mediaTrackId: String - track's id which needs to be removed
-      return {
-        ...state,
-        mediaTracks: _.filter(state.mediaTracks, mediaTrack => mediaTrack.id !== action.data.mediaTrackId),
+        mediaTrackLastInsertedQueueId,
+        mediaPlaybackCurrentTrackList: mediaTrackList,
       };
     }
     case MediaEnums.MediaPlayerActions.LoadingTrack: {
