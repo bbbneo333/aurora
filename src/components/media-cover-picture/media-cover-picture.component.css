@@ -26,6 +26,8 @@
   align-items: center;
   justify-content: center;
   float: left;
+  width: inherit;
+  height: inherit;
 }
 
 .media-cover-placeholder-icon {
