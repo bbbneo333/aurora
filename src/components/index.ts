@@ -1,7 +1,6 @@
 export {BrowserNavigation} from './browser-navigation/browser-navigation.component';
 export {BrowserScroll} from './browser-scroll/browser-scroll.component';
 export {Icon} from './icon/icon.component';
-export {MediaAlbumTrackContextMenu} from './media-album-track-context-menu/media-album-track-context-menu.component';
 export {MediaAlbumTile} from './media-album-tile/media-album-tile.component';
 export {MediaButtonComponent} from './media-button/media-button.component';
 export {MediaContentHeaderUserComponent} from './media-content-header-user/media-content-header-user.component';
@@ -10,6 +9,7 @@ export {MediaPlayerRibbonComponent} from './media-player-ribbon/media-player-rib
 export {MediaProgressBarComponent} from './media-progress-bar/media-progress-bar.component';
 export {MediaSessionComponent} from './media-session/media-session.component';
 export {MediaTrackComponent} from './media-track/media-track.component';
+export {MediaTrackContextMenu} from './media-track-context-menu/media-track-context-menu.component';
 export {MediaTrackListComponent} from './media-track-list/media-track-list.component';
 export {MediaTrackInfoComponent, MediaTrackArtistLinkComponent} from './media-track-info/media-track-info.component';
 export {MediaCoverPictureComponent} from './media-cover-picture/media-cover-picture.component';

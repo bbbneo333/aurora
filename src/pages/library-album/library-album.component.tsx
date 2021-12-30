@@ -4,12 +4,13 @@ import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 
 import {
-  MediaAlbumTrackContextMenu,
   MediaCoverPictureComponent,
   MediaTrackArtistLinkComponent,
+  MediaTrackContextMenu,
   MediaTrackListComponent,
 } from '../../components';
 
+import {MediaTrackContextMenuItem} from '../../components/media-track-context-menu/media-track-context-menu.component';
 import {Layout} from '../../constants';
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService} from '../../services';
@@ -17,6 +18,10 @@ import {I18nService, MediaLibraryService} from '../../services';
 import styles from './library-album.component.css';
 
 const cx = classNames.bind(styles);
+
+enum MediaContextMenus {
+  AlbumTrack = 'media_queue_album_track_context_menu',
+}
 
 export function LibraryAlbumComponent() {
   const {
@@ -69,9 +74,18 @@ export function LibraryAlbumComponent() {
           mediaTrackList={{
             id: mediaSelectedAlbum.id,
           }}
+          mediaTrackContextMenuId={MediaContextMenus.AlbumTrack}
           showCovers={false}
         />
-        <MediaAlbumTrackContextMenu mediaAlbum={mediaSelectedAlbum}/>
+        <MediaTrackContextMenu
+          id={MediaContextMenus.AlbumTrack}
+          menuItems={[
+            MediaTrackContextMenuItem.AddToQueue,
+            MediaTrackContextMenuItem.Separator,
+            MediaTrackContextMenuItem.AddToLikedSongs,
+            MediaTrackContextMenuItem.AddToPlaylist,
+          ]}
+        />
       </div>
     </div>
   );

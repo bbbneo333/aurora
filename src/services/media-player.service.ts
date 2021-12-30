@@ -160,6 +160,7 @@ class MediaPlayerService {
 
     const {
       mediaTracks,
+      mediaPlaybackCurrentTrackList,
       mediaPlaybackCurrentMediaTrack,
       mediaTrackLastInsertedQueueId,
     } = mediaPlayer;
@@ -200,12 +201,16 @@ class MediaPlayerService {
     }
 
     // #5 - update state
-    // important to send the mediaTrackLastInsertedQueueId with that of track we inserted
-    // this is to keep track of the inserted track when we are inserting a new one in the list
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.SetTracks,
       data: {
         mediaTracks,
+        // important - adding a track outside current tracklist will reset it
+        mediaTrackList: mediaPlaybackCurrentTrackList && mediaPlaybackCurrentTrackList.id === mediaQueueTrack.tracklist_id
+          ? mediaPlaybackCurrentTrackList
+          : undefined,
+        // important to send the mediaTrackLastInsertedQueueId with that of track we inserted
+        // this is to keep track of the inserted track when we are inserting a new one in the list
         mediaTrackLastInsertedQueueId: mediaQueueTrack.queue_entry_id,
       },
     });
@@ -213,6 +218,45 @@ class MediaPlayerService {
     // #6 - notify user
     // TODO: Add support for sending notification
     //  "Track was added to the queue"
+  }
+
+  removeMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentTrackList,
+    } = mediaPlayer;
+
+    // #1 - determine the position from where the track needs to be removed
+    const mediaQueueTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaQueueTrack.queue_entry_id);
+    if (_.isNil(mediaQueueTrackPointer)) {
+      throw new Error('MediaPlayerService encountered error at removeMediaTrackFromQueue - Provided media track was not found in the list');
+    }
+
+    // #2 - remove track from the list using the obtained position
+    _.pullAt(mediaTracks, mediaQueueTrackPointer);
+
+    // #3 - update the queue_insertion_index for all the subsequent tracks in queue
+    // this is as well is going to be a simple decrement over the previous value as have removed only one track
+    for (let mediaTrackPointer = 0; mediaTrackPointer < mediaTracks.length; mediaTrackPointer += 1) {
+      const mediaTrackFromQueue = mediaTracks[mediaTrackPointer];
+      if (mediaTrackFromQueue.queue_insertion_index >= mediaQueueTrack.queue_insertion_index) {
+        mediaTrackFromQueue.queue_insertion_index -= 1;
+      }
+    }
+
+    // #4 - update state
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks,
+        // important - retain existing tracklist when removing tracks
+        mediaTrackList: mediaPlaybackCurrentTrackList,
+      },
+    });
   }
 
   loadMediaTrack(mediaQueueTrack: IMediaQueueTrack): IMediaPlayback {

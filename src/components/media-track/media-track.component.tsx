@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import * as _ from 'lodash';
 import {useContextMenu} from 'react-contexify';
 
-import {ContextMenus, Icons} from '../../constants';
+import {Icons} from '../../constants';
 import {useMediaTrackList} from '../../contexts';
 import {MediaEnums} from '../../enums';
 import {IMediaTrack} from '../../interfaces';
@@ -99,6 +99,7 @@ function MediaTrackActionButton(props: {
 export function MediaTrackComponent(props: {
   mediaTrack: IMediaTrack,
   mediaTrackPointer?: number,
+  mediaTrackContextMenuId?: string;
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
   showCover?: boolean,
@@ -106,6 +107,7 @@ export function MediaTrackComponent(props: {
   const {
     mediaTrack,
     mediaTrackPointer,
+    mediaTrackContextMenuId,
     handleOnPlayButtonClick,
     isPlaying,
     showCover = true,
@@ -114,15 +116,21 @@ export function MediaTrackComponent(props: {
   const {show} = useContextMenu();
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
-    show(e, {
-      id: ContextMenus.MediaTrack,
-      props: {
-        mediaTrack,
-      },
-    });
+    if (mediaTrackContextMenuId) {
+      show(e, {
+        id: mediaTrackContextMenuId,
+        props: {
+          mediaTrack,
+          // important - this component is also used for media queue tracks, in order to support actions for the same
+          // we are supplying value for mediaQueueTrack as well
+          mediaQueueTrack: mediaTrack,
+        },
+      });
+    }
   }, [
     show,
     mediaTrack,
+    mediaTrackContextMenuId,
   ]);
 
   // mediaTrackPointer can be used for providing position for a MediaTrack within a list

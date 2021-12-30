@@ -13,11 +13,13 @@ import {MediaTrackComponent} from '../media-track/media-track.component';
 export function MediaTrackListComponent(props: {
   mediaTracks: IMediaTrack[],
   mediaTrackList?: IMediaTrackList,
+  mediaTrackContextMenuId?: string;
   showCovers?: boolean,
 }) {
   const {
     mediaTracks,
     mediaTrackList,
+    mediaTrackContextMenuId,
     showCovers = true,
   } = props;
 
@@ -32,6 +34,7 @@ export function MediaTrackListComponent(props: {
             key={mediaTrack.id}
             mediaTrack={mediaTrack}
             mediaTrackPointer={mediaTrackPointer}
+            mediaTrackContextMenuId={mediaTrackContextMenuId}
             showCover={showCovers}
           />
         ))}
