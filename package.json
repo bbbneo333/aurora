@@ -217,10 +217,10 @@
     "tiny-typed-emitter": "^2.0.3",
     "uuid": "^8.2.0"
   },
-  "devEngines": {
-    "node": ">=10.x",
-    "npm": ">=6.x",
-    "yarn": ">=1.21.3"
+  "engines": {
+    "node": "^15.14.0",
+    "npm": "^7.7.6",
+    "yarn": "^1.22.17"
   },
   "browserslist": [],
   "husky": {
