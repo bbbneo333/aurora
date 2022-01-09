@@ -44,8 +44,8 @@ export function MediaTrackContextMenu(props: {
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
     const itemAction: MediaTrackContextMenuItemAction = itemParams.event.currentTarget.id as MediaTrackContextMenuItemAction;
 
-    const mediaTrack: IMediaTrack | undefined = itemParams.props?.mediaTrack;
-    const mediaQueueTrack: IMediaQueueTrack | undefined = itemParams.props?.mediaQueueTrack;
+    const mediaTrack: IMediaTrack|undefined = itemParams.props?.mediaTrack;
+    const mediaQueueTrack: IMediaQueueTrack|undefined = itemParams.props?.mediaQueueTrack;
 
     switch (itemAction) {
       case MediaTrackContextMenuItemAction.AddToQueue:
@@ -67,12 +67,12 @@ export function MediaTrackContextMenu(props: {
 
   return (
     <Menu id={id} animation={animation.fade}>
-      {menuItems.map((menuItem) => {
+      {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaTrackContextMenuItem.AddToQueue:
             return (
               <Item
-                key={MediaTrackContextMenuItemAction.AddToQueue}
+                key={MediaTrackContextMenuItem.AddToQueue}
                 id={MediaTrackContextMenuItemAction.AddToQueue}
                 onClick={handleMenuItemClick}
               >
@@ -82,7 +82,7 @@ export function MediaTrackContextMenu(props: {
           case MediaTrackContextMenuItem.RemoveFromQueue:
             return (
               <Item
-                key={MediaTrackContextMenuItemAction.RemoveFromQueue}
+                key={MediaTrackContextMenuItem.RemoveFromQueue}
                 id={MediaTrackContextMenuItemAction.RemoveFromQueue}
                 onClick={handleMenuItemClick}
               >
@@ -93,7 +93,7 @@ export function MediaTrackContextMenu(props: {
             return (
               <Item
                 disabled
-                key={MediaTrackContextMenuItemAction.AddToLikedSongs}
+                key={MediaTrackContextMenuItem.AddToLikedSongs}
                 id={MediaTrackContextMenuItemAction.AddToLikedSongs}
                 onClick={handleMenuItemClick}
               >
@@ -104,7 +104,7 @@ export function MediaTrackContextMenu(props: {
             return (
               <Submenu
                 disabled
-                key={MediaTrackContextMenuItemAction.AddToPlaylist}
+                key={MediaTrackContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_track_add_to_playlist')}
               >
                 {/* <Item id={MediaTrackContextMenuItemAction.AddToPlaylist} onClick={handleMenuItemClick}> */}
@@ -113,7 +113,8 @@ export function MediaTrackContextMenu(props: {
             );
           case MediaTrackContextMenuItem.Separator: {
             return (
-              <MenuSeparator/>
+              // eslint-disable-next-line react/no-array-index-key
+              <MenuSeparator key={`${MediaTrackContextMenuItem.Separator}-${menuItemPointer}`}/>
             );
           }
           default:
