@@ -108,6 +108,7 @@ class MediaPlayerService {
       mediaPlaybackCurrentMediaTrack,
       mediaPlaybackCurrentTrackList,
       mediaPlaybackCurrentPlayingInstance,
+      mediaPlaybackQueueOnShuffle,
     } = mediaPlayer;
 
     if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentPlayingInstance) {
@@ -125,10 +126,13 @@ class MediaPlayerService {
 
     // add tracks to the queue
     // important - setting tracks will remove all existing ones
-    const mediaQueueTracks = this.loadMediaTracksToQueue(mediaTracks, mediaTrackList);
+    // important - pass the pointer for the track whose position will be preserved in case shuffling is enabled
+    // in case shuffling is enabled, track to load will be on top of the list
+    const mediaQueueTracks = this.loadMediaTracksToQueue(mediaTracks, mediaTrackList, mediaTrackPointer);
 
     // request media provider to load and play the track
-    this.loadAndPlayMediaTrack(mediaQueueTracks[mediaTrackPointer]);
+    const mediaQueueTrackToPlay = mediaPlaybackQueueOnShuffle ? mediaQueueTracks[0] : mediaQueueTracks[mediaTrackPointer];
+    this.loadAndPlayMediaTrack(mediaQueueTrackToPlay);
   }
 
   playMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack) {
@@ -594,7 +598,7 @@ class MediaPlayerService {
     return mediaQueueTrack;
   }
 
-  private loadMediaTracksToQueue(mediaTracks: IMediaTrack[], mediaTrackList?: IMediaTrackList): IMediaQueueTrack[] {
+  private loadMediaTracksToQueue(mediaTracks: IMediaTrack[], mediaTrackList?: IMediaTrackList, mediaTrackPointerToPreserve?: number): IMediaQueueTrack[] {
     const {
       mediaPlayer,
     } = store.getState();
@@ -608,9 +612,21 @@ class MediaPlayerService {
       mediaTrackPointer,
     ) => this.getMediaQueueTrack(mediaTrack, mediaTrackPointer, mediaTrackList));
 
-    const mediaQueueTracks = mediaPlaybackQueueOnShuffle
-      ? this.getShuffledMediaTracks(mediaQueueTracksForTrackList)
-      : this.getSortedMediaTracks(mediaQueueTracksForTrackList);
+    let mediaQueueTracks: IMediaQueueTrack[] = [];
+    if (mediaPlaybackQueueOnShuffle) {
+      // important - when mediaTrackPointerToPreserve is provided, only tracks other than this track
+      // are shuffled, this track is then stays on the top of the list
+      if (!_.isNil(mediaTrackPointerToPreserve)) {
+        const mediaTracksToShuffle = _.filter(mediaQueueTracksForTrackList, (_mediaTrack, mediaTrackPointer) => mediaTrackPointer !== mediaTrackPointerToPreserve);
+        const mediaTracksShuffled = this.getShuffledMediaTracks(mediaTracksToShuffle);
+
+        mediaQueueTracks = [mediaQueueTracksForTrackList[mediaTrackPointerToPreserve], ...mediaTracksShuffled];
+      } else {
+        mediaQueueTracks = this.getShuffledMediaTracks(mediaQueueTracksForTrackList);
+      }
+    } else {
+      mediaQueueTracks = this.getSortedMediaTracks(mediaQueueTracksForTrackList);
+    }
 
     this.loadMediaQueueTracks(mediaQueueTracks, mediaTrackList);
 
