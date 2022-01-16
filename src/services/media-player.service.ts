@@ -287,6 +287,9 @@ class MediaPlayerService {
       data: {
         mediaQueueTrackEntryId: mediaQueueTrack.queue_entry_id,
         mediaPlayingInstance: mediaPlayback,
+        // important - in order to prevent adding tracks to queue before the current playing track
+        // loading a track would always reset the last inserted track pointer
+        mediaTrackLastInsertedQueueId: undefined,
       },
     });
 
@@ -870,7 +873,7 @@ class MediaPlayerService {
     return true;
   }
 
-  private getPreviousFromList(): IMediaQueueTrack | undefined {
+  private getPreviousFromList(): IMediaQueueTrack|undefined {
     const {
       mediaPlayer,
     } = store.getState();
@@ -908,7 +911,7 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaTrack);
   }
 
-  private getNextFromList(): IMediaQueueTrack | undefined {
+  private getNextFromList(): IMediaQueueTrack|undefined {
     const {
       mediaPlayer,
     } = store.getState();
