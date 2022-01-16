@@ -25,6 +25,8 @@ export interface IAppMain {
   getModule<T>(type: new (data: any) => T): T;
 
   openPath(path: string): void;
+
+  removeAppData(): void;
 }
 
 export interface IAppBuilder {
@@ -37,5 +39,5 @@ export interface IAppModule {
 export interface IAppStatePersistor {
   serialize?: (state: any) => Promise<any>,
   deserialize?: (state: any) => Promise<any>,
-  exhaust: (state: any) => Promise<any>,
+  exhaust: (stateExisting: any, stateStored: any) => Promise<any>,
 }

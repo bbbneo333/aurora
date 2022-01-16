@@ -17,7 +17,7 @@ import {DatastoreModule} from '../modules';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
-  submenu?: DarwinMenuItemConstructorOptions[]|Menu;
+  submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
 export default class MenuBuilder implements IAppBuilder {
@@ -213,12 +213,17 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
+          label: 'Remove AppData and Reload',
+          click: () => {
+            this.removeAppData();
+            this.reloadApp();
+          },
+        },
+        {
           label: 'Remove DataStores and Reload',
           click: () => {
-            const datastore = this.app.getModule(DatastoreModule);
-
-            datastore.removeDatastores();
-            browserWindow.webContents.reload();
+            this.removeDataStores();
+            this.reloadApp();
           },
         },
         {
@@ -311,12 +316,17 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
+          label: 'Remove AppData and Reload',
+          click: () => {
+            this.removeAppData();
+            this.reloadApp();
+          },
+        },
+        {
           label: 'Remove DataStores and Reload',
           click: () => {
-            const datastore = this.app.getModule(DatastoreModule);
-
-            datastore.removeDatastores();
-            browserWindow.webContents.reload();
+            this.removeDataStores();
+            this.reloadApp();
           },
         },
         {
@@ -339,5 +349,19 @@ export default class MenuBuilder implements IAppBuilder {
     }
 
     return subMenuList;
+  }
+
+  private removeAppData() {
+    this.app.removeAppData();
+  }
+
+  private removeDataStores() {
+    const datastore = this.app.getModule(DatastoreModule);
+    datastore.removeDatastores();
+  }
+
+  private reloadApp() {
+    const browserWindow = this.app.getCurrentWindow();
+    browserWindow.webContents.reload();
   }
 }

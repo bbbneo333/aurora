@@ -1,16 +1,22 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
 import {Provider, useSelector} from 'react-redux';
 import {MemoryRouter as Router, NavLink} from 'react-router-dom';
 import * as _ from 'lodash';
 
-import {Icon, RouterSwitchComponent} from './components';
+import {
+  BrowserNavigation,
+  BrowserScroll,
+  Icon,
+  RouterSwitchComponent,
+  MediaSessionComponent,
+  MediaPlayerRibbonComponent,
+} from './components';
+
 import {IAppStatePersistor} from './interfaces';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
 import {I18nService, MediaProviderService} from './services';
-
-import * as AppComponents from './components';
 
 import statePersistors from './persistors';
 import store from './store';
@@ -46,17 +52,20 @@ function AppContentHeaderPage() {
 function AppContentHeader() {
   return (
     <div className={cx('app-content-header-container')}>
-      <AppComponents.MediaContentHeaderNavigatorComponent/>
+      <BrowserNavigation/>
       <AppContentHeaderPage/>
       {/* TODO: Add back MediaContentHeaderUserComponent once implemented */}
-      {/* <AppComponents.MediaContentHeaderUserComponent/> */}
+      {/* <MediaContentHeaderUserComponent/> */}
     </div>
   );
 }
 
 function AppContentBrowser() {
+  const browserRef = useRef(null);
+
   return (
-    <div className={cx('app-content-browser-container', 'app-scrollable')}>
+    <div ref={browserRef} className={cx('app-content-browser-container', 'app-scrollable')}>
+      <BrowserScroll browserRef={browserRef}/>
       <RouterSwitchComponent routes={routes.main}/>
     </div>
   );
@@ -113,9 +122,7 @@ function AppSidebarNavigationList() {
 
 function AppSidebarBrandingLogo() {
   return (
-    // TODO: Add app logo / branding here
-    // <div className={cx('app-sidebar-logo')}/>
-    <></>
+    <div className={cx('app-sidebar-logo')}/>
   );
 }
 
@@ -171,8 +178,8 @@ function AppMediaPlayer() {
       active: !!mediaPlaybackCurrentMediaTrack,
     })}
     >
-      <AppComponents.MediaSessionComponent/>
-      <AppComponents.MediaPlayerRibbonComponent/>
+      <MediaSessionComponent/>
+      <MediaPlayerRibbonComponent/>
     </div>
   );
 }

@@ -2,15 +2,26 @@ import React, {useEffect} from 'react';
 import classNames from 'classnames/bind';
 import {useParams} from 'react-router-dom';
 import {useSelector} from 'react-redux';
-import * as _ from 'lodash';
 
-import {MediaCoverPictureComponent, MediaTrackArtistLinkComponent, MediaTrackListComponent} from '../../components';
+import {
+  MediaCoverPictureComponent,
+  MediaTrackArtistLinkComponent,
+  MediaTrackContextMenu,
+  MediaTrackListComponent,
+} from '../../components';
+
+import {MediaTrackContextMenuItem} from '../../components/media-track-context-menu/media-track-context-menu.component';
+import {Layout} from '../../constants';
 import {RootState} from '../../reducers';
 import {I18nService, MediaLibraryService} from '../../services';
 
 import styles from './library-album.component.css';
 
 const cx = classNames.bind(styles);
+
+enum MediaContextMenus {
+  AlbumTrack = 'media_queue_album_track_context_menu',
+}
 
 export function LibraryAlbumComponent() {
   const {
@@ -32,46 +43,49 @@ export function LibraryAlbumComponent() {
     return (<></>);
   }
 
-  const mediaAlbumHasCover = !_.isNil(mediaSelectedAlbum.album_cover_picture);
-  const mediaAlbumHeaderColumnWidth = mediaAlbumHasCover ? 'col-8' : 'col-12';
-
   return (
-    <div className={cx('library-album')}>
-      <div className="container-fluid">
-        <div className={cx('library-album-header')}>
-          <div className="row">
-            {mediaAlbumHasCover && (
-              <div className={cx('col-3', 'library-album-header-cover-column')}>
-                <MediaCoverPictureComponent
-                  mediaPicture={mediaSelectedAlbum.album_cover_picture}
-                  mediaPictureAltText={mediaSelectedAlbum.album_name}
-                  className={cx('library-album-cover-picture')}
-                />
-              </div>
-            )}
-            <div className={cx(mediaAlbumHeaderColumnWidth, 'library-album-header-info-column')}>
-              <div className={cx('library-album-header-label')}>
-                {I18nService.getString('label_library_album_header')}
-              </div>
-              <div className={cx('library-album-header-name')}>
-                {mediaSelectedAlbum.album_name}
-              </div>
-              <div className={cx('library-album-header-info')}>
-                <MediaTrackArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
-              </div>
+    <div className="container-fluid">
+      <div className={cx('library-album-header')}>
+        <div className="row">
+          <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
+            <MediaCoverPictureComponent
+              mediaPicture={mediaSelectedAlbum.album_cover_picture}
+              mediaPictureAltText={mediaSelectedAlbum.album_name}
+              className={cx('library-album-cover-picture')}
+            />
+          </div>
+          <div className={cx(Layout.Grid.LibraryAlbumHeaderInfoColumn, 'library-album-header-info-column')}>
+            <div className={cx('library-album-header-label')}>
+              {I18nService.getString('label_library_album_header')}
+            </div>
+            <div className={cx('library-album-header-name')}>
+              {mediaSelectedAlbum.album_name}
+            </div>
+            <div className={cx('library-album-header-info')}>
+              <MediaTrackArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
             </div>
           </div>
         </div>
-        <div className={cx('library-album-actions')}/>
-        <div className={cx('library-album-tracklist')}>
-          <MediaTrackListComponent
-            mediaTracks={mediaSelectedAlbumTracks}
-            mediaTrackList={{
-              id: mediaSelectedAlbum.id,
-            }}
-            showCovers={false}
-          />
-        </div>
+      </div>
+      <div className={cx('library-album-actions')}/>
+      <div className={cx('library-album-tracklist')}>
+        <MediaTrackListComponent
+          mediaTracks={mediaSelectedAlbumTracks}
+          mediaTrackList={{
+            id: mediaSelectedAlbum.id,
+          }}
+          mediaTrackContextMenuId={MediaContextMenus.AlbumTrack}
+          showCovers={false}
+        />
+        <MediaTrackContextMenu
+          id={MediaContextMenus.AlbumTrack}
+          menuItems={[
+            MediaTrackContextMenuItem.AddToQueue,
+            MediaTrackContextMenuItem.Separator,
+            MediaTrackContextMenuItem.AddToLikedSongs,
+            MediaTrackContextMenuItem.AddToPlaylist,
+          ]}
+        />
       </div>
     </div>
   );

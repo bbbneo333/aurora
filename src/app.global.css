@@ -4,6 +4,7 @@
  */
 @import '~@fortawesome/fontawesome-free/css/all.css';
 @import '~bootstrap/dist/css/bootstrap.css';
+@import '~react-contexify/dist/ReactContexify.css';
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
 
@@ -30,8 +31,20 @@
   --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
   --titlebar-overlay-height: 60px;
   --scrollable-scrollbar-width: 15px;
-  --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease;
+  --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;
+  /*v2*/
+  --context-menu-color: #b3b3b3;
+  --context-menu-bg-color: #282828;
+  --selectable-focused-bg-color: #3c3c3c;
+  --selectable-hovered-color: #fff;
+  --selectable-hovered-bg-color: #353535;
 }
+
+body {
+  user-select: none;
+}
+
+/*overlay using as a title bar*/
 
 #title-bar-overlay {
   width: 100%;
@@ -41,6 +54,8 @@
   -webkit-user-select: none;
   -webkit-app-region: drag;
 }
+
+/*scrollable*/
 
 .app-scrollable {
   overflow-y: scroll;
@@ -65,6 +80,41 @@
   background-clip: padding-box;
 }
 
+/*navigation link*/
+
 .app-nav-link {
   text-decoration: none;
+}
+
+/*context menu*/
+
+.react-contexify {
+  background-color: var(--context-menu-bg-color);
+  color: var(--context-menu-color);
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 14px;
+  box-shadow: 0 16px 24px rgb(0 0 0 / 30%), 0 6px 8px rgb(0 0 0 / 20%);
+}
+
+.react-contexify__item {
+  color: inherit;
+}
+
+.react-contexify__item__content {
+  color: inherit;
+  transition: var(--selectable-item-transition);
+  border-radius: 2px;
+  padding: 8px 16px;
+}
+
+.react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__item__content,
+.react-contexify__item:not(.react-contexify__item--disabled):focus > .react-contexify__item__content {
+  color: var(--selectable-hovered-color);
+  background-color: var(--selectable-hovered-bg-color);
+}
+
+.react-contexify__separator {
+  background-color: var(--selectable-hovered-bg-color);
+  margin: 0;
 }

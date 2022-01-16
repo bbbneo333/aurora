@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import {Col, Row} from 'react-bootstrap';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
@@ -19,29 +19,9 @@ const cx = classNames.bind(styles);
 export function MediaPlayerControls() {
   const {
     mediaPlaybackState,
-    mediaPlaybackCurrentMediaTrack,
-    mediaPlaybackCurrentMediaProgress,
     mediaPlaybackQueueOnShuffle,
     mediaPlaybackQueueRepeatType,
   } = useSelector((state: RootState) => state.mediaPlayer);
-
-  const handleOnMediaPlayPreviousButtonSubmit = useCallback(() => {
-    // if the track has progressed for more than 30% of it's duration
-    // or if we don't have any previous track in the queue
-    // we will be seeking current track to 0
-    // otherwise, we will be playing the next track
-    if ((mediaPlaybackCurrentMediaTrack
-        && mediaPlaybackCurrentMediaProgress
-        && ((mediaPlaybackCurrentMediaProgress / mediaPlaybackCurrentMediaTrack.track_duration) * 100) > 30)
-      || !MediaPlayerService.hasPreviousTrack()) {
-      MediaPlayerService.seekMediaTrack(0);
-    } else {
-      MediaPlayerService.playPreviousTrack();
-    }
-  }, [
-    mediaPlaybackCurrentMediaTrack,
-    mediaPlaybackCurrentMediaProgress,
-  ]);
 
   return (
     <Row className={cx('media-player-controls-container')}>
@@ -58,7 +38,9 @@ export function MediaPlayerControls() {
         </MediaButtonComponent>
         <MediaButtonComponent
           className={cx('media-player-control', 'media-player-control-md')}
-          onButtonSubmit={handleOnMediaPlayPreviousButtonSubmit}
+          onButtonSubmit={() => {
+            MediaPlayerService.playPreviousTrack();
+          }}
         >
           <Icon name={Icons.PlayerPrevious}/>
         </MediaButtonComponent>

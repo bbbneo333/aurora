@@ -21,6 +21,8 @@ class MediaPlayerService {
   private mediaProgressReportRetryDelayMS = 150;
   private mediaProgressReportCurrentRetryCount = 0;
 
+  // media queue control API
+
   playMediaTrack(mediaTrack: IMediaTrack): void {
     const {
       mediaPlayer,
@@ -48,7 +50,7 @@ class MediaPlayerService {
     // important - setting track will remove all existing ones
     this.loadMediaTrackToQueue(mediaTrack);
 
-    // request media provider to load the track
+    // request media provider to load and play the track
     this.loadAndPlayMediaTrack();
   }
 
@@ -84,16 +86,16 @@ class MediaPlayerService {
     // important - setting tracks will remove all existing ones
     this.loadMediaTracksToQueue(mediaTracks, mediaTrackList);
 
-    // request media provider to load the track
+    // request media provider to load and play the track
     this.loadAndPlayMediaTrack();
   }
 
-  playMediaTrackFromList(mediaTracks: IMediaTrack[], mediaTrackId: string, mediaTrackList?: IMediaTrackList): void {
+  playMediaTrackFromList(mediaTracks: IMediaTrack[], mediaTrackPointer: number, mediaTrackList?: IMediaTrackList): void {
     if (_.isEmpty(mediaTracks)) {
       throw new Error('MediaPlayerService encountered error at playMediaTracks - Empty track list was provided');
     }
 
-    const mediaTrack = mediaTracks.find(track => track.id === mediaTrackId);
+    const mediaTrack = mediaTracks[mediaTrackPointer];
     if (!mediaTrack) {
       throw new Error('MediaPlayerService encountered error at playMediaTracks - Provided media track does not exists in the list');
     }
@@ -123,13 +125,13 @@ class MediaPlayerService {
 
     // add tracks to the queue
     // important - setting tracks will remove all existing ones
-    this.loadMediaTracksToQueue(mediaTracks, mediaTrackList);
+    const mediaQueueTracks = this.loadMediaTracksToQueue(mediaTracks, mediaTrackList);
 
-    // request media provider to load the track
-    this.loadAndPlayMediaTrack(mediaTrack);
+    // request media provider to load and play the track
+    this.loadAndPlayMediaTrack(mediaQueueTracks[mediaTrackPointer]);
   }
 
-  playMediaTrackFromQueue(mediaTrack: IMediaTrack) {
+  playMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack) {
     const {
       mediaPlayer,
     } = store.getState();
@@ -139,7 +141,7 @@ class MediaPlayerService {
     } = mediaPlayer;
 
     // if the current media track is same as provided one, simply resume and conclude
-    if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id) {
+    if (mediaPlaybackCurrentMediaTrack && mediaPlaybackCurrentMediaTrack.queue_entry_id === mediaQueueTrack.queue_entry_id) {
       this.resumeMediaPlayer();
       return;
     }
@@ -148,53 +150,163 @@ class MediaPlayerService {
     this.stopMediaPlayer();
 
     // load up and play found track from queue
-    this.loadAndPlayMediaTrack(mediaTrack);
+    this.loadAndPlayMediaTrack(mediaQueueTrack);
   }
 
-  seekMediaTrack(mediaTrackSeekPosition: number): void {
+  addMediaTrackToQueue(mediaTrack: IMediaTrack): void {
     const {
       mediaPlayer,
     } = store.getState();
 
     const {
-      mediaPlaybackState,
+      mediaTracks,
+      mediaPlaybackCurrentTrackList,
       mediaPlaybackCurrentMediaTrack,
-      mediaPlaybackCurrentPlayingInstance,
+      mediaTrackLastInsertedQueueId,
     } = mediaPlayer;
 
-    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
-      return;
+    const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);
+
+    // #1 - determine the track after which the new track will be inserted
+    // by default, it will get inserted at start of the list
+    // if mediaTrackLastInsertedQueueId is present, track will be inserted after that track
+    // otherwise, if mediaPlaybackCurrentMediaTrack is present, track will be inserted after that track
+    let mediaTrackExistingPointer;
+    if (mediaTrackLastInsertedQueueId) {
+      mediaTrackExistingPointer = _.findIndex(mediaTracks, track => track.queue_entry_id === mediaTrackLastInsertedQueueId);
+    } else if (mediaPlaybackCurrentMediaTrack) {
+      mediaTrackExistingPointer = _.findIndex(mediaTracks, track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id);
     }
 
-    // update playback progress state to the requested one right away
-    // this is being done in order to prevent delay between seek request and actual audio seek success response
-    this.updateMediaPlaybackProgress(mediaTrackSeekPosition);
+    // #2 - update the queue_insertion_index for the new track with that of obtained track
+    // this will be a simple increment as we are inserting it after the obtained track
+    let mediaTrackInsertPointer = 0;
+    if (!_.isNil(mediaTrackExistingPointer)) {
+      mediaTrackInsertPointer = mediaTrackExistingPointer + 1;
 
-    mediaPlaybackCurrentPlayingInstance
-      .seekPlayback(mediaTrackSeekPosition)
-      .then((mediaPlaybackSeeked) => {
-        if (!mediaPlaybackSeeked) {
-          // TODO: Handle cases where media playback could not be seeked
-          return;
-        }
+      const mediaTrackExisting = mediaTracks[mediaTrackExistingPointer];
+      mediaQueueTrack.queue_insertion_index = mediaTrackExisting.queue_insertion_index + 1;
+    }
 
-        if (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
-          // only request progress update if track is currently playing
-          // this is being done in order to avoid progress updates if track is already ended
-          this.startMediaProgressReporting();
-        }
-      });
+    // #3 - insert the new track from the obtained pointer
+    mediaTracks.splice(mediaTrackInsertPointer, 0, mediaQueueTrack);
+
+    // #4 - update the queue_insertion_index for all the subsequent tracks in queue
+    // this is as well is going to be a simple increment over the previous value as have inserted only one track
+    for (let mediaTrackPointer = mediaTrackInsertPointer + 1; mediaTrackPointer < mediaTracks.length; mediaTrackPointer += 1) {
+      const mediaTrackFromQueue = mediaTracks[mediaTrackPointer];
+      if (mediaTrackFromQueue.queue_insertion_index >= mediaQueueTrack.queue_insertion_index) {
+        mediaTrackFromQueue.queue_insertion_index += 1;
+      }
+    }
+
+    // #5 - update state
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks,
+        // important - adding a track outside current tracklist will reset it
+        mediaTrackList: mediaPlaybackCurrentTrackList && mediaPlaybackCurrentTrackList.id === mediaQueueTrack.tracklist_id
+          ? mediaPlaybackCurrentTrackList
+          : undefined,
+        // important to send the mediaTrackLastInsertedQueueId with that of track we inserted
+        // this is to keep track of the inserted track when we are inserting a new one in the list
+        mediaTrackLastInsertedQueueId: mediaQueueTrack.queue_entry_id,
+      },
+    });
+
+    // #6 - notify user
+    // TODO: Add support for sending notification
+    //  "Track was added to the queue"
   }
 
-  startMediaProgressReporting() {
-    // reset the retry count so that we can retry again in case of further failures
-    this.mediaProgressReportCurrentRetryCount = 0;
+  removeMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
 
-    // using setTimeout instead of requestAnimationFrame as setTimeout also works when app is in background
-    setTimeout(() => {
-      this.reportMediaPlaybackProgress();
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentTrackList,
+    } = mediaPlayer;
+
+    // #1 - determine the position from where the track needs to be removed
+    const mediaQueueTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaQueueTrack.queue_entry_id);
+    if (_.isNil(mediaQueueTrackPointer)) {
+      throw new Error('MediaPlayerService encountered error at removeMediaTrackFromQueue - Provided media track was not found in the list');
+    }
+
+    // #2 - remove track from the list using the obtained position
+    _.pullAt(mediaTracks, mediaQueueTrackPointer);
+
+    // #3 - update the queue_insertion_index for all the subsequent tracks in queue
+    // this is as well is going to be a simple decrement over the previous value as have removed only one track
+    for (let mediaTrackPointer = 0; mediaTrackPointer < mediaTracks.length; mediaTrackPointer += 1) {
+      const mediaTrackFromQueue = mediaTracks[mediaTrackPointer];
+      if (mediaTrackFromQueue.queue_insertion_index >= mediaQueueTrack.queue_insertion_index) {
+        mediaTrackFromQueue.queue_insertion_index -= 1;
+      }
+    }
+
+    // #4 - update state
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks,
+        // important - retain existing tracklist when removing tracks
+        mediaTrackList: mediaPlaybackCurrentTrackList,
+      },
     });
   }
+
+  loadMediaTrack(mediaQueueTrack: IMediaQueueTrack): IMediaPlayback {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackVolumeCurrent,
+      mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
+    } = mediaPlayer;
+
+    // loading a media track will always remove the track repeat
+    this.removeTrackRepeat();
+
+    // request media playback instance for the provided track from the media provider
+    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaQueueTrack.provider);
+    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaQueueTrack, {
+      mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
+      mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
+      mediaPlaybackVolumeMuted,
+    });
+
+    // load the track
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.LoadTrack,
+      data: {
+        mediaQueueTrackEntryId: mediaQueueTrack.queue_entry_id,
+        mediaPlayingInstance: mediaPlayback,
+        // important - in order to prevent adding tracks to queue before the current playing track
+        // loading a track would always reset the last inserted track pointer
+        mediaTrackLastInsertedQueueId: undefined,
+      },
+    });
+
+    return mediaPlayback;
+  }
+
+  loadMediaQueueTracks(mediaQueueTracks: IMediaQueueTrack[], mediaTrackList?: IMediaTrackList) {
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks: mediaQueueTracks,
+        mediaTrackList,
+      },
+    });
+  }
+
+  // media player control API
 
   pauseMediaPlayer(): void {
     const {
@@ -288,52 +400,6 @@ class MediaPlayerService {
       });
   }
 
-  changeMediaPlayerVolume(mediaPlaybackVolume: number): void {
-    this.changePlaybackVolumeAsync(mediaPlaybackVolume)
-      .then((mediaPlaybackVolumeChanged) => {
-        if (!mediaPlaybackVolumeChanged) {
-          // TODO: Handle cases where media playback volume could not be changed
-        }
-      });
-  }
-
-  muteMediaPlayerVolume(): void {
-    this.mutePlaybackVolumeAsync()
-      .then((mediaPlaybackVolumeMuted) => {
-        if (!mediaPlaybackVolumeMuted) {
-          // TODO: Handle cases where media playback could not be muted
-        }
-      });
-  }
-
-  unmuteMediaPlayerVolume(): void {
-    this.unmutePlaybackVolumeAsync()
-      .then((mediaPlaybackVolumeUnmuted) => {
-        if (!mediaPlaybackVolumeUnmuted) {
-          // TODO: Handle cases where media playback could not be un-muted
-        }
-      });
-  }
-
-  playPreviousTrack(): void {
-    this.stopMediaPlayer();
-    this.playPrevious();
-  }
-
-  playNextTrack(): void {
-    this.stopMediaPlayer();
-    this.removeTrackRepeat();
-    this.playNext();
-  }
-
-  hasPreviousTrack(): boolean {
-    return !_.isNil(this.getPreviousFromList());
-  }
-
-  hasNextTrack(): boolean {
-    return !_.isNil(this.getNextFromList());
-  }
-
   toggleShuffle(): void {
     const {
       mediaPlayer,
@@ -367,7 +433,7 @@ class MediaPlayerService {
     // important - dispatch in batch to avoid re-renders
     // we are going to update tracks first, then the shuffle state
     batch(() => {
-      this.loadMediaQueueTracksToQueue(mediaQueueTracks, mediaPlaybackCurrentTrackList);
+      this.loadMediaQueueTracks(mediaQueueTracks, mediaPlaybackCurrentTrackList);
       this.setShuffle(mediaPlaybackQueueShuffleEnabled);
     });
   }
@@ -409,53 +475,160 @@ class MediaPlayerService {
     });
   }
 
-  loadMediaTrack(mediaTrack: IMediaTrack): IMediaPlayback {
+  // media volume control API
+
+  changeMediaPlayerVolume(mediaPlaybackVolume: number): void {
+    this.changePlaybackVolumeAsync(mediaPlaybackVolume)
+      .then((mediaPlaybackVolumeChanged) => {
+        if (!mediaPlaybackVolumeChanged) {
+          // TODO: Handle cases where media playback volume could not be changed
+        }
+      });
+  }
+
+  muteMediaPlayerVolume(): void {
+    this.mutePlaybackVolumeAsync()
+      .then((mediaPlaybackVolumeMuted) => {
+        if (!mediaPlaybackVolumeMuted) {
+          // TODO: Handle cases where media playback could not be muted
+        }
+      });
+  }
+
+  unmuteMediaPlayerVolume(): void {
+    this.unmutePlaybackVolumeAsync()
+      .then((mediaPlaybackVolumeUnmuted) => {
+        if (!mediaPlaybackVolumeUnmuted) {
+          // TODO: Handle cases where media playback could not be un-muted
+        }
+      });
+  }
+
+  // media playback control API
+
+  seekMediaTrack(mediaTrackSeekPosition: number): void {
     const {
       mediaPlayer,
     } = store.getState();
 
     const {
-      mediaPlaybackVolumeCurrent,
-      mediaPlaybackVolumeMaxLimit,
-      mediaPlaybackVolumeMuted,
+      mediaPlaybackState,
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentPlayingInstance,
     } = mediaPlayer;
 
-    // loading a media track will always remove the track repeat
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      return;
+    }
+
+    // update playback progress state to the requested one right away
+    // this is being done in order to prevent delay between seek request and actual audio seek success response
+    this.updateMediaPlaybackProgress(mediaTrackSeekPosition);
+
+    mediaPlaybackCurrentPlayingInstance
+      .seekPlayback(mediaTrackSeekPosition)
+      .then((mediaPlaybackSeeked) => {
+        if (!mediaPlaybackSeeked) {
+          // TODO: Handle cases where media playback could not be seeked
+          return;
+        }
+
+        if (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
+          // only request progress update if track is currently playing
+          // this is being done in order to avoid progress updates if track is already ended
+          this.startMediaProgressReporting();
+        }
+      });
+  }
+
+  playPreviousTrack(force?: boolean): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackCurrentMediaTrack,
+      mediaPlaybackCurrentMediaProgress,
+    } = mediaPlayer;
+
+    // we will be seeking current track to 0 if:
+    // - we don't have any previous track in the queue
+    // - or, action was not forced and the track has progressed for more than 15 seconds
+    // otherwise, we will be playing the previous track in queue
+
+    if (!this.hasPreviousTrack() || (!force
+      && mediaPlaybackCurrentMediaTrack
+      && mediaPlaybackCurrentMediaProgress
+      && mediaPlaybackCurrentMediaProgress > 15)) {
+      this.seekMediaTrack(0);
+    } else {
+      this.stopMediaPlayer();
+      this.playPrevious();
+    }
+  }
+
+  playNextTrack(): void {
+    this.stopMediaPlayer();
     this.removeTrackRepeat();
+    this.playNext();
+  }
 
-    // request media playback instance for the provided track from the media provider
-    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
-    const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaTrack, {
-      mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
-      mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
-      mediaPlaybackVolumeMuted,
-    });
+  hasPreviousTrack(): boolean {
+    return !_.isNil(this.getPreviousFromList());
+  }
 
-    // load the track
+  hasNextTrack(): boolean {
+    return !_.isNil(this.getNextFromList());
+  }
+
+  private loadMediaTrackToQueue(mediaTrack: IMediaTrack): IMediaQueueTrack {
+    const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);
+
     store.dispatch({
-      type: MediaEnums.MediaPlayerActions.LoadTrack,
+      type: MediaEnums.MediaPlayerActions.SetTrack,
       data: {
-        mediaTrackId: mediaTrack.id,
-        mediaPlayingInstance: mediaPlayback,
+        mediaTrack: mediaQueueTrack,
       },
     });
 
-    return mediaPlayback;
+    return mediaQueueTrack;
   }
 
-  loadMediaQueueTracksToQueue(mediaQueueTracks: IMediaQueueTrack[], mediaTrackList?: IMediaTrackList) {
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.SetTracks,
-      data: {
-        mediaTracks: mediaQueueTracks,
-        mediaTrackList,
-      },
-    });
+  private loadMediaTracksToQueue(mediaTracks: IMediaTrack[], mediaTrackList?: IMediaTrackList): IMediaQueueTrack[] {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackQueueOnShuffle,
+    } = mediaPlayer;
+
+    const mediaQueueTracksForTrackList = mediaTracks.map((
+      mediaTrack,
+      mediaTrackPointer,
+    ) => this.getMediaQueueTrack(mediaTrack, mediaTrackPointer, mediaTrackList));
+
+    const mediaQueueTracks = mediaPlaybackQueueOnShuffle
+      ? this.getShuffledMediaTracks(mediaQueueTracksForTrackList)
+      : this.getSortedMediaTracks(mediaQueueTracksForTrackList);
+
+    this.loadMediaQueueTracks(mediaQueueTracks, mediaTrackList);
+
+    return mediaQueueTracks;
   }
 
-  private loadAndPlayMediaTrack(mediaTrack?: IMediaTrack): void {
+  private getMediaQueueTrack(mediaTrack: IMediaTrack, mediaTrackPointer?: number, mediaTrackList?: IMediaTrackList): IMediaQueueTrack {
+    return {
+      ...mediaTrack,
+      tracklist_id: mediaTrackList ? mediaTrackList.id : mediaTrack.track_album.id,
+      queue_entry_id: StringUtils.generateId(),
+      queue_insertion_index: _.isNil(mediaTrackPointer) ? 0 : mediaTrackPointer,
+    };
+  }
+
+  private loadAndPlayMediaTrack(mediaQueueTrack?: IMediaQueueTrack): void {
     this
-      .loadAndPlayMediaTrackAsync(mediaTrack)
+      .loadAndPlayMediaTrackAsync(mediaQueueTrack)
       .then((mediaPlayed) => {
         if (!mediaPlayed) {
           // TODO: Handle cases where media could not be played
@@ -463,7 +636,7 @@ class MediaPlayerService {
       });
   }
 
-  private async loadAndPlayMediaTrackAsync(mediaTrack?: IMediaTrack): Promise<boolean> {
+  private async loadAndPlayMediaTrackAsync(mediaQueueTrack?: IMediaQueueTrack): Promise<boolean> {
     const {
       mediaPlayer,
     } = store.getState();
@@ -473,7 +646,7 @@ class MediaPlayerService {
     } = mediaPlayer;
 
     // if no media track was explicitly provided, will load from the first one present in current track list
-    const mediaTrackToLoad = mediaTrack || mediaTracks[0];
+    const mediaTrackToLoad = mediaQueueTrack || mediaTracks[0];
     if (!mediaTrackToLoad) {
       throw new Error('MediaPlayerService encountered error at loadAndPlayMediaTrack - Could not find any track to load');
     }
@@ -497,45 +670,6 @@ class MediaPlayerService {
 
     this.reportMediaPlaybackProgress();
     return true;
-  }
-
-  private loadMediaTrackToQueue(mediaTrack: IMediaTrack) {
-    const mediaQueueTrack = {
-      ...mediaTrack,
-      tracklist_id: mediaTrack.track_album.id,
-      queue_entry_id: StringUtils.generateId(),
-      queue_insertion_index: 0,
-    };
-
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.SetTrack,
-      data: {
-        mediaTrack: mediaQueueTrack,
-      },
-    });
-  }
-
-  private loadMediaTracksToQueue(mediaTracks: IMediaTrack[], mediaTrackList?: IMediaTrackList) {
-    const {
-      mediaPlayer,
-    } = store.getState();
-
-    const {
-      mediaPlaybackQueueOnShuffle,
-    } = mediaPlayer;
-
-    const mediaQueueTracksForTrackList = mediaTracks.map((mediaTrack, mediaTrackPointer) => ({
-      ...mediaTrack,
-      tracklist_id: mediaTrackList ? mediaTrackList.id : mediaTrack.track_album.id,
-      queue_entry_id: StringUtils.generateId(),
-      queue_insertion_index: mediaTrackPointer,
-    }));
-
-    const mediaQueueTracks = mediaPlaybackQueueOnShuffle
-      ? this.getShuffledMediaTracks(mediaQueueTracksForTrackList)
-      : this.getSortedMediaTracks(mediaQueueTracksForTrackList);
-
-    this.loadMediaQueueTracksToQueue(mediaQueueTracks, mediaTrackList);
   }
 
   private async changePlaybackVolumeAsync(mediaPlaybackVolume: number): Promise<boolean> {
@@ -646,6 +780,16 @@ class MediaPlayerService {
     return true;
   }
 
+  private startMediaProgressReporting() {
+    // reset the retry count so that we can retry again in case of further failures
+    this.mediaProgressReportCurrentRetryCount = 0;
+
+    // using setTimeout instead of requestAnimationFrame as setTimeout also works when app is in background
+    setTimeout(() => {
+      this.reportMediaPlaybackProgress();
+    });
+  }
+
   private reportMediaPlaybackProgress(): void {
     const {
       mediaPlayer,
@@ -729,7 +873,7 @@ class MediaPlayerService {
     return true;
   }
 
-  private getPreviousFromList(): IMediaTrack | undefined {
+  private getPreviousFromList(): IMediaQueueTrack|undefined {
     const {
       mediaPlayer,
     } = store.getState();
@@ -741,7 +885,10 @@ class MediaPlayerService {
 
     let mediaTrack;
     if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
-      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, track => track.id === mediaPlaybackCurrentMediaTrack.id);
+      const mediaCurrentTrackPointer = _.findIndex(
+        mediaTracks,
+        track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id,
+      );
       if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer > 0) {
         mediaTrack = mediaTracks[mediaCurrentTrackPointer - 1];
       }
@@ -764,7 +911,7 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaTrack);
   }
 
-  private getNextFromList(): IMediaQueueTrack | undefined {
+  private getNextFromList(): IMediaQueueTrack|undefined {
     const {
       mediaPlayer,
     } = store.getState();
@@ -776,7 +923,10 @@ class MediaPlayerService {
 
     let mediaTrack;
     if (!_.isEmpty(mediaTracks) && mediaPlaybackCurrentMediaTrack) {
-      const mediaCurrentTrackPointer = _.findIndex(mediaTracks, track => track.id === mediaPlaybackCurrentMediaTrack.id);
+      const mediaCurrentTrackPointer = _.findIndex(
+        mediaTracks,
+        track => track.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id,
+      );
       if (!_.isNil(mediaCurrentTrackPointer) && mediaCurrentTrackPointer < mediaTracks.length - 1) {
         mediaTrack = mediaTracks[mediaCurrentTrackPointer + 1];
       }

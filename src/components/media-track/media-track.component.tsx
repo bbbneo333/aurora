@@ -2,6 +2,7 @@ import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
 import * as _ from 'lodash';
+import {useContextMenu} from 'react-contexify';
 
 import {Icons} from '../../constants';
 import {useMediaTrackList} from '../../contexts';
@@ -21,11 +22,13 @@ const cx = classNames.bind(styles);
 
 function MediaTrackActionButton(props: {
   mediaTrack: IMediaTrack,
+  mediaTrackPointer?: number,
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
 }) {
   const {
     mediaTrack,
+    mediaTrackPointer,
     handleOnPlayButtonClick,
     isPlaying,
   } = props;
@@ -44,13 +47,19 @@ function MediaTrackActionButton(props: {
     if (handleOnPlayButtonClick) {
       handleOnPlayButtonClick();
     } else if (!_.isEmpty(mediaTracks)) {
-      MediaPlayerService.playMediaTrackFromList(mediaTracks, mediaTrack.id, mediaTrackList);
+      // when playing from a list, media track pointer is required to be provided
+      if (_.isNil(mediaTrackPointer)) {
+        throw new Error('MediaTrackActionButton encountered error while playing track - MediaTrack pointer was not provided');
+      }
+
+      MediaPlayerService.playMediaTrackFromList(mediaTracks, mediaTrackPointer, mediaTrackList);
     } else {
       MediaPlayerService.playMediaTrack(mediaTrack);
     }
   }, [
     handleOnPlayButtonClick,
     mediaTrack,
+    mediaTrackPointer,
     mediaTracks,
     mediaTrackList,
   ]);
@@ -89,25 +98,58 @@ function MediaTrackActionButton(props: {
 
 export function MediaTrackComponent(props: {
   mediaTrack: IMediaTrack,
+  mediaTrackPointer?: number,
+  mediaTrackContextMenuId?: string;
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
   showCover?: boolean,
 }) {
   const {
     mediaTrack,
+    mediaTrackPointer,
+    mediaTrackContextMenuId,
     handleOnPlayButtonClick,
     isPlaying,
     showCover = true,
   } = props;
 
+  const {show} = useContextMenu();
+
+  const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
+    if (mediaTrackContextMenuId) {
+      show(e, {
+        id: mediaTrackContextMenuId,
+        props: {
+          mediaTrack,
+          // important - this component is also used for media queue tracks, in order to support actions for the same
+          // we are supplying value for mediaQueueTrack as well
+          mediaQueueTrack: mediaTrack,
+        },
+      });
+    }
+  }, [
+    show,
+    mediaTrack,
+    mediaTrackContextMenuId,
+  ]);
+
+  // mediaTrackPointer can be used for providing position for a MediaTrack within a list
+  // this information can be then used for setting accessibility control over our MediaTrack container
+  const mediaTrackAriaProps = !_.isNil(mediaTrackPointer) && {
+    role: 'row',
+    tabIndex: mediaTrackPointer + 1,
+    'aria-rowindex': mediaTrackPointer + 1,
+  };
+
   return (
-    <div className={cx('col-12 mb-3')}>
-      <div className={cx('media-track')}>
+    <div className={cx('col-12 mb-3')} onContextMenu={handleOnContextMenu}>
+      <div className={cx('media-track')} {...mediaTrackAriaProps}>
         <div className="row">
           <div className={cx('col-10', 'media-track-main-column')}>
             <div className={cx('media-track-section')}>
               <MediaTrackActionButton
                 mediaTrack={mediaTrack}
+                mediaTrackPointer={mediaTrackPointer}
                 isPlaying={isPlaying}
                 handleOnPlayButtonClick={handleOnPlayButtonClick}
               />

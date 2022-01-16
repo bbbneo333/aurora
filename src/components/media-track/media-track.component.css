@@ -4,6 +4,10 @@
   border-radius: 5px;
 }
 
+.media-track:focus {
+  background-color: var(--selectable-focused-bg-color) !important;
+}
+
 .media-track:hover {
   background-color: var(--selected-bg-color);
 }
@@ -19,7 +23,8 @@
 }
 
 .media-track-cover {
-  max-width: 50px;
+  width: 50px;
+  height: 50px;
 }
 
 .media-track-action-button {

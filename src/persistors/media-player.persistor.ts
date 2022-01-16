@@ -4,6 +4,7 @@ import {IAppStatePersistor, IMediaQueueTrack} from '../interfaces';
 import {MediaLibraryService, MediaPlayerService} from '../services';
 
 import {MediaPlayerState} from '../reducers/media-player.reducer';
+import {MediaEnums} from '../enums';
 
 export type MediaQueueTrackSerialized = Pick<IMediaQueueTrack, 'id' | 'provider' | 'provider_id' | 'tracklist_id' | 'queue_entry_id' | 'queue_insertion_index'>;
 
@@ -27,7 +28,13 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
     };
   }
 
-  async exhaust(state: MediaPlayerStateSerialized): Promise<void> {
+  async exhaust(stateExisting: MediaPlayerState, stateStored: MediaPlayerStateSerialized): Promise<void> {
+    // exhaust won't run if media player is already playing a track
+    // this only happens in case of HotReloads in development
+    if (stateExisting.mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
+      return;
+    }
+
     const {
       mediaTracks,
       mediaPlaybackCurrentMediaTrack,
@@ -37,7 +44,7 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
       mediaPlaybackVolumeMuted,
       mediaPlaybackQueueOnShuffle,
       mediaPlaybackQueueRepeatType,
-    } = state;
+    } = stateStored;
 
     // set shuffle, repeat and volume
     MediaPlayerService.setShuffle(mediaPlaybackQueueOnShuffle);
@@ -64,7 +71,7 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
 
       return mediaTracksDeserialized;
     }, []);
-    MediaPlayerService.loadMediaQueueTracksToQueue(mediaQueueTracks, mediaPlaybackCurrentTrackList);
+    MediaPlayerService.loadMediaQueueTracks(mediaQueueTracks, mediaPlaybackCurrentTrackList);
 
     // load current playing track
     if (mediaPlaybackCurrentMediaTrack) {

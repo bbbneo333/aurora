@@ -1,9 +1,9 @@
-.media-content-navigator {
+.browser-navigation {
   display: flex;
   flex-direction: row;
 }
 
-.media-content-navigate-button {
+.browser-navigation-button {
   background-color: var(--dark-bg-color);
   color: var(--light-text-color);
   display: flex;
@@ -19,6 +19,10 @@
   border: 2px solid var(--dark-bg-color);
 }
 
-.media-content-navigate-button:hover {
+.browser-navigation-button.disabled {
+  color: var(--dark-disabled-button-color);
+}
+
+.browser-navigation-button:not(.disabled):hover {
   border-color: var(--dark-selectable-outline-color);
 }

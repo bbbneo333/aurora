@@ -2,8 +2,9 @@
   margin-bottom: 20px;
 }
 
-.library-album-header-cover-column {
-  min-width: 200px;
+.library-album-cover-picture {
+  /* size for placeholder icon */
+  font-size: 50px;
 }
 
 .library-album-header-info-column {
@@ -21,8 +22,7 @@
 }
 
 .library-album-header-name {
-  font-size: 54px;
-  line-height: 60px;
+  font-size: 36px;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;

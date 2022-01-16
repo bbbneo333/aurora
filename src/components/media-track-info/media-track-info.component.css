@@ -30,3 +30,7 @@
   color: var(--light-text-color) !important;
   text-decoration: underline;
 }
+
+.media-track-info-subtitle .media-track-artist-link:not(:first-child) {
+  margin-left: 5px;
+}

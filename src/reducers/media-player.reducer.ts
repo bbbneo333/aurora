@@ -15,6 +15,7 @@ export type MediaPlayerState = {
   mediaPlaybackVolumeMuted: boolean,
   mediaPlaybackQueueOnShuffle: boolean,
   mediaPlaybackQueueRepeatType?: MediaEnums.MediaPlaybackRepeatType,
+  mediaTrackLastInsertedQueueId?: string,
 };
 
 export type MediaPlayerStateAction = {
@@ -34,33 +35,43 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaPlaybackVolumeMuted: false,
   mediaPlaybackQueueOnShuffle: false,
   mediaPlaybackQueueRepeatType: undefined,
+  mediaTrackLastInsertedQueueId: undefined,
 };
 
 export default (state: MediaPlayerState = mediaPlayerInitialState, action: MediaPlayerStateAction): MediaPlayerState => {
   switch (action.type) {
     case MediaEnums.MediaPlayerActions.SetTrack: {
-      // data.mediaTrack: MediaQueueTrack - track which needs to be added
+      // data.mediaTrack: IMediaQueueTrack - track which needs to be added
+      const {mediaTrack} = action.data;
+      if (!mediaTrack) {
+        throw new Error('MediaPlayerReducer encountered error at SetTrack - No media track was provided');
+      }
+
       return {
         ...state,
-        mediaTracks: [action.data.mediaTrack],
+        mediaTracks: [mediaTrack],
+        mediaTrackLastInsertedQueueId: undefined,
+        mediaPlaybackCurrentTrackList: undefined,
       };
     }
     case MediaEnums.MediaPlayerActions.SetTracks: {
-      // data.mediaTracks: MediaQueueTrack[] - tracks which needs to be added
-      // data.mediaTrackList: MediaTrackList - tracklist from which media is being added
-      const {mediaTracks, mediaTrackList} = action.data;
+      // data.mediaTracks: IMediaQueueTrack[] - tracks which needs to be added
+      // data.mediaTrackList?: MediaTrackList - tracklist from which media is being added
+      // data.mediaTrackLastInsertedQueueId?: string - optional track queue id can be provided which keeps track of
+      // last inserted item in the queue
+      // important - if not provided, mediaTrackList will be reset
+      // important - if not provided, mediaTrackLastInsertedQueueId will be reset
+      const {
+        mediaTracks,
+        mediaTrackList,
+        mediaTrackLastInsertedQueueId,
+      } = action.data;
 
       return {
         ...state,
         mediaTracks,
+        mediaTrackLastInsertedQueueId,
         mediaPlaybackCurrentTrackList: mediaTrackList,
-      };
-    }
-    case MediaEnums.MediaPlayerActions.RemoveTrack: {
-      // data.mediaTrackId: String - track's id which needs to be removed
-      return {
-        ...state,
-        mediaTracks: _.filter(state.mediaTracks, mediaTrack => mediaTrack.id !== action.data.mediaTrackId),
       };
     }
     case MediaEnums.MediaPlayerActions.LoadingTrack: {
@@ -70,9 +81,14 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
       };
     }
     case MediaEnums.MediaPlayerActions.LoadTrack: {
-      // data.mediaTrackId: string - track's id from the list which needs to be loaded
+      // data.mediaQueueTrackEntryId: string - track's queue entry id
       // data.mediaPlayingInstance: any - playback instance
-      const mediaTrackToLoad = _.find(state.mediaTracks, mediaTrack => mediaTrack.id === action.data.mediaTrackId);
+      const {
+        mediaQueueTrackEntryId,
+        mediaPlayingInstance,
+      } = action.data;
+
+      const mediaTrackToLoad = _.find(state.mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaQueueTrackEntryId);
       if (!mediaTrackToLoad) {
         throw new Error('MediaPlayerReducer encountered error at LoadTrack - Provided media track was not found');
       }
@@ -82,7 +98,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         mediaPlaybackState: MediaEnums.MediaPlaybackState.Paused,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
         mediaPlaybackCurrentMediaProgress: undefined,
-        mediaPlaybackCurrentPlayingInstance: action.data.mediaPlayingInstance,
+        mediaPlaybackCurrentPlayingInstance: mediaPlayingInstance,
       };
     }
     case MediaEnums.MediaPlayerActions.Play: {
