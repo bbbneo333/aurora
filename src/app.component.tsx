@@ -120,18 +120,19 @@ function AppSidebarNavigationList() {
   );
 }
 
-function AppSidebarBrandingLogo() {
-  return (
-    <div className={cx('app-sidebar-logo')}/>
-  );
-}
+// function AppSidebarBrandingLogo() {
+//   return (
+//     <div className={cx('app-sidebar-logo')}/>
+//   );
+// }
 
 // app > stage > rows [sidebar, content]
 
 function AppSidebar() {
   return (
     <div className={cx('app-sidebar-container')}>
-      <AppSidebarBrandingLogo/>
+      {/* TODO: Add back AppSidebarBrandingLogo when required */}
+      {/* <AppSidebarBrandingLogo/> */}
       <AppSidebarNavigationList/>
       <AppSidebarQuickAccess/>
     </div>
