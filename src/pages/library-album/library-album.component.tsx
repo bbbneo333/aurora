@@ -20,7 +20,7 @@ import styles from './library-album.component.css';
 const cx = classNames.bind(styles);
 
 enum MediaContextMenus {
-  AlbumTrack = 'media_queue_album_track_context_menu',
+  AlbumTrack = 'media_album_track_context_menu',
 }
 
 export function LibraryAlbumComponent() {
