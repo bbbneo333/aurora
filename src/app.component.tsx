@@ -28,15 +28,6 @@ import routes from './app.routes';
 
 const cx = classNames.bind(styles);
 
-// register media providers
-const mediaLocalProvider = new MediaLocalProvider();
-MediaProviderService.registerMediaProvider(mediaLocalProvider);
-
-// register state persistors
-_.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
-  registerStatePersistor(stateKey, statePersistor);
-});
-
 // app > stage > content > header > rows [navigator, page header, user]
 
 function AppContentHeaderPage() {
@@ -192,6 +183,15 @@ export function AppComponent() {
 
   useEffect(() => {
     setAppStateIsLoading(true);
+
+    // register media providers
+    const mediaLocalProvider = new MediaLocalProvider();
+    MediaProviderService.registerMediaProvider(mediaLocalProvider);
+
+    // register state persistors
+    _.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
+      registerStatePersistor(stateKey, statePersistor);
+    });
 
     loadState(store)
       .then(() => {
