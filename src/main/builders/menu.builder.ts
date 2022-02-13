@@ -227,6 +227,13 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
+          label: 'Remove Persisted States and Reload',
+          click: () => {
+            this.removePersistedStates();
+            this.reloadApp();
+          },
+        },
+        {
           label: 'Compact DataStores',
           click: () => {
             const datastore = this.app.getModule(DatastoreModule);
@@ -330,6 +337,13 @@ export default class MenuBuilder implements IAppBuilder {
           },
         },
         {
+          label: 'Remove Persisted States and Reload',
+          click: () => {
+            this.removePersistedStates();
+            this.reloadApp();
+          },
+        },
+        {
           label: 'Compact DataStores',
           click: () => {
             const datastore = this.app.getModule(DatastoreModule);
@@ -358,6 +372,10 @@ export default class MenuBuilder implements IAppBuilder {
   private removeDataStores() {
     const datastore = this.app.getModule(DatastoreModule);
     datastore.removeDatastores();
+  }
+
+  private removePersistedStates() {
+    this.app.removePersistedStates();
   }
 
   private reloadApp() {

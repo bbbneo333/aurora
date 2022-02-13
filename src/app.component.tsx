@@ -14,14 +14,15 @@ import {
   RouterLink,
 } from './components';
 
+import {AppEnums} from './enums';
 import {IAppStatePersistor} from './interfaces';
 import {MediaLocalProvider} from './providers';
 import {RootState} from './reducers';
-import {I18nService, MediaProviderService} from './services';
+import {AppService, I18nService, MediaProviderService} from './services';
 
 import statePersistors from './persistors';
 import store from './store';
-import {registerStatePersistor, loadState} from './store/persistor';
+import {registerStatePersistor, loadState, removeStates} from './store/persistor';
 
 import './app.global.css';
 import styles from './app.component.css';
@@ -193,6 +194,9 @@ export function AppComponent() {
     _.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
       registerStatePersistor(stateKey, statePersistor);
     });
+
+    // add listeners for messages from main process
+    AppService.registerSyncMessageHandler(AppEnums.IPCRendererCommChannels.StateRemovePersisted, removeStates);
 
     loadState(store)
       .then(() => {

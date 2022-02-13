@@ -16,6 +16,8 @@ export interface IAppMain {
 
   registerAsyncMessageHandler(messageChannel: string, messageHandler: AppAsyncMessageHandler, messageHandlerCtx?: any): void;
 
+  sendSyncMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any;
+
   getAssetPath(...paths: string[]): string;
 
   getDataPath(...paths: string[]): string;
@@ -27,6 +29,8 @@ export interface IAppMain {
   openPath(path: string): void;
 
   removeAppData(): void;
+
+  removePersistedStates(): void;
 }
 
 export interface IAppBuilder {

@@ -17,6 +17,11 @@ export enum IPCCommChannels {
   MediaScaleAndCacheImage = 'media:scale_and_cache_image',
 }
 
+export enum IPCRendererCommChannels {
+  // state
+  StateRemovePersisted = 'state:remove_persisted',
+}
+
 export enum Platforms {
   Darwin = 'darwin',
 }

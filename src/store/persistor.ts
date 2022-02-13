@@ -9,13 +9,17 @@ const debug = require('debug')('app:store:persistor');
 
 const statePersistors: Record<string, IAppStatePersistor> = {};
 
-function saveStateToLocalStorage(key: string, value: any) {
+function saveStateToLocalStorage(key: string, value: any): void {
   localStorage.setItem(`app:state:${key}`, JSON.stringify(value));
 }
 
 function loadStateFromLocalStorage(key: string): any {
   const state = localStorage.getItem(`app:state:${key}`);
   return state ? JSON.parse(state) : null;
+}
+
+function removeStateFromLocalStorage(key: string): void {
+  localStorage.removeItem(`app:state:${key}`);
 }
 
 async function saveStateToStorage(state: any, stateKey: string, statePersistor: IAppStatePersistor) {
@@ -91,4 +95,11 @@ export async function loadState(store: Store): Promise<void> {
 
       throw error;
     });
+}
+
+export function removeStates() {
+  Object.keys(statePersistors).forEach((stateKey) => {
+    debug('removing state - %s', stateKey);
+    removeStateFromLocalStorage(stateKey);
+  });
 }
