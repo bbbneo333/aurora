@@ -11,7 +11,7 @@ export {MediaSessionComponent} from './media-session/media-session.component';
 export {MediaTrackComponent} from './media-track/media-track.component';
 export {MediaTrackContextMenu} from './media-track-context-menu/media-track-context-menu.component';
 export {MediaTrackListComponent} from './media-track-list/media-track-list.component';
-export {MediaTrackInfoComponent, MediaTrackArtistLinkComponent} from './media-track-info/media-track-info.component';
+export {MediaTrackInfoComponent, MediaArtistLinkComponent} from './media-track-info/media-track-info.component';
 export {MediaCoverPictureComponent} from './media-cover-picture/media-cover-picture.component';
 export {RouterSwitchComponent} from './router-switch/router-switch.component';
 export {RouterLinkToggle} from './router-link-toggle/router-link-toggle.component';

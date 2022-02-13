@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import {
   MediaCoverPictureComponent,
-  MediaTrackArtistLinkComponent,
+  MediaArtistLinkComponent,
   MediaTrackContextMenu,
   MediaTrackListComponent,
 } from '../../components';
@@ -62,7 +62,7 @@ export function LibraryAlbumComponent() {
               {mediaSelectedAlbum.album_name}
             </div>
             <div className={cx('library-album-header-info')}>
-              <MediaTrackArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
+              <MediaArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
             </div>
           </div>
         </div>
@@ -75,7 +75,8 @@ export function LibraryAlbumComponent() {
             id: mediaSelectedAlbum.id,
           }}
           mediaTrackContextMenuId={MediaContextMenus.AlbumTrack}
-          showCovers={false}
+          disableCovers
+          disableAlbumLinks
         />
         <MediaTrackContextMenu
           id={MediaContextMenus.AlbumTrack}

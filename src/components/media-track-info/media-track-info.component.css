@@ -16,6 +16,7 @@
   color: var(--dark-text-color);
 }
 
+.media-track-album-link,
 .media-track-artist-link {
   font-size: inherit;
   color: inherit !important;
@@ -26,6 +27,7 @@
   border: none;
 }
 
+.media-track-album-link:hover,
 .media-track-artist-link:hover {
   color: var(--light-text-color) !important;
   text-decoration: underline;

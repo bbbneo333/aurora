@@ -11,13 +11,43 @@ import styles from './media-track-info.component.css';
 
 const cx = classNames.bind(styles);
 
-function MediaTrackArtistLinkSeparator() {
+function MediaArtistLinkSeparator() {
   return (
     <span>,</span>
   );
 }
 
-export function MediaTrackArtistLinkComponent(props: {
+export function MediaTrackAlbumLinkComponent(props: {
+  mediaTrack: IMediaTrack,
+}) {
+  const {mediaTrack} = props;
+
+  return (
+    <NavLink
+      exact
+      to={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
+        albumId: mediaTrack.track_album.id,
+      })}
+      className={cx('media-track-album-link', 'app-nav-link')}
+    >
+      {mediaTrack.track_name}
+    </NavLink>
+  );
+}
+
+export function MediaTrackNameComponent(props: {
+  mediaTrack: IMediaTrack,
+}) {
+  const {mediaTrack} = props;
+
+  return (
+    <div className={cx('media-track-name')}>
+      {mediaTrack.track_name}
+    </div>
+  );
+}
+
+export function MediaArtistLinkComponent(props: {
   mediaArtist: IMediaArtist,
 }) {
   const {
@@ -37,33 +67,47 @@ export function MediaTrackArtistLinkComponent(props: {
   );
 }
 
+export function MediaArtistLinksComponent(props: {
+  mediaArtists: IMediaArtist[],
+}) {
+  const {mediaArtists} = props;
+
+  return (
+    withSeparator(
+      mediaArtists,
+      mediaArtist => (
+        <MediaArtistLinkComponent
+          key={mediaArtist.id}
+          mediaArtist={mediaArtist}
+        />
+      ),
+      <MediaArtistLinkSeparator/>,
+    )
+  );
+}
+
 export function MediaTrackInfoComponent(props: {
   mediaTrack: IMediaTrack,
+  disableAlbumLink?: boolean,
   className?: string,
 }) {
   const {
     mediaTrack,
+    disableAlbumLink = false,
     className,
   } = props;
 
   return (
     <div className={cx('media-track-info', className)}>
       <div className={cx('media-track-info-title')}>
-        {mediaTrack.track_name}
+        {
+          disableAlbumLink
+            ? <MediaTrackNameComponent mediaTrack={mediaTrack}/>
+            : <MediaTrackAlbumLinkComponent mediaTrack={mediaTrack}/>
+        }
       </div>
       <div className={cx('media-track-info-subtitle')}>
-        {
-          withSeparator(
-            mediaTrack.track_artists,
-            mediaArtist => (
-              <MediaTrackArtistLinkComponent
-                key={mediaArtist.id}
-                mediaArtist={mediaArtist}
-              />
-            ),
-            <MediaTrackArtistLinkSeparator/>,
-          )
-        }
+        <MediaArtistLinksComponent mediaArtists={mediaTrack.track_artists}/>
       </div>
     </div>
   );
