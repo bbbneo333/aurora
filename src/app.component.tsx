@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
 import {Provider, useSelector} from 'react-redux';
-import {MemoryRouter as Router, NavLink} from 'react-router-dom';
+import {MemoryRouter as Router} from 'react-router-dom';
 import * as _ from 'lodash';
 
 import {
@@ -11,6 +11,7 @@ import {
   RouterSwitchComponent,
   MediaSessionComponent,
   MediaPlayerRibbonComponent,
+  RouterLink,
 } from './components';
 
 import {IAppStatePersistor} from './interfaces';
@@ -86,7 +87,7 @@ function AppSidebarNavigationLink(props: {
   } = props;
 
   return (
-    <NavLink
+    <RouterLink
       to={path}
       activeClassName={cx('selected')}
       className={cx('app-sidebar-navigation-item', 'app-nav-link')}
@@ -97,7 +98,7 @@ function AppSidebarNavigationLink(props: {
       <span className={cx('app-sidebar-navigation-item-label')}>
         {I18nService.getString(name)}
       </span>
-    </NavLink>
+    </RouterLink>
   );
 }
 

@@ -102,7 +102,8 @@ export function MediaTrackComponent(props: {
   mediaTrackContextMenuId?: string;
   handleOnPlayButtonClick?: () => void,
   isPlaying?: boolean,
-  showCover?: boolean,
+  disableCover?: boolean,
+  disableAlbumLink?: boolean,
 }) {
   const {
     mediaTrack,
@@ -110,7 +111,8 @@ export function MediaTrackComponent(props: {
     mediaTrackContextMenuId,
     handleOnPlayButtonClick,
     isPlaying,
-    showCover = true,
+    disableCover = false,
+    disableAlbumLink = false,
   } = props;
 
   const {show} = useContextMenu();
@@ -154,7 +156,7 @@ export function MediaTrackComponent(props: {
                 handleOnPlayButtonClick={handleOnPlayButtonClick}
               />
             </div>
-            {showCover && (
+            {!disableCover && (
               <div className={cx('media-track-section')}>
                 <MediaCoverPictureComponent
                   mediaPicture={mediaTrack.track_cover_picture}
@@ -166,6 +168,7 @@ export function MediaTrackComponent(props: {
             <div className={cx('media-track-section')}>
               <MediaTrackInfoComponent
                 mediaTrack={mediaTrack}
+                disableAlbumLink={disableAlbumLink}
                 className={cx('media-track-info')}
               />
             </div>

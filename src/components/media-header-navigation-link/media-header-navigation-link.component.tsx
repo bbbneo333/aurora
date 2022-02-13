@@ -1,8 +1,8 @@
 import React from 'react';
-import {NavLink} from 'react-router-dom';
 import classNames from 'classnames/bind';
 
 import {I18nService} from '../../services';
+import {RouterLink} from '../router-link/router-link.component';
 
 import styles from './media-header-navigation-link.component.css';
 
@@ -18,7 +18,7 @@ export function MediaHeaderNavigationLinkComponent(props: {
   } = props;
 
   return (
-    <NavLink
+    <RouterLink
       to={path}
       activeClassName={cx('selected')}
       className={cx('media-header-navigation-link', 'app-nav-link')}
@@ -26,6 +26,6 @@ export function MediaHeaderNavigationLinkComponent(props: {
       <span className={cx('media-header-navigation-link-label')}>
         {I18nService.getString(tName)}
       </span>
-    </NavLink>
+    </RouterLink>
   );
 }

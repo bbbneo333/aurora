@@ -1,7 +1,6 @@
 import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
-import {NavLink} from 'react-router-dom';
 
 import {Icons, Layout, Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
@@ -13,6 +12,7 @@ import {StringUtils} from '../../utils';
 import {Icon} from '../icon/icon.component';
 import {MediaButtonComponent} from '../media-button/media-button.component';
 import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
+import {RouterLink} from '../router-link/router-link.component';
 
 import styles from './media-album-tile.component.css';
 
@@ -66,7 +66,7 @@ export function MediaAlbumTile(props: {
         playing: isMediaAlbumPlaying,
       })}
       >
-        <NavLink
+        <RouterLink
           exact
           to={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
             albumId: mediaAlbum.id,
@@ -113,7 +113,7 @@ export function MediaAlbumTile(props: {
               </div>
             </div>
           </div>
-        </NavLink>
+        </RouterLink>
       </div>
     </div>
   );

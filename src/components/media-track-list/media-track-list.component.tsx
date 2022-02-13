@@ -14,13 +14,15 @@ export function MediaTrackListComponent(props: {
   mediaTracks: IMediaTrack[],
   mediaTrackList?: IMediaTrackList,
   mediaTrackContextMenuId?: string;
-  showCovers?: boolean,
+  disableCovers?: boolean,
+  disableAlbumLinks?: boolean,
 }) {
   const {
     mediaTracks,
     mediaTrackList,
     mediaTrackContextMenuId,
-    showCovers = true,
+    disableCovers = false,
+    disableAlbumLinks = false,
   } = props;
 
   return (
@@ -35,7 +37,8 @@ export function MediaTrackListComponent(props: {
             mediaTrack={mediaTrack}
             mediaTrackPointer={mediaTrackPointer}
             mediaTrackContextMenuId={mediaTrackContextMenuId}
-            showCover={showCovers}
+            disableCover={disableCovers}
+            disableAlbumLink={disableAlbumLinks}
           />
         ))}
       </MediaTrackListProvider>
