@@ -10,11 +10,11 @@ import {
 
 import {AppBrowserHistory} from '../../types';
 
-type RouterLinkToggleComponentProps = Pick<NavLinkProps, 'children' | 'className' | 'activeClassName' | 'to'> & {
+type RouterLinkToggleProps = NavLinkProps & {
   fallbackPath?: string,
 };
 
-export function RouterLinkToggle(props: RouterLinkToggleComponentProps) {
+export function RouterLinkToggle(props: RouterLinkToggleProps) {
   const {
     className,
     activeClassName,
@@ -43,6 +43,8 @@ export function RouterLinkToggle(props: RouterLinkToggleComponentProps) {
 
   return (
     <NavLink
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
       to={togglePath}
       className={classNames(className, activeClassName && {
         [activeClassName]: pathname === to,
