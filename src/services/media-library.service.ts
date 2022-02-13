@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import {AppEnums, MediaEnums} from '../enums';
-import {DatastoreUtils} from '../utils';
+import {DatastoreUtils, MediaUtils} from '../utils';
 
 import {
   MediaAlbumDatastore,
@@ -118,7 +118,8 @@ class MediaLibraryService {
     });
   }
 
-  // TODO: This needs to replaced by Provider based implementation
+  // fetch API
+
   async getMediaTrack(mediaTrackId: string): Promise<IMediaTrack | undefined> {
     const mediaTrackData = await MediaTrackDatastore.findMediaTrack({
       id: mediaTrackId,
@@ -127,7 +128,6 @@ class MediaLibraryService {
     return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
   }
 
-  // TODO: This needs to replaced by Provider based implementation
   async getMediaAlbumTracks(mediaAlbumId: string): Promise<IMediaTrack[]> {
     const mediaAlbumTrackDataList = await MediaTrackDatastore.findMediaTracks({
       track_album_id: mediaAlbumId,
@@ -135,18 +135,37 @@ class MediaLibraryService {
     });
 
     const mediaAlbumTracks = await this.buildMediaTracks(mediaAlbumTrackDataList);
-    return this.sortMediaAlbumTracks(mediaAlbumTracks);
+    return MediaUtils.sortMediaAlbumTracks(mediaAlbumTracks);
+  }
+
+  async getMediaAlbums(): Promise<IMediaAlbum[]> {
+    const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums();
+
+    const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
+    return MediaUtils.sortMediaAlbums(mediaAlbums);
   }
 
   // load API
 
-  // TODO: This needs to replaced by Provider based implementation
+  loadMediaAlbums(): void {
+    this
+      .getMediaAlbums()
+      .then((mediaAlbums) => {
+        store.dispatch({
+          type: MediaEnums.MediaLibraryActions.AddAlbums,
+          data: {
+            mediaAlbums,
+          },
+        });
+      });
+  }
+
   loadMediaAlbum(mediaAlbumId: string): void {
     this
       .getMediaAlbumTracks(mediaAlbumId)
       .then(async (mediaAlbumTracks) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.LoadAlbum,
+          type: MediaEnums.MediaLibraryActions.SetAlbum,
           data: {
             mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
             mediaAlbumTracks,
@@ -379,12 +398,6 @@ class MediaLibraryService {
 
     // image data type does not need any processing, return as is
     return mediaPicture;
-  }
-
-  private sortMediaAlbumTracks(
-    mediaAlbumTracks: IMediaTrack[],
-  ): IMediaTrack[] {
-    return _.sortBy(mediaAlbumTracks, (mediaAlbumTrack: IMediaTrack) => mediaAlbumTrack.track_number);
   }
 }
 

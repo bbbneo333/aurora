@@ -28,7 +28,7 @@ class MediaAlbumDatastore {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
   }
 
-  findMediaAlbums(mediaAlbumFilterParams: IMediaAlbumDataFilterParams): Promise<IMediaAlbumData[]> {
+  findMediaAlbums(mediaAlbumFilterParams?: IMediaAlbumDataFilterParams): Promise<IMediaAlbumData[]> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
   }
 

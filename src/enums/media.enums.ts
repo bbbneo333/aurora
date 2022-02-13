@@ -12,11 +12,12 @@ export enum MediaLibraryActions {
   AddTrack = 'media/library/addTrack',
   RemoveTrack = 'media/library/removeTrack',
   AddAlbum = 'media/library/addAlbum',
+  AddAlbums = 'media/library/addAlbums',
   RemoveAlbum = 'media/library/removeAlbum',
-  LoadAlbum = 'media/library/loadAlbum',
+  SetAlbum = 'media/library/setAlbum',
   AddArtist = 'media/library/addArtist',
   RemoveArtist = 'media/library/removeArtist',
-  LoadArtist = 'media/library/loadArtist',
+  SetArtist = 'media/library/setArtist',
 }
 
 export enum MediaPlayerActions {
