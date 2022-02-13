@@ -1,11 +1,12 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import {NavLink} from 'react-router-dom';
 
 import {Routes} from '../../constants';
 import {IMediaArtist, IMediaTrack} from '../../interfaces';
 import {StringUtils} from '../../utils';
 import {withSeparator} from '../../utils/render.utils';
+
+import {RouterLink} from '../router-link/router-link.component';
 
 import styles from './media-track-info.component.css';
 
@@ -23,7 +24,7 @@ export function MediaTrackAlbumLinkComponent(props: {
   const {mediaTrack} = props;
 
   return (
-    <NavLink
+    <RouterLink
       exact
       to={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
         albumId: mediaTrack.track_album.id,
@@ -31,7 +32,7 @@ export function MediaTrackAlbumLinkComponent(props: {
       className={cx('media-track-album-link', 'app-nav-link')}
     >
       {mediaTrack.track_name}
-    </NavLink>
+    </RouterLink>
   );
 }
 
@@ -55,7 +56,7 @@ export function MediaArtistLinkComponent(props: {
   } = props;
 
   return (
-    <NavLink
+    <RouterLink
       exact
       to={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
         artistId: mediaArtist.id,
@@ -63,7 +64,7 @@ export function MediaArtistLinkComponent(props: {
       className={cx('media-track-artist-link', 'app-nav-link')}
     >
       {mediaArtist.artist_name}
-    </NavLink>
+    </RouterLink>
   );
 }
 
