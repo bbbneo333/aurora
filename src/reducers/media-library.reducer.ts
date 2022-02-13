@@ -27,7 +27,7 @@ const mediaLibraryInitialState: MediaLibraryState = {
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
   switch (action.type) {
-    case MediaEnums.MediaLibraryActions.InitializeSafe: {
+    case MediaEnums.MediaLibraryActions.Initialize: {
       // data.mediaProviderIdentifier
       // TODO: To be implemented
 
@@ -62,9 +62,9 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       if (mediaSelectedAlbum && mediaSelectedAlbum.id === mediaTrack.track_album.id) {
         mediaSelectedAlbumTracks = mediaSelectedAlbumTracks || [];
 
-        // only add the track if it does not already exists
+        // only add the track if it does not already exist
         if (_.isNil(mediaSelectedAlbumTracks.find(mediaAlbumTrack => mediaAlbumTrack.id === mediaTrack.id))) {
-          ArrayUtils.updateSortedArray<IMediaTrack>(mediaSelectedAlbumTracks, mediaTrack, MediaUtils.mediaTrackInsertComparator);
+          ArrayUtils.updateSortedArray<IMediaTrack>(mediaSelectedAlbumTracks, mediaTrack, MediaUtils.mediaTrackComparator);
         }
       }
 
@@ -88,13 +88,13 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbumTracks,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddAlbumSafe: {
+    case MediaEnums.MediaLibraryActions.AddAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be added
       const {mediaAlbum} = action.data;
       const {mediaAlbums} = state;
 
       if (_.isNil(mediaAlbums.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
-        ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, MediaUtils.mediaAlbumInsertionComparator);
+        ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
       }
 
       return {
@@ -102,7 +102,23 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaAlbums,
       };
     }
-    case MediaEnums.MediaLibraryActions.LoadAlbum: {
+    case MediaEnums.MediaLibraryActions.AddAlbums: {
+      // data.mediaAlbums: MediaAlbum[] - albums which are needed to be added
+      const {mediaAlbums} = action.data;
+      const mediaAlbumsExisting = state.mediaAlbums;
+
+      mediaAlbums.forEach((mediaAlbum: IMediaAlbum) => {
+        if (_.isNil(mediaAlbumsExisting.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
+          ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbumsExisting, mediaAlbum, MediaUtils.mediaAlbumComparator);
+        }
+      });
+
+      return {
+        ...state,
+        mediaAlbums: mediaAlbumsExisting,
+      };
+    }
+    case MediaEnums.MediaLibraryActions.SetAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be loaded
       // data.mediaAlbumTracks: MediaTrack[] - album tracks which can be loaded
       const {
@@ -113,16 +129,16 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       return {
         ...state,
         mediaSelectedAlbum: mediaAlbum,
-        mediaSelectedAlbumTracks: MediaUtils.mediaAlbumTrackSort(mediaAlbumTracks),
+        mediaSelectedAlbumTracks: mediaAlbumTracks,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddArtistSafe: {
+    case MediaEnums.MediaLibraryActions.AddArtist: {
       // data.mediaArtist: MediaArtist - artist which needs to be added
       const {mediaArtist} = action.data;
       const {mediaArtists} = state;
 
       if (_.isNil(mediaArtists.find(exMediaArtist => exMediaArtist.id === mediaArtist.id))) {
-        ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, MediaUtils.mediaArtistInsertionComparator);
+        ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, MediaUtils.mediaArtistComparator);
       }
 
       return {
@@ -130,7 +146,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaArtists,
       };
     }
-    case MediaEnums.MediaLibraryActions.LoadArtist: {
+    case MediaEnums.MediaLibraryActions.SetArtist: {
       // data.mediaArtist: MediaArtist - artist which needs to be loaded
       // data.mediaArtistAlbums: MediaAlbum[] - artist albums which can be loaded
       const {

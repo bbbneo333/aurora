@@ -8,7 +8,7 @@ import {MediaEnums} from '../../enums';
 import {IMediaAlbum} from '../../interfaces';
 import {RootState} from '../../reducers';
 import {MediaLibraryService, MediaPlayerService} from '../../services';
-import {MediaUtils, StringUtils} from '../../utils';
+import {StringUtils} from '../../utils';
 
 import {Icon} from '../icon/icon.component';
 import {MediaButtonComponent} from '../media-button/media-button.component';
@@ -38,9 +38,7 @@ export function MediaAlbumTile(props: {
     MediaLibraryService
       .getMediaAlbumTracks(mediaAlbum.id)
       .then((mediaAlbumTracks) => {
-        const mediaAlbumTracksSorted = MediaUtils.mediaAlbumTrackSort(mediaAlbumTracks);
-
-        MediaPlayerService.playMediaTracks(mediaAlbumTracksSorted, {
+        MediaPlayerService.playMediaTracks(mediaAlbumTracks, {
           id: mediaAlbum.id,
         });
       });

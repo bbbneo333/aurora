@@ -28,15 +28,6 @@ import routes from './app.routes';
 
 const cx = classNames.bind(styles);
 
-// register media providers
-const mediaLocalProvider = new MediaLocalProvider();
-MediaProviderService.registerMediaProvider(mediaLocalProvider);
-
-// register state persistors
-_.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
-  registerStatePersistor(stateKey, statePersistor);
-});
-
 // app > stage > content > header > rows [navigator, page header, user]
 
 function AppContentHeaderPage() {
@@ -120,18 +111,19 @@ function AppSidebarNavigationList() {
   );
 }
 
-function AppSidebarBrandingLogo() {
-  return (
-    <div className={cx('app-sidebar-logo')}/>
-  );
-}
+// function AppSidebarBrandingLogo() {
+//   return (
+//     <div className={cx('app-sidebar-logo')}/>
+//   );
+// }
 
 // app > stage > rows [sidebar, content]
 
 function AppSidebar() {
   return (
     <div className={cx('app-sidebar-container')}>
-      <AppSidebarBrandingLogo/>
+      {/* TODO: Add back AppSidebarBrandingLogo when required */}
+      {/* <AppSidebarBrandingLogo/> */}
       <AppSidebarNavigationList/>
       <AppSidebarQuickAccess/>
     </div>
@@ -191,6 +183,15 @@ export function AppComponent() {
 
   useEffect(() => {
     setAppStateIsLoading(true);
+
+    // register media providers
+    const mediaLocalProvider = new MediaLocalProvider();
+    MediaProviderService.registerMediaProvider(mediaLocalProvider);
+
+    // register state persistors
+    _.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
+      registerStatePersistor(stateKey, statePersistor);
+    });
 
     loadState(store)
       .then(() => {

@@ -13,6 +13,8 @@ export type MediaPlayerStateSerialized = Omit<MediaPlayerState, 'mediaTracks' | 
   mediaPlaybackCurrentMediaTrack?: MediaQueueTrackSerialized;
 };
 
+export type MediaPlayerStateDeserialized = MediaPlayerStateSerialized & {};
+
 export default class MediaPlayerPersistor implements IAppStatePersistor {
   async serialize(state: MediaPlayerState): Promise<MediaPlayerStateSerialized> {
     return {
@@ -28,7 +30,11 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
     };
   }
 
-  async exhaust(stateExisting: MediaPlayerState, stateStored: MediaPlayerStateSerialized): Promise<void> {
+  async deserialize(state: MediaPlayerStateSerialized): Promise<MediaPlayerStateDeserialized> {
+    return state;
+  }
+
+  async exhaust(stateExisting: MediaPlayerState, stateStored: MediaPlayerStateDeserialized): Promise<void> {
     // exhaust won't run if media player is already playing a track
     // this only happens in case of HotReloads in development
     if (stateExisting.mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {

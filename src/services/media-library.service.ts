@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import {AppEnums, MediaEnums} from '../enums';
-import {DatastoreUtils} from '../utils';
+import {DatastoreUtils, MediaUtils} from '../utils';
 
 import {
   MediaAlbumDatastore,
@@ -31,6 +31,8 @@ import store from '../store';
 class MediaLibraryService {
   private readonly mediaPictureScaleWidth = 500;
   private readonly mediaPictureScaleHeight = 500;
+
+  // sync API
 
   async insertMediaTrack(mediaProviderIdentifier: string, mediaTrackProviderData: IMediaTrackProviderData): Promise<IMediaTrack> {
     const mediaTrackData = await this.checkAndInsertMediaTrack(mediaProviderIdentifier, mediaTrackProviderData);
@@ -116,7 +118,8 @@ class MediaLibraryService {
     });
   }
 
-  // TODO: This needs to replaced by Provider based implementation
+  // fetch API
+
   async getMediaTrack(mediaTrackId: string): Promise<IMediaTrack | undefined> {
     const mediaTrackData = await MediaTrackDatastore.findMediaTrack({
       id: mediaTrackId,
@@ -125,54 +128,51 @@ class MediaLibraryService {
     return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
   }
 
-  // TODO: This needs to replaced by Provider based implementation
   async getMediaAlbumTracks(mediaAlbumId: string): Promise<IMediaTrack[]> {
     const mediaAlbumTrackDataList = await MediaTrackDatastore.findMediaTracks({
       track_album_id: mediaAlbumId,
       removed: false,
     });
 
-    return this.buildMediaTracks(mediaAlbumTrackDataList);
+    const mediaAlbumTracks = await this.buildMediaTracks(mediaAlbumTrackDataList);
+    return MediaUtils.sortMediaAlbumTracks(mediaAlbumTracks);
   }
 
-  loadMediaAlbum(mediaAlbumId: string): void {
-    MediaTrackDatastore
-      .findMediaTracks({
-        track_album_id: mediaAlbumId,
-        removed: false,
-      })
-      .then(async (mediaAlbumTrackDataList) => {
+  async getMediaAlbums(): Promise<IMediaAlbum[]> {
+    const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums();
+
+    const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
+    return MediaUtils.sortMediaAlbums(mediaAlbums);
+  }
+
+  // load API
+
+  loadMediaAlbums(): void {
+    this
+      .getMediaAlbums()
+      .then((mediaAlbums) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.LoadAlbum,
+          type: MediaEnums.MediaLibraryActions.AddAlbums,
           data: {
-            mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
-            mediaAlbumTracks: await this.buildMediaTracks(mediaAlbumTrackDataList),
+            mediaAlbums,
           },
         });
       });
   }
 
-  // async syncMediaTracks(mediaProviderIdentifier: string): Promise<void> {
-  //   const {mediaLibraryService} = await MediaProviderService.getMediaProvider(mediaProviderIdentifier);
-  //   await mediaLibraryService.syncMediaTracks();
-  // }
-
-  // loadMediaArtist(mediaArtist: IMediaArtist): void {
-  //   MediaAlbumDatastore
-  //     .findMediaAlbums({
-  //       provider: mediaArtist.provider,
-  //       album_artist_id: mediaArtist.id,
-  //     })
-  //     .then(async (mediaAlbumDataList) => {
-  //       store.dispatch({
-  //         type: MediaEnums.MediaLibraryActions.LoadAlbum,
-  //         data: {
-  //           mediaArtist,
-  //           mediaArtistAlbums: await this.buildMediaAlbums(mediaAlbumDataList),
-  //         },
-  //       });
-  //     });
-  // }
+  loadMediaAlbum(mediaAlbumId: string): void {
+    this
+      .getMediaAlbumTracks(mediaAlbumId)
+      .then(async (mediaAlbumTracks) => {
+        store.dispatch({
+          type: MediaEnums.MediaLibraryActions.SetAlbum,
+          data: {
+            mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
+            mediaAlbumTracks,
+          },
+        });
+      });
+  }
 
   private async removeUnSyncTracks(mediaProviderIdentifier: string, mediaSyncKey: string): Promise<void> {
     await MediaTrackDatastore.removeMediaTracks({
@@ -223,7 +223,7 @@ class MediaLibraryService {
 
     if (loadMediaAlbum) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddAlbumSafe,
+        type: MediaEnums.MediaLibraryActions.AddAlbum,
         data: {
           mediaAlbum: mediaAlbumBuilt,
         },
@@ -232,10 +232,6 @@ class MediaLibraryService {
 
     return mediaAlbumBuilt;
   }
-
-  // private async buildMediaAlbums(mediaAlbums: string[]|IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
-  //   return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
-  // }
 
   private async buildMediaArtist(mediaArtist: string | IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
     // info - no further processing required for MediaArtistData -> MediaArtist
@@ -252,7 +248,7 @@ class MediaLibraryService {
 
     if (loadMediaArtist) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddArtistSafe,
+        type: MediaEnums.MediaLibraryActions.AddArtist,
         data: {
           mediaArtist: mediaArtistData,
         },
