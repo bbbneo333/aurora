@@ -1,6 +1,7 @@
 import React, {useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import classNames from 'classnames/bind';
+import {useContextMenu} from 'react-contexify';
 
 import {Icons, Layout, Routes} from '../../constants';
 import {MediaEnums} from '../../enums';
@@ -20,10 +21,14 @@ const cx = classNames.bind(styles);
 
 export function MediaAlbumTile(props: {
   mediaAlbum: IMediaAlbum,
+  mediaAlbumContextMenuId?: string,
 }) {
   const {
     mediaAlbum,
+    mediaAlbumContextMenuId,
   } = props;
+
+  const {show} = useContextMenu();
 
   const {
     mediaPlaybackState,
@@ -60,8 +65,23 @@ export function MediaAlbumTile(props: {
     e.stopPropagation();
   }, []);
 
+  const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
+    if (mediaAlbumContextMenuId) {
+      show(e, {
+        id: mediaAlbumContextMenuId,
+        props: {
+          mediaAlbum,
+        },
+      });
+    }
+  }, [
+    show,
+    mediaAlbum,
+    mediaAlbumContextMenuId,
+  ]);
+
   return (
-    <div className={cx(Layout.Grid.LibraryAlbumTile, 'mb-3')}>
+    <div className={cx(Layout.Grid.LibraryAlbumTile, 'mb-3')} onContextMenu={handleOnContextMenu}>
       <div className={cx('album-tile', {
         playing: isMediaAlbumPlaying,
       })}

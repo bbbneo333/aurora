@@ -157,7 +157,9 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaQueueTrack);
   }
 
-  addMediaTrackToQueue(mediaTrack: IMediaTrack): void {
+  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions: {
+    skipUserNotification?: boolean,
+  } = {}): void {
     const {
       mediaPlayer,
     } = store.getState();
@@ -219,9 +221,24 @@ class MediaPlayerService {
       },
     });
 
-    // #6 - notify user
-    // TODO: Add support for sending notification
-    //  "Track was added to the queue"
+    // #6 - if there's no loaded track currently, load the added track
+    if (!mediaPlaybackCurrentMediaTrack) {
+      this.loadMediaTrack(mediaQueueTrack);
+    }
+
+    // #7 - notify user
+    if (!mediaTrackAddToQueueOptions.skipUserNotification) {
+      // TODO: Add support for sending notification
+      //  "Track was added to the queue"
+    }
+  }
+
+  addMediaTracksToQueue(mediaTracksToAdd: IMediaTrack[]): void {
+    mediaTracksToAdd.forEach((mediaTrackToAdd) => {
+      this.addMediaTrackToQueue(mediaTrackToAdd, {
+        skipUserNotification: true,
+      });
+    });
   }
 
   removeMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack): void {
@@ -889,7 +906,7 @@ class MediaPlayerService {
     return true;
   }
 
-  private getPreviousFromList(): IMediaQueueTrack|undefined {
+  private getPreviousFromList(): IMediaQueueTrack | undefined {
     const {
       mediaPlayer,
     } = store.getState();
@@ -927,7 +944,7 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaTrack);
   }
 
-  private getNextFromList(): IMediaQueueTrack|undefined {
+  private getNextFromList(): IMediaQueueTrack | undefined {
     const {
       mediaPlayer,
     } = store.getState();

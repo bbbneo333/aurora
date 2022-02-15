@@ -2,6 +2,7 @@ export {BrowserNavigation} from './browser-navigation/browser-navigation.compone
 export {BrowserScroll} from './browser-scroll/browser-scroll.component';
 export {Icon} from './icon/icon.component';
 export {MediaAlbumTile} from './media-album-tile/media-album-tile.component';
+export {MediaAlbumContextMenu} from './media-album-context-menu/media-album-context-menu.component';
 export {MediaButtonComponent} from './media-button/media-button.component';
 export {MediaContentHeaderUserComponent} from './media-content-header-user/media-content-header-user.component';
 export {MediaHeaderNavigationLinkComponent} from './media-header-navigation-link/media-header-navigation-link.component';
