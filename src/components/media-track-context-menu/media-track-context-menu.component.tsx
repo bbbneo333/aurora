@@ -21,10 +21,10 @@ export enum MediaTrackContextMenuItem {
 }
 
 export enum MediaTrackContextMenuItemAction {
-  AddToQueue = 'add_to_queue',
-  AddToLikedSongs = 'add_to_liked_songs',
-  AddToPlaylist = 'add_to_playlist',
-  RemoveFromQueue = 'remove_from_queue',
+  AddToQueue = 'media/track/action/addToQueue',
+  AddToLikedSongs = 'media/track/action/addToLikedSongs',
+  AddToPlaylist = 'media/track/action/addToPlaylist',
+  RemoveFromQueue = 'media/track/action/removeFromQueue',
 }
 
 export interface MediaTrackContextMenuItemProps {
@@ -44,8 +44,8 @@ export function MediaTrackContextMenu(props: {
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
     const itemAction: MediaTrackContextMenuItemAction = itemParams.event.currentTarget.id as MediaTrackContextMenuItemAction;
 
-    const mediaTrack: IMediaTrack|undefined = itemParams.props?.mediaTrack;
-    const mediaQueueTrack: IMediaQueueTrack|undefined = itemParams.props?.mediaQueueTrack;
+    const mediaTrack: IMediaTrack | undefined = itemParams.props?.mediaTrack;
+    const mediaQueueTrack: IMediaQueueTrack | undefined = itemParams.props?.mediaQueueTrack;
 
     switch (itemAction) {
       case MediaTrackContextMenuItemAction.AddToQueue:

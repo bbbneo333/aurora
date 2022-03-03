@@ -46,6 +46,10 @@ import {
   AppAsyncMessageHandler,
 } from './types';
 
+import {
+  AppEnums,
+} from './enums';
+
 import * as AppBuilders from './main/builders';
 import * as AppModules from './main/modules';
 
@@ -114,6 +118,11 @@ class App implements IAppMain {
     });
   }
 
+  sendSyncMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any {
+    const window = this.getCurrentWindow();
+    window.webContents.send(messageChannel, ...messageArgs);
+  }
+
   getAssetPath(...paths: string[]): string {
     const appAssetsPath = app.isPackaged
       ? path.join(this.resourcesPath, 'assets')
@@ -162,6 +171,10 @@ class App implements IAppMain {
   removeAppData() {
     const appDataPath = this.getDataPath();
     this.removeDirectorySafe(appDataPath);
+  }
+
+  removePersistedStates() {
+    this.sendSyncMessageToRenderer(AppEnums.IPCRendererCommChannels.StateRemovePersisted);
   }
 
   private removeDirectorySafe(directory: string) {
