@@ -1,14 +1,14 @@
-import React, {useCallback, useState} from 'react';
-import {Col, Row} from 'react-bootstrap';
+import React, { useCallback, useState } from 'react';
+import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import {DateTimeUtils} from '../../utils';
-import {MediaEnums} from '../../enums';
-import {RootState} from '../../reducers';
-import {MediaPlayerService} from '../../services';
+import { DateTimeUtils } from '../../utils';
+import { MediaEnums } from '../../enums';
+import { RootState } from '../../reducers';
+import { MediaPlayerService } from '../../services';
 
-import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
+import { MediaProgressBarComponent } from '../media-progress-bar/media-progress-bar.component';
 
 import styles from './media-player-ribbon.component.css';
 

@@ -1,6 +1,6 @@
-import {Routes} from '../../constants';
+import { Routes } from '../../constants';
 
-import {PlayerQueueComponent} from '../player-queue/player-queue.component';
+import { PlayerQueueComponent } from '../player-queue/player-queue.component';
 
 export default [
   {

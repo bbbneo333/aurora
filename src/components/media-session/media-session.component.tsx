@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react';
-import {useSelector} from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
-import {MediaEnums} from '../../enums';
-import {RootState} from '../../reducers';
-import {MediaPlayerService} from '../../services';
+import { MediaEnums } from '../../enums';
+import { RootState } from '../../reducers';
+import { MediaPlayerService } from '../../services';
 
 const debug = require('debug')('app:component:media_session_component');
 
@@ -15,7 +15,7 @@ export function MediaSessionComponent() {
       return;
     }
 
-    const {mediaSession} = navigator;
+    const { mediaSession } = navigator;
 
     debug('registering media action handlers');
 

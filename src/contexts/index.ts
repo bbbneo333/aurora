@@ -1,1 +1,1 @@
-export {MediaTrackListProvider, useMediaTrackList} from './media-track-list.context';
+export { MediaTrackListProvider, useMediaTrackList } from './media-track-list.context';

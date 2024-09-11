@@ -1,19 +1,19 @@
-import React, {useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
-import {useContextMenu} from 'react-contexify';
+import { useContextMenu } from 'react-contexify';
 
-import {Icons, Layout, Routes} from '../../constants';
-import {MediaEnums} from '../../enums';
-import {IMediaAlbum} from '../../interfaces';
-import {RootState} from '../../reducers';
-import {MediaLibraryService, MediaPlayerService} from '../../services';
-import {StringUtils} from '../../utils';
+import { Icons, Layout, Routes } from '../../constants';
+import { MediaEnums } from '../../enums';
+import { IMediaAlbum } from '../../interfaces';
+import { RootState } from '../../reducers';
+import { MediaLibraryService, MediaPlayerService } from '../../services';
+import { StringUtils } from '../../utils';
 
-import {Icon} from '../icon/icon.component';
-import {MediaButtonComponent} from '../media-button/media-button.component';
-import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
-import {RouterLink} from '../router-link/router-link.component';
+import { Icon } from '../icon/icon.component';
+import { MediaButtonComponent } from '../media-button/media-button.component';
+import { MediaCoverPictureComponent } from '../media-cover-picture/media-cover-picture.component';
+import { RouterLink } from '../router-link/router-link.component';
 
 import styles from './media-album-tile.component.css';
 
@@ -28,7 +28,7 @@ export function MediaAlbumTile(props: {
     mediaAlbumContextMenuId,
   } = props;
 
-  const {show} = useContextMenu();
+  const { show } = useContextMenu();
 
   const {
     mediaPlaybackState,

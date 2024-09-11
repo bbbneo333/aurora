@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react';
 
 import {
   Menu,
@@ -9,8 +9,8 @@ import {
   animation,
 } from 'react-contexify';
 
-import {IMediaAlbum} from '../../interfaces';
-import {I18nService, MediaLibraryService, MediaPlayerService} from '../../services';
+import { IMediaAlbum } from '../../interfaces';
+import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
 
 export enum MediaAlbumContextMenuItem {
   AddToQueue,

@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import {useHistory, useLocation} from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import * as _ from 'lodash';
 
-import {Icons} from '../../constants';
-import {AppBrowserHistory} from '../../types';
-import {Icon} from '../icon/icon.component';
+import { Icons } from '../../constants';
+import { AppBrowserHistory } from '../../types';
+import { Icon } from '../icon/icon.component';
 
 import styles from './browser-navigation.component.css';
 

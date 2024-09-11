@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import {IMediaTrack, IMediaTrackList} from '../interfaces';
+import { IMediaTrack, IMediaTrackList } from '../interfaces';
 
 const mediaTrackListInitialState = {
   mediaTracks: [],
@@ -25,7 +25,7 @@ export function MediaTrackListProvider(props: {
   } = props;
 
   return (
-    <MediaTrackListContext.Provider value={{mediaTracks, mediaTrackList}}>
+    <MediaTrackListContext.Provider value={{ mediaTracks, mediaTrackList }}>
       {children}
     </MediaTrackListContext.Provider>
   );

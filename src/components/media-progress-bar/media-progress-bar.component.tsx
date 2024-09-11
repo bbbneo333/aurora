@@ -8,9 +8,9 @@ import React, {
 
 import classNames from 'classnames/bind';
 
-import {SystemEnums} from '../../enums';
+import { SystemEnums } from '../../enums';
 
-import {MediaButtonComponent} from '../media-button/media-button.component';
+import { MediaButtonComponent } from '../media-button/media-button.component';
 
 import styles from './media-progress-bar.component.scss';
 

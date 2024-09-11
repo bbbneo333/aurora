@@ -1,4 +1,4 @@
-import {IMediaProvider} from '../../interfaces';
+import { IMediaProvider } from '../../interfaces';
 
 import MediaLocalLibraryService from './media-local-library.service';
 import MediaLocalPlaybackService from './media-local-playback.service';

@@ -1,5 +1,5 @@
-import {ipcRenderer} from 'electron';
-import {AppSyncMessageHandler} from '../types';
+import { ipcRenderer } from 'electron';
+import { AppSyncMessageHandler } from '../types';
 
 const debug = require('debug')('app:service:app_service');
 

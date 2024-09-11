@@ -1,8 +1,8 @@
-import {createStore, applyMiddleware} from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 
 import storeReducer from '../reducers';
 import storeComposer from './composer';
-import {persistState} from './persistor';
+import { persistState } from './persistor';
 
 const storeEnhancer = storeComposer(
   applyMiddleware(persistState),

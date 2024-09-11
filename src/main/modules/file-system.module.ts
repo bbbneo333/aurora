@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import {dialog} from 'electron';
+import { dialog } from 'electron';
 
-import {AppEnums} from '../../enums';
+import { AppEnums } from '../../enums';
 
 import {
   IAppMain,

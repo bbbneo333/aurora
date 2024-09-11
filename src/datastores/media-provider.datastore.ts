@@ -1,5 +1,5 @@
-import {AppEnums} from '../enums';
-import {IMediaProviderData, IMediaProviderDataUpdateParams} from '../interfaces';
+import { AppEnums } from '../enums';
+import { IMediaProviderData, IMediaProviderDataUpdateParams } from '../interfaces';
 import AppService from '../services/app.service';
 
 class MediaProviderDatastore {

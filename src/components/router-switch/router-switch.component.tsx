@@ -1,5 +1,5 @@
 import React from 'react';
-import {Redirect, Route as RouteComponent, Switch} from 'react-router-dom';
+import { Redirect, Route as RouteComponent, Switch } from 'react-router-dom';
 
 export type Route = {
   path: string,

@@ -1,6 +1,6 @@
-import LocalizedStrings, {LocalizedStringsMethods} from 'react-localization';
+import LocalizedStrings, { LocalizedStringsMethods } from 'react-localization';
 
-import {AppEnums} from '../enums';
+import { AppEnums } from '../enums';
 import AppService from './app.service';
 
 class I18nService {

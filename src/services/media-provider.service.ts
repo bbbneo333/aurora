@@ -1,6 +1,6 @@
-import {MediaEnums} from '../enums';
-import {MediaProviderDatastore} from '../datastores';
-import {IMediaProvider} from '../interfaces';
+import { MediaEnums } from '../enums';
+import { MediaProviderDatastore } from '../datastores';
+import { IMediaProvider } from '../interfaces';
 import store from '../store';
 
 const debug = require('debug')('app:service:media_provider_service');
@@ -24,7 +24,7 @@ class MediaProviderService {
   }
 
   getMediaProvider(mediaProviderIdentifier: string): IMediaProvider {
-    const {mediaProviderRegistry} = store.getState();
+    const { mediaProviderRegistry } = store.getState();
 
     const mediaProviderRequested = mediaProviderRegistry.mediaProviders.find(mediaProvider => mediaProvider.mediaProviderIdentifier === mediaProviderIdentifier);
     if (!mediaProviderRequested) {

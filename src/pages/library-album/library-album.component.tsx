@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import classNames from 'classnames/bind';
-import {useParams} from 'react-router-dom';
-import {useSelector} from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 import {
   MediaCoverPictureComponent,
@@ -10,10 +10,10 @@ import {
   MediaTrackListComponent,
 } from '../../components';
 
-import {MediaTrackContextMenuItem} from '../../components/media-track-context-menu/media-track-context-menu.component';
-import {Layout} from '../../constants';
-import {RootState} from '../../reducers';
-import {I18nService, MediaLibraryService} from '../../services';
+import { MediaTrackContextMenuItem } from '../../components/media-track-context-menu/media-track-context-menu.component';
+import { Layout } from '../../constants';
+import { RootState } from '../../reducers';
+import { I18nService, MediaLibraryService } from '../../services';
 
 import styles from './library-album.component.css';
 
@@ -26,7 +26,7 @@ enum MediaContextMenus {
 export function LibraryAlbumComponent() {
   const {
     albumId,
-  } = useParams() as {albumId: string};
+  } = useParams() as { albumId: string };
 
   const {
     mediaSelectedAlbum,

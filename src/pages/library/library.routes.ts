@@ -1,8 +1,8 @@
-import {Routes} from '../../constants';
+import { Routes } from '../../constants';
 
-import {LibraryArtistsComponent} from '../library-artists/library-artists.component';
-import {LibraryAlbumsComponent} from '../library-albums/library-albums.component';
-import {LibraryAlbumComponent} from '../library-album/library-album.component';
+import { LibraryArtistsComponent } from '../library-artists/library-artists.component';
+import { LibraryAlbumsComponent } from '../library-albums/library-albums.component';
+import { LibraryAlbumComponent } from '../library-album/library-album.component';
 
 export default [
   {

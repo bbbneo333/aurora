@@ -1,6 +1,6 @@
 // setting up redux devtools as enhancer composer (if configured)
 // @see - https://github.com/zalmoxisus/redux-devtools-extension#12-advanced-store-setup
-import {compose} from 'redux';
+import { compose } from 'redux';
 
 const reduxDevtoolsComposer = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__;
 

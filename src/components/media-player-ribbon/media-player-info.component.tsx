@@ -1,14 +1,14 @@
 import React from 'react';
-import {Col, Row} from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import {Icons} from '../../constants';
-import {RootState} from '../../reducers';
+import { Icons } from '../../constants';
+import { RootState } from '../../reducers';
 
-import {Icon} from '../icon/icon.component';
-import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
-import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
+import { Icon } from '../icon/icon.component';
+import { MediaCoverPictureComponent } from '../media-cover-picture/media-cover-picture.component';
+import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 
 import styles from './media-player-ribbon.component.css';
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 
 import {
@@ -8,7 +8,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 
-import {AppBrowserHistory} from '../../types';
+import { AppBrowserHistory } from '../../types';
 
 type RouterLinkToggleProps = NavLinkProps & {
   fallbackPath?: string,
@@ -23,8 +23,8 @@ export function RouterLinkToggle(props: RouterLinkToggleProps) {
     fallbackPath = '/',
   } = props;
 
-  const {pathname} = useLocation();
-  const {entries} = useHistory() as AppBrowserHistory;
+  const { pathname } = useLocation();
+  const { entries } = useHistory() as AppBrowserHistory;
   const [togglePath, setTogglePath] = useState<string>(to);
 
   useEffect(() => {

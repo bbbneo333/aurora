@@ -1,14 +1,14 @@
 import React from 'react';
 import classNames from 'classnames/bind';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import * as _ from 'lodash';
 
-import {MediaTrackComponent, MediaTrackContextMenu} from '../../components';
-import {MediaTrackContextMenuItem} from '../../components/media-track-context-menu/media-track-context-menu.component';
-import {MediaEnums} from '../../enums';
-import {IMediaQueueTrack} from '../../interfaces';
-import {RootState} from '../../reducers';
-import {I18nService, MediaPlayerService} from '../../services';
+import { MediaTrackComponent, MediaTrackContextMenu } from '../../components';
+import { MediaTrackContextMenuItem } from '../../components/media-track-context-menu/media-track-context-menu.component';
+import { MediaEnums } from '../../enums';
+import { IMediaQueueTrack } from '../../interfaces';
+import { RootState } from '../../reducers';
+import { I18nService, MediaPlayerService } from '../../services';
 
 import styles from './player-queue.component.css';
 

@@ -1,10 +1,10 @@
-import React, {useEffect, useReducer} from 'react';
+import React, { useEffect, useReducer } from 'react';
 import * as _ from 'lodash';
 
-import {AppEnums} from '../../enums';
-import {AppService, MediaProviderService} from '../../services';
+import { AppEnums } from '../../enums';
+import { AppService, MediaProviderService } from '../../services';
 
-import {IMediaLocalSettings} from './media-local.interfaces';
+import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
 
 enum MediaLocalSettingsStateActionType {
@@ -65,7 +65,7 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
     }
     case MediaLocalSettingsStateActionType.AddDirectory: {
       // data.selectedDirectory - directory which needs to be added
-      const {selectedDirectory} = action.data;
+      const { selectedDirectory } = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
       let directoriesAreUpdated = false;
 
@@ -86,7 +86,7 @@ function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: 
     }
     case MediaLocalSettingsStateActionType.RemoveDirectory: {
       // data.directory - directory which needs to be removed
-      const {directory} = action.data;
+      const { directory } = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
       let directoriesAreUpdated = false;
 

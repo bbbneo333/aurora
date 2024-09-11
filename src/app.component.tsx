@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
-import {Provider, useSelector} from 'react-redux';
-import {MemoryRouter as Router} from 'react-router-dom';
+import { Provider, useSelector } from 'react-redux';
+import { MemoryRouter as Router } from 'react-router-dom';
 import * as _ from 'lodash';
 
 import {
@@ -14,15 +14,15 @@ import {
   RouterLink,
 } from './components';
 
-import {AppEnums} from './enums';
-import {IAppStatePersistor} from './interfaces';
-import {MediaLocalProvider} from './providers';
-import {RootState} from './reducers';
-import {AppService, I18nService, MediaProviderService} from './services';
+import { AppEnums } from './enums';
+import { IAppStatePersistor } from './interfaces';
+import { MediaLocalProvider } from './providers';
+import { RootState } from './reducers';
+import { AppService, I18nService, MediaProviderService } from './services';
 
 import statePersistors from './persistors';
 import store from './store';
-import {registerStatePersistor, loadState, removeStates} from './store/persistor';
+import { registerStatePersistor, loadState, removeStates } from './store/persistor';
 
 import './app.global.css';
 import styles from './app.component.css';

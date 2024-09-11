@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
-import {batch} from 'react-redux';
+import { batch } from 'react-redux';
 
-import {MediaEnums} from '../enums';
+import { MediaEnums } from '../enums';
 import store from '../store';
-import {ArrayUtils, StringUtils} from '../utils';
+import { ArrayUtils, StringUtils } from '../utils';
 
 import {
   IMediaPlayback,
@@ -295,7 +295,7 @@ class MediaPlayerService {
     this.removeTrackRepeat();
 
     // request media playback instance for the provided track from the media provider
-    const {mediaPlaybackService} = MediaProviderService.getMediaProvider(mediaQueueTrack.provider);
+    const { mediaPlaybackService } = MediaProviderService.getMediaProvider(mediaQueueTrack.provider);
     const mediaPlayback = mediaPlaybackService.playMediaTrack(mediaQueueTrack, {
       mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
       mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,

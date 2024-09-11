@@ -1,16 +1,16 @@
 import React from 'react';
-import {Col, Row} from 'react-bootstrap';
-import {useSelector} from 'react-redux';
+import { Col, Row } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import * as _ from 'lodash';
 
-import {Icons} from '../../constants';
-import {RootState} from '../../reducers';
-import {MediaPlayerService} from '../../services';
-import {MediaEnums} from '../../enums';
+import { Icons } from '../../constants';
+import { RootState } from '../../reducers';
+import { MediaPlayerService } from '../../services';
+import { MediaEnums } from '../../enums';
 
-import {Icon} from '../icon/icon.component';
-import {MediaButtonComponent} from '../media-button/media-button.component';
+import { Icon } from '../icon/icon.component';
+import { MediaButtonComponent } from '../media-button/media-button.component';
 
 import styles from './media-player-ribbon.component.css';
 

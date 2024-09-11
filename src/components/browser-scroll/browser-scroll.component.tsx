@@ -1,10 +1,10 @@
-import React, {MutableRefObject, useLayoutEffect} from 'react';
-import {useLocation} from 'react-router-dom';
+import React, { MutableRefObject, useLayoutEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 export function BrowserScroll(props: {
   browserRef: MutableRefObject<null>,
 }) {
-  const {browserRef} = props;
+  const { browserRef } = props;
   const location = useLocation();
 
   // navigating to new page won't automatically reset the scroll and will reuse the old scroll position

@@ -1,4 +1,4 @@
-import {MediaLocalProvider} from './media-local';
+import { MediaLocalProvider } from './media-local';
 
 export {
   MediaLocalProvider,

@@ -23,7 +23,7 @@ module.exports = (api) => {
       // @babel/preset-env will automatically target our browserslist targets
       require('@babel/preset-env'),
       require('@babel/preset-typescript'),
-      [require('@babel/preset-react'), {development}],
+      [require('@babel/preset-react'), { development }],
     ],
     plugins: [
       // stage - 0
@@ -32,13 +32,13 @@ module.exports = (api) => {
       // stage - 1
       require('@babel/plugin-proposal-export-default-from'),
       require('@babel/plugin-proposal-logical-assignment-operators'),
-      [require('@babel/plugin-proposal-optional-chaining'), {loose: false}],
-      [require('@babel/plugin-proposal-pipeline-operator'), {proposal: 'minimal'}],
-      [require('@babel/plugin-proposal-nullish-coalescing-operator'), {loose: false}],
+      [require('@babel/plugin-proposal-optional-chaining'), { loose: false }],
+      [require('@babel/plugin-proposal-pipeline-operator'), { proposal: 'minimal' }],
+      [require('@babel/plugin-proposal-nullish-coalescing-operator'), { loose: false }],
       require('@babel/plugin-proposal-do-expressions'),
 
       // stage - 2
-      [require('@babel/plugin-proposal-decorators'), {legacy: true}],
+      [require('@babel/plugin-proposal-decorators'), { legacy: true }],
       require('@babel/plugin-proposal-function-sent'),
       require('@babel/plugin-proposal-export-namespace-from'),
       require('@babel/plugin-proposal-numeric-separator'),
