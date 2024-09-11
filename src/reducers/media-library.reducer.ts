@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
 
-import {MediaEnums} from '../enums';
-import {IMediaAlbum, IMediaArtist, IMediaTrack} from '../interfaces';
-import {ArrayUtils, MediaUtils} from '../utils';
+import { MediaEnums } from '../enums';
+import { IMediaAlbum, IMediaArtist, IMediaTrack } from '../interfaces';
+import { ArrayUtils, MediaUtils } from '../utils';
 
 export type MediaLibraryState = {
   mediaAlbums: IMediaAlbum[],
@@ -54,9 +54,9 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     }
     case MediaEnums.MediaLibraryActions.AddTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be added
-      const {mediaTrack} = action.data;
-      const {mediaSelectedAlbum} = state;
-      let {mediaSelectedAlbumTracks} = state;
+      const { mediaTrack } = action.data;
+      const { mediaSelectedAlbum } = state;
+      let { mediaSelectedAlbumTracks } = state;
 
       // location #1 - mediaSelectedAlbumTracks (if selected album was found)
       if (mediaSelectedAlbum && mediaSelectedAlbum.id === mediaTrack.track_album.id) {
@@ -75,8 +75,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     }
     case MediaEnums.MediaLibraryActions.RemoveTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be removed
-      const {mediaTrack} = action.data;
-      let {mediaSelectedAlbumTracks} = state;
+      const { mediaTrack } = action.data;
+      let { mediaSelectedAlbumTracks } = state;
 
       // location #1 - mediaSelectedAlbumTracks
       if (!_.isEmpty(mediaSelectedAlbumTracks)) {
@@ -90,8 +90,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     }
     case MediaEnums.MediaLibraryActions.AddAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be added
-      const {mediaAlbum} = action.data;
-      const {mediaAlbums} = state;
+      const { mediaAlbum } = action.data;
+      const { mediaAlbums } = state;
 
       if (_.isNil(mediaAlbums.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
         ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
@@ -104,7 +104,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     }
     case MediaEnums.MediaLibraryActions.AddAlbums: {
       // data.mediaAlbums: MediaAlbum[] - albums which are needed to be added
-      const {mediaAlbums} = action.data;
+      const { mediaAlbums } = action.data;
       const mediaAlbumsExisting = state.mediaAlbums;
 
       mediaAlbums.forEach((mediaAlbum: IMediaAlbum) => {
@@ -134,8 +134,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     }
     case MediaEnums.MediaLibraryActions.AddArtist: {
       // data.mediaArtist: MediaArtist - artist which needs to be added
-      const {mediaArtist} = action.data;
-      const {mediaArtists} = state;
+      const { mediaArtist } = action.data;
+      const { mediaArtists } = state;
 
       if (_.isNil(mediaArtists.find(exMediaArtist => exMediaArtist.id === mediaArtist.id))) {
         ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, MediaUtils.mediaArtistComparator);

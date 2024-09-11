@@ -1,9 +1,9 @@
 // @ts-ignore
-import {Howl} from 'howler';
+import { Howl } from 'howler';
 
-import {IMediaPlayback, IMediaPlaybackOptions} from '../../interfaces';
+import { IMediaPlayback, IMediaPlaybackOptions } from '../../interfaces';
 
-import {IMediaLocalTrack} from './media-local.interfaces';
+import { IMediaLocalTrack } from './media-local.interfaces';
 import MediaLocalUtils from './media-local.utils';
 
 const debug = require('debug')('app:provider:media_local:media_playback');

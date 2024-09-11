@@ -13,12 +13,7 @@ module.exports = {
   plugins: [
     'promise',
   ],
-  rules: {
-    '@typescript-eslint/object-curly-spacing': [
-      'error',
-      'never',
-    ],
-  },
+  rules: {},
   settings: {
     'import/resolver': {
       // @see - https://github.com/benmosher/eslint-plugin-import/issues/1396#issuecomment-575727774 for line below

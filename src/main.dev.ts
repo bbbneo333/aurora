@@ -242,7 +242,7 @@ class App implements IAppMain {
       return;
     }
 
-    const {autoUpdater} = electronUpdater;
+    const { autoUpdater } = electronUpdater;
 
     autoUpdater.logger = electronLog;
     autoUpdater

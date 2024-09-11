@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
-import {AppEnums, MediaEnums} from '../enums';
-import {DatastoreUtils, MediaUtils} from '../utils';
+import { AppEnums, MediaEnums } from '../enums';
+import { DatastoreUtils, MediaUtils } from '../utils';
 
 import {
   MediaAlbumDatastore,
@@ -40,7 +40,7 @@ class MediaLibraryService {
   }
 
   async removeMediaTrack(mediaTrack: IMediaTrack): Promise<void> {
-    const {mediaLibraryService} = MediaProviderService.getMediaProvider(mediaTrack.provider);
+    const { mediaLibraryService } = MediaProviderService.getMediaProvider(mediaTrack.provider);
 
     // a media track can be removed via one of the following ways:
     // - if provider provides removeMediaTrack - then the media track will be removed completely

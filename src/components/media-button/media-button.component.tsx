@@ -1,8 +1,8 @@
-import React, {DetailsHTMLAttributes, useEffect, useRef} from 'react';
+import React, { DetailsHTMLAttributes, useEffect, useRef } from 'react';
 import * as _ from 'lodash';
 import classNames from 'classnames/bind';
 
-import {SystemEnums} from '../../enums';
+import { SystemEnums } from '../../enums';
 
 import styles from './media-button.component.css';
 

@@ -10,10 +10,10 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
-import {AppEnums} from '../../enums';
-import {IAppBuilder, IAppMain} from '../../interfaces';
+import { AppEnums } from '../../enums';
+import { IAppBuilder, IAppMain } from '../../interfaces';
 
-import {DatastoreModule} from '../modules';
+import { DatastoreModule } from '../modules';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;

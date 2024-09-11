@@ -1,5 +1,5 @@
-import {AppEnums} from '../enums';
-import {IMediaTrackData, IMediaTrackDataFilterParams, IMediaTrackDataUpdateParams} from '../interfaces';
+import { AppEnums } from '../enums';
+import { IMediaTrackData, IMediaTrackDataFilterParams, IMediaTrackDataUpdateParams } from '../interfaces';
 import AppService from '../services/app.service';
 
 class MediaTrackDatastore {

@@ -1,16 +1,16 @@
-import React, {useCallback, useRef, useState} from 'react';
-import {Col, Row} from 'react-bootstrap';
-import {useSelector} from 'react-redux';
+import React, { useCallback, useRef, useState } from 'react';
+import { Col, Row } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 
-import {Icons, Routes} from '../../constants';
-import {RootState} from '../../reducers';
-import {MediaPlayerService} from '../../services';
+import { Icons, Routes } from '../../constants';
+import { RootState } from '../../reducers';
+import { MediaPlayerService } from '../../services';
 
-import {Icon} from '../icon/icon.component';
-import {MediaButtonComponent} from '../media-button/media-button.component';
-import {MediaProgressBarComponent} from '../media-progress-bar/media-progress-bar.component';
-import {RouterLinkToggle} from '../router-link-toggle/router-link-toggle.component';
+import { Icon } from '../icon/icon.component';
+import { MediaButtonComponent } from '../media-button/media-button.component';
+import { MediaProgressBarComponent } from '../media-progress-bar/media-progress-bar.component';
+import { RouterLinkToggle } from '../router-link-toggle/router-link-toggle.component';
 
 import styles from './media-player-ribbon.component.css';
 

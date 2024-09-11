@@ -1,12 +1,12 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import {Routes} from '../../constants';
-import {IMediaArtist, IMediaTrack} from '../../interfaces';
-import {StringUtils} from '../../utils';
-import {withSeparator} from '../../utils/render.utils';
+import { Routes } from '../../constants';
+import { IMediaArtist, IMediaTrack } from '../../interfaces';
+import { StringUtils } from '../../utils';
+import { withSeparator } from '../../utils/render.utils';
 
-import {RouterLink} from '../router-link/router-link.component';
+import { RouterLink } from '../router-link/router-link.component';
 
 import styles from './media-track-info.component.css';
 
@@ -21,7 +21,7 @@ function MediaArtistLinkSeparator() {
 export function MediaTrackAlbumLinkComponent(props: {
   mediaTrack: IMediaTrack,
 }) {
-  const {mediaTrack} = props;
+  const { mediaTrack } = props;
 
   return (
     <RouterLink
@@ -39,7 +39,7 @@ export function MediaTrackAlbumLinkComponent(props: {
 export function MediaTrackNameComponent(props: {
   mediaTrack: IMediaTrack,
 }) {
-  const {mediaTrack} = props;
+  const { mediaTrack } = props;
 
   return (
     <div className={cx('media-track-name')}>
@@ -71,7 +71,7 @@ export function MediaArtistLinkComponent(props: {
 export function MediaArtistLinksComponent(props: {
   mediaArtists: IMediaArtist[],
 }) {
-  const {mediaArtists} = props;
+  const { mediaArtists } = props;
 
   return (
     withSeparator(

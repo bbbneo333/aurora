@@ -1,8 +1,8 @@
 import Jimp from 'jimp';
 
-import {AppEnums} from '../../enums';
-import {IAppMain, IAppModule} from '../../interfaces';
-import {StringUtils} from '../../utils';
+import { AppEnums } from '../../enums';
+import { IAppMain, IAppModule } from '../../interfaces';
+import { StringUtils } from '../../utils';
 
 const debug = require('debug')('app:module:media_module');
 

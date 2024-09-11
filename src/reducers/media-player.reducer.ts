@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
-import {MediaEnums} from '../enums';
-import {IMediaPlayback, IMediaQueueTrack, IMediaTrackList} from '../interfaces';
+import { MediaEnums } from '../enums';
+import { IMediaPlayback, IMediaQueueTrack, IMediaTrackList } from '../interfaces';
 
 export type MediaPlayerState = {
   mediaTracks: IMediaQueueTrack[];
@@ -42,7 +42,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
   switch (action.type) {
     case MediaEnums.MediaPlayerActions.SetTrack: {
       // data.mediaTrack: IMediaQueueTrack - track which needs to be added
-      const {mediaTrack} = action.data;
+      const { mediaTrack } = action.data;
       if (!mediaTrack) {
         throw new Error('MediaPlayerReducer encountered error at SetTrack - No media track was provided');
       }
@@ -158,7 +158,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     }
     case MediaEnums.MediaPlayerActions.SetShuffle: {
       // data.mediaPlaybackQueueOnShuffle: boolean - shuffle state
-      const {mediaPlaybackQueueOnShuffle} = action.data;
+      const { mediaPlaybackQueueOnShuffle } = action.data;
 
       return {
         ...state,
@@ -167,7 +167,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     }
     case MediaEnums.MediaPlayerActions.SetRepeat: {
       // data.mediaPlaybackQueueRepeatType: MediaEnums.MediaPlaybackRepeatType | undefined - repeat type
-      const {mediaPlaybackQueueRepeatType} = action.data;
+      const { mediaPlaybackQueueRepeatType } = action.data;
 
       return {
         ...state,

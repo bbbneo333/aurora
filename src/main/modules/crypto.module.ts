@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
-import {AppEnums} from '../../enums';
-import {IAppMain, IAppModule} from '../../interfaces';
+import { AppEnums } from '../../enums';
+import { IAppMain, IAppModule } from '../../interfaces';
 
 export class CryptoModule implements IAppModule {
   private readonly app: IAppMain;

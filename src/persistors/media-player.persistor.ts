@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 
-import {IAppStatePersistor, IMediaQueueTrack} from '../interfaces';
-import {MediaLibraryService, MediaPlayerService} from '../services';
+import { IAppStatePersistor, IMediaQueueTrack } from '../interfaces';
+import { MediaLibraryService, MediaPlayerService } from '../services';
 
-import {MediaPlayerState} from '../reducers/media-player.reducer';
-import {MediaEnums} from '../enums';
+import { MediaPlayerState } from '../reducers/media-player.reducer';
+import { MediaEnums } from '../enums';
 
 export type MediaQueueTrackSerialized = Pick<IMediaQueueTrack, 'id' | 'provider' | 'provider_id' | 'tracklist_id' | 'queue_entry_id' | 'queue_insertion_index'>;
 

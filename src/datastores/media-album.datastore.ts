@@ -1,5 +1,5 @@
-import {AppEnums} from '../enums';
-import {IMediaAlbumData, IMediaAlbumDataFilterParams} from '../interfaces';
+import { AppEnums } from '../enums';
+import { IMediaAlbumData, IMediaAlbumDataFilterParams } from '../interfaces';
 import AppService from '../services/app.service';
 
 class MediaAlbumDatastore {

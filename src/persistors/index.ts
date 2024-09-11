@@ -1,4 +1,4 @@
-import {IAppStatePersistor} from '../interfaces';
+import { IAppStatePersistor } from '../interfaces';
 
 import MediaPlayerPersistor from './media-player.persistor';
 

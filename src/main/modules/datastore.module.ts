@@ -1,8 +1,8 @@
 import Datastore from 'nedb-promises';
 import fs from 'fs';
 
-import {IAppMain, IAppModule} from '../../interfaces';
-import {AppEnums} from '../../enums';
+import { IAppMain, IAppModule } from '../../interfaces';
+import { AppEnums } from '../../enums';
 
 const debug = require('debug')('app:module:datastore_module');
 

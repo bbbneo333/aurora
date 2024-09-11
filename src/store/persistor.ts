@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
-import {Dispatch, MiddlewareAPI, Store} from 'redux';
+import { Dispatch, MiddlewareAPI, Store } from 'redux';
 
-import {IAppStatePersistor} from '../interfaces';
-import {RootState} from '../reducers';
-import {PromiseUtils} from '../utils';
+import { IAppStatePersistor } from '../interfaces';
+import { RootState } from '../reducers';
+import { PromiseUtils } from '../utils';
 
 const debug = require('debug')('app:store:persistor');
 

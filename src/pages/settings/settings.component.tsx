@@ -1,7 +1,7 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import {RootState} from '../../reducers';
+import { RootState } from '../../reducers';
 
 export function SettingsComponent() {
   const mediaProviderRegistry = useSelector((state: RootState) => state.mediaProviderRegistry);

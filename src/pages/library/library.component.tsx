@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import {MediaHeaderNavigationLinkComponent, RouterSwitchComponent} from '../../components';
+import { MediaHeaderNavigationLinkComponent, RouterSwitchComponent } from '../../components';
 
 import styles from './library.component.css';
 import routes from './library.routes';

@@ -5,11 +5,11 @@ import {
   selectCover,
 } from 'music-metadata';
 
-import {AppEnums, MediaEnums} from '../../enums';
-import {IFSDirectoryReadResponse, IMediaLibraryService} from '../../interfaces';
-import {AppService, MediaProviderService, MediaLibraryService} from '../../services';
+import { AppEnums, MediaEnums } from '../../enums';
+import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
+import { AppService, MediaProviderService, MediaLibraryService } from '../../services';
 
-import {IMediaLocalSettings} from './media-local.interfaces';
+import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
 import MediaLocalUtils from './media-local.utils';
 

@@ -1,5 +1,5 @@
-import {MediaEnums} from '../enums';
-import {IMediaProvider} from '../interfaces';
+import { MediaEnums } from '../enums';
+import { IMediaProvider } from '../interfaces';
 
 export type MediaProviderRegistryState = {
   mediaProviders: IMediaProvider[];

@@ -1,8 +1,8 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import {I18nService} from '../../services';
-import {RouterLink} from '../router-link/router-link.component';
+import { I18nService } from '../../services';
+import { RouterLink } from '../router-link/router-link.component';
 
 import styles from './media-header-navigation-link.component.css';
 

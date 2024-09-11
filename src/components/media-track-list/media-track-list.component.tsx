@@ -1,10 +1,10 @@
 import React from 'react';
 // import classNames from 'classnames/bind';
 
-import {MediaTrackListProvider} from '../../contexts';
-import {IMediaTrack, IMediaTrackList} from '../../interfaces';
+import { MediaTrackListProvider } from '../../contexts';
+import { IMediaTrack, IMediaTrackList } from '../../interfaces';
 
-import {MediaTrackComponent} from '../media-track/media-track.component';
+import { MediaTrackComponent } from '../media-track/media-track.component';
 
 // import styles from './media-track-list.component.css';
 //

@@ -1,20 +1,20 @@
-import React, {useCallback} from 'react';
-import {useSelector} from 'react-redux';
+import React, { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import * as _ from 'lodash';
-import {useContextMenu} from 'react-contexify';
+import { useContextMenu } from 'react-contexify';
 
-import {Icons} from '../../constants';
-import {useMediaTrackList} from '../../contexts';
-import {MediaEnums} from '../../enums';
-import {IMediaTrack} from '../../interfaces';
-import {RootState} from '../../reducers';
-import {MediaPlayerService} from '../../services';
-import {DateTimeUtils} from '../../utils';
+import { Icons } from '../../constants';
+import { useMediaTrackList } from '../../contexts';
+import { MediaEnums } from '../../enums';
+import { IMediaTrack } from '../../interfaces';
+import { RootState } from '../../reducers';
+import { MediaPlayerService } from '../../services';
+import { DateTimeUtils } from '../../utils';
 
-import {Icon} from '../icon/icon.component';
-import {MediaCoverPictureComponent} from '../media-cover-picture/media-cover-picture.component';
-import {MediaTrackInfoComponent} from '../media-track-info/media-track-info.component';
+import { Icon } from '../icon/icon.component';
+import { MediaCoverPictureComponent } from '../media-cover-picture/media-cover-picture.component';
+import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 
 import styles from './media-track.component.css';
 
@@ -115,7 +115,7 @@ export function MediaTrackComponent(props: {
     disableAlbumLink = false,
   } = props;
 
-  const {show} = useContextMenu();
+  const { show } = useContextMenu();
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaTrackContextMenuId) {

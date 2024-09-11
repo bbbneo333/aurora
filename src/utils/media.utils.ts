@@ -1,4 +1,4 @@
-import {IMediaAlbum, IMediaArtist, IMediaTrack} from '../interfaces';
+import { IMediaAlbum, IMediaArtist, IMediaTrack } from '../interfaces';
 
 export function mediaNameSanitizerForComparator(mediaName: string): string {
   return mediaName.replace(/[^A-Z0-9]/ig, '');

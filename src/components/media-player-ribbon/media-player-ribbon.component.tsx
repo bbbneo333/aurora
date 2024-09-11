@@ -1,15 +1,15 @@
 import React from 'react';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
-import {Col, Container, Row} from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 
-import {RootState} from '../../reducers';
+import { RootState } from '../../reducers';
 
 import styles from './media-player-ribbon.component.css';
-import {MediaPlayerInfo} from './media-player-info.component';
-import {MediaPlayerControls} from './media-player-controls.component';
-import {MediaPlayerProgress} from './media-player-progress.component';
-import {MediaPlayerSide} from './media-player-side.component';
+import { MediaPlayerInfo } from './media-player-info.component';
+import { MediaPlayerControls } from './media-player-controls.component';
+import { MediaPlayerProgress } from './media-player-progress.component';
+import { MediaPlayerSide } from './media-player-side.component';
 
 const cx = classNames.bind(styles);
 

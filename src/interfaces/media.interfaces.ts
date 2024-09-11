@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {MediaEnums} from '../enums';
+import { MediaEnums } from '../enums';
 
 export interface IMediaTrackData {
   readonly id: string;
