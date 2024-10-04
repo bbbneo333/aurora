@@ -34,10 +34,11 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
 
   const mediaButtonContainerProps = _.omit(props, [
     'children',
+    'className',
+    'icon',
+    'iconClassName',
     'onButtonSubmit',
     'onButtonMove',
-    // we are using our own classnames as well
-    'className',
   ]);
   const mediaButtonContainerRef = useRef(null);
 
