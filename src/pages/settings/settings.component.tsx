@@ -1,30 +1,37 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import classNames from 'classnames/bind';
 
 import { RootState } from '../../reducers';
+
+import styles from './settings.component.css';
+
+const cx = classNames.bind(styles);
 
 export function SettingsComponent() {
   const mediaProviderRegistry = useSelector((state: RootState) => state.mediaProviderRegistry);
 
   return (
-    <div>
-      This is the settings page
+    <div className={cx('settings-container')}>
+      <div className={cx('settings-header')}>
+        Settings
+      </div>
 
       {mediaProviderRegistry.mediaProviders.map((mediaRegisteredProvider) => {
         const mediaProviderSettingsComponent = mediaRegisteredProvider.mediaSettingsService.getSettingsComponent();
 
         if (mediaProviderSettingsComponent) {
           return (
-            React.createElement(mediaProviderSettingsComponent, {
-              key: mediaRegisteredProvider.mediaProviderIdentifier,
-            })
+            <div key={mediaRegisteredProvider.mediaProviderIdentifier} className={cx('settings-section')}>
+              {React.createElement(mediaProviderSettingsComponent, {
+                cx,
+              })}
+            </div>
           );
         }
 
         return (
-          <div key={mediaRegisteredProvider.mediaProviderIdentifier}>
-            This Provider does not have any settings
-          </div>
+          <></>
         );
       })}
     </div>
