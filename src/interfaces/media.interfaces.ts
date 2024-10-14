@@ -14,8 +14,7 @@ export interface IMediaTrackData {
   readonly removed: boolean;
   readonly track_album_id: string,
   readonly sync: {
-    last_sync_key: string;
-    last_sync_at: number;
+    timestamp: number;
   };
   readonly extra?: object;
 }
@@ -27,15 +26,14 @@ export interface IMediaTrackDataFilterParams {
   track_album_id?: string;
   removed?: boolean,
   sync?: {
-    last_sync_key: string;
+    timestamp?: number;
   },
 }
 
 export interface IMediaTrackDataUpdateParams {
   removed?: boolean;
   sync?: {
-    last_sync_key: string;
-    last_sync_at: number;
+    timestamp?: number;
   },
 }
 
@@ -81,7 +79,7 @@ export interface IMediaTrackProviderData {
   readonly track_artists: IMediaArtistProviderData[];
   readonly track_album: IMediaAlbumProviderData;
   readonly sync: {
-    sync_key: string;
+    timestamp: number;
   };
   readonly extra?: object;
 }
@@ -208,18 +206,16 @@ export interface IMediaProviderData {
   settings: object;
   options: object;
   library: {
-    last_sync_key: string | null,
-    last_sync_started_at: number | null,
-    last_sync_finished_at: number | null,
+    sync_started_at: number | null,
+    sync_finished_at: number | null,
   },
 }
 
 export interface IMediaProviderDataUpdateParams {
   settings?: object;
   library?: {
-    last_sync_key?: string | null,
-    last_sync_started_at?: number | null,
-    last_sync_finished_at?: number | null,
+    sync_started_at?: number | null,
+    sync_finished_at?: number | null,
   },
 }
 

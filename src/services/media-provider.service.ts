@@ -79,9 +79,8 @@ class MediaProviderService {
       settings: mediaProviderDefaultSettings,
       options: {},
       library: {
-        last_sync_key: null,
-        last_sync_started_at: null,
-        last_sync_finished_at: null,
+        sync_started_at: null,
+        sync_finished_at: null,
       },
     });
   }

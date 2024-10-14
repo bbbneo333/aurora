@@ -1,5 +1,6 @@
 import { AppEnums } from '../enums';
-import { IMediaTrackData, IMediaTrackDataFilterParams, IMediaTrackDataUpdateParams } from '../interfaces';
+import { IMediaTrackData } from '../interfaces';
+
 import AppService from '../services/app.service';
 
 class MediaTrackDatastore {
@@ -24,11 +25,11 @@ class MediaTrackDatastore {
     });
   }
 
-  findMediaTrack(mediaTrackFilterParams: IMediaTrackDataFilterParams): Promise<IMediaTrackData | undefined> {
+  findMediaTrack(mediaTrackFilterParams: any): Promise<IMediaTrackData | undefined> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaTrackDatastoreName, mediaTrackFilterParams);
   }
 
-  findMediaTracks(mediaTrackFilterParams: IMediaTrackDataFilterParams): Promise<IMediaTrackData[]> {
+  findMediaTracks(mediaTrackFilterParams: any): Promise<IMediaTrackData[]> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaTrackDatastoreName, mediaTrackFilterParams);
   }
 
@@ -42,11 +43,11 @@ class MediaTrackDatastore {
     });
   }
 
-  removeMediaTracks(mediaTrackFilterParams: IMediaTrackDataFilterParams): Promise<void> {
+  removeMediaTracks(mediaTrackFilterParams: any): Promise<void> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemove, this.mediaTrackDatastoreName, mediaTrackFilterParams);
   }
 
-  updateMediaTrackById(mediaTrackId: string, mediaTrackUpdateParams: IMediaTrackDataUpdateParams): Promise<void> {
+  updateMediaTrackById(mediaTrackId: string, mediaTrackUpdateParams: any): Promise<void> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaTrackDatastoreName, {
       id: mediaTrackId,
     }, {

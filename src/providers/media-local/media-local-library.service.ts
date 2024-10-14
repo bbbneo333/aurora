@@ -42,12 +42,12 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
   async syncMediaTracks() {
     const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-    const mediaSyncKey = await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
-    await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory, mediaSyncKey));
-    await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider, mediaSyncKey);
+    await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
+    await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
+    await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
   }
 
-  private async addTracksFromDirectory(mediaLibraryDirectory: string, mediaSyncKey: string): Promise<void> {
+  private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
     const fsDirectoryReadResponse: IFSDirectoryReadResponse = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
       fileExtensions: this.mediaTrackSupportedFileTypes,
     });
@@ -88,7 +88,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           image_format: audioCoverPicture.format,
         } : undefined,
         sync: {
-          sync_key: mediaSyncKey,
+          timestamp: Date.now(),
         },
         extra: {
           location: {
@@ -108,7 +108,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     return parseFile(filePath);
   }
 
-  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture|null {
+  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture | null {
     return selectCover(audioMetadata.common.picture);
   }
 }

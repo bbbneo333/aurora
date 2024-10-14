@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { AppEnums, MediaEnums } from '../enums';
 import { DatastoreUtils, MediaUtils } from '../utils';
@@ -27,6 +27,8 @@ import {
 import AppService from './app.service';
 import MediaProviderService from './media-provider.service';
 import store from '../store';
+
+const debug = require('debug')('app:service:media_library_service');
 
 class MediaLibraryService {
   private readonly mediaPictureScaleWidth = 500;
@@ -66,21 +68,20 @@ class MediaLibraryService {
     });
   }
 
-  async startMediaTrackSync(mediaProviderIdentifier: string): Promise<string> {
+  async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at startMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
     }
 
     const mediaSyncStartTimestamp = Date.now();
-    const mediaSyncKey = mediaSyncStartTimestamp.toString();
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
       library: {
-        last_sync_key: mediaSyncKey,
-        last_sync_started_at: mediaSyncStartTimestamp,
-        last_sync_finished_at: null,
+        sync_started_at: mediaSyncStartTimestamp,
+        sync_finished_at: null,
       },
     });
+    debug('started sync for provider %s at %d', mediaProviderIdentifier, mediaSyncStartTimestamp);
 
     store.dispatch({
       type: MediaEnums.MediaLibraryActions.StartSync,
@@ -88,27 +89,27 @@ class MediaLibraryService {
         mediaProviderIdentifier,
       },
     });
-
-    return mediaSyncKey;
   }
 
-  async finishMediaTrackSync(mediaProviderIdentifier: string, mediaSyncKey: string): Promise<void> {
+  async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
     }
-    if (!mediaProviderData.library.last_sync_key || mediaProviderData.library.last_sync_key !== mediaSyncKey || mediaProviderData.library.last_sync_finished_at) {
+    if (!mediaProviderData.library.sync_started_at) {
       throw new Error('MediaLibraryService encountered error at finishMediaTrackSync - Invalid sync state');
     }
 
-    await this.removeUnSyncTracks(mediaProviderIdentifier, mediaSyncKey);
+    await this.removeUnSyncTracks(mediaProviderIdentifier, mediaProviderData.library.sync_started_at);
+
+    const mediaSyncEndTimestamp = Date.now();
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
       library: {
-        last_sync_key: mediaSyncKey,
-        last_sync_started_at: mediaProviderData.library.last_sync_started_at,
-        last_sync_finished_at: Date.now(),
+        sync_started_at: mediaProviderData.library.sync_started_at,
+        sync_finished_at: mediaSyncEndTimestamp,
       },
     });
+    debug('finished sync for provider %s at %d', mediaProviderIdentifier, mediaSyncEndTimestamp);
 
     store.dispatch({
       type: MediaEnums.MediaLibraryActions.FinishSync,
@@ -174,13 +175,15 @@ class MediaLibraryService {
       });
   }
 
-  private async removeUnSyncTracks(mediaProviderIdentifier: string, mediaSyncKey: string): Promise<void> {
+  private async removeUnSyncTracks(mediaProviderIdentifier: string, mediaSyncTimestamp: number): Promise<void> {
     await MediaTrackDatastore.removeMediaTracks({
-      provider_id: mediaProviderIdentifier,
-      sync: {
-        last_sync_key: mediaSyncKey,
+      provider: mediaProviderIdentifier,
+      'sync.timestamp': {
+        $lt: mediaSyncTimestamp,
       },
     });
+
+    debug('removed tracks for provider %s before %d', mediaProviderIdentifier, mediaSyncTimestamp);
   }
 
   private async buildMediaTrack(mediaTrackData: IMediaTrackData, loadMediaTrack = false): Promise<IMediaTrack> {
@@ -335,8 +338,7 @@ class MediaLibraryService {
     if (mediaTrackData) {
       const mediaTrackUpdateParams: IMediaTrackDataUpdateParams = {
         sync: {
-          last_sync_key: mediaTrackProviderData.sync.sync_key,
-          last_sync_at: mediaSyncTimestamp,
+          timestamp: mediaSyncTimestamp,
         },
       };
       // update track
@@ -360,8 +362,7 @@ class MediaLibraryService {
       track_album_id: mediaAlbumData.id,
       removed: false,
       sync: {
-        last_sync_key: mediaTrackProviderData.sync.sync_key,
-        last_sync_at: mediaSyncTimestamp,
+        timestamp: mediaSyncTimestamp,
       },
       extra: mediaTrackProviderData.extra,
     });
