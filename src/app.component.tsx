@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Provider, useSelector } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import {
   BrowserNavigation,

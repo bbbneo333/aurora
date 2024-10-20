@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { MediaEnums } from '../enums';
 import { IMediaAlbum, IMediaArtist, IMediaTrack } from '../interfaces';

@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { useContextMenu } from 'react-contexify';
 
 import { Icons } from '../../constants';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useHistory, useLocation } from 'react-router-dom';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { Icons } from '../../constants';
 import { AppBrowserHistory } from '../../types';

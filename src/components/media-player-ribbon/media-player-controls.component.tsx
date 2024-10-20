@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { Icons } from '../../constants';
 import { RootState } from '../../reducers';

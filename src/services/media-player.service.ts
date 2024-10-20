@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { batch } from 'react-redux';
 
 import { MediaEnums } from '../enums';

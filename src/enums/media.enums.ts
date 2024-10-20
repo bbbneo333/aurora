@@ -13,10 +13,8 @@ export enum MediaLibraryActions {
   RemoveTrack = 'media/library/removeTrack',
   AddAlbum = 'media/library/addAlbum',
   AddAlbums = 'media/library/addAlbums',
-  RemoveAlbum = 'media/library/removeAlbum',
   SetAlbum = 'media/library/setAlbum',
   AddArtist = 'media/library/addArtist',
-  RemoveArtist = 'media/library/removeArtist',
   SetArtist = 'media/library/setArtist',
 }
 
