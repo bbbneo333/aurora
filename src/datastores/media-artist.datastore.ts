@@ -1,6 +1,7 @@
 import { AppEnums } from '../enums';
 import { IMediaArtistData } from '../interfaces';
 import AppService from '../services/app.service';
+import { DataStoreFilterData, DataStoreInputData } from '../types';
 
 class MediaArtistDatastore {
   private readonly mediaArtistDatastoreName = 'media_artists';
@@ -24,12 +25,12 @@ class MediaArtistDatastore {
     });
   }
 
-  findMediaArtist(mediaArtistFilterParams: any): Promise<IMediaArtistData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterParams);
+  findMediaArtist(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>): Promise<IMediaArtistData | undefined> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 
-  insertMediaArtist(mediaArtistData: IMediaArtistData): Promise<IMediaArtistData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaArtistDatastoreName, mediaArtistData);
+  insertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaArtistDatastoreName, mediaArtistInputData);
   }
 }
 

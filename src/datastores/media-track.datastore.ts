@@ -1,6 +1,7 @@
 import { AppEnums } from '../enums';
 import { IMediaTrackData } from '../interfaces';
 import AppService from '../services/app.service';
+import { DataStoreFilterData, DataStoreInputData } from '../types';
 
 class MediaTrackDatastore {
   private readonly mediaTrackDatastoreName = 'media_tracks';
@@ -18,16 +19,16 @@ class MediaTrackDatastore {
     });
   }
 
-  findMediaTrack(mediaTrackFilterParams: any): Promise<IMediaTrackData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaTrackDatastoreName, mediaTrackFilterParams);
+  findMediaTrack(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>): Promise<IMediaTrackData | undefined> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaTrackDatastoreName, mediaTrackFilterData);
   }
 
-  findMediaTracks(mediaTrackFilterParams: any): Promise<IMediaTrackData[]> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaTrackDatastoreName, mediaTrackFilterParams);
+  findMediaTracks(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>): Promise<IMediaTrackData[]> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaTrackDatastoreName, mediaTrackFilterData);
   }
 
-  insertMediaTrack(mediaTrackData: IMediaTrackData): Promise<IMediaTrackData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaTrackDatastoreName, mediaTrackData);
+  insertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaTrackDatastoreName, mediaTrackInputData);
   }
 }
 

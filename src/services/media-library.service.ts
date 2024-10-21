@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { AppEnums, MediaEnums } from '../enums';
-import { DatastoreUtils, MediaUtils } from '../utils';
+import { MediaUtils } from '../utils';
 import AppService from './app.service';
 import store from '../store';
 import { DataStoreInputData } from '../types';
@@ -39,10 +39,8 @@ class MediaLibraryService {
 
     const mediaSyncStartTimestamp = Date.now();
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
-      library: {
-        sync_started_at: mediaSyncStartTimestamp,
-        sync_finished_at: null,
-      },
+      sync_started_at: mediaSyncStartTimestamp,
+      sync_finished_at: null,
     });
     debug('started sync for provider %s at %d', mediaProviderIdentifier, mediaSyncStartTimestamp);
 
@@ -59,16 +57,13 @@ class MediaLibraryService {
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
     }
-    if (!mediaProviderData.library.sync_started_at) {
+    if (mediaProviderData.sync_finished_at) {
       throw new Error('MediaLibraryService encountered error at finishMediaTrackSync - Invalid sync state');
     }
 
     const mediaSyncEndTimestamp = Date.now();
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
-      library: {
-        sync_started_at: mediaProviderData.library.sync_started_at,
-        sync_finished_at: mediaSyncEndTimestamp,
-      },
+      sync_finished_at: mediaSyncEndTimestamp,
     });
     debug('finished sync for provider %s at %d', mediaProviderIdentifier, mediaSyncEndTimestamp);
 
@@ -101,7 +96,6 @@ class MediaLibraryService {
 
     if (!mediaArtistData) {
       mediaArtistData = await MediaArtistDatastore.insertMediaArtist({
-        id: DatastoreUtils.generateId(),
         provider: mediaArtistInputData.provider,
         provider_id: mediaArtistInputData.provider_id,
         artist_name: mediaArtistInputData.artist_name,
@@ -131,7 +125,6 @@ class MediaLibraryService {
 
     if (!mediaTrackAlbumData) {
       mediaTrackAlbumData = await MediaAlbumDatastore.insertMediaAlbum({
-        id: DatastoreUtils.generateId(),
         provider: mediaAlbumInputData.provider,
         provider_id: mediaAlbumInputData.provider_id,
         album_name: mediaAlbumInputData.album_name,
@@ -155,7 +148,6 @@ class MediaLibraryService {
 
     if (!mediaTrackData) {
       mediaTrackData = await MediaTrackDatastore.insertMediaTrack({
-        id: DatastoreUtils.generateId(),
         provider: mediaTrackInputData.provider,
         provider_id: mediaTrackInputData.provider_id,
         track_name: mediaTrackInputData.track_name,

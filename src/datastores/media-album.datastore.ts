@@ -1,6 +1,7 @@
 import { AppEnums } from '../enums';
 import { IMediaAlbumData } from '../interfaces';
 import AppService from '../services/app.service';
+import { DataStoreFilterData, DataStoreInputData } from '../types';
 
 class MediaAlbumDatastore {
   private readonly mediaAlbumDatastoreName = 'media_albums';
@@ -24,16 +25,16 @@ class MediaAlbumDatastore {
     });
   }
 
-  findMediaAlbum(mediaAlbumFilterParams: any): Promise<IMediaAlbumData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
+  findMediaAlbum(mediaAlbumFilterData: DataStoreFilterData<IMediaAlbumData>): Promise<IMediaAlbumData | undefined> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaAlbumDatastoreName, mediaAlbumFilterData);
   }
 
-  findMediaAlbums(mediaAlbumFilterParams?: any): Promise<IMediaAlbumData[]> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
+  findMediaAlbums(mediaAlbumFilterData?: DataStoreFilterData<IMediaAlbumData>): Promise<IMediaAlbumData[]> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaAlbumDatastoreName, mediaAlbumFilterData);
   }
 
-  insertMediaAlbum(mediaAlbumData: IMediaAlbumData): Promise<IMediaAlbumData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaAlbumDatastoreName, mediaAlbumData);
+  insertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbumData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaAlbumDatastoreName, mediaAlbumInputData);
   }
 }
 

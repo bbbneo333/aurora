@@ -1,6 +1,7 @@
 import { AppEnums } from '../enums';
-import { IMediaProviderData, IMediaProviderDataUpdateParams } from '../interfaces';
+import { IMediaProviderData } from '../interfaces';
 import AppService from '../services/app.service';
+import { DataStoreInputData, DataStoreUpdateData } from '../types';
 
 class MediaProviderDatastore {
   private readonly mediaProviderDatastoreName = 'media_providers';
@@ -20,16 +21,16 @@ class MediaProviderDatastore {
     });
   }
 
-  updateMediaProviderByIdentifier(mediaProviderIdentifier: string, mediaProviderUpdateParams: IMediaProviderDataUpdateParams): Promise<void> {
+  updateMediaProviderByIdentifier(mediaProviderIdentifier: string, mediaProviderUpdateData: DataStoreUpdateData<IMediaProviderData>): Promise<IMediaProviderData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     }, {
-      $set: mediaProviderUpdateParams,
+      $set: mediaProviderUpdateData,
     });
   }
 
-  insertMediaProvider(mediaProviderData: IMediaProviderData): Promise<IMediaProviderData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderData);
+  insertMediaProvider(mediaProviderInputData: DataStoreInputData<IMediaProviderData>): Promise<IMediaProviderData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
   }
 }
 

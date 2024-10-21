@@ -3,6 +3,7 @@ import fs from 'fs';
 
 import { IAppMain, IAppModule } from '../../interfaces';
 import { AppEnums } from '../../enums';
+import { DatastoreUtils } from '../../utils';
 
 const debug = require('debug')('app:module:datastore_module');
 
@@ -115,7 +116,10 @@ export class DatastoreModule implements IAppModule {
 
   private insertOne(datastoreName: string, datastoreInsertDoc: object): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-    return datastore.insert(datastoreInsertDoc);
+    return datastore.insert({
+      id: DatastoreUtils.generateId(),
+      ...datastoreInsertDoc,
+    });
   }
 
   private async updateOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object): Promise<void> {

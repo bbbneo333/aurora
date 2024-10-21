@@ -140,18 +140,8 @@ export interface IMediaProviderData {
   enabled: boolean;
   settings: object;
   options: object;
-  library: {
-    sync_started_at: number | null,
-    sync_finished_at: number | null,
-  },
-}
-
-export interface IMediaProviderDataUpdateParams {
-  settings?: object;
-  library?: {
-    sync_started_at?: number | null,
-    sync_finished_at?: number | null,
-  },
+  sync_started_at: number | null;
+  sync_finished_at: number | null;
 }
 
 export interface IMediaProvider {

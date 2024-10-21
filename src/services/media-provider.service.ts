@@ -78,10 +78,8 @@ class MediaProviderService {
       enabled: true,
       settings: mediaProviderDefaultSettings,
       options: {},
-      library: {
-        sync_started_at: null,
-        sync_finished_at: null,
-      },
+      sync_started_at: null,
+      sync_finished_at: null,
     });
   }
 
