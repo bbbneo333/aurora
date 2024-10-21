@@ -3,49 +3,41 @@ import React from 'react';
 import { MediaEnums } from '../enums';
 
 export interface IMediaTrackData {
-  readonly id: string;
-  readonly provider: string;
-  readonly provider_id?: string;
-  readonly track_name: string;
-  readonly track_number: number;
-  readonly track_duration: number;
-  readonly track_cover_picture?: IMediaPicture;
-  readonly track_artist_ids: string[],
-  readonly track_album_id: string,
-  readonly extra?: object;
+  id: string;
+  provider: string;
+  provider_id?: string;
+  track_name: string;
+  track_number: number;
+  track_duration: number;
+  track_cover_picture?: IMediaPicture;
+  track_artist_ids: string[],
+  track_album_id: string,
+  extra?: object;
 }
 
 export interface IMediaAlbumData {
-  readonly id: string;
-  readonly provider: string;
-  readonly provider_id?: string;
-  readonly album_name: string;
-  readonly album_artist_id: string;
-  readonly album_cover_picture?: IMediaPicture;
-  readonly extra?: object;
+  id: string;
+  provider: string;
+  provider_id?: string;
+  album_name: string;
+  album_artist_id: string;
+  album_cover_picture?: IMediaPicture;
+  extra?: object;
 }
 
 export interface IMediaArtistData {
-  readonly id: string;
-  readonly provider: string;
-  readonly provider_id?: string;
-  readonly artist_name: string;
-  readonly artist_display_picture?: IMediaPicture;
-  readonly artist_feature_picture?: IMediaPicture;
-  readonly extra?: object;
+  id: string;
+  provider: string;
+  provider_id?: string;
+  artist_name: string;
+  artist_display_picture?: IMediaPicture;
+  artist_feature_picture?: IMediaPicture;
+  extra?: object;
 }
 
-export interface IMediaTrack {
-  readonly id: string;
-  readonly provider: string;
-  readonly provider_id?: string;
-  readonly track_name: string;
-  readonly track_number: number;
-  readonly track_duration: number;
-  readonly track_cover_picture?: IMediaPicture;
-  readonly track_artists: IMediaArtist[];
-  readonly track_album: IMediaAlbum;
-  readonly extra?: object;
+export interface IMediaTrack extends IMediaTrackData {
+  track_artists: IMediaArtist[];
+  track_album: IMediaAlbum;
 }
 
 export interface IMediaTrackList {
@@ -58,24 +50,11 @@ export interface IMediaQueueTrack extends IMediaTrack {
   queue_insertion_index: number,
 }
 
-export interface IMediaAlbum {
-  readonly id: string;
-  readonly provider: string;
-  readonly provider_id?: string;
-  readonly album_name: string;
-  readonly album_artist: IMediaArtist;
-  readonly album_cover_picture?: IMediaPicture;
-  readonly extra?: object;
+export interface IMediaAlbum extends IMediaAlbumData {
+  album_artist: IMediaArtist;
 }
 
-export interface IMediaArtist {
-  readonly id: string;
-  readonly provider: string;
-  readonly provider_id?: string;
-  readonly artist_name: string;
-  readonly artist_display_picture?: IMediaPicture;
-  readonly artist_feature_picture?: IMediaPicture;
-  readonly extra?: object;
+export interface IMediaArtist extends IMediaArtistData {
 }
 
 export interface IMediaPicture {
