@@ -1,5 +1,5 @@
 import { AppEnums } from '../enums';
-import { IMediaArtistDataFilterParams, IMediaArtistData } from '../interfaces';
+import { IMediaArtistData } from '../interfaces';
 import AppService from '../services/app.service';
 
 class MediaArtistDatastore {
@@ -24,7 +24,7 @@ class MediaArtistDatastore {
     });
   }
 
-  findMediaArtist(mediaArtistFilterParams: IMediaArtistDataFilterParams): Promise<IMediaArtistData | undefined> {
+  findMediaArtist(mediaArtistFilterParams: any): Promise<IMediaArtistData | undefined> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterParams);
   }
 

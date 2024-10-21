@@ -11,30 +11,8 @@ export interface IMediaTrackData {
   readonly track_duration: number;
   readonly track_cover_picture?: IMediaPicture;
   readonly track_artist_ids: string[],
-  readonly removed: boolean;
   readonly track_album_id: string,
-  readonly sync: {
-    timestamp: number;
-  };
   readonly extra?: object;
-}
-
-export interface IMediaTrackDataFilterParams {
-  id?: string,
-  provider?: string;
-  provider_id?: string;
-  track_album_id?: string;
-  removed?: boolean,
-  sync?: {
-    timestamp?: number;
-  },
-}
-
-export interface IMediaTrackDataUpdateParams {
-  removed?: boolean;
-  sync?: {
-    timestamp?: number;
-  },
 }
 
 export interface IMediaAlbumData {
@@ -47,52 +25,9 @@ export interface IMediaAlbumData {
   readonly extra?: object;
 }
 
-export interface IMediaAlbumDataFilterParams {
-  provider?: string;
-  provider_id?: string;
-  album_name?: string;
-  album_artist_id?: string;
-}
-
 export interface IMediaArtistData {
   readonly id: string;
   readonly provider: string;
-  readonly provider_id?: string;
-  readonly artist_name: string;
-  readonly artist_display_picture?: IMediaPicture;
-  readonly artist_feature_picture?: IMediaPicture;
-  readonly extra?: object;
-}
-
-export interface IMediaArtistDataFilterParams {
-  provider?: string;
-  provider_id?: string;
-  artist_name?: string;
-}
-
-export interface IMediaTrackProviderData {
-  readonly provider_id?: string;
-  readonly track_name: string;
-  readonly track_number: number;
-  readonly track_duration: number;
-  readonly track_cover_picture?: IMediaPicture;
-  readonly track_artists: IMediaArtistProviderData[];
-  readonly track_album: IMediaAlbumProviderData;
-  readonly sync: {
-    timestamp: number;
-  };
-  readonly extra?: object;
-}
-
-export interface IMediaAlbumProviderData {
-  readonly provider_id?: string;
-  readonly album_name: string;
-  readonly album_artist: IMediaArtistProviderData;
-  readonly album_cover_picture?: IMediaPicture;
-  readonly extra?: object;
-}
-
-export interface IMediaArtistProviderData {
   readonly provider_id?: string;
   readonly artist_name: string;
   readonly artist_display_picture?: IMediaPicture;

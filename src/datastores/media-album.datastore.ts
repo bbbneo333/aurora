@@ -1,5 +1,5 @@
 import { AppEnums } from '../enums';
-import { IMediaAlbumData, IMediaAlbumDataFilterParams } from '../interfaces';
+import { IMediaAlbumData } from '../interfaces';
 import AppService from '../services/app.service';
 
 class MediaAlbumDatastore {
@@ -24,11 +24,11 @@ class MediaAlbumDatastore {
     });
   }
 
-  findMediaAlbum(mediaAlbumFilterParams: IMediaAlbumDataFilterParams): Promise<IMediaAlbumData | undefined> {
+  findMediaAlbum(mediaAlbumFilterParams: any): Promise<IMediaAlbumData | undefined> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
   }
 
-  findMediaAlbums(mediaAlbumFilterParams?: IMediaAlbumDataFilterParams): Promise<IMediaAlbumData[]> {
+  findMediaAlbums(mediaAlbumFilterParams?: any): Promise<IMediaAlbumData[]> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
   }
 

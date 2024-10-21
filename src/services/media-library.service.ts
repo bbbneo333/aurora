@@ -2,6 +2,9 @@ import _ from 'lodash';
 
 import { AppEnums, MediaEnums } from '../enums';
 import { DatastoreUtils, MediaUtils } from '../utils';
+import AppService from './app.service';
+import store from '../store';
+import { DataStoreInputData } from '../types';
 
 import {
   MediaAlbumDatastore,
@@ -13,20 +16,12 @@ import {
 import {
   IMediaAlbum,
   IMediaAlbumData,
-  IMediaAlbumProviderData,
   IMediaArtist,
   IMediaArtistData,
-  IMediaArtistProviderData,
   IMediaPicture,
   IMediaTrack,
   IMediaTrackData,
-  IMediaTrackDataUpdateParams,
-  IMediaTrackProviderData,
 } from '../interfaces';
-
-import AppService from './app.service';
-import MediaProviderService from './media-provider.service';
-import store from '../store';
 
 const debug = require('debug')('app:service:media_library_service');
 
@@ -35,38 +30,6 @@ class MediaLibraryService {
   private readonly mediaPictureScaleHeight = 500;
 
   // sync API
-
-  async insertMediaTrack(mediaProviderIdentifier: string, mediaTrackProviderData: IMediaTrackProviderData): Promise<IMediaTrack> {
-    const mediaTrackData = await this.checkAndInsertMediaTrack(mediaProviderIdentifier, mediaTrackProviderData);
-    return this.buildMediaTrack(mediaTrackData, true);
-  }
-
-  async removeMediaTrack(mediaTrack: IMediaTrack): Promise<void> {
-    const { mediaLibraryService } = MediaProviderService.getMediaProvider(mediaTrack.provider);
-
-    // a media track can be removed via one of the following ways:
-    // - if provider provides removeMediaTrack - then the media track will be removed completely
-    // - if provider does not provide removeMediaTrack - then the media track will be marked as removed and will not show up in the list
-    // provider then has the option to recover removed tracks via recoverRemovedTracks
-    if (mediaLibraryService.removeMediaTrack) {
-      const mediaTrackWasRemoved = await mediaLibraryService.removeMediaTrack(mediaTrack);
-      if (!mediaTrackWasRemoved) {
-        throw new Error(`MediaLibraryService encountered error at removeMediaTrack - Media track could not be removed for provider - ${mediaTrack.provider}, track id - ${mediaTrack.id}`);
-      }
-      await MediaTrackDatastore.removeMediaTrackById(mediaTrack.id);
-    } else {
-      await MediaTrackDatastore.updateMediaTrackById(mediaTrack.id, {
-        removed: true,
-      });
-    }
-
-    store.dispatch({
-      type: MediaEnums.MediaLibraryActions.RemoveTrack,
-      data: {
-        mediaTrack,
-      },
-    });
-  }
 
   async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
@@ -100,8 +63,6 @@ class MediaLibraryService {
       throw new Error('MediaLibraryService encountered error at finishMediaTrackSync - Invalid sync state');
     }
 
-    await this.removeUnSyncTracks(mediaProviderIdentifier, mediaProviderData.library.sync_started_at);
-
     const mediaSyncEndTimestamp = Date.now();
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
       library: {
@@ -119,6 +80,97 @@ class MediaLibraryService {
     });
   }
 
+  async checkAndInsertMediaArtists(mediaArtistInputDataList: DataStoreInputData<IMediaArtistData>[]): Promise<IMediaArtist[]> {
+    return Promise.all(mediaArtistInputDataList.map(mediaArtistInputData => this.checkAndInsertMediaArtist(mediaArtistInputData)));
+  }
+
+  async checkAndInsertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtist> {
+    let mediaArtistData;
+
+    if (!_.isNil(mediaArtistInputData.provider_id)) {
+      mediaArtistData = await MediaArtistDatastore.findMediaArtist({
+        provider: mediaArtistInputData.provider,
+        provider_id: mediaArtistInputData.provider_id,
+      });
+    } else {
+      mediaArtistData = await MediaArtistDatastore.findMediaArtist({
+        provider: mediaArtistInputData.provider,
+        artist_name: mediaArtistInputData.artist_name,
+      });
+    }
+
+    if (!mediaArtistData) {
+      mediaArtistData = await MediaArtistDatastore.insertMediaArtist({
+        id: DatastoreUtils.generateId(),
+        provider: mediaArtistInputData.provider,
+        provider_id: mediaArtistInputData.provider_id,
+        artist_name: mediaArtistInputData.artist_name,
+        artist_display_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
+        artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
+        extra: mediaArtistInputData.extra,
+      });
+    }
+
+    return this.buildMediaArtist(mediaArtistData, true);
+  }
+
+  async checkAndInsertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbum> {
+    let mediaTrackAlbumData;
+
+    if (!_.isNil(mediaAlbumInputData.provider_id)) {
+      mediaTrackAlbumData = await MediaAlbumDatastore.findMediaAlbum({
+        provider: mediaAlbumInputData.provider,
+        provider_id: mediaAlbumInputData.provider_id,
+      });
+    } else {
+      mediaTrackAlbumData = await MediaAlbumDatastore.findMediaAlbum({
+        provider: mediaAlbumInputData.provider,
+        album_name: mediaAlbumInputData.album_name,
+      });
+    }
+
+    if (!mediaTrackAlbumData) {
+      mediaTrackAlbumData = await MediaAlbumDatastore.insertMediaAlbum({
+        id: DatastoreUtils.generateId(),
+        provider: mediaAlbumInputData.provider,
+        provider_id: mediaAlbumInputData.provider_id,
+        album_name: mediaAlbumInputData.album_name,
+        album_artist_id: mediaAlbumInputData.album_artist_id,
+        album_cover_picture: await this.processPicture(mediaAlbumInputData.album_cover_picture),
+        extra: mediaAlbumInputData.extra,
+      });
+    }
+
+    return this.buildMediaAlbum(mediaTrackAlbumData, true);
+  }
+
+  async checkAndInsertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrack> {
+    let mediaTrackData;
+    if (!_.isNil(mediaTrackInputData.provider_id)) {
+      mediaTrackData = await MediaTrackDatastore.findMediaTrack({
+        provider: mediaTrackInputData.provider,
+        provider_id: mediaTrackInputData.provider_id,
+      });
+    }
+
+    if (!mediaTrackData) {
+      mediaTrackData = await MediaTrackDatastore.insertMediaTrack({
+        id: DatastoreUtils.generateId(),
+        provider: mediaTrackInputData.provider,
+        provider_id: mediaTrackInputData.provider_id,
+        track_name: mediaTrackInputData.track_name,
+        track_number: mediaTrackInputData.track_number,
+        track_duration: mediaTrackInputData.track_duration,
+        track_cover_picture: await this.processPicture(mediaTrackInputData.track_cover_picture),
+        track_artist_ids: mediaTrackInputData.track_artist_ids,
+        track_album_id: mediaTrackInputData.track_album_id,
+        extra: mediaTrackInputData.extra,
+      });
+    }
+
+    return this.buildMediaTrack(mediaTrackData, true);
+  }
+
   // fetch API
 
   async getMediaTrack(mediaTrackId: string): Promise<IMediaTrack | undefined> {
@@ -132,7 +184,6 @@ class MediaLibraryService {
   async getMediaAlbumTracks(mediaAlbumId: string): Promise<IMediaTrack[]> {
     const mediaAlbumTrackDataList = await MediaTrackDatastore.findMediaTracks({
       track_album_id: mediaAlbumId,
-      removed: false,
     });
 
     const mediaAlbumTracks = await this.buildMediaTracks(mediaAlbumTrackDataList);
@@ -175,24 +226,13 @@ class MediaLibraryService {
       });
   }
 
-  private async removeUnSyncTracks(mediaProviderIdentifier: string, mediaSyncTimestamp: number): Promise<void> {
-    await MediaTrackDatastore.removeMediaTracks({
-      provider: mediaProviderIdentifier,
-      'sync.timestamp': {
-        $lt: mediaSyncTimestamp,
-      },
-    });
-
-    debug('removed tracks for provider %s before %d', mediaProviderIdentifier, mediaSyncTimestamp);
-  }
-
   private async buildMediaTrack(mediaTrackData: IMediaTrackData, loadMediaTrack = false): Promise<IMediaTrack> {
     const mediaTrack = _.assign({}, mediaTrackData, {
       track_artists: await this.buildMediaArtists(mediaTrackData.track_artist_ids, loadMediaTrack),
       track_album: await this.buildMediaAlbum(mediaTrackData.track_album_id, loadMediaTrack),
     });
 
-    if (loadMediaTrack && !mediaTrackData.removed) {
+    if (loadMediaTrack) {
       store.dispatch({
         type: MediaEnums.MediaLibraryActions.AddTrack,
         data: {
@@ -263,109 +303,6 @@ class MediaLibraryService {
 
   private async buildMediaArtists(mediaArtists: string[] | IMediaArtistData[], loadMediaArtists = false): Promise<IMediaArtist[]> {
     return Promise.all(mediaArtists.map((mediaArtist: any) => this.buildMediaArtist(mediaArtist, loadMediaArtists)));
-  }
-
-  private async checkAndInsertMediaArtist(mediaProviderIdentifier: string, mediaArtistProviderData: IMediaArtistProviderData): Promise<IMediaArtistData> {
-    let mediaArtistData;
-    if (!_.isNil(mediaArtistProviderData.provider_id)) {
-      mediaArtistData = await MediaArtistDatastore.findMediaArtist({
-        provider: mediaProviderIdentifier,
-        provider_id: mediaArtistProviderData.provider_id,
-      });
-    } else {
-      mediaArtistData = await MediaArtistDatastore.findMediaArtist({
-        provider: mediaProviderIdentifier,
-        artist_name: mediaArtistProviderData.artist_name,
-      });
-    }
-
-    return mediaArtistData || MediaArtistDatastore.insertMediaArtist({
-      id: DatastoreUtils.generateId(),
-      provider: mediaProviderIdentifier,
-      provider_id: mediaArtistProviderData.provider_id,
-      artist_name: mediaArtistProviderData.artist_name,
-      artist_display_picture: await this.processPicture(mediaArtistProviderData.artist_feature_picture),
-      artist_feature_picture: await this.processPicture(mediaArtistProviderData.artist_feature_picture),
-      extra: mediaArtistProviderData.extra,
-    });
-  }
-
-  private async checkAndInsertMediaArtists(mediaProviderIdentifier: string, mediaArtistProviderDataList: IMediaArtistProviderData[]): Promise<IMediaArtistData[]> {
-    return Promise.all(mediaArtistProviderDataList.map(mediaArtistProviderData => this.checkAndInsertMediaArtist(mediaProviderIdentifier, mediaArtistProviderData)));
-  }
-
-  private async checkAndInsertMediaAlbum(mediaProviderIdentifier: string, mediaAlbumProviderData: IMediaAlbumProviderData): Promise<IMediaAlbumData> {
-    let mediaTrackAlbum;
-    if (!_.isNil(mediaAlbumProviderData.provider_id)) {
-      mediaTrackAlbum = await MediaAlbumDatastore.findMediaAlbum({
-        provider: mediaProviderIdentifier,
-        provider_id: mediaAlbumProviderData.provider_id,
-      });
-    } else {
-      mediaTrackAlbum = await MediaAlbumDatastore.findMediaAlbum({
-        provider: mediaProviderIdentifier,
-        album_name: mediaAlbumProviderData.album_name,
-      });
-    }
-    if (mediaTrackAlbum) {
-      return mediaTrackAlbum;
-    }
-
-    const mediaAlbumArtistData = await this.checkAndInsertMediaArtist(mediaProviderIdentifier, mediaAlbumProviderData.album_artist);
-
-    return MediaAlbumDatastore.insertMediaAlbum({
-      id: DatastoreUtils.generateId(),
-      provider: mediaProviderIdentifier,
-      provider_id: mediaAlbumProviderData.provider_id,
-      album_name: mediaAlbumProviderData.album_name,
-      album_artist_id: mediaAlbumArtistData.id,
-      album_cover_picture: await this.processPicture(mediaAlbumProviderData.album_cover_picture),
-      extra: mediaAlbumProviderData.extra,
-    });
-  }
-
-  private async checkAndInsertMediaTrack(mediaProviderIdentifier: string, mediaTrackProviderData: IMediaTrackProviderData): Promise<IMediaTrackData> {
-    const mediaSyncTimestamp = Date.now();
-
-    let mediaTrackData;
-    if (!_.isNil(mediaTrackProviderData.provider_id)) {
-      mediaTrackData = await MediaTrackDatastore.findMediaTrack({
-        provider: mediaProviderIdentifier,
-        provider_id: mediaTrackProviderData.provider_id,
-      });
-    }
-
-    if (mediaTrackData) {
-      const mediaTrackUpdateParams: IMediaTrackDataUpdateParams = {
-        sync: {
-          timestamp: mediaSyncTimestamp,
-        },
-      };
-      // update track
-      await MediaTrackDatastore.updateMediaTrackById(mediaTrackData.id, mediaTrackUpdateParams);
-      // conclude with the updated track data
-      return _.merge(mediaTrackData, mediaTrackUpdateParams);
-    }
-
-    const mediaArtistDataList = await this.checkAndInsertMediaArtists(mediaProviderIdentifier, mediaTrackProviderData.track_artists);
-    const mediaAlbumData = await this.checkAndInsertMediaAlbum(mediaProviderIdentifier, mediaTrackProviderData.track_album);
-
-    return MediaTrackDatastore.insertMediaTrack({
-      id: DatastoreUtils.generateId(),
-      provider: mediaProviderIdentifier,
-      provider_id: mediaTrackProviderData.provider_id,
-      track_name: mediaTrackProviderData.track_name,
-      track_number: mediaTrackProviderData.track_number,
-      track_duration: mediaTrackProviderData.track_duration,
-      track_cover_picture: await this.processPicture(mediaTrackProviderData.track_cover_picture),
-      track_artist_ids: mediaArtistDataList.map(mediaArtistData => (mediaArtistData.id)),
-      track_album_id: mediaAlbumData.id,
-      removed: false,
-      sync: {
-        timestamp: mediaSyncTimestamp,
-      },
-      extra: mediaTrackProviderData.extra,
-    });
   }
 
   private async processPicture(mediaPicture?: IMediaPicture): Promise<IMediaPicture | undefined> {

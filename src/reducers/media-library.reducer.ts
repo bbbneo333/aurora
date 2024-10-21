@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import { MediaEnums } from '../enums';
 import { IMediaAlbum, IMediaArtist, IMediaTrack } from '../interfaces';
 import { ArrayUtils, MediaUtils } from '../utils';
@@ -61,26 +59,13 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       // location #1 - mediaSelectedAlbumTracks (if selected album was found)
       if (mediaSelectedAlbum && mediaSelectedAlbum.id === mediaTrack.track_album.id) {
         mediaSelectedAlbumTracks = mediaSelectedAlbumTracks || [];
+        const mediaTrackIdx = mediaSelectedAlbumTracks.findIndex(mediaAlbumTrack => mediaAlbumTrack.id === mediaTrack.id);
 
-        // only add the track if it does not already exist
-        if (_.isNil(mediaSelectedAlbumTracks.find(mediaAlbumTrack => mediaAlbumTrack.id === mediaTrack.id))) {
+        if (mediaTrackIdx === -1) {
           ArrayUtils.updateSortedArray<IMediaTrack>(mediaSelectedAlbumTracks, mediaTrack, MediaUtils.mediaTrackComparator);
+        } else {
+          mediaSelectedAlbumTracks[mediaTrackIdx] = mediaTrack;
         }
-      }
-
-      return {
-        ...state,
-        mediaSelectedAlbumTracks,
-      };
-    }
-    case MediaEnums.MediaLibraryActions.RemoveTrack: {
-      // data.mediaTrack: MediaTrack - track which needs to be removed
-      const { mediaTrack } = action.data;
-      let { mediaSelectedAlbumTracks } = state;
-
-      // location #1 - mediaSelectedAlbumTracks
-      if (!_.isEmpty(mediaSelectedAlbumTracks)) {
-        mediaSelectedAlbumTracks = _.filter(mediaSelectedAlbumTracks, mediaAlbumTrack => mediaAlbumTrack.id !== mediaTrack.id);
       }
 
       return {
@@ -92,9 +77,12 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       // data.mediaAlbum: MediaAlbum - album which needs to be added
       const { mediaAlbum } = action.data;
       const { mediaAlbums } = state;
+      const mediaAlbumIdx = mediaAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
 
-      if (_.isNil(mediaAlbums.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
+      if (mediaAlbumIdx === -1) {
         ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
+      } else {
+        mediaAlbums[mediaAlbumIdx] = mediaAlbum;
       }
 
       return {
@@ -108,8 +96,12 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       const mediaAlbumsExisting = state.mediaAlbums;
 
       mediaAlbums.forEach((mediaAlbum: IMediaAlbum) => {
-        if (_.isNil(mediaAlbumsExisting.find(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id))) {
+        const mediaAlbumIdx = mediaAlbumsExisting.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
+
+        if (mediaAlbumIdx === -1) {
           ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbumsExisting, mediaAlbum, MediaUtils.mediaAlbumComparator);
+        } else {
+          mediaAlbumsExisting[mediaAlbumIdx] = mediaAlbum;
         }
       });
 
@@ -136,9 +128,12 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       // data.mediaArtist: MediaArtist - artist which needs to be added
       const { mediaArtist } = action.data;
       const { mediaArtists } = state;
+      const mediaArtistIdx = mediaArtists.findIndex(exMediaArtist => exMediaArtist.id === mediaArtist.id);
 
-      if (_.isNil(mediaArtists.find(exMediaArtist => exMediaArtist.id === mediaArtist.id))) {
+      if (mediaArtistIdx === -1) {
         ArrayUtils.updateSortedArray<IMediaArtist>(mediaArtists, mediaArtist, MediaUtils.mediaArtistComparator);
+      } else {
+        mediaArtists[mediaArtistIdx] = mediaArtist;
       }
 
       return {

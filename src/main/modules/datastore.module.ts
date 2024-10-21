@@ -121,10 +121,10 @@ export class DatastoreModule implements IAppModule {
   private async updateOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
-    await datastore.update(datastoreFindOneDoc, datastoreUpdateOneDoc, {
+    return datastore.update(datastoreFindOneDoc, datastoreUpdateOneDoc, {
       multi: false,
       upsert: false,
-      returnUpdatedDocs: false,
+      returnUpdatedDocs: true,
     });
   }
 

@@ -60,36 +60,41 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
       // generate local id - we are using location of the file to uniquely identify the track
       const mediaTrackId = MediaLocalLibraryService.getMediaTrackId(fsDirectoryReadFile.path);
+      // add media artist
+      const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
+        ? audioMetadata.common.artists.map(audioArtist => ({
+          artist_name: audioArtist,
+          provider: MediaLocalConstants.Provider,
+        }))
+        : [{
+          artist_name: 'unknown artist',
+          provider: MediaLocalConstants.Provider,
+        }]);
+      // add media album
+      const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
+        album_name: audioMetadata.common.album || 'unknown album',
+        album_artist_id: mediaArtistDataList[0].id,
+        album_cover_picture: audioCoverPicture ? {
+          image_data: audioCoverPicture.data,
+          image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+          image_format: audioCoverPicture.format,
+        } : undefined,
+        provider: MediaLocalConstants.Provider,
+      });
       // add media track
-      await MediaLibraryService.insertMediaTrack(MediaLocalConstants.Provider, {
+      await MediaLibraryService.checkAndInsertMediaTrack({
+        provider: MediaLocalConstants.Provider,
         provider_id: mediaTrackId,
         track_name: audioMetadata.common.title || 'unknown track',
         track_number: audioMetadata.common.track.no || 0,
-        track_artists: audioMetadata.common.artists ? audioMetadata.common.artists.map(audioArtist => ({
-          artist_name: audioArtist,
-        })) : [{
-          artist_name: 'unknown artist',
-        }],
-        track_album: {
-          album_name: audioMetadata.common.album || 'unknown album',
-          album_artist: {
-            artist_name: audioMetadata.common.artists ? audioMetadata.common.artists[0] : 'unknown artist',
-          },
-          album_cover_picture: audioCoverPicture ? {
-            image_data: audioCoverPicture.data,
-            image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-            image_format: audioCoverPicture.format,
-          } : undefined,
-        },
         track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
         track_cover_picture: audioCoverPicture ? {
           image_data: audioCoverPicture.data,
           image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
           image_format: audioCoverPicture.format,
         } : undefined,
-        sync: {
-          timestamp: Date.now(),
-        },
+        track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
+        track_album_id: mediaAlbumData.id,
         extra: {
           location: {
             address: fsDirectoryReadFile.path,
