@@ -5,6 +5,7 @@ import { MediaUtils } from '../utils';
 import AppService from './app.service';
 import store from '../store';
 import { DataStoreInputData } from '../types';
+import MediaPlayerService from './media-player.service';
 
 import {
   MediaAlbumDatastore,
@@ -65,6 +66,7 @@ class MediaLibraryService {
     // important - this will only delete it from store, state still needs to be managed
     const mediaSyncStartTimestamp = mediaProviderData.sync_started_at;
     await this.deleteUnsyncMedia(mediaProviderIdentifier, mediaSyncStartTimestamp);
+    await MediaPlayerService.revalidatePlayer();
 
     // update provider
     const mediaSyncEndTimestamp = Date.now();

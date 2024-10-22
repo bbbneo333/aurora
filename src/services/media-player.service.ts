@@ -4,6 +4,8 @@ import { batch } from 'react-redux';
 import { MediaEnums } from '../enums';
 import store from '../store';
 import { ArrayUtils, StringUtils } from '../utils';
+import MediaProviderService from './media-provider.service';
+import { MediaTrackDatastore } from '../datastores';
 
 import {
   IMediaPlayback,
@@ -11,8 +13,6 @@ import {
   IMediaTrack,
   IMediaTrackList,
 } from '../interfaces';
-
-import MediaProviderService from './media-provider.service';
 
 const debug = require('debug')('app:service:media_player_service');
 
@@ -157,9 +157,9 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaQueueTrack);
   }
 
-  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions: {
-    skipUserNotification?: boolean,
-  } = {}): void {
+  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions?: {
+    skipUserNotification?: boolean
+  }): void {
     const {
       mediaPlayer,
     } = store.getState();
@@ -227,7 +227,7 @@ class MediaPlayerService {
     }
 
     // #7 - notify user
-    if (!mediaTrackAddToQueueOptions.skipUserNotification) {
+    if (!mediaTrackAddToQueueOptions?.skipUserNotification) {
       // TODO: Add support for sending notification
       //  "Track was added to the queue"
     }
@@ -323,6 +323,50 @@ class MediaPlayerService {
       data: {
         mediaTracks: mediaQueueTracks,
         mediaTrackList,
+      },
+    });
+  }
+
+  async revalidatePlayer(): Promise<void> {
+    // this run revalidation on the current queued tracks
+    // this removes / unloads track(s) which are not found in the datastore
+    // important - this does not update any track in place
+
+    const { mediaPlayer } = store.getState();
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentTrackList,
+      mediaTrackLastInsertedQueueId,
+      mediaPlaybackCurrentMediaTrack,
+    } = mediaPlayer;
+
+    // revalidate current playing track
+    if (mediaPlaybackCurrentMediaTrack) {
+      const mediaCurrentTrack = await MediaTrackDatastore.findMediaTrack({
+        id: mediaPlaybackCurrentMediaTrack.id,
+      });
+      // if current track was not found in store, unload and stop the player
+      if (!mediaCurrentTrack) {
+        this.stopMediaPlayer();
+      }
+    }
+
+    // revalidate queue
+    const mediaTrackIds = mediaTracks.map(mediaTrack => mediaTrack.id);
+    const mediaTracksUpdated = await MediaTrackDatastore.findMediaTracks({
+      id: {
+        $in: mediaTrackIds,
+      },
+    });
+    const mediaTracksUpdatedIds = mediaTracksUpdated.map(mediaTrack => mediaTrack.id);
+    const mediaQueueTracksUpdated = mediaTracks.filter(mediaTrack => mediaTracksUpdatedIds.includes(mediaTrack.id));
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks: mediaQueueTracksUpdated,
+        mediaTrackList: mediaPlaybackCurrentTrackList,
+        mediaTrackLastInsertedQueueId,
       },
     });
   }

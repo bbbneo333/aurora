@@ -1,9 +1,6 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import { Col, Container, Row } from 'react-bootstrap';
-
-import { RootState } from '../../reducers';
 
 import styles from './media-player-ribbon.component.css';
 import { MediaPlayerInfo } from './media-player-info.component';
@@ -14,14 +11,6 @@ import { MediaPlayerSide } from './media-player-side.component';
 const cx = classNames.bind(styles);
 
 export function MediaPlayerRibbonComponent() {
-  const {
-    mediaPlaybackCurrentMediaTrack,
-  } = useSelector((state: RootState) => state.mediaPlayer);
-
-  if (!mediaPlaybackCurrentMediaTrack) {
-    return (<></>);
-  }
-
   return (
     <Container fluid className={cx('h-100')}>
       <Row className={cx('media-player-container')}>

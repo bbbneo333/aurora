@@ -122,6 +122,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     case MediaEnums.MediaPlayerActions.StopPlayer: {
       return {
         ...state,
+        mediaPlaybackCurrentMediaTrack: undefined,
         mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
         mediaPlaybackCurrentMediaProgress: 0,
       };
