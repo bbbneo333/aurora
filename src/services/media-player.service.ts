@@ -41,9 +41,9 @@ class MediaPlayerService {
         return;
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-      this.stopMediaPlayer();
+      // pause media player
+      debug('playMediaTrack - pausing - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.pauseMediaPlayer();
     }
 
     // add track to the queue
@@ -77,9 +77,9 @@ class MediaPlayerService {
         return;
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-      this.stopMediaPlayer();
+      // pause media player
+      debug('playMediaTrack - pausing - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.pauseMediaPlayer();
     }
 
     // add tracks to the queue
@@ -119,9 +119,9 @@ class MediaPlayerService {
         return;
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-      this.stopMediaPlayer();
+      // pause media player
+      debug('playMediaTrack - pausing - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.pauseMediaPlayer();
     }
 
     // add tracks to the queue
@@ -150,8 +150,8 @@ class MediaPlayerService {
       return;
     }
 
-    // stop current playing instance
-    this.stopMediaPlayer();
+    // pause current playing instance
+    this.pauseMediaPlayer();
 
     // load up and play found track from queue
     this.loadAndPlayMediaTrack(mediaQueueTrack);
@@ -340,17 +340,6 @@ class MediaPlayerService {
       mediaPlaybackCurrentMediaTrack,
     } = mediaPlayer;
 
-    // revalidate current playing track
-    if (mediaPlaybackCurrentMediaTrack) {
-      const mediaCurrentTrack = await MediaTrackDatastore.findMediaTrack({
-        id: mediaPlaybackCurrentMediaTrack.id,
-      });
-      // if current track was not found in store, unload and stop the player
-      if (!mediaCurrentTrack) {
-        this.stopMediaPlayer();
-      }
-    }
-
     // revalidate queue
     const mediaTrackIds = mediaTracks.map(mediaTrack => mediaTrack.id);
     const mediaTracksUpdated = await MediaTrackDatastore.findMediaTracks({
@@ -369,6 +358,19 @@ class MediaPlayerService {
         mediaTrackLastInsertedQueueId,
       },
     });
+
+    // revalidate current playing track
+    // if the current track was not found in the updated list, pause and load next on player
+    // if no tracks are in queue, stop the player
+    if (mediaPlaybackCurrentMediaTrack && !mediaTracksUpdatedIds.includes(mediaPlaybackCurrentMediaTrack.id)) {
+      const nextMediaTrack = this.getNextFromList();
+      if (nextMediaTrack) {
+        this.pauseMediaPlayer();
+        this.loadMediaTrack(nextMediaTrack);
+      } else {
+        this.stopMediaPlayer();
+      }
+    }
   }
 
   // media player control API
@@ -627,13 +629,13 @@ class MediaPlayerService {
       && mediaPlaybackCurrentMediaProgress > 15)) {
       this.seekMediaTrack(0);
     } else {
-      this.stopMediaPlayer();
+      this.pauseMediaPlayer();
       this.playPrevious();
     }
   }
 
   playNextTrack(): void {
-    this.stopMediaPlayer();
+    this.pauseMediaPlayer();
     this.removeTrackRepeat();
     this.playNext();
   }
@@ -899,16 +901,10 @@ class MediaPlayerService {
       this.startMediaProgressReporting();
     } else if (mediaPlaybackCurrentPlayingInstance.checkIfEnded()) {
       debug('reportMediaPlaybackProgress - media playback ended, playing next...');
-
-      // first stop the current playing track (only the state)
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.StopPlayer,
-      });
-
-      // request next track
       this.playNext();
     } else if (!this.retryMediaProgressReporting()) {
       debug('reportMediaPlaybackProgress - media instance did not reported valid state, aborting...');
+      this.pauseMediaPlayer();
     }
   }
 
