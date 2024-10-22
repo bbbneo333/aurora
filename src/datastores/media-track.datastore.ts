@@ -1,7 +1,7 @@
 import { AppEnums } from '../enums';
 import { IMediaTrackData } from '../interfaces';
 import AppService from '../services/app.service';
-import { DataStoreFilterData, DataStoreInputData } from '../types';
+import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
 
 class MediaTrackDatastore {
   private readonly mediaTrackDatastoreName = 'media_tracks';
@@ -27,8 +27,20 @@ class MediaTrackDatastore {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaTrackDatastoreName, mediaTrackFilterData);
   }
 
+  updateTrackById(mediaTrackId: string, mediaTrackUpdateData: DataStoreUpdateData<IMediaTrackData>): Promise<IMediaTrackData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaTrackDatastoreName, {
+      id: mediaTrackId,
+    }, {
+      $set: mediaTrackUpdateData,
+    });
+  }
+
   insertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaTrackDatastoreName, mediaTrackInputData);
+  }
+
+  deleteTracks(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>): Promise<void> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemove, this.mediaTrackDatastoreName, mediaTrackFilterData);
   }
 }
 

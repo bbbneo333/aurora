@@ -1,5 +1,6 @@
 import Datastore from 'nedb-promises';
 import fs from 'fs';
+import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
 import { AppEnums } from '../../enums';
@@ -116,16 +117,19 @@ export class DatastoreModule implements IAppModule {
 
   private insertOne(datastoreName: string, datastoreInsertDoc: object): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
+
+    // important - id is reserved for datastore
     return datastore.insert({
-      id: DatastoreUtils.generateId(),
       ...datastoreInsertDoc,
+      id: DatastoreUtils.generateId(),
     });
   }
 
   private async updateOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
-    return datastore.update(datastoreFindOneDoc, datastoreUpdateOneDoc, {
+    // important - id is reserved for datastore
+    return datastore.update(datastoreFindOneDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
       multi: false,
       upsert: false,
       returnUpdatedDocs: true,

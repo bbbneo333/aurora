@@ -54,6 +54,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
     await Promise.mapSeries(fsDirectoryReadResponse.files, async (fsDirectoryReadFile) => {
       debug('addTracksFromDirectory - found file - %s', fsDirectoryReadFile.path);
+      const mediaSyncTimestamp = Date.now();
+
       // read metadata
       const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(fsDirectoryReadFile.path);
       // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
@@ -65,10 +67,12 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         ? audioMetadata.common.artists.map(audioArtist => ({
           artist_name: audioArtist,
           provider: MediaLocalConstants.Provider,
+          sync_timestamp: mediaSyncTimestamp,
         }))
         : [{
           artist_name: 'unknown artist',
           provider: MediaLocalConstants.Provider,
+          sync_timestamp: mediaSyncTimestamp,
         }]);
       // add media album
       const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
@@ -80,6 +84,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           image_format: audioCoverPicture.format,
         } : undefined,
         provider: MediaLocalConstants.Provider,
+        sync_timestamp: mediaSyncTimestamp,
       });
       // add media track
       await MediaLibraryService.checkAndInsertMediaTrack({
@@ -100,6 +105,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
             address: fsDirectoryReadFile.path,
           },
         },
+        sync_timestamp: mediaSyncTimestamp,
       });
     });
     debug('addTracksFromDirectory - finished processing - %o', fsDirectoryReadResponse.stats);

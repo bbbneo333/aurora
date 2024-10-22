@@ -6,6 +6,7 @@ export interface IMediaTrackData {
   id: string;
   provider: string;
   provider_id?: string;
+  sync_timestamp: number;
   track_name: string;
   track_number: number;
   track_duration: number;
@@ -19,6 +20,7 @@ export interface IMediaAlbumData {
   id: string;
   provider: string;
   provider_id?: string;
+  sync_timestamp: number;
   album_name: string;
   album_artist_id: string;
   album_cover_picture?: IMediaPicture;
@@ -29,6 +31,7 @@ export interface IMediaArtistData {
   id: string;
   provider: string;
   provider_id?: string;
+  sync_timestamp: number;
   artist_name: string;
   artist_display_picture?: IMediaPicture;
   artist_feature_picture?: IMediaPicture;

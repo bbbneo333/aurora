@@ -57,10 +57,16 @@ class MediaLibraryService {
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
     }
-    if (mediaProviderData.sync_finished_at) {
+    if (!mediaProviderData.sync_started_at || mediaProviderData.sync_finished_at) {
       throw new Error('MediaLibraryService encountered error at finishMediaTrackSync - Invalid sync state');
     }
 
+    // delete unsync'd media - media which is older than start of the sync
+    // important - this will only delete it from store, state still needs to be managed
+    const mediaSyncStartTimestamp = mediaProviderData.sync_started_at;
+    await this.deleteUnsyncMedia(mediaProviderIdentifier, mediaSyncStartTimestamp);
+
+    // update provider
     const mediaSyncEndTimestamp = Date.now();
     await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
       sync_finished_at: mediaSyncEndTimestamp,
@@ -71,6 +77,7 @@ class MediaLibraryService {
       type: MediaEnums.MediaLibraryActions.FinishSync,
       data: {
         mediaProviderIdentifier,
+        mediaSyncStartTimestamp,
       },
     });
   }
@@ -94,10 +101,17 @@ class MediaLibraryService {
       });
     }
 
-    if (!mediaArtistData) {
+    if (mediaArtistData) {
+      mediaArtistData = await MediaArtistDatastore.updateArtistById(mediaArtistData.id, {
+        ...mediaArtistInputData,
+        artist_display_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
+        artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
+      });
+    } else {
       mediaArtistData = await MediaArtistDatastore.insertMediaArtist({
         provider: mediaArtistInputData.provider,
         provider_id: mediaArtistInputData.provider_id,
+        sync_timestamp: mediaArtistInputData.sync_timestamp,
         artist_name: mediaArtistInputData.artist_name,
         artist_display_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
         artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
@@ -123,10 +137,16 @@ class MediaLibraryService {
       });
     }
 
-    if (!mediaTrackAlbumData) {
+    if (mediaTrackAlbumData) {
+      mediaTrackAlbumData = await MediaAlbumDatastore.updateAlbumById(mediaTrackAlbumData.id, {
+        ...mediaAlbumInputData,
+        album_cover_picture: await this.processPicture(mediaAlbumInputData.album_cover_picture),
+      });
+    } else {
       mediaTrackAlbumData = await MediaAlbumDatastore.insertMediaAlbum({
         provider: mediaAlbumInputData.provider,
         provider_id: mediaAlbumInputData.provider_id,
+        sync_timestamp: mediaAlbumInputData.sync_timestamp,
         album_name: mediaAlbumInputData.album_name,
         album_artist_id: mediaAlbumInputData.album_artist_id,
         album_cover_picture: await this.processPicture(mediaAlbumInputData.album_cover_picture),
@@ -139,6 +159,7 @@ class MediaLibraryService {
 
   async checkAndInsertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrack> {
     let mediaTrackData;
+
     if (!_.isNil(mediaTrackInputData.provider_id)) {
       mediaTrackData = await MediaTrackDatastore.findMediaTrack({
         provider: mediaTrackInputData.provider,
@@ -146,10 +167,16 @@ class MediaLibraryService {
       });
     }
 
-    if (!mediaTrackData) {
+    if (mediaTrackData) {
+      mediaTrackData = await MediaTrackDatastore.updateTrackById(mediaTrackData.id, {
+        ...mediaTrackInputData,
+        track_cover_picture: await this.processPicture(mediaTrackInputData.track_cover_picture),
+      });
+    } else {
       mediaTrackData = await MediaTrackDatastore.insertMediaTrack({
         provider: mediaTrackInputData.provider,
         provider_id: mediaTrackInputData.provider_id,
+        sync_timestamp: mediaTrackInputData.sync_timestamp,
         track_name: mediaTrackInputData.track_name,
         track_number: mediaTrackInputData.track_number,
         track_duration: mediaTrackInputData.track_duration,
@@ -328,6 +355,27 @@ class MediaLibraryService {
 
     // image data type does not need any processing, return as is
     return mediaPicture;
+  }
+
+  private async deleteUnsyncMedia(mediaProviderIdentifier: string, mediaSyncStartTimestamp: number): Promise<void> {
+    await MediaTrackDatastore.deleteTracks({
+      provider: mediaProviderIdentifier,
+      sync_timestamp: {
+        $lt: mediaSyncStartTimestamp,
+      },
+    });
+    await MediaAlbumDatastore.deleteAlbums({
+      provider: mediaProviderIdentifier,
+      sync_timestamp: {
+        $lt: mediaSyncStartTimestamp,
+      },
+    });
+    await MediaArtistDatastore.deleteArtists({
+      provider: mediaProviderIdentifier,
+      sync_timestamp: {
+        $lt: mediaSyncStartTimestamp,
+      },
+    });
   }
 }
 

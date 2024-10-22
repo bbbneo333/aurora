@@ -1,7 +1,7 @@
 import { AppEnums } from '../enums';
 import { IMediaArtistData } from '../interfaces';
 import AppService from '../services/app.service';
-import { DataStoreFilterData, DataStoreInputData } from '../types';
+import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
 
 class MediaArtistDatastore {
   private readonly mediaArtistDatastoreName = 'media_artists';
@@ -29,8 +29,20 @@ class MediaArtistDatastore {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 
+  updateArtistById(mediaArtistId: string, mediaArtistUpdateData: DataStoreUpdateData<IMediaArtistData>): Promise<IMediaArtistData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaArtistDatastoreName, {
+      id: mediaArtistId,
+    }, {
+      $set: mediaArtistUpdateData,
+    });
+  }
+
   insertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaArtistDatastoreName, mediaArtistInputData);
+  }
+
+  deleteArtists(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>): Promise<void> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemove, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 }
 
