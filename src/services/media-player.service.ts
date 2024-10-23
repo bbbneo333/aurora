@@ -901,6 +901,7 @@ class MediaPlayerService {
       this.startMediaProgressReporting();
     } else if (mediaPlaybackCurrentPlayingInstance.checkIfEnded()) {
       debug('reportMediaPlaybackProgress - media playback ended, playing next...');
+      this.pauseMediaPlayer();
       this.playNext();
     } else if (!this.retryMediaProgressReporting()) {
       debug('reportMediaPlaybackProgress - media instance did not reported valid state, aborting...');
