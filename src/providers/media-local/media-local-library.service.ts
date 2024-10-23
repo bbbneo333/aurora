@@ -41,10 +41,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   async syncMediaTracks() {
-    const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-    await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
-    await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
-    await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
+    await MediaLibraryService.syncMedia(MediaLocalConstants.Provider, async () => {
+      const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
+      await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
+    });
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {

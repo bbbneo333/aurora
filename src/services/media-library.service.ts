@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { Semaphore } from 'async-mutex';
 
 import { AppEnums, MediaEnums } from '../enums';
 import { MediaUtils } from '../utils';
@@ -24,63 +25,22 @@ import {
   IMediaTrackData,
 } from '../interfaces';
 
+type MediaSyncFunction = () => Promise<void>;
+
 const debug = require('debug')('app:service:media_library_service');
 
 class MediaLibraryService {
   private readonly mediaPictureScaleWidth = 500;
   private readonly mediaPictureScaleHeight = 500;
+  private readonly mediaSyncLock = new Semaphore(1);
 
   // sync API
 
-  async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
-    const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
-    if (!mediaProviderData) {
-      throw new Error(`MediaLibraryService encountered error at startMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
-    }
-
-    const mediaSyncStartTimestamp = Date.now();
-    await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
-      sync_started_at: mediaSyncStartTimestamp,
-      sync_finished_at: null,
-    });
-    debug('started sync for provider %s at %d', mediaProviderIdentifier, mediaSyncStartTimestamp);
-
-    store.dispatch({
-      type: MediaEnums.MediaLibraryActions.StartSync,
-      data: {
-        mediaProviderIdentifier,
-      },
-    });
-  }
-
-  async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
-    const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
-    if (!mediaProviderData) {
-      throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
-    }
-    if (!mediaProviderData.sync_started_at || mediaProviderData.sync_finished_at) {
-      throw new Error('MediaLibraryService encountered error at finishMediaTrackSync - Invalid sync state');
-    }
-
-    // delete unsync'd media - media which is older than start of the sync
-    // important - this will only delete it from store, state still needs to be managed
-    const mediaSyncStartTimestamp = mediaProviderData.sync_started_at;
-    await this.deleteUnsyncMedia(mediaProviderIdentifier, mediaSyncStartTimestamp);
-    await MediaPlayerService.revalidatePlayer();
-
-    // update provider
-    const mediaSyncEndTimestamp = Date.now();
-    await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
-      sync_finished_at: mediaSyncEndTimestamp,
-    });
-    debug('finished sync for provider %s at %d', mediaProviderIdentifier, mediaSyncEndTimestamp);
-
-    store.dispatch({
-      type: MediaEnums.MediaLibraryActions.FinishSync,
-      data: {
-        mediaProviderIdentifier,
-        mediaSyncStartTimestamp,
-      },
+  async syncMedia(mediaProviderIdentifier: string, syncFn: MediaSyncFunction): Promise<void> {
+    await this.mediaSyncLock.runExclusive(async () => {
+      await this.startMediaTrackSync(mediaProviderIdentifier);
+      await syncFn();
+      await this.finishMediaTrackSync(mediaProviderIdentifier);
     });
   }
 
@@ -245,6 +205,58 @@ class MediaLibraryService {
           },
         });
       });
+  }
+
+  private async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
+    const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
+    if (!mediaProviderData) {
+      throw new Error(`MediaLibraryService encountered error at startMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
+    }
+
+    const mediaSyncStartTimestamp = Date.now();
+    await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
+      sync_started_at: mediaSyncStartTimestamp,
+      sync_finished_at: null,
+    });
+    debug('started sync for provider %s at %d', mediaProviderIdentifier, mediaSyncStartTimestamp);
+
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.StartSync,
+      data: {
+        mediaProviderIdentifier,
+      },
+    });
+  }
+
+  private async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
+    const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
+    if (!mediaProviderData) {
+      throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
+    }
+    if (!mediaProviderData.sync_started_at || mediaProviderData.sync_finished_at) {
+      throw new Error('MediaLibraryService encountered error at finishMediaTrackSync - Invalid sync state');
+    }
+
+    // delete unsync'd media - media which is older than start of the sync
+    // important - this will only delete it from store, state still needs to be managed
+    const mediaSyncStartTimestamp = mediaProviderData.sync_started_at;
+    await this.deleteUnsyncMedia(mediaProviderIdentifier, mediaSyncStartTimestamp);
+    await MediaPlayerService.revalidatePlayer();
+
+    // update provider
+    const mediaSyncEndTimestamp = Date.now();
+    await MediaProviderDatastore.updateMediaProviderByIdentifier(mediaProviderIdentifier, {
+      sync_finished_at: mediaSyncEndTimestamp,
+    });
+    debug('finished sync for provider %s at %d', mediaProviderIdentifier, mediaSyncEndTimestamp);
+
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.FinishSync,
+      data: {
+        mediaProviderIdentifier,
+        mediaSyncStartTimestamp,
+      },
+    });
   }
 
   private async buildMediaTrack(mediaTrackData: IMediaTrackData, loadMediaTrack = false): Promise<IMediaTrack> {
