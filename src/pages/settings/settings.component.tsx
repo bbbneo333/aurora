@@ -12,7 +12,7 @@ export function SettingsComponent() {
   const mediaProviderRegistry = useSelector((state: RootState) => state.mediaProviderRegistry);
 
   return (
-    <div className={cx('settings-container')}>
+    <div className={cx('settings-container', 'container-fluid')}>
       <div className={cx('settings-header')}>
         Settings
       </div>
