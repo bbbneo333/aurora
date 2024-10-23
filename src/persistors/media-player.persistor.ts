@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { IAppStatePersistor, IMediaQueueTrack } from '../interfaces';
 import { MediaLibraryService, MediaPlayerService } from '../services';

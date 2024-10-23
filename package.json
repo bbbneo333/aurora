@@ -192,6 +192,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.3",
+    "async-mutex": "^0.5.0",
     "bluebird": "^3.7.2",
     "bootstrap": "^5.0.1",
     "classnames": "^2.3.1",
@@ -219,9 +220,9 @@
     "uuid": "^8.2.0"
   },
   "engines": {
-    "node": "^15.14.0",
-    "npm": "^7.7.6",
-    "yarn": "^1.22.17"
+    "node": "^16.20.2",
+    "npm": "^8.19.4",
+    "yarn": "^1.22.22"
   },
   "browserslist": [],
   "husky": {

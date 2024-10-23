@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 type SortedInsertionComparator<T> = (elementA: T, elementB: T) => number;
 

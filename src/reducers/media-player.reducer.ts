@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import { MediaEnums } from '../enums';
 import { IMediaPlayback, IMediaQueueTrack, IMediaTrackList } from '../interfaces';
@@ -122,6 +122,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     case MediaEnums.MediaPlayerActions.StopPlayer: {
       return {
         ...state,
+        mediaPlaybackCurrentMediaTrack: undefined,
         mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
         mediaPlaybackCurrentMediaProgress: 0,
       };

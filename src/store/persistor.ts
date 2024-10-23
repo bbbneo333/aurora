@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { Dispatch, MiddlewareAPI, Store } from 'redux';
 
 import { IAppStatePersistor } from '../interfaces';

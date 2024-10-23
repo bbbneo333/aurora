@@ -1,8 +1,10 @@
 import Datastore from 'nedb-promises';
 import fs from 'fs';
+import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
 import { AppEnums } from '../../enums';
+import { DatastoreUtils } from '../../utils';
 
 const debug = require('debug')('app:module:datastore_module');
 
@@ -115,16 +117,22 @@ export class DatastoreModule implements IAppModule {
 
   private insertOne(datastoreName: string, datastoreInsertDoc: object): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-    return datastore.insert(datastoreInsertDoc);
+
+    // important - id is reserved for datastore
+    return datastore.insert({
+      ...datastoreInsertDoc,
+      id: DatastoreUtils.generateId(),
+    });
   }
 
   private async updateOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
-    await datastore.update(datastoreFindOneDoc, datastoreUpdateOneDoc, {
+    // important - id is reserved for datastore
+    return datastore.update(datastoreFindOneDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
       multi: false,
       upsert: false,
-      returnUpdatedDocs: false,
+      returnUpdatedDocs: true,
     });
   }
 

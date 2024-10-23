@@ -1,8 +1,9 @@
 import React, { DetailsHTMLAttributes, useEffect, useRef } from 'react';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import classNames from 'classnames/bind';
 
 import { SystemEnums } from '../../enums';
+import { Icon } from '../icon/icon.component';
 
 import styles from './media-button.component.css';
 
@@ -14,6 +15,8 @@ require('../../vendor/js/outline');
 export type MediaButtonComponentProps = {
   children?: any,
   disabled?: boolean,
+  icon?: string,
+  iconClassName?: string,
   onButtonSubmit?(event: Event): void,
   onButtonMove?(event: KeyboardEvent): void,
 };
@@ -23,16 +26,19 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
     children,
     className,
     disabled = false,
+    icon,
+    iconClassName,
     onButtonSubmit,
     onButtonMove,
   } = props;
 
   const mediaButtonContainerProps = _.omit(props, [
     'children',
+    'className',
+    'icon',
+    'iconClassName',
     'onButtonSubmit',
     'onButtonMove',
-    // we are using our own classnames as well
-    'className',
   ]);
   const mediaButtonContainerRef = useRef(null);
 
@@ -101,6 +107,12 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
       tabIndex={0}
       {...mediaButtonContainerProps}
     >
+      {icon && (
+        <Icon
+          className={cx('media-button-icon', iconClassName)}
+          name={icon}
+        />
+      )}
       {children}
     </div>
   );

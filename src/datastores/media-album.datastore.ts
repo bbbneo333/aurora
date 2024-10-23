@@ -1,6 +1,7 @@
 import { AppEnums } from '../enums';
-import { IMediaAlbumData, IMediaAlbumDataFilterParams } from '../interfaces';
+import { IMediaAlbumData } from '../interfaces';
 import AppService from '../services/app.service';
+import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
 
 class MediaAlbumDatastore {
   private readonly mediaAlbumDatastoreName = 'media_albums';
@@ -24,16 +25,28 @@ class MediaAlbumDatastore {
     });
   }
 
-  findMediaAlbum(mediaAlbumFilterParams: IMediaAlbumDataFilterParams): Promise<IMediaAlbumData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
+  findMediaAlbum(mediaAlbumFilterData: DataStoreFilterData<IMediaAlbumData>): Promise<IMediaAlbumData | undefined> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaAlbumDatastoreName, mediaAlbumFilterData);
   }
 
-  findMediaAlbums(mediaAlbumFilterParams?: IMediaAlbumDataFilterParams): Promise<IMediaAlbumData[]> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaAlbumDatastoreName, mediaAlbumFilterParams);
+  findMediaAlbums(mediaAlbumFilterData?: DataStoreFilterData<IMediaAlbumData>): Promise<IMediaAlbumData[]> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaAlbumDatastoreName, mediaAlbumFilterData);
   }
 
-  insertMediaAlbum(mediaAlbumData: IMediaAlbumData): Promise<IMediaAlbumData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaAlbumDatastoreName, mediaAlbumData);
+  updateAlbumById(mediaAlbumId: string, mediaAlbumUpdateData: DataStoreUpdateData<IMediaAlbumData>): Promise<IMediaAlbumData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaAlbumDatastoreName, {
+      id: mediaAlbumId,
+    }, {
+      $set: mediaAlbumUpdateData,
+    });
+  }
+
+  insertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbumData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaAlbumDatastoreName, mediaAlbumInputData);
+  }
+
+  deleteAlbums(mediaAlbumFilterData?: DataStoreFilterData<IMediaAlbumData>): Promise<void> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemove, this.mediaAlbumDatastoreName, mediaAlbumFilterData);
   }
 }
 

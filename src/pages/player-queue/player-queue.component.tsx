@@ -1,10 +1,9 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
-import { MediaTrackComponent, MediaTrackContextMenu } from '../../components';
-import { MediaTrackContextMenuItem } from '../../components/media-track-context-menu/media-track-context-menu.component';
+import { MediaTrackComponent, MediaTrackContextMenu, MediaTrackContextMenuItem } from '../../components';
 import { MediaEnums } from '../../enums';
 import { IMediaQueueTrack } from '../../interfaces';
 import { RootState } from '../../reducers';

@@ -1,0 +1,16 @@
+.settings-header {
+  font-weight: 700;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.settings-section > .settings-heading {
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.settings-section > .settings-content {
+  display: flex;
+  flex-flow: column;
+  gap: 10px;
+}

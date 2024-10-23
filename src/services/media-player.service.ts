@@ -1,9 +1,11 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { batch } from 'react-redux';
 
 import { MediaEnums } from '../enums';
 import store from '../store';
 import { ArrayUtils, StringUtils } from '../utils';
+import MediaProviderService from './media-provider.service';
+import { MediaTrackDatastore } from '../datastores';
 
 import {
   IMediaPlayback,
@@ -11,8 +13,6 @@ import {
   IMediaTrack,
   IMediaTrackList,
 } from '../interfaces';
-
-import MediaProviderService from './media-provider.service';
 
 const debug = require('debug')('app:service:media_player_service');
 
@@ -41,9 +41,9 @@ class MediaPlayerService {
         return;
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-      this.stopMediaPlayer();
+      // pause media player
+      debug('playMediaTrack - pausing - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.pauseMediaPlayer();
     }
 
     // add track to the queue
@@ -77,9 +77,9 @@ class MediaPlayerService {
         return;
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-      this.stopMediaPlayer();
+      // pause media player
+      debug('playMediaTrack - pausing - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.pauseMediaPlayer();
     }
 
     // add tracks to the queue
@@ -119,9 +119,9 @@ class MediaPlayerService {
         return;
       }
 
-      // stop media player
-      debug('playMediaTrack - stopping - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
-      this.stopMediaPlayer();
+      // pause media player
+      debug('playMediaTrack - pausing - media track id - %s', mediaPlaybackCurrentMediaTrack.id);
+      this.pauseMediaPlayer();
     }
 
     // add tracks to the queue
@@ -150,16 +150,16 @@ class MediaPlayerService {
       return;
     }
 
-    // stop current playing instance
-    this.stopMediaPlayer();
+    // pause current playing instance
+    this.pauseMediaPlayer();
 
     // load up and play found track from queue
     this.loadAndPlayMediaTrack(mediaQueueTrack);
   }
 
-  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions: {
-    skipUserNotification?: boolean,
-  } = {}): void {
+  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions?: {
+    skipUserNotification?: boolean
+  }): void {
     const {
       mediaPlayer,
     } = store.getState();
@@ -227,7 +227,7 @@ class MediaPlayerService {
     }
 
     // #7 - notify user
-    if (!mediaTrackAddToQueueOptions.skipUserNotification) {
+    if (!mediaTrackAddToQueueOptions?.skipUserNotification) {
       // TODO: Add support for sending notification
       //  "Track was added to the queue"
     }
@@ -325,6 +325,52 @@ class MediaPlayerService {
         mediaTrackList,
       },
     });
+  }
+
+  async revalidatePlayer(): Promise<void> {
+    // this run revalidation on the current queued tracks
+    // this removes / unloads track(s) which are not found in the datastore
+    // important - this does not update any track in place
+
+    const { mediaPlayer } = store.getState();
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentTrackList,
+      mediaTrackLastInsertedQueueId,
+      mediaPlaybackCurrentMediaTrack,
+    } = mediaPlayer;
+
+    // revalidate queue
+    const mediaTrackIds = mediaTracks.map(mediaTrack => mediaTrack.id);
+    const mediaTracksUpdated = await MediaTrackDatastore.findMediaTracks({
+      id: {
+        $in: mediaTrackIds,
+      },
+    });
+    const mediaTracksUpdatedIds = mediaTracksUpdated.map(mediaTrack => mediaTrack.id);
+    const mediaQueueTracksUpdated = mediaTracks.filter(mediaTrack => mediaTracksUpdatedIds.includes(mediaTrack.id));
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks: mediaQueueTracksUpdated,
+        mediaTrackList: mediaPlaybackCurrentTrackList,
+        mediaTrackLastInsertedQueueId,
+      },
+    });
+
+    // revalidate current playing track
+    // if the current track was not found in the updated list, pause and load next on player
+    // if no tracks are in queue, stop the player
+    if (mediaPlaybackCurrentMediaTrack && !mediaTracksUpdatedIds.includes(mediaPlaybackCurrentMediaTrack.id)) {
+      const nextMediaTrack = this.getNextFromList();
+      if (nextMediaTrack) {
+        this.pauseMediaPlayer();
+        this.loadMediaTrack(nextMediaTrack);
+      } else {
+        this.stopMediaPlayer();
+      }
+    }
   }
 
   // media player control API
@@ -583,13 +629,13 @@ class MediaPlayerService {
       && mediaPlaybackCurrentMediaProgress > 15)) {
       this.seekMediaTrack(0);
     } else {
-      this.stopMediaPlayer();
+      this.pauseMediaPlayer();
       this.playPrevious();
     }
   }
 
   playNextTrack(): void {
-    this.stopMediaPlayer();
+    this.pauseMediaPlayer();
     this.removeTrackRepeat();
     this.playNext();
   }
@@ -855,16 +901,11 @@ class MediaPlayerService {
       this.startMediaProgressReporting();
     } else if (mediaPlaybackCurrentPlayingInstance.checkIfEnded()) {
       debug('reportMediaPlaybackProgress - media playback ended, playing next...');
-
-      // first stop the current playing track (only the state)
-      store.dispatch({
-        type: MediaEnums.MediaPlayerActions.StopPlayer,
-      });
-
-      // request next track
+      this.pauseMediaPlayer();
       this.playNext();
     } else if (!this.retryMediaProgressReporting()) {
       debug('reportMediaPlaybackProgress - media instance did not reported valid state, aborting...');
+      this.pauseMediaPlayer();
     }
   }
 

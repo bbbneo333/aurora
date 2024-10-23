@@ -21,7 +21,7 @@ import fs from 'fs';
 import electronUpdater from 'electron-updater';
 import electronLog from 'electron-log';
 import electronDebug from 'electron-debug';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 import installExtension, {
   REACT_DEVELOPER_TOOLS,

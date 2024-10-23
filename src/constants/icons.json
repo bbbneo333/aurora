@@ -1,5 +1,8 @@
 {
+  "AddCircle": "fas fa-plus-circle",
   "CoverAlbumPlaceholder": "fas fa-compact-disc",
+  "Close": "fas fa-times",
+  "Folder": "fas fa-folder",
   "LinkLibrary": "fas fa-layer-group",
   "LinkSettings": "fas fa-cog",
   "MediaPlay": "fas fa-play",
