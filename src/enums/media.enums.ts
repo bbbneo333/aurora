@@ -16,6 +16,7 @@ export enum MediaLibraryActions {
   RemoveAlbum = 'media/library/removeAlbum',
   SetAlbum = 'media/library/setAlbum',
   AddArtist = 'media/library/addArtist',
+  AddArtists = 'media/library/addArtists',
   RemoveArtist = 'media/library/removeArtist',
   SetArtist = 'media/library/setArtist',
 }

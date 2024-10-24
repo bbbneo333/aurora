@@ -12,6 +12,6 @@
   "label_submenu_media_track_remove_from_queue": "Remove from queue",
   "label_submenu_media_track_add_to_liked_songs": "Save to your Liked Songs",
   "label_submenu_media_track_add_to_playlist": "Add to playlist",
-  "label_submenu_media_album_add_to_queue": "Add to queue",
-  "label_submenu_media_album_add_to_playlist": "Add to playlist"
+  "label_submenu_media_collection_add_to_queue": "Add to queue",
+  "label_submenu_media_collection_add_to_playlist": "Add to playlist"
 }

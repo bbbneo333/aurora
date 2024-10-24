@@ -178,6 +178,13 @@ class MediaLibraryService {
     return MediaUtils.sortMediaAlbums(mediaAlbums);
   }
 
+  async getMediaArtists(): Promise<IMediaArtist[]> {
+    const mediaArtistDataList = await MediaArtistDatastore.findMediaArtists();
+
+    const mediaAlbums = await Promise.all(mediaArtistDataList.map(mediaArtistData => this.buildMediaArtist(mediaArtistData)));
+    return MediaUtils.sortMediaArtists(mediaAlbums);
+  }
+
   // load API
 
   loadMediaAlbums(): void {
@@ -202,6 +209,19 @@ class MediaLibraryService {
           data: {
             mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
             mediaAlbumTracks,
+          },
+        });
+      });
+  }
+
+  loadMediaArtists(): void {
+    this
+      .getMediaArtists()
+      .then((mediaArtists) => {
+        store.dispatch({
+          type: MediaEnums.MediaLibraryActions.AddArtists,
+          data: {
+            mediaArtists,
           },
         });
       });

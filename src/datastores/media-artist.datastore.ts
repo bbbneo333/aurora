@@ -29,6 +29,10 @@ class MediaArtistDatastore {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 
+  findMediaArtists(mediaArtistFilterData?: DataStoreFilterData<IMediaArtistData>): Promise<IMediaArtistData[]> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaArtistDatastoreName, mediaArtistFilterData);
+  }
+
   updateArtistById(mediaArtistId: string, mediaArtistUpdateData: DataStoreUpdateData<IMediaArtistData>): Promise<IMediaArtistData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaArtistDatastoreName, {
       id: mediaArtistId,

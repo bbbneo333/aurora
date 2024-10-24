@@ -1,14 +1,17 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { MediaAlbumTile, MediaAlbumContextMenu } from '../../components';
+import {
+  MediaCollectionTile,
+  MediaCollectionContextMenu,
+  MediaCollectionContextMenuItem,
+  MediaCollectionContextMenuId,
+} from '../../components';
 import { RootState } from '../../reducers';
 import { MediaLibraryService } from '../../services';
-import { MediaAlbumContextMenuItem } from '../../components/media-album-context-menu/media-album-context-menu.component';
-
-enum MediaContextMenus {
-  Album = 'media_album_context_menu',
-}
+import { StringUtils } from '../../utils';
+import { Routes } from '../../constants';
+import { IMediaCollectionItem } from '../../interfaces';
 
 export function LibraryAlbumsComponent() {
   const { mediaAlbums } = useSelector((state: RootState) => state.mediaLibrary);
@@ -20,20 +23,32 @@ export function LibraryAlbumsComponent() {
   return (
     <div className="container-fluid">
       <div className="row">
-        {mediaAlbums.map(mediaAlbum => (
-          <MediaAlbumTile
-            key={mediaAlbum.id}
-            mediaAlbum={mediaAlbum}
-            mediaAlbumContextMenuId={MediaContextMenus.Album}
-          />
-        ))}
+        {mediaAlbums.map((mediaAlbum) => {
+          const mediaItem: IMediaCollectionItem = {
+            id: mediaAlbum.id,
+            name: mediaAlbum.album_name,
+            type: 'album',
+            picture: mediaAlbum.album_cover_picture,
+          };
+
+          return (
+            <MediaCollectionTile
+              key={mediaAlbum.id}
+              mediaItem={mediaItem}
+              mediaRouterLink={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
+                albumId: mediaAlbum.id,
+              })}
+              mediaSubtitle={mediaAlbum.album_artist.artist_name}
+              mediaContextMenuId={MediaCollectionContextMenuId}
+            />
+          );
+        })}
       </div>
-      <MediaAlbumContextMenu
-        id={MediaContextMenus.Album}
+      <MediaCollectionContextMenu
         menuItems={[
-          MediaAlbumContextMenuItem.AddToQueue,
-          MediaAlbumContextMenuItem.Separator,
-          MediaAlbumContextMenuItem.AddToPlaylist,
+          MediaCollectionContextMenuItem.AddToQueue,
+          MediaCollectionContextMenuItem.Separator,
+          MediaCollectionContextMenuItem.AddToPlaylist,
         ]}
       />
     </div>

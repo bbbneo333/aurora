@@ -34,3 +34,7 @@ export function sortMediaAlbumTracks(
 export function sortMediaAlbums(mediaAlbums: IMediaAlbum[]): IMediaAlbum[] {
   return mediaAlbums.sort(mediaAlbumComparator);
 }
+
+export function sortMediaArtists(mediaArtists: IMediaArtist[]): IMediaArtist[] {
+  return mediaArtists.sort(mediaArtistComparator);
+}

@@ -7,7 +7,7 @@ import { Icons } from '../../constants';
 import { RootState } from '../../reducers';
 
 import { Icon } from '../icon/icon.component';
-import { MediaCoverPictureComponent } from '../media-cover-picture/media-cover-picture.component';
+import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 
 import styles from './media-player-ribbon.component.css';
@@ -26,7 +26,7 @@ export function MediaPlayerInfo() {
   return (
     <Row className={cx('media-player-info-container')}>
       <Col className={cx('col-12', 'media-player-info-column')}>
-        <MediaCoverPictureComponent
+        <MediaCoverPicture
           mediaPicture={mediaPlaybackCurrentMediaTrack.track_album.album_cover_picture}
           mediaPictureAltText={mediaPlaybackCurrentMediaTrack.track_album.album_name}
           className={cx('media-player-track-cover-image')}

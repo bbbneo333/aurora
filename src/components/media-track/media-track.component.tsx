@@ -13,7 +13,7 @@ import { MediaPlayerService } from '../../services';
 import { DateTimeUtils } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
-import { MediaCoverPictureComponent } from '../media-cover-picture/media-cover-picture.component';
+import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 
 import styles from './media-track.component.css';
@@ -158,7 +158,7 @@ export function MediaTrackComponent(props: {
             </div>
             {!disableCover && (
               <div className={cx('media-track-section')}>
-                <MediaCoverPictureComponent
+                <MediaCoverPicture
                   mediaPicture={mediaTrack.track_cover_picture}
                   mediaPictureAltText={mediaTrack.track_name}
                   className={cx('media-track-cover')}

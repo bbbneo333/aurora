@@ -1,6 +1,7 @@
 {
   "AddCircle": "fas fa-plus-circle",
-  "CoverAlbumPlaceholder": "fas fa-compact-disc",
+  "AlbumTilePlaceholder": "fas fa-compact-disc",
+  "ArtistTilePlaceholder": "fas fa-user",
   "Close": "fas fa-times",
   "Folder": "fas fa-folder",
   "LinkLibrary": "fas fa-layer-group",
