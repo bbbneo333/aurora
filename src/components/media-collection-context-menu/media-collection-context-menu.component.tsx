@@ -46,9 +46,9 @@ export function MediaCollectionContextMenu(props: {
           throw new Error('MediaCollectionContextMenu encountered error while performing action AddToQueue - No media item was provided');
         }
         MediaLibraryService
-          .getMediaAlbumTracks(mediaItem.id)
-          .then((mediaAlbumTracks) => {
-            MediaPlayerService.addMediaTracksToQueue(mediaAlbumTracks);
+          .getMediaCollectionTracks(mediaItem)
+          .then((mediaTracks) => {
+            MediaPlayerService.addMediaTracksToQueue(mediaTracks);
           });
         break;
       }

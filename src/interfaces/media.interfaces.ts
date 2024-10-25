@@ -33,7 +33,6 @@ export interface IMediaArtistData {
   provider_id?: string;
   sync_timestamp: number;
   artist_name: string;
-  artist_display_picture?: IMediaPicture;
   artist_feature_picture?: IMediaPicture;
   extra?: object;
 }

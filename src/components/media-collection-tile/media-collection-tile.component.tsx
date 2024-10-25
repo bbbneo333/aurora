@@ -44,9 +44,9 @@ export function MediaCollectionTile(props: {
 
   const handleOnPlayButtonClick = useCallback((e: Event) => {
     MediaLibraryService
-      .getMediaAlbumTracks(mediaItem.id)
-      .then((mediaAlbumTracks) => {
-        MediaPlayerService.playMediaTracks(mediaAlbumTracks, {
+      .getMediaCollectionTracks(mediaItem)
+      .then((mediaTracks) => {
+        MediaPlayerService.playMediaTracks(mediaTracks, {
           id: mediaItem.id,
         });
       });

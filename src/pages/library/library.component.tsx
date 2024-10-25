@@ -8,7 +8,7 @@ import routes from './library.routes';
 
 const cx = classNames.bind(styles);
 
-export function LibraryComponent() {
+export function LibraryPage() {
   return (
     <div className={cx('library-content-browser-container')}>
       <RouterSwitchComponent routes={routes}/>
@@ -16,7 +16,7 @@ export function LibraryComponent() {
   );
 }
 
-export function LibraryHeaderComponent() {
+export function LibraryHeader() {
   return (
     <div className={cx('library-header')}>
       <div className={cx('library-header-navigation-list')}>

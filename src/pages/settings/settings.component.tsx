@@ -8,7 +8,7 @@ import styles from './settings.component.css';
 
 const cx = classNames.bind(styles);
 
-export function SettingsComponent() {
+export function SettingsPage() {
   const mediaProviderRegistry = useSelector((state: RootState) => state.mediaProviderRegistry);
 
   return (

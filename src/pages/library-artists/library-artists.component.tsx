@@ -28,6 +28,7 @@ export function LibraryArtistsComponent() {
             id: mediaArtist.id,
             type: 'artist',
             name: mediaArtist.artist_name,
+            picture: mediaArtist.artist_feature_picture,
           };
 
           return (
