@@ -102,7 +102,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     case MediaEnums.MediaLibraryActions.AddAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be added
       const { mediaAlbum } = action.data;
-      const { mediaAlbums, mediaSelectedArtistAlbums = [] } = state;
+      const { mediaAlbums, mediaSelectedArtist, mediaSelectedArtistAlbums = [] } = state;
       let { mediaSelectedAlbum } = state;
 
       const mediaAlbumIdx = mediaAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
@@ -113,8 +113,12 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       }
 
       const mediaAlbumSelectedIdx = mediaSelectedArtistAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
-      if (mediaAlbumSelectedIdx) {
-        mediaSelectedArtistAlbums[mediaAlbumSelectedIdx] = mediaAlbum;
+      if (mediaSelectedArtist?.id === mediaAlbum.album_artist_id) {
+        if (mediaAlbumSelectedIdx === -1) {
+          ArrayUtils.updateSortedArray<IMediaAlbum>(mediaSelectedArtistAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
+        } else {
+          mediaSelectedArtistAlbums[mediaAlbumSelectedIdx] = mediaAlbum;
+        }
       }
 
       if (mediaSelectedAlbum?.id === mediaAlbum.id) {
@@ -128,24 +132,13 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbum,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddAlbums: {
+    case MediaEnums.MediaLibraryActions.SetAlbums: {
       // data.mediaAlbums: MediaAlbum[] - albums which are needed to be added
       const { mediaAlbums } = action.data;
-      const mediaAlbumsExisting = state.mediaAlbums;
-
-      mediaAlbums.forEach((mediaAlbum: IMediaAlbum) => {
-        const mediaAlbumIdx = mediaAlbumsExisting.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
-
-        if (mediaAlbumIdx === -1) {
-          ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbumsExisting, mediaAlbum, MediaUtils.mediaAlbumComparator);
-        } else {
-          mediaAlbumsExisting[mediaAlbumIdx] = mediaAlbum;
-        }
-      });
 
       return {
         ...state,
-        mediaAlbums: mediaAlbumsExisting,
+        mediaAlbums: MediaUtils.sortMediaAlbums(mediaAlbums),
       };
     }
     case MediaEnums.MediaLibraryActions.SetAlbum: {

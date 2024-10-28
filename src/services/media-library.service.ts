@@ -222,7 +222,7 @@ class MediaLibraryService {
       .getMediaAlbums()
       .then((mediaAlbums) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.AddAlbums,
+          type: MediaEnums.MediaLibraryActions.SetAlbums,
           data: {
             mediaAlbums,
           },
