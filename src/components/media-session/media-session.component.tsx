@@ -1,21 +1,52 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { MediaEnums } from '../../enums';
+import { AppEnums, MediaEnums } from '../../enums';
 import { RootState } from '../../reducers';
-import { MediaPlayerService } from '../../services';
+import { AppService, MediaPlayerService } from '../../services';
+import { IMediaTrack } from '../../interfaces';
 
 const debug = require('debug')('app:component:media_session_component');
 
-export function MediaSessionComponent() {
+const getSessionArtworkForMediaTrack = (mediaTrack: IMediaTrack): MediaImage | undefined => {
+  const mediaTrackPicture = mediaTrack.track_cover_picture;
+  if (!mediaTrackPicture) {
+    return undefined;
+  }
+
+  let mediaTrackPictureBuffer: Buffer;
+
+  switch (mediaTrackPicture?.image_data_type) {
+    case MediaEnums.MediaTrackCoverPictureImageDataType.Path: {
+      const image = AppService.sendSyncMessage(AppEnums.IPCCommChannels.FSReadFile, mediaTrackPicture.image_data);
+      mediaTrackPictureBuffer = Buffer.from(image);
+      break;
+    }
+    case MediaEnums.MediaTrackCoverPictureImageDataType.Buffer: {
+      mediaTrackPictureBuffer = mediaTrackPicture.image_data;
+      break;
+    }
+    default: {
+      throw new Error(`MediaSession encountered error at getSessionArtworkForMediaTrack - Unsupported image data type - ${mediaTrackPicture.image_data_type}`);
+    }
+  }
+
+  const base64Image = mediaTrackPictureBuffer.toString('base64');
+  const dataUri = `data:image/png;base64,${base64Image}`;
+
+  return {
+    src: dataUri,
+  };
+};
+
+export function MediaSession() {
   const mediaPlayer = useSelector((state: RootState) => state.mediaPlayer);
+  const { mediaSession } = navigator;
 
   useEffect(() => {
-    if (!navigator.mediaSession) {
+    if (!mediaSession) {
       return;
     }
-
-    const { mediaSession } = navigator;
 
     debug('registering media action handlers');
 
@@ -42,12 +73,12 @@ export function MediaSessionComponent() {
       MediaPlayerService.seekMediaTrack(event.seekTime);
     });
 
-    navigator.mediaSession.setActionHandler('seekbackward', (event) => {
+    mediaSession.setActionHandler('seekbackward', (event) => {
       debug('received action - %s, seek offset - %f', 'seekbackward', event.seekOffset);
       // TODO: Add support for seeking backwards with provided offset
     });
 
-    navigator.mediaSession.setActionHandler('seekforward', (event) => {
+    mediaSession.setActionHandler('seekforward', (event) => {
       debug('received action - %s, seek offset - %f', 'seekforward', event.seekOffset);
       // TODO: Add support for seeking forwards with provided offset
     });
@@ -61,34 +92,39 @@ export function MediaSessionComponent() {
       debug('received action - %s', 'nexttrack');
       MediaPlayerService.playNextTrack();
     });
-  }, []);
+  }, [
+    mediaSession,
+  ]);
 
   useEffect(() => {
-    if (!navigator.mediaSession
+    if (!mediaSession
       || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlaybackState.Playing
       || !mediaPlayer.mediaPlaybackCurrentMediaTrack) {
       return;
     }
 
     const mediaTrack = mediaPlayer.mediaPlaybackCurrentMediaTrack;
+    const mediaTrackArtwork = getSessionArtworkForMediaTrack(mediaTrack);
+
     const mediaSessionMetadata = new MediaMetadata({
       title: mediaTrack.track_name,
       artist: mediaTrack.track_album.album_artist.artist_name,
       album: mediaTrack.track_album.album_name,
-      artwork: [],
+      artwork: mediaTrackArtwork && [mediaTrackArtwork],
     });
 
     debug('updating metadata - %o', mediaSessionMetadata);
 
-    navigator.mediaSession.metadata = mediaSessionMetadata;
+    mediaSession.metadata = mediaSessionMetadata;
   }, [
+    mediaSession,
     mediaPlayer.mediaPlaybackCurrentMediaTrack,
     mediaPlayer.mediaPlaybackState,
   ]);
 
   useEffect(() => {
-    if (!navigator.mediaSession
-      || !navigator.mediaSession.setPositionState
+    if (!mediaSession
+      || !mediaSession.setPositionState
       || !mediaPlayer.mediaPlaybackCurrentMediaTrack
       || mediaPlayer.mediaPlaybackState !== MediaEnums.MediaPlaybackState.Playing) {
       return;
@@ -102,14 +138,15 @@ export function MediaSessionComponent() {
 
     debug('updating position state - %o', mediaSessionPlaybackState);
 
-    navigator.mediaSession.setPositionState(mediaSessionPlaybackState);
+    mediaSession.setPositionState(mediaSessionPlaybackState);
   }, [
+    mediaSession,
     mediaPlayer.mediaPlaybackState,
     mediaPlayer.mediaPlaybackCurrentMediaTrack,
     mediaPlayer.mediaPlaybackCurrentMediaProgress,
   ]);
 
-  // important - this component does not renders anything
+  // important - this component does not render anything
   return (
     <></>
   );
