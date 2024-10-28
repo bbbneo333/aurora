@@ -20,6 +20,7 @@ import {
   IMediaAlbumData,
   IMediaArtist,
   IMediaArtistData,
+  IMediaCollectionItem,
   IMediaPicture,
   IMediaTrack,
   IMediaTrackData,
@@ -66,7 +67,6 @@ class MediaLibraryService {
     if (mediaArtistData) {
       mediaArtistData = await MediaArtistDatastore.updateArtistById(mediaArtistData.id, {
         ...mediaArtistInputData,
-        artist_display_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
         artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
       });
     } else {
@@ -75,7 +75,6 @@ class MediaLibraryService {
         provider_id: mediaArtistInputData.provider_id,
         sync_timestamp: mediaArtistInputData.sync_timestamp,
         artist_name: mediaArtistInputData.artist_name,
-        artist_display_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
         artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
         extra: mediaArtistInputData.extra,
       });
@@ -171,11 +170,49 @@ class MediaLibraryService {
     return MediaUtils.sortMediaAlbumTracks(mediaAlbumTracks);
   }
 
+  async getMediaArtistTracks(mediaArtistId: string): Promise<IMediaTrack[]> {
+    const mediaTrackDataList = await MediaTrackDatastore.findMediaTracks({
+      track_artist_ids: [mediaArtistId],
+    });
+
+    const mediaTracks = await this.buildMediaTracks(mediaTrackDataList);
+    return MediaUtils.sortMediaArtistTracks(mediaTracks);
+  }
+
   async getMediaAlbums(): Promise<IMediaAlbum[]> {
     const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums();
 
     const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
     return MediaUtils.sortMediaAlbums(mediaAlbums);
+  }
+
+  async getMediaArtists(): Promise<IMediaArtist[]> {
+    const mediaArtistDataList = await MediaArtistDatastore.findMediaArtists();
+
+    const mediaArtists = await Promise.all(mediaArtistDataList.map(mediaArtistData => this.buildMediaArtist(mediaArtistData)));
+    return MediaUtils.sortMediaArtists(mediaArtists);
+  }
+
+  async getMediaArtistAlbums(mediaArtistId: string): Promise<IMediaAlbum[]> {
+    const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums({
+      album_artist_id: mediaArtistId,
+    });
+
+    const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
+    return MediaUtils.sortMediaAlbums(mediaAlbums);
+  }
+
+  async getMediaCollectionTracks(mediaCollectionItem: IMediaCollectionItem): Promise<IMediaTrack[]> {
+    switch (mediaCollectionItem.type) {
+      case 'album': {
+        return this.getMediaAlbumTracks(mediaCollectionItem.id);
+      }
+      case 'artist': {
+        return this.getMediaArtistTracks(mediaCollectionItem.id);
+      }
+      default:
+        throw new Error(`Unsupported media collection type - ${mediaCollectionItem.type}`);
+    }
   }
 
   // load API
@@ -185,7 +222,7 @@ class MediaLibraryService {
       .getMediaAlbums()
       .then((mediaAlbums) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.AddAlbums,
+          type: MediaEnums.MediaLibraryActions.SetAlbums,
           data: {
             mediaAlbums,
           },
@@ -202,6 +239,33 @@ class MediaLibraryService {
           data: {
             mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
             mediaAlbumTracks,
+          },
+        });
+      });
+  }
+
+  loadMediaArtists(): void {
+    this
+      .getMediaArtists()
+      .then((mediaArtists) => {
+        store.dispatch({
+          type: MediaEnums.MediaLibraryActions.AddArtists,
+          data: {
+            mediaArtists,
+          },
+        });
+      });
+  }
+
+  loadMediaArtist(mediaArtistId: string): void {
+    this
+      .getMediaArtistAlbums(mediaArtistId)
+      .then(async (mediaArtistAlbums) => {
+        store.dispatch({
+          type: MediaEnums.MediaLibraryActions.SetArtist,
+          data: {
+            mediaArtist: await this.buildMediaArtist(mediaArtistId),
+            mediaArtistAlbums,
           },
         });
       });

@@ -11,8 +11,8 @@ export interface IMediaTrackData {
   track_number: number;
   track_duration: number;
   track_cover_picture?: IMediaPicture;
-  track_artist_ids: string[],
-  track_album_id: string,
+  track_artist_ids: string[];
+  track_album_id: string;
   extra?: object;
 }
 
@@ -33,7 +33,6 @@ export interface IMediaArtistData {
   provider_id?: string;
   sync_timestamp: number;
   artist_name: string;
-  artist_display_picture?: IMediaPicture;
   artist_feature_picture?: IMediaPicture;
   extra?: object;
 }
@@ -44,13 +43,13 @@ export interface IMediaTrack extends IMediaTrackData {
 }
 
 export interface IMediaTrackList {
-  id: string,
+  id: string;
 }
 
 export interface IMediaQueueTrack extends IMediaTrack {
-  tracklist_id: string,
-  queue_entry_id: string,
-  queue_insertion_index: number,
+  tracklist_id: string;
+  queue_entry_id: string;
+  queue_insertion_index: number;
 }
 
 export interface IMediaAlbum extends IMediaAlbumData {
@@ -135,4 +134,11 @@ export interface IMediaProvider {
   onMediaProviderRegistered?(): void;
 
   onMediaProviderSettingsUpdated?(existingSettings: object, updatedSettings: object): void;
+}
+
+export interface IMediaCollectionItem {
+  id: string;
+  type: 'artist' | 'album';
+  name: string;
+  picture?: IMediaPicture;
 }

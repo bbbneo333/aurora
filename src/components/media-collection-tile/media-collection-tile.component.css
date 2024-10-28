@@ -1,41 +1,41 @@
-.album-tile {
+.collection-tile {
   background-color: var(--dark-card-bg-color);
   border-radius: 4px;
   transition: var(--selectable-item-transition);
   height: 100%;
 }
 
-.album-tile:hover {
+.collection-tile:hover {
   background-color: var(--selected-bg-color);
 }
 
-.album-tile-body {
+.collection-tile-body {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: 16px;
 }
 
-.album-tile-link {
+.collection-tile-link {
   color: var(--light-text-color);
 }
 
-.album-tile:hover .album-tile-link {
+.collection-tile:hover .collection-tile-link {
   color: var(--light-text-color);
 }
 
-.album-tile-cover {
+.collection-tile-cover {
   margin-bottom: 16px;
   flex-grow: 1;
   position: relative;
 }
 
-.album-tile-cover-picture {
+.collection-tile-cover-picture {
   /* size for placeholder icon */
   font-size: 50px;
 }
 
-.album-tile-cover-overlay {
+.collection-tile-cover-overlay {
   position: absolute;
   overflow: hidden;
   display: flex;
@@ -48,19 +48,19 @@
   z-index: 2;
 }
 
-.album-tile-cover-action {
+.collection-tile-cover-action {
   margin-bottom: -40px;
   transition: var(--slide-in-item-transition);
   opacity: 0;
 }
 
-.album-tile:hover .album-tile-cover-action,
-.album-tile.playing .album-tile-cover-action {
+.collection-tile:hover .collection-tile-cover-action,
+.collection-tile.playing .collection-tile-cover-action {
   margin-bottom: 0;
   opacity: 1;
 }
 
-.album-tile-action-button {
+.collection-tile-action-button {
   border: none;
   color: var(--light-button-color);
   background-color: var(--light-toggle-active-color);
@@ -71,18 +71,18 @@
   transition: var(--selectable-item-transition);
 }
 
-.album-tile-action-button:hover {
+.collection-tile-action-button:hover {
   background-color: var(--light-toggle-color);
 }
 
-.album-tile-title {
+.collection-tile-title {
   font-weight: bold;
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
 }
 
-.album-tile-subtitle {
+.collection-tile-subtitle {
   font-size: smaller;
   color: var(--dark-text-color);
   white-space: nowrap;

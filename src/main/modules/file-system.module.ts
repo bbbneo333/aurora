@@ -24,6 +24,7 @@ export class FileSystemModule implements IAppModule {
     this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadAsset, this.readAsset, this);
     this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectDirectory, this.selectDirectory, this);
     this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.FSReadDirectory, this.readDirectory, this);
+    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadFile, this.readFile, this);
   }
 
   private readAsset(fsAssetPath: string[], fsAssetReadOptions: IFSAssetReadOptions = {}) {
@@ -128,5 +129,9 @@ export class FileSystemModule implements IAppModule {
         });
       });
     });
+  }
+
+  private readFile(fsFilePath: string) {
+    return fs.readFileSync(fsFilePath);
   }
 }

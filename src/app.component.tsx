@@ -9,7 +9,7 @@ import {
   BrowserScroll,
   Icon,
   RouterSwitchComponent,
-  MediaSessionComponent,
+  MediaSession,
   MediaPlayerRibbonComponent,
   RouterLink,
 } from './components';
@@ -172,7 +172,7 @@ function AppMediaPlayer() {
       active: !!mediaPlaybackCurrentMediaTrack,
     })}
     >
-      <MediaSessionComponent/>
+      <MediaSession/>
       <MediaPlayerRibbonComponent/>
     </div>
   );

@@ -11,14 +11,16 @@ import styles from './media-cover-picture.component.css';
 
 const cx = classNames.bind(styles);
 
-export function MediaCoverPictureComponent(props: {
+export function MediaCoverPicture(props: {
   mediaPicture?: IMediaPicture,
-  mediaPictureAltText: string,
+  mediaPictureAltText?: string,
+  mediaCoverPlaceholderIcon?: string,
   className?: string,
 }) {
   const {
     mediaPicture,
     mediaPictureAltText,
+    mediaCoverPlaceholderIcon,
     className,
   } = props;
 
@@ -28,7 +30,7 @@ export function MediaCoverPictureComponent(props: {
         <div className={cx('media-cover-placeholder')}>
           <Icon
             className={cx('media-cover-placeholder-icon')}
-            name={Icons.CoverAlbumPlaceholder}
+            name={mediaCoverPlaceholderIcon || Icons.AlbumTilePlaceholder}
           />
         </div>
       </div>

@@ -8,7 +8,7 @@ import routes from './player.routes';
 
 const cx = classNames.bind(styles);
 
-export function PlayerComponent() {
+export function PlayerPage() {
   return (
     <div className={cx('player-content-browser-container')}>
       <RouterSwitchComponent routes={routes}/>
@@ -16,7 +16,7 @@ export function PlayerComponent() {
   );
 }
 
-export function PlayerHeaderComponent() {
+export function PlayerHeader() {
   return (
     <div className={cx('player-header')}>
       <div className={cx('player-header-navigation-list')}>

@@ -25,6 +25,14 @@ export function mediaTrackComparator(
   return mediaTrackA.track_number < mediaTrackB.track_number ? -1 : 1;
 }
 
+export function mediaArtistTrackComparator(
+  mediaTrackA: IMediaTrack,
+  mediaTrackB: IMediaTrack,
+) {
+  return `${mediaNameSanitizerForComparator(mediaTrackA.track_album.album_name)}-${mediaTrackA.track_number}`
+  < `${mediaNameSanitizerForComparator(mediaTrackB.track_album.album_name)}-${mediaTrackB.track_number}` ? -1 : 1;
+}
+
 export function sortMediaAlbumTracks(
   mediaAlbumTracks: IMediaTrack[],
 ): IMediaTrack[] {
@@ -33,4 +41,14 @@ export function sortMediaAlbumTracks(
 
 export function sortMediaAlbums(mediaAlbums: IMediaAlbum[]): IMediaAlbum[] {
   return mediaAlbums.sort(mediaAlbumComparator);
+}
+
+export function sortMediaArtists(mediaArtists: IMediaArtist[]): IMediaArtist[] {
+  return mediaArtists.sort(mediaArtistComparator);
+}
+
+export function sortMediaArtistTracks(
+  mediaTracks: IMediaTrack[],
+): IMediaTrack[] {
+  return mediaTracks.sort(mediaArtistTrackComparator);
 }

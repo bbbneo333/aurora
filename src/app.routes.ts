@@ -5,15 +5,15 @@ export default {
   main: [
     {
       path: Routes.Library,
-      component: AppPages.LibraryComponent,
+      component: AppPages.LibraryPage,
     },
     {
       path: Routes.Settings,
-      component: AppPages.SettingsComponent,
+      component: AppPages.SettingsPage,
     },
     {
       path: Routes.Player,
-      component: AppPages.PlayerComponent,
+      component: AppPages.PlayerPage,
     },
     {
       path: '/',
@@ -23,11 +23,11 @@ export default {
   header: [
     {
       path: Routes.Library,
-      component: AppPages.LibraryHeaderComponent,
+      component: AppPages.LibraryHeader,
     },
     {
       path: Routes.PlayerQueue,
-      component: AppPages.PlayerHeaderComponent,
+      component: AppPages.PlayerHeader,
     },
   ],
   sidebar: [

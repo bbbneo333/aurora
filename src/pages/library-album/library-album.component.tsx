@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import {
-  MediaCoverPictureComponent,
+  MediaCoverPicture,
   MediaArtistLinkComponent,
   MediaTrackContextMenu,
   MediaTrackListComponent,
@@ -23,7 +23,7 @@ enum MediaContextMenus {
   AlbumTrack = 'media_album_track_context_menu',
 }
 
-export function LibraryAlbumComponent() {
+export function LibraryAlbumPage() {
   const {
     albumId,
   } = useParams() as { albumId: string };
@@ -48,7 +48,7 @@ export function LibraryAlbumComponent() {
       <div className={cx('library-album-header')}>
         <div className="row">
           <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
-            <MediaCoverPictureComponent
+            <MediaCoverPicture
               mediaPicture={mediaSelectedAlbum.album_cover_picture}
               mediaPictureAltText={mediaSelectedAlbum.album_name}
               className={cx('library-album-cover-picture')}
