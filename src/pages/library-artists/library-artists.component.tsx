@@ -13,7 +13,7 @@ import { StringUtils } from '../../utils';
 import { Routes } from '../../constants';
 import { IMediaCollectionItem } from '../../interfaces';
 
-export function LibraryArtistsComponent() {
+export function LibraryArtistsPage() {
   const { mediaArtists } = useSelector((state: RootState) => state.mediaLibrary);
 
   useEffect(() => {

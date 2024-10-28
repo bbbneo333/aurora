@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import { useContextMenu } from 'react-contexify';
+import { capitalize } from 'lodash';
 
 import { Icons, Layout } from '../../constants';
 import { MediaEnums } from '../../enums';
@@ -99,6 +100,8 @@ export function MediaCollectionTile(props: {
               <MediaCoverPicture
                 mediaPicture={mediaItem.picture}
                 mediaPictureAltText={mediaItem.name}
+                // @ts-ignore
+                mediaCoverPlaceholderIcon={Icons[`${capitalize(mediaItem.type)}TilePlaceholder`]}
                 className={cx('collection-tile-cover-picture')}
               />
               <div className={cx('collection-tile-cover-overlay')}>

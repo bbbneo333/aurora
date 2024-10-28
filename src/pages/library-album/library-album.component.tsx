@@ -23,7 +23,7 @@ enum MediaContextMenus {
   AlbumTrack = 'media_album_track_context_menu',
 }
 
-export function LibraryAlbumComponent() {
+export function LibraryAlbumPage() {
   const {
     albumId,
   } = useParams() as { albumId: string };

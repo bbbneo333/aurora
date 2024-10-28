@@ -5,6 +5,7 @@
   "link_settings": "Settings",
   "link_player_queue": "Queue",
   "label_library_album_header": "Album",
+  "label_library_artist_header": "Artist",
   "label_player_queue_current_track": "Now playing",
   "label_player_queue_upcoming_tracks": "Up next",
   "label_player_queue_empty": "You got nothing playing right now",

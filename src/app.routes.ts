@@ -8,10 +8,6 @@ export default {
       component: AppPages.LibraryPage,
     },
     {
-      path: Routes.LibraryArtist,
-      component: AppPages.LibraryArtistPage,
-    },
-    {
       path: Routes.Settings,
       component: AppPages.SettingsPage,
     },

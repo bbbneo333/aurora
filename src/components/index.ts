@@ -2,6 +2,7 @@ export * from './action-list/action-list.component';
 export * from './browser-navigation/browser-navigation.component';
 export * from './browser-scroll/browser-scroll.component';
 export * from './icon/icon.component';
+export * from './media-albums/media-albums.component';
 export * from './media-collection-tile/media-collection-tile.component';
 export * from './media-collection-context-menu/media-collection-context-menu.component';
 export * from './media-button/media-button.component';
