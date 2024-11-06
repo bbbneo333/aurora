@@ -90,7 +90,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       await MediaLibraryService.checkAndInsertMediaTrack({
         provider: MediaLocalConstants.Provider,
         provider_id: mediaTrackId,
-        track_name: audioMetadata.common.title || 'unknown track',
+        // fallback to file name if title could not be found in metadata
+        track_name: audioMetadata.common.title || fsDirectoryReadFile.name,
         track_number: audioMetadata.common.track.no || 0,
         track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
         track_cover_picture: audioCoverPicture ? {
