@@ -14,9 +14,11 @@ class I18nService {
     this.localeStrings = new LocalizedStrings(localeAssets);
   }
 
-  getString(key: string): string {
+  getString(key: string, values?: Record<string, string>): string {
+    // values can be named object for string substitution
+    // @see - https://www.npmjs.com/package/react-localization#api
     // @ts-ignore
-    return this.localeStrings.formatString(this.localeStrings[key]) as string;
+    return this.localeStrings.formatString(this.localeStrings[key], values) as string;
   }
 
   private getLocaleFile(locale: string): object {

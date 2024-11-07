@@ -105,6 +105,9 @@ body {
   color: inherit;
   transition: var(--selectable-item-transition);
   border-radius: 2px;
+}
+
+.contexify_item:not(.contexify_item_inline) > .contexify_itemContent {
   padding: 8px 16px;
 }
 

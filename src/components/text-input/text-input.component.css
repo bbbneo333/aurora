@@ -1,0 +1,34 @@
+.text-input-container {
+  width: 100%;
+  position: relative;
+}
+
+.text-input {
+  width: inherit;
+  color: var(--dark-text-color);
+  background: none;
+  border: none;
+  padding: 5px 26px;
+}
+
+.text-input-overlay {
+  position: absolute;
+  left: 0;
+  display: flex;
+  height: 100%;
+  width: inherit;
+  pointer-events: none;
+  align-items: center;
+  padding: 0 5px;
+}
+
+.text-input-icon {
+  color: var(--dark-text-color);
+  opacity: .2;
+}
+
+.text-input-clear-button {
+  /* for aligning close icon to extreme end */
+  margin-left: auto;
+  pointer-events: auto;
+}

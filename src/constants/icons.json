@@ -1,8 +1,9 @@
 {
   "AddCircle": "fas fa-plus-circle",
-  "AlbumTilePlaceholder": "fas fa-compact-disc",
-  "ArtistTilePlaceholder": "fas fa-user",
+  "AlbumPlaceholder": "fas fa-compact-disc",
+  "ArtistPlaceholder": "fas fa-user",
   "Close": "fas fa-times",
+  "Edit": "fas fa-edit",
   "Folder": "fas fa-folder",
   "LinkLibrary": "fas fa-layer-group",
   "LinkSettings": "fas fa-cog",
@@ -11,6 +12,7 @@
   "MediaLike": "far fa-heart",
   "NavigationBack": "fas fa-chevron-left",
   "NavigationForward": "fas fa-chevron-right",
+  "PlaylistPlaceholder": "fas fa-play",
   "PlayerShuffle": "fas fa-random",
   "PlayerPrevious": "fas fa-step-backward",
   "PlayerPlay": "fas fa-play-circle",
@@ -20,5 +22,6 @@
   "PlayerQueue": "fas fa-list",
   "PlayerVolume1": "fas fa-volume-up",
   "PlayerVolume2": "fas fa-volume-down",
-  "PlayerVolumeMuted": "fas fa-volume-mute"
+  "PlayerVolumeMuted": "fas fa-volume-mute",
+  "Search": "fas fa-search"
 }

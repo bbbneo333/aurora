@@ -19,6 +19,7 @@ export enum MediaLibraryActions {
   AddArtists = 'media/library/addArtists',
   RemoveArtist = 'media/library/removeArtist',
   SetArtist = 'media/library/setArtist',
+  SetPlaylists = 'media/library/setPlaylists',
 }
 
 export enum MediaPlayerActions {

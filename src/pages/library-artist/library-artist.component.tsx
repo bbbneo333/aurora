@@ -41,7 +41,7 @@ export function LibraryArtistPage() {
             <MediaCoverPicture
               mediaPicture={mediaSelectedArtist.artist_feature_picture}
               mediaPictureAltText={mediaSelectedArtist.artist_name}
-              mediaCoverPlaceholderIcon={Icons.ArtistTilePlaceholder}
+              mediaCoverPlaceholderIcon={Icons.ArtistPlaceholder}
               className={cx('library-artist-cover-picture')}
             />
           </div>

@@ -30,7 +30,7 @@ export function MediaCoverPicture(props: {
         <div className={cx('media-cover-placeholder')}>
           <Icon
             className={cx('media-cover-placeholder-icon')}
-            name={mediaCoverPlaceholderIcon || Icons.AlbumTilePlaceholder}
+            name={mediaCoverPlaceholderIcon || Icons.AlbumPlaceholder}
           />
         </div>
       </div>

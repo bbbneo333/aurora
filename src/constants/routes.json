@@ -4,6 +4,8 @@
   "LibraryArtist": "/library/artists/:artistId",
   "LibraryAlbums": "/library/albums",
   "LibraryAlbum": "/library/albums/:albumId",
+  "LibraryPlaylists": "/library/playlists",
+  "LibraryPlaylist": "/library/playlists/:playlistId",
   "Player": "/player",
   "PlayerQueue": "/player/queue",
   "Settings": "/settings"

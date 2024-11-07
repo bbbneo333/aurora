@@ -138,7 +138,27 @@ export interface IMediaProvider {
 
 export interface IMediaCollectionItem {
   id: string;
-  type: 'artist' | 'album';
+  type: 'artist' | 'album' | 'playlist';
   name: string;
   picture?: IMediaPicture;
+}
+
+export interface IMediaPlaylistData {
+  id: string;
+  name: string;
+  tracks: IMediaPlaylistTrackData[];
+  cover_picture?: IMediaPicture;
+  created_at: number;
+}
+
+export interface IMediaPlaylistTrackData {
+  id: string;
+  added_at: number;
+}
+
+export interface IMediaPlaylist extends IMediaPlaylistData {
+  tracks: IMediaPlaylistTrack[];
+}
+
+export interface IMediaPlaylistTrack extends IMediaPlaylistTrackData, IMediaTrack {
 }

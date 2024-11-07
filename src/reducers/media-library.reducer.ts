@@ -1,6 +1,12 @@
 import { MediaEnums } from '../enums';
-import { IMediaAlbum, IMediaArtist, IMediaTrack } from '../interfaces';
 import { ArrayUtils, MediaUtils } from '../utils';
+
+import {
+  IMediaAlbum,
+  IMediaArtist,
+  IMediaPlaylist,
+  IMediaTrack,
+} from '../interfaces';
 
 export type MediaLibraryState = {
   mediaAlbums: IMediaAlbum[],
@@ -10,6 +16,7 @@ export type MediaLibraryState = {
   mediaSelectedArtist?: IMediaArtist,
   mediaSelectedArtistAlbums?: IMediaAlbum[],
   mediaIsSyncing: boolean,
+  mediaPlaylists: IMediaPlaylist[],
 };
 
 export type MediaLibraryStateAction = {
@@ -21,6 +28,7 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaAlbums: [],
   mediaArtists: [],
   mediaIsSyncing: false,
+  mediaPlaylists: [],
 };
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
@@ -190,6 +198,17 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         ...state,
         mediaSelectedArtist: mediaArtist,
         mediaSelectedArtistAlbums: mediaArtistAlbums,
+      };
+    }
+    case MediaEnums.MediaLibraryActions.SetPlaylists: {
+      // data.mediaPlaylists: MediaPlaylist - playlists which need to be loaded
+      const {
+        mediaPlaylists,
+      } = action.data;
+
+      return {
+        ...state,
+        mediaPlaylists,
       };
     }
     default:
