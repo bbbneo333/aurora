@@ -6,11 +6,11 @@ import {
   Item,
   Submenu,
   ItemParams,
-  animation,
 } from 'react-contexify';
 
 import { IMediaCollectionItem } from '../../interfaces';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
 export const MediaCollectionContextMenuId = 'media_collection_context_menu';
 
@@ -22,7 +22,6 @@ export enum MediaCollectionContextMenuItem {
 
 export enum MediaCollectionContextMenuItemAction {
   AddToQueue = 'media/collection/action/addToQueue',
-  AddToPlaylist = 'media/collection/addToPlaylist',
 }
 
 export interface MediaCollectionContextMenuItemProps {
@@ -37,7 +36,7 @@ export function MediaCollectionContextMenu(props: {
   } = props;
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaCollectionContextMenuItemProps>) => {
-    const itemAction: MediaCollectionContextMenuItemAction = itemParams.event.currentTarget.id as MediaCollectionContextMenuItemAction;
+    const itemAction: MediaCollectionContextMenuItemAction = itemParams.id as MediaCollectionContextMenuItemAction;
     const mediaItem: IMediaCollectionItem | undefined = itemParams.props?.mediaItem;
 
     switch (itemAction) {
@@ -58,7 +57,7 @@ export function MediaCollectionContextMenu(props: {
   }, []);
 
   return (
-    <Menu id={MediaCollectionContextMenuId} animation={animation.fade}>
+    <Menu id={MediaCollectionContextMenuId}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaCollectionContextMenuItem.AddToQueue:
@@ -74,12 +73,10 @@ export function MediaCollectionContextMenu(props: {
           case MediaCollectionContextMenuItem.AddToPlaylist:
             return (
               <Submenu
-                disabled
                 key={MediaCollectionContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_collection_add_to_playlist')}
               >
-                {/* <Item id={MediaTrackContextMenuItemAction.AddToPlaylist} onClick={handleMenuItemClick}> */}
-                {/* </Item> */}
+                <MediaPlaylistContextMenu/>
               </Submenu>
             );
           case MediaCollectionContextMenuItem.Separator: {

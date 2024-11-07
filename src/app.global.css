@@ -88,7 +88,7 @@ body {
 
 /*context menu*/
 
-.react-contexify {
+.contexify {
   background-color: var(--context-menu-bg-color);
   color: var(--context-menu-color);
   border-radius: 4px;
@@ -97,24 +97,24 @@ body {
   box-shadow: 0 16px 24px rgb(0 0 0 / 30%), 0 6px 8px rgb(0 0 0 / 20%);
 }
 
-.react-contexify__item {
+.contexify_item {
   color: inherit;
 }
 
-.react-contexify__item__content {
+.contexify_itemContent {
   color: inherit;
   transition: var(--selectable-item-transition);
   border-radius: 2px;
   padding: 8px 16px;
 }
 
-.react-contexify__item:not(.react-contexify__item--disabled):hover > .react-contexify__item__content,
-.react-contexify__item:not(.react-contexify__item--disabled):focus > .react-contexify__item__content {
+.contexify_item:not(.contexify_item-disabled):hover > .contexify_itemContent,
+.contexify_item:not(.contexify_item-disabled):focus > .contexify_itemContent {
   color: var(--selectable-hovered-color);
   background-color: var(--selectable-hovered-bg-color);
 }
 
-.react-contexify__separator {
+.contexify_separator {
   background-color: var(--selectable-hovered-bg-color);
-  margin: 0;
+  margin: 5px 0;
 }

@@ -71,11 +71,10 @@ export function MediaCollectionTile(props: {
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaContextMenuId) {
-      show(e, {
+      show({
         id: mediaContextMenuId,
-        props: {
-          mediaItem,
-        },
+        event: e,
+        props: { mediaItem },
       });
     }
   }, [

@@ -6,11 +6,11 @@ import {
   Item,
   Submenu,
   ItemParams,
-  animation,
 } from 'react-contexify';
 
 import { IMediaQueueTrack, IMediaTrack } from '../../interfaces';
 import { I18nService, MediaPlayerService } from '../../services';
+import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
 export enum MediaTrackContextMenuItem {
   AddToQueue,
@@ -42,8 +42,7 @@ export function MediaTrackContextMenu(props: {
   } = props;
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
-    const itemAction: MediaTrackContextMenuItemAction = itemParams.event.currentTarget.id as MediaTrackContextMenuItemAction;
-
+    const itemAction: MediaTrackContextMenuItemAction = itemParams.id as MediaTrackContextMenuItemAction;
     const mediaTrack: IMediaTrack | undefined = itemParams.props?.mediaTrack;
     const mediaQueueTrack: IMediaQueueTrack | undefined = itemParams.props?.mediaQueueTrack;
 
@@ -66,7 +65,7 @@ export function MediaTrackContextMenu(props: {
   }, []);
 
   return (
-    <Menu id={id} animation={animation.fade}>
+    <Menu id={id}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaTrackContextMenuItem.AddToQueue:
@@ -103,12 +102,10 @@ export function MediaTrackContextMenu(props: {
           case MediaTrackContextMenuItem.AddToPlaylist:
             return (
               <Submenu
-                disabled
                 key={MediaTrackContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_track_add_to_playlist')}
               >
-                {/* <Item id={MediaTrackContextMenuItemAction.AddToPlaylist} onClick={handleMenuItemClick}> */}
-                {/* </Item> */}
+                <MediaPlaylistContextMenu/>
               </Submenu>
             );
           case MediaTrackContextMenuItem.Separator: {
