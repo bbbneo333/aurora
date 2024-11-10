@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 import { Icon } from '../icon/icon.component';
 
 import styles from './action-list.component.css';
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 import { Icons } from '../../constants';
 
 const cx = classNames.bind(styles);
@@ -42,12 +42,12 @@ export const ActionList = ({ items, onRemove }: ActionListProps) => (
         </div>
         {onRemove && (
           <div className={cx('action-list-item-button')}>
-            <MediaButtonComponent onButtonSubmit={() => {
+            <Button onButtonSubmit={() => {
               onRemove(item.id);
             }}
             >
               <Icon name={Icons.Close}/>
-            </MediaButtonComponent>
+            </Button>
           </div>
         )}
       </div>

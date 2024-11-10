@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer } from 'react';
 import classNames from 'classnames/bind';
 
-import { ActionList, MediaButtonComponent } from '../../components';
+import { ActionList, Button } from '../../components';
 import { Icons } from '../../constants';
 import { AppEnums } from '../../enums';
 import { AppService, MediaProviderService } from '../../services';
@@ -109,7 +109,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             />
           </div>
           <div className={cl('settings-add-directory')}>
-            <MediaButtonComponent
+            <Button
               className={cl('settings-add-directory-button')}
               icon={Icons.AddCircle}
               iconClassName={cl('settings-add-directory-button-icon')}
@@ -126,7 +126,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               }}
             >
               Add Directory
-            </MediaButtonComponent>
+            </Button>
           </div>
         </div>
       </div>

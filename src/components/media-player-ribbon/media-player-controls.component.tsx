@@ -10,7 +10,7 @@ import { MediaPlayerService } from '../../services';
 import { MediaEnums } from '../../enums';
 
 import { Icon } from '../icon/icon.component';
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -26,7 +26,7 @@ export function MediaPlayerControls() {
   return (
     <Row className={cx('media-player-controls-container')}>
       <Col className={cx('col-12', 'media-player-controls-column')}>
-        <MediaButtonComponent
+        <Button
           className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', {
             active: mediaPlaybackQueueOnShuffle,
           })}
@@ -35,28 +35,28 @@ export function MediaPlayerControls() {
           }}
         >
           <Icon name={Icons.PlayerShuffle}/>
-        </MediaButtonComponent>
-        <MediaButtonComponent
+        </Button>
+        <Button
           className={cx('media-player-control', 'media-player-control-md')}
           onButtonSubmit={() => {
             MediaPlayerService.playPreviousTrack();
           }}
         >
           <Icon name={Icons.PlayerPrevious}/>
-        </MediaButtonComponent>
+        </Button>
         {mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
           ? (
-            <MediaButtonComponent
+            <Button
               className={cx('media-player-control', 'media-player-control-lg')}
               onButtonSubmit={() => {
                 MediaPlayerService.pauseMediaPlayer();
               }}
             >
               <Icon name={Icons.PlayerPause}/>
-            </MediaButtonComponent>
+            </Button>
           )
           : (
-            <MediaButtonComponent
+            <Button
               disabled={mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
               className={cx('media-player-control', 'media-player-control-lg')}
               onButtonSubmit={() => {
@@ -64,9 +64,9 @@ export function MediaPlayerControls() {
               }}
             >
               <Icon name={Icons.PlayerPlay}/>
-            </MediaButtonComponent>
+            </Button>
           )}
-        <MediaButtonComponent
+        <Button
           className={cx('media-player-control', 'media-player-control-md')}
           disabled={!MediaPlayerService.hasNextTrack()}
           onButtonSubmit={() => {
@@ -74,8 +74,8 @@ export function MediaPlayerControls() {
           }}
         >
           <Icon name={Icons.PlayerNext}/>
-        </MediaButtonComponent>
-        <MediaButtonComponent
+        </Button>
+        <Button
           className={cx('media-player-control', 'media-player-control-sm', 'media-player-toggle', 'media-player-repeat-toggle', {
             active: !_.isNil(mediaPlaybackQueueRepeatType),
           })}
@@ -90,7 +90,7 @@ export function MediaPlayerControls() {
           >
             1
           </span>
-        </MediaButtonComponent>
+        </Button>
       </Col>
     </Row>
   );

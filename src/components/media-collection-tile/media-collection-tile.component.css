@@ -68,7 +68,6 @@
   padding: 10px 15px;
   border-radius: 50%;
   box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
-  transition: var(--selectable-item-transition);
 }
 
 .collection-tile-action-button:hover {

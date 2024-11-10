@@ -8,7 +8,7 @@ import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 
 import { Icon } from '../icon/icon.component';
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 import { MediaProgressBarComponent } from '../media-progress-bar/media-progress-bar.component';
 import { RouterLinkToggle } from '../router-link-toggle/router-link-toggle.component';
 
@@ -77,12 +77,12 @@ export function MediaPlayerSide() {
         >
           <Icon name={Icons.PlayerQueue}/>
         </RouterLinkToggle>
-        <MediaButtonComponent
+        <Button
           className={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
           onButtonSubmit={handleOnVolumeButtonSubmit}
         >
           <Icon name={mediaVolumeButtonIcon}/>
-        </MediaButtonComponent>
+        </Button>
         <div className={cx('media-player-volume-bar-container')}>
           <MediaProgressBarComponent
             autoCommitOnUpdate

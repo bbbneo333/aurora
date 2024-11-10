@@ -53,15 +53,6 @@
   text-align: center;
   padding: 5px;
   margin: 2px;
-  transition: var(--selectable-item-transition);
-}
-
-.media-player-control[disabled] {
-  color: var(--dark-disabled-button-color) !important;
-}
-
-.media-player-control:not([disabled]):hover {
-  color: var(--light-text-color);
 }
 
 .media-player-control.media-player-control-sm {

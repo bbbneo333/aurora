@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 import styles from './text-input.component.css';
 import { Icon } from '../icon/icon.component';
 import { Icons } from '../../constants';
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 
 const cx = classNames.bind(styles);
 
@@ -50,7 +50,7 @@ export function TextInput(props: TextInputProps = {}) {
           />
         )}
         {clearable && !isEmpty(textInputValue) && (
-          <MediaButtonComponent
+          <Button
             className={cx('text-input-clear-button')}
             onButtonSubmit={() => setTextInputValue('')}
           >
@@ -58,7 +58,7 @@ export function TextInput(props: TextInputProps = {}) {
               className={cx('text-input-icon')}
               name={Icons.Close}
             />
-          </MediaButtonComponent>
+          </Button>
         )}
       </div>
       <input

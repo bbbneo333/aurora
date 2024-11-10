@@ -11,7 +11,7 @@ import { RootState } from '../../reducers';
 import { MediaLibraryService, MediaPlayerService } from '../../services';
 
 import { Icon } from '../icon/icon.component';
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { RouterLink } from '../router-link/router-link.component';
 
@@ -108,20 +108,20 @@ export function MediaCollectionTile(props: {
                   {
                     isMediaPlaying
                       ? (
-                        <MediaButtonComponent
+                        <Button
                           className={cx('collection-tile-action-button')}
                           onButtonSubmit={handleOnPauseButtonClick}
                         >
                           <Icon name={Icons.MediaPause}/>
-                        </MediaButtonComponent>
+                        </Button>
                       )
                       : (
-                        <MediaButtonComponent
+                        <Button
                           className={cx('collection-tile-action-button')}
                           onButtonSubmit={handleOnPlayButtonClick}
                         >
                           <Icon name={Icons.MediaPlay}/>
-                        </MediaButtonComponent>
+                        </Button>
                       )
                   }
                 </div>
