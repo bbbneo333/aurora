@@ -1,6 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  DetailsHTMLAttributes, useCallback, useEffect, useState,
+} from 'react';
 import classNames from 'classnames/bind';
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 
 import styles from './text-input.component.css';
 import { Icon } from '../icon/icon.component';
@@ -16,13 +18,18 @@ export type TextInputProps = {
   onInputValue?: (value: string) => void;
 };
 
-export function TextInput(props: TextInputProps = {}) {
+export function TextInput(props: TextInputProps & DetailsHTMLAttributes<HTMLInputElement> = {}) {
   const {
     clearable,
     icon,
-    placeholder,
     onInputValue,
   } = props;
+
+  const textInputElementProps = omit(props, [
+    'clearable',
+    'icon',
+    'onInputValue',
+  ]);
 
   const [textInputValue, setTextInputValue] = useState<string>('');
 
@@ -64,9 +71,9 @@ export function TextInput(props: TextInputProps = {}) {
       <input
         className={cx('text-input')}
         type="text"
-        placeholder={placeholder}
         onChange={onTextInputChange}
         value={textInputValue}
+        {...textInputElementProps}
       />
     </div>
   );

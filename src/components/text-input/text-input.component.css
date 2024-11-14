@@ -8,7 +8,7 @@
   color: var(--dark-text-color);
   background: none;
   border: none;
-  padding: 5px 26px;
+  padding: 0 20px;
 }
 
 .text-input-overlay {
@@ -19,16 +19,20 @@
   width: inherit;
   pointer-events: none;
   align-items: center;
-  padding: 0 5px;
 }
 
 .text-input-icon {
   color: var(--dark-text-color);
   opacity: .2;
+  transition: var(--selectable-item-transition);
 }
 
 .text-input-clear-button {
   /* for aligning close icon to extreme end */
   margin-left: auto;
   pointer-events: auto;
+}
+
+.text-input-clear-button:hover .text-input-icon {
+  opacity: 1;
 }
