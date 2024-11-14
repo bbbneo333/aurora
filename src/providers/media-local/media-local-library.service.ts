@@ -61,22 +61,25 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
       const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
       // generate local id - we are using location of the file to uniquely identify the track
-      const mediaTrackId = MediaLocalLibraryService.getMediaTrackId(fsDirectoryReadFile.path);
+      const mediaTrackId = MediaLocalLibraryService.getMediaId(fsDirectoryReadFile.path);
       // add media artist
       const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
         ? audioMetadata.common.artists.map(audioArtist => ({
           artist_name: audioArtist,
           provider: MediaLocalConstants.Provider,
+          provider_id: MediaLocalLibraryService.getMediaId(audioArtist),
           sync_timestamp: mediaSyncTimestamp,
         }))
         : [{
           artist_name: 'unknown artist',
           provider: MediaLocalConstants.Provider,
+          provider_id: MediaLocalLibraryService.getMediaId('unknown artist'),
           sync_timestamp: mediaSyncTimestamp,
         }]);
       // add media album
+      const mediaAlbumName = audioMetadata.common.album || 'unknown album';
       const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
-        album_name: audioMetadata.common.album || 'unknown album',
+        album_name: mediaAlbumName,
         album_artist_id: mediaArtistDataList[0].id,
         album_cover_picture: audioCoverPicture ? {
           image_data: audioCoverPicture.data,
@@ -84,6 +87,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           image_format: audioCoverPicture.format,
         } : undefined,
         provider: MediaLocalConstants.Provider,
+        provider_id: MediaLocalLibraryService.getMediaId(mediaAlbumName),
         sync_timestamp: mediaSyncTimestamp,
       });
       // add media track
@@ -112,8 +116,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     debug('addTracksFromDirectory - finished processing - %o', fsDirectoryReadResponse.stats);
   }
 
-  private static getMediaTrackId(mediaTrackInput: string): string {
-    return AppService.sendSyncMessage(AppEnums.IPCCommChannels.CryptoGenerateSHA256Hash, mediaTrackInput);
+  private static getMediaId(mediaInput: string): string {
+    return AppService.sendSyncMessage(AppEnums.IPCCommChannels.CryptoGenerateSHA256Hash, mediaInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
