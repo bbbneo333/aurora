@@ -83,7 +83,6 @@ export function LibraryAlbumPage() {
           menuItems={[
             MediaTrackContextMenuItem.AddToQueue,
             MediaTrackContextMenuItem.Separator,
-            MediaTrackContextMenuItem.AddToLikedSongs,
             MediaTrackContextMenuItem.AddToPlaylist,
           ]}
         />

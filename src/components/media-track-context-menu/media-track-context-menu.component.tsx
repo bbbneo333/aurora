@@ -14,7 +14,6 @@ import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-p
 
 export enum MediaTrackContextMenuItem {
   AddToQueue,
-  AddToLikedSongs,
   AddToPlaylist,
   RemoveFromQueue,
   Separator,
@@ -22,8 +21,6 @@ export enum MediaTrackContextMenuItem {
 
 export enum MediaTrackContextMenuItemAction {
   AddToQueue = 'media/track/action/addToQueue',
-  AddToLikedSongs = 'media/track/action/addToLikedSongs',
-  AddToPlaylist = 'media/track/action/addToPlaylist',
   RemoveFromQueue = 'media/track/action/removeFromQueue',
 }
 
@@ -86,17 +83,6 @@ export function MediaTrackContextMenu(props: {
                 onClick={handleMenuItemClick}
               >
                 {I18nService.getString('label_submenu_media_track_remove_from_queue')}
-              </Item>
-            );
-          case MediaTrackContextMenuItem.AddToLikedSongs:
-            return (
-              <Item
-                disabled
-                key={MediaTrackContextMenuItem.AddToLikedSongs}
-                id={MediaTrackContextMenuItemAction.AddToLikedSongs}
-                onClick={handleMenuItemClick}
-              >
-                {I18nService.getString('label_submenu_media_track_add_to_liked_songs')}
               </Item>
             );
           case MediaTrackContextMenuItem.AddToPlaylist:
