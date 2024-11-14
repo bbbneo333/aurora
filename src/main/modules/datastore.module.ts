@@ -1,10 +1,13 @@
 import Datastore from 'nedb-promises';
 import fs from 'fs';
-import _ from 'lodash';
+import {
+  isNil, omit, forEach, set,
+} from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
 import { AppEnums } from '../../enums';
 import { DatastoreUtils } from '../../utils';
+import { DataStoreQueryData } from '../../types';
 
 const debug = require('debug')('app:module:datastore_module');
 
@@ -53,6 +56,7 @@ export class DatastoreModule implements IAppModule {
     this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSUpdateOne, this.updateOne, this);
     this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSRemove, this.remove, this);
     this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSRemoveOne, this.removeOne, this);
+    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSCount, this.count, this);
   }
 
   private removeDatastore(datastore: Datastore): void {
@@ -105,9 +109,17 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private find(datastoreName: string, datastoreFindDoc: object): Promise<any> {
+  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData<never>): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-    return datastore.find(datastoreFindDoc);
+
+    const cursor = datastore.find(datastoreQueryDoc.filter);
+    forEach(datastoreQueryDoc, (value, key) => {
+      if (!isNil(value)) {
+        set(cursor, key, value);
+      }
+    });
+
+    return cursor.exec();
   }
 
   private findOne(datastoreName: string, datastoreFindOneDoc: object): Promise<any> {
@@ -129,7 +141,7 @@ export class DatastoreModule implements IAppModule {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore
-    return datastore.update(datastoreFindOneDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
+    return datastore.update(datastoreFindOneDoc, omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
       multi: false,
       upsert: false,
       returnUpdatedDocs: true,
@@ -150,6 +162,12 @@ export class DatastoreModule implements IAppModule {
     await datastore.remove(datastoreFindOneDoc, {
       multi: false,
     });
+  }
+
+  private async count(datastoreName: string, datastoreFindOneDoc?: object): Promise<number> {
+    const datastore = this.getDatastore(datastoreName);
+
+    return datastore.count(datastoreFindOneDoc);
   }
 
   private getDatastore(datastoreName: string): Datastore {

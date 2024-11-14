@@ -5,6 +5,7 @@ export enum IPCCommChannels {
   FSReadDirectory = 'fs:read_directory',
   FSReadFile = 'fs:read_file',
   // datastore (ds)
+  DSCount = 'ds:count',
   DSRegisterDatastore = 'ds:register_datastore',
   DSFind = 'ds:find',
   DSFindOne = 'ds:find_one',
