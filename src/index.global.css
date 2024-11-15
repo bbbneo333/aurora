@@ -28,7 +28,7 @@
   --light-toggle-color: #1db954;
   --selected-bg-color: #282828;
   --selected-text-color: #fff;
-  --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, opacity 200ms ease;
   --titlebar-overlay-height: 60px;
   --scrollable-scrollbar-width: 15px;
   --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;

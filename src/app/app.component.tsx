@@ -12,19 +12,18 @@ import {
   MediaSession,
   MediaPlayerRibbonComponent,
   RouterLink,
-} from './components';
+} from '../components';
 
-import { AppEnums } from './enums';
-import { IAppStatePersistor } from './interfaces';
-import { MediaLocalProvider } from './providers';
-import { RootState } from './reducers';
-import { AppService, I18nService, MediaProviderService } from './services';
+import { AppEnums } from '../enums';
+import { IAppStatePersistor } from '../interfaces';
+import { MediaLocalProvider } from '../providers';
+import { RootState } from '../reducers';
+import { AppService, I18nService, MediaProviderService } from '../services';
 
-import statePersistors from './persistors';
-import store from './store';
-import { registerStatePersistor, loadState, removeStates } from './store/persistor';
+import statePersistors from '../persistors';
+import store from '../store';
+import { registerStatePersistor, loadState, removeStates } from '../store/persistor';
 
-import './app.global.css';
 import styles from './app.component.css';
 import routes from './app.routes';
 
@@ -180,7 +179,7 @@ function AppMediaPlayer() {
 
 // app > columns [splash | stage, media player]
 
-export function AppComponent() {
+export function App() {
   const [appStateIsLoading, setAppStateIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -203,7 +202,7 @@ export function AppComponent() {
         setAppStateIsLoading(false);
       })
       .catch((error) => {
-        throw new Error(`AppComponent encountered error while loading state - ${error.message}`);
+        throw new Error(`App encountered error while loading state - ${error.message}`);
       });
   }, []);
 
