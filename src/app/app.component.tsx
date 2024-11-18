@@ -14,6 +14,7 @@ import {
   RouterLink,
 } from '../components';
 
+import { ContextMenuProvider } from '../contexts';
 import { AppEnums } from '../enums';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
@@ -214,8 +215,10 @@ export function App() {
         )}
         {!appStateIsLoading && (
           <Router>
-            <AppStage/>
-            <AppMediaPlayer/>
+            <ContextMenuProvider>
+              <AppStage/>
+              <AppMediaPlayer/>
+            </ContextMenuProvider>
           </Router>
         )}
       </Provider>

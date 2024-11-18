@@ -1,5 +1,5 @@
 import React, {
-  DetailsHTMLAttributes, useCallback, useEffect, useState,
+  DetailsHTMLAttributes, useCallback, useEffect, useRef, useState,
 } from 'react';
 import classNames from 'classnames/bind';
 import { isEmpty, omit } from 'lodash';
@@ -13,6 +13,7 @@ const cx = classNames.bind(styles);
 
 export type TextInputProps = {
   clearable?: boolean;
+  focus?: boolean;
   icon?: string;
   placeholder?: string;
   onInputValue?: (value: string) => void;
@@ -21,17 +22,20 @@ export type TextInputProps = {
 export function TextInput(props: TextInputProps & DetailsHTMLAttributes<HTMLInputElement> = {}) {
   const {
     clearable,
+    focus,
     icon,
     onInputValue,
   } = props;
 
+  const [textInputValue, setTextInputValue] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const textInputElementProps = omit(props, [
     'clearable',
+    'focus',
     'icon',
     'onInputValue',
   ]);
-
-  const [textInputValue, setTextInputValue] = useState<string>('');
 
   const onTextInputChange = useCallback((e) => {
     const { value } = e.target as HTMLInputElement;
@@ -45,6 +49,16 @@ export function TextInput(props: TextInputProps & DetailsHTMLAttributes<HTMLInpu
   }, [
     onInputValue,
     textInputValue,
+  ]);
+
+  useEffect(() => {
+    if (focus) {
+      inputRef.current?.focus();
+    } else {
+      inputRef.current?.blur();
+    }
+  }, [
+    focus,
   ]);
 
   return (
@@ -69,6 +83,7 @@ export function TextInput(props: TextInputProps & DetailsHTMLAttributes<HTMLInpu
         )}
       </div>
       <input
+        ref={inputRef}
         className={cx('text-input')}
         type="text"
         onChange={onTextInputChange}

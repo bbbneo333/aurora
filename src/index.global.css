@@ -107,6 +107,10 @@ body {
   border-radius: 2px;
 }
 
+.contexify_itemContent > .icon {
+  margin-right: 5px;
+}
+
 .contexify_item:not(.contexify_item_inline) > .contexify_itemContent {
   padding: 8px 16px;
 }

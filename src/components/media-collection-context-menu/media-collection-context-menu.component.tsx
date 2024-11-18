@@ -8,6 +8,7 @@ import {
   ItemParams,
 } from 'react-contexify';
 
+import { useContextMenu } from '../../contexts';
 import { IMediaCollectionItem } from '../../interfaces';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
@@ -31,13 +32,12 @@ export interface MediaCollectionContextMenuItemProps {
 export function MediaCollectionContextMenu(props: {
   menuItems: MediaCollectionContextMenuItem[],
 }) {
-  const {
-    menuItems,
-  } = props;
+  const { menuItems } = props;
+  const { menuProps } = useContextMenu<MediaCollectionContextMenuItemProps>();
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaCollectionContextMenuItemProps>) => {
     const itemAction: MediaCollectionContextMenuItemAction = itemParams.id as MediaCollectionContextMenuItemAction;
-    const mediaItem: IMediaCollectionItem | undefined = itemParams.props?.mediaItem;
+    const { mediaItem } = menuProps;
 
     switch (itemAction) {
       case MediaCollectionContextMenuItemAction.AddToQueue: {
@@ -54,7 +54,9 @@ export function MediaCollectionContextMenu(props: {
       default:
       // unsupported action, do nothing
     }
-  }, []);
+  }, [
+    menuProps,
+  ]);
 
   return (
     <Menu id={MediaCollectionContextMenuId}>

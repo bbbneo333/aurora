@@ -2,10 +2,9 @@ import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import _ from 'lodash';
-import { useContextMenu } from 'react-contexify';
 
 import { Icons } from '../../constants';
-import { useMediaTrackList } from '../../contexts';
+import { useContextMenu, useMediaTrackList } from '../../contexts';
 import { MediaEnums } from '../../enums';
 import { IMediaTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
@@ -115,11 +114,11 @@ export function MediaTrackComponent(props: {
     disableAlbumLink = false,
   } = props;
 
-  const { show } = useContextMenu();
+  const { showMenu } = useContextMenu();
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaTrackContextMenuId) {
-      show({
+      showMenu({
         id: mediaTrackContextMenuId,
         event: e,
         props: {
@@ -131,7 +130,7 @@ export function MediaTrackComponent(props: {
       });
     }
   }, [
-    show,
+    showMenu,
     mediaTrack,
     mediaTrackContextMenuId,
   ]);

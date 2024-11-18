@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
-import { useContextMenu } from 'react-contexify';
 import { capitalize } from 'lodash';
 
 import { Icons, Layout } from '../../constants';
+import { useContextMenu } from '../../contexts';
 import { MediaEnums } from '../../enums';
 import { IMediaCollectionItem } from '../../interfaces';
 import { RootState } from '../../reducers';
@@ -32,7 +32,7 @@ export function MediaCollectionTile(props: {
     mediaContextMenuId,
   } = props;
 
-  const { show } = useContextMenu();
+  const { showMenu } = useContextMenu();
 
   const {
     mediaPlaybackState,
@@ -57,7 +57,7 @@ export function MediaCollectionTile(props: {
     e.preventDefault();
     e.stopPropagation();
   }, [
-    mediaItem.id,
+    mediaItem,
   ]);
 
   const handleOnPauseButtonClick = useCallback((e: Event) => {
@@ -71,14 +71,14 @@ export function MediaCollectionTile(props: {
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaContextMenuId) {
-      show({
+      showMenu({
         id: mediaContextMenuId,
         event: e,
         props: { mediaItem },
       });
     }
   }, [
-    show,
+    showMenu,
     mediaItem,
     mediaContextMenuId,
   ]);

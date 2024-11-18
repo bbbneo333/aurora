@@ -8,6 +8,7 @@ import {
   ItemParams,
 } from 'react-contexify';
 
+import { useContextMenu } from '../../contexts';
 import { IMediaQueueTrack, IMediaTrack } from '../../interfaces';
 import { I18nService, MediaPlayerService } from '../../services';
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
@@ -33,15 +34,12 @@ export function MediaTrackContextMenu(props: {
   id: string;
   menuItems: MediaTrackContextMenuItem[],
 }) {
-  const {
-    id,
-    menuItems,
-  } = props;
+  const { id, menuItems } = props;
+  const { menuProps } = useContextMenu<MediaTrackContextMenuItemProps>();
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
     const itemAction: MediaTrackContextMenuItemAction = itemParams.id as MediaTrackContextMenuItemAction;
-    const mediaTrack: IMediaTrack | undefined = itemParams.props?.mediaTrack;
-    const mediaQueueTrack: IMediaQueueTrack | undefined = itemParams.props?.mediaQueueTrack;
+    const { mediaTrack, mediaQueueTrack } = menuProps;
 
     switch (itemAction) {
       case MediaTrackContextMenuItemAction.AddToQueue:
@@ -59,7 +57,9 @@ export function MediaTrackContextMenu(props: {
       default:
       // unsupported action, do nothing
     }
-  }, []);
+  }, [
+    menuProps,
+  ]);
 
   return (
     <Menu id={id}>

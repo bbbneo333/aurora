@@ -11,6 +11,6 @@ export function Icon(props: {
   } = props;
 
   return (
-    <i className={classNames(name, className)}/>
+    <i className={classNames('icon', name, className)}/>
   );
 }

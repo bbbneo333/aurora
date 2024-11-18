@@ -1,4 +1,5 @@
 {
+  "button_create_playlist": "New Playlist",
   "link_library": "Library",
   "link_library_artists": "Artists",
   "link_library_albums": "Albums",
@@ -11,11 +12,13 @@
   "label_player_queue_upcoming_tracks": "Up next",
   "label_player_queue_empty": "You got nothing playing right now",
   "label_playlist_subtitle": "{trackCount} tracks",
+  "label_new_playlist_default_name": "Playlist #{playlistCount}",
   "label_submenu_media_track_add_to_queue": "Add to queue",
   "label_submenu_media_track_remove_from_queue": "Remove from queue",
   "label_submenu_media_track_add_to_liked_songs": "Save to your Liked Songs",
   "label_submenu_media_track_add_to_playlist": "Add to playlist",
   "label_submenu_media_collection_add_to_queue": "Add to queue",
   "label_submenu_media_collection_add_to_playlist": "Add to playlist",
+  "label_playlists_empty": "No Playlists Found",
   "placeholder_playlist_context_menu_search_input": "Find a playlist"
 }

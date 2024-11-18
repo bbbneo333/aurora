@@ -1,0 +1,42 @@
+import React, { useCallback, useState } from 'react';
+import PropTypes from 'prop-types';
+import { ShowContextMenuParams, useContextMenu as useMenu } from 'react-contexify';
+
+export type ContextMenuContextType<T> = {
+  showMenu: (params: ShowContextMenuParams) => void;
+  menuProps: T;
+};
+
+const ContextMenuContext = React.createContext<ContextMenuContextType<any> | null>(null);
+
+export function ContextMenuProvider<T>(props: {
+  children: PropTypes.ReactNodeArray,
+}) {
+  const {
+    children,
+  } = props;
+
+  const [menuProps, setMenuProps] = useState<T>();
+  const { show } = useMenu();
+
+  const showMenu = useCallback((params: ShowContextMenuParams) => {
+    setMenuProps(params.props as T);
+    show(params);
+  }, [
+    show,
+  ]);
+
+  return (
+    <ContextMenuContext.Provider value={{ menuProps, showMenu }}>
+      {children}
+    </ContextMenuContext.Provider>
+  );
+}
+
+export function useContextMenu<T = any>() {
+  const context = React.useContext(ContextMenuContext);
+  if (!context) {
+    throw new Error('useContextMenu must be used within ContextMenuContext');
+  }
+  return context as ContextMenuContextType<T>;
+}

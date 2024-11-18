@@ -161,3 +161,13 @@ export interface IMediaPlaylist extends IMediaPlaylistData {
 
 export interface IMediaPlaylistTrack extends IMediaPlaylistTrackData, IMediaTrack {
 }
+
+export interface IMediaPlaylistInputData {
+  name?: string;
+  tracks?: IMediaPlaylistTrackInputData[];
+  cover_picture?: IMediaPicture;
+}
+
+export interface IMediaPlaylistTrackInputData {
+  id: string;
+}
