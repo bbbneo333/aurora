@@ -1,14 +1,11 @@
 import React, { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import { capitalize } from 'lodash';
 
 import { Icons, Layout } from '../../constants';
 import { useContextMenu } from '../../contexts';
-import { MediaEnums } from '../../enums';
+import { useMediaPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
-import { RootState } from '../../reducers';
-import { MediaLibraryService, MediaPlayerService } from '../../services';
 
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
@@ -33,41 +30,9 @@ export function MediaCollectionTile(props: {
   } = props;
 
   const { showMenu } = useContextMenu();
-
-  const {
-    mediaPlaybackState,
-    mediaPlaybackCurrentTrackList,
-  } = useSelector((state: RootState) => state.mediaPlayer);
-
-  const isMediaPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
-    && mediaPlaybackCurrentTrackList
-    && mediaPlaybackCurrentTrackList.id === mediaItem.id;
-
-  const handleOnPlayButtonClick = useCallback((e: Event) => {
-    MediaLibraryService
-      .getMediaCollectionTracks(mediaItem)
-      .then((mediaTracks) => {
-        MediaPlayerService.playMediaTracks(mediaTracks, {
-          id: mediaItem.id,
-        });
-      });
-
-    // this action button resides within a link
-    // stop propagation to prevent that
-    e.preventDefault();
-    e.stopPropagation();
-  }, [
+  const { isMediaPlaying, handleOnPlayButtonClick, handleOnPauseButtonClick } = useMediaPlayback({
     mediaItem,
-  ]);
-
-  const handleOnPauseButtonClick = useCallback((e: Event) => {
-    MediaPlayerService.pauseMediaPlayer();
-
-    // this action button resides within a link
-    // stop propagation to prevent that
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
+  });
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaContextMenuId) {
