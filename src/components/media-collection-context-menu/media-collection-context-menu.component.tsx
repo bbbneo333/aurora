@@ -19,6 +19,7 @@ export enum MediaCollectionContextMenuItem {
   AddToQueue,
   AddToPlaylist,
   Separator,
+  ManagePlaylist,
 }
 
 export enum MediaCollectionContextMenuItemAction {
@@ -78,8 +79,18 @@ export function MediaCollectionContextMenu(props: {
                 key={MediaCollectionContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_collection_add_to_playlist')}
               >
-                <MediaPlaylistContextMenu/>
+                <MediaPlaylistContextMenu
+                  key={MediaCollectionContextMenuItem.AddToPlaylist}
+                  type="add"
+                />
               </Submenu>
+            );
+          case MediaCollectionContextMenuItem.ManagePlaylist:
+            return (
+              <MediaPlaylistContextMenu
+                key={MediaCollectionContextMenuItem.ManagePlaylist}
+                type="manage"
+              />
             );
           case MediaCollectionContextMenuItem.Separator: {
             return (

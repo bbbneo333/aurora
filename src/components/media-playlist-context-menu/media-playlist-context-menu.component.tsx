@@ -15,8 +15,11 @@ import { Icon } from '../icon/icon.component';
 import { TextInput } from '../text-input/text-input.component';
 
 export enum MediaPlaylistContextMenuItemAction {
+  SearchPlaylist = 'media/playlist/searchPlaylist',
   CreatePlaylist = 'media/playlist/createPlaylist',
   AddToPlaylist = 'media/playlist/addToPlaylist',
+  RenamePlaylist = 'media/playlist/renamePlaylist',
+  DeletePlaylist = 'media/playlist/deletePlaylist',
 }
 
 export type MediaPlaylistContextMenuItemProps = {
@@ -28,7 +31,12 @@ export type MediaPlaylistContextMenuItemData = {
   mediaPlaylistId: string;
 };
 
-export function MediaPlaylistContextMenu() {
+export type MediaPlaylistContextMenuProps = {
+  type: 'add' | 'manage';
+};
+
+export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
+  const { type: mediaPlaylistContextMenuType } = props;
   const { mediaPlaylists } = useSelector((state: RootState) => state.mediaLibrary);
   const [mediaPlaylistsSearchStr, setMediaPlaylistsSearchStr] = useState<string>('');
   const history = useHistory();
@@ -78,6 +86,18 @@ export function MediaPlaylistContextMenu() {
           await MediaLibraryService.addMediaTracksToPlaylist(mediaPlaylistId, mediaTracks);
         });
         break;
+      case MediaPlaylistContextMenuItemAction.RenamePlaylist:
+        if (!mediaItem) {
+          throw new Error('MediaPlaylistContextMenu encountered error at RenamePlaylist - mediaItem is required');
+        }
+        // TODO: Add support for renaming playlist
+        break;
+      case MediaPlaylistContextMenuItemAction.DeletePlaylist:
+        if (!mediaItem) {
+          throw new Error('MediaPlaylistContextMenu encountered error at DeletePlaylist - mediaItem is required');
+        }
+        // TODO: Add support for deleting playlist
+        break;
       default:
       // unsupported action, do nothing
     }
@@ -85,59 +105,87 @@ export function MediaPlaylistContextMenu() {
     menuProps,
   ]);
 
-  return (
-    <>
-      <Item
-        closeOnClick={false}
-        className="contexify_item_inline"
-        onFocus={() => {
-          setSearchInputFocus(true);
-        }}
-        onBlur={() => {
-          setSearchInputFocus(false);
-        }}
-      >
-        <TextInput
-          clearable
-          focus={searchInputFocus}
-          icon={Icons.Search}
-          placeholder={I18nService.getString('placeholder_playlist_context_menu_search_input')}
-          onInputValue={(value) => {
-            setMediaPlaylistsSearchStr(value);
-          }}
-          onKeyDown={(event) => {
-            // pressing space bar closes the context menu for unknown reasons
-            // adding this to handle such cases
-            if (event.key === ' ') {
-              event.stopPropagation();
-            }
-          }}
-        />
-      </Item>
-      <Item
-        id={MediaPlaylistContextMenuItemAction.CreatePlaylist}
-        className="contexify_item_inline"
-        onClick={handleMenuItemClick}
-      >
-        <Icon name={Icons.AddCircle}/>
-        {I18nService.getString('button_create_playlist')}
-      </Item>
-      <MenuSeparator/>
-      {isEmpty(mediaPlaylists) && (
-        <Item disabled>
-          {I18nService.getString('label_playlists_empty')}
-        </Item>
-      )}
-      {mediaPlaylistsToShow.map(mediaPlaylist => (
+  if (mediaPlaylistContextMenuType === 'add') {
+    return (
+      <>
         <Item
-          id={MediaPlaylistContextMenuItemAction.AddToPlaylist}
-          key={mediaPlaylist.id}
-          onClick={handleMenuItemClick}
-          data={{ mediaPlaylistId: mediaPlaylist.id }}
+          key={MediaPlaylistContextMenuItemAction.SearchPlaylist}
+          closeOnClick={false}
+          className="contexify_item_inline"
+          onFocus={() => {
+            setSearchInputFocus(true);
+          }}
+          onBlur={() => {
+            setSearchInputFocus(false);
+          }}
         >
-          {mediaPlaylist.name}
+          <TextInput
+            clearable
+            focus={searchInputFocus}
+            icon={Icons.Search}
+            placeholder={I18nService.getString('placeholder_playlist_context_menu_search_input')}
+            onInputValue={(value) => {
+              setMediaPlaylistsSearchStr(value);
+            }}
+            onKeyDown={(event) => {
+              // pressing space bar closes the context menu for unknown reasons
+              // adding this to handle such cases
+              if (event.key === ' ') {
+                event.stopPropagation();
+              }
+            }}
+          />
         </Item>
-      ))}
-    </>
+        <Item
+          key={MediaPlaylistContextMenuItemAction.CreatePlaylist}
+          id={MediaPlaylistContextMenuItemAction.CreatePlaylist}
+          className="contexify_item_inline"
+          onClick={handleMenuItemClick}
+        >
+          <Icon name={Icons.AddCircle}/>
+          {I18nService.getString('button_create_playlist')}
+        </Item>
+        <MenuSeparator/>
+        {isEmpty(mediaPlaylists) && (
+          <Item disabled>
+            {I18nService.getString('label_playlists_empty')}
+          </Item>
+        )}
+        {mediaPlaylistsToShow.map(mediaPlaylist => (
+          <Item
+            key={mediaPlaylist.id}
+            id={MediaPlaylistContextMenuItemAction.AddToPlaylist}
+            onClick={handleMenuItemClick}
+            data={{ mediaPlaylistId: mediaPlaylist.id }}
+          >
+            {mediaPlaylist.name}
+          </Item>
+        ))}
+      </>
+    );
+  }
+  if (mediaPlaylistContextMenuType === 'manage') {
+    return (
+      <>
+        <Item
+          key={MediaPlaylistContextMenuItemAction.RenamePlaylist}
+          id={MediaPlaylistContextMenuItemAction.RenamePlaylist}
+          onClick={handleMenuItemClick}
+        >
+          {I18nService.getString('label_playlist_rename')}
+        </Item>
+        <Item
+          key={MediaPlaylistContextMenuItemAction.DeletePlaylist}
+          id={MediaPlaylistContextMenuItemAction.DeletePlaylist}
+          onClick={handleMenuItemClick}
+        >
+          {I18nService.getString('label_playlist_delete')}
+        </Item>
+      </>
+    );
+  }
+
+  return (
+    <></>
   );
 }

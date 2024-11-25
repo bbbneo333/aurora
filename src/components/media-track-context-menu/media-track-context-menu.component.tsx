@@ -91,7 +91,7 @@ export function MediaTrackContextMenu(props: {
                 key={MediaTrackContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_track_add_to_playlist')}
               >
-                <MediaPlaylistContextMenu/>
+                <MediaPlaylistContextMenu type="add"/>
               </Submenu>
             );
           case MediaTrackContextMenuItem.Separator: {
