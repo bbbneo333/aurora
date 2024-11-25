@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import PropTypes from 'prop-types';
 import { ShowContextMenuParams, useContextMenu as useMenu } from 'react-contexify';
 
 export type ContextMenuContextType<T> = {
@@ -10,7 +9,7 @@ export type ContextMenuContextType<T> = {
 const ContextMenuContext = React.createContext<ContextMenuContextType<any> | null>(null);
 
 export function ContextMenuProvider<T>(props: {
-  children: PropTypes.ReactNodeArray,
+  children: React.ReactNode,
 }) {
   const {
     children,
