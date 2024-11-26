@@ -71,6 +71,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         });
       });
   }, [
+    dirty,
     settings,
   ]);
 
