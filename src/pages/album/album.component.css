@@ -1,27 +1,27 @@
-.library-album-header {
+.album-header {
   margin-bottom: 20px;
 }
 
-.library-album-cover-picture {
+.album-cover-picture {
   /* size for placeholder icon */
   font-size: 50px;
 }
 
-.library-album-header-info-column {
+.album-header-info-column {
   display: flex;
   flex-direction: column;
   align-self: flex-end;
   justify-items: flex-start;
 }
 
-.library-album-header-label {
+.album-header-label {
   font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #e0e0e0;
 }
 
-.library-album-header-name {
+.album-header-name {
   font-size: 36px;
   font-weight: bold;
   overflow: hidden;
@@ -31,6 +31,6 @@
   -webkit-box-orient: horizontal;
 }
 
-.library-album-header-info {
+.album-header-info {
   color: var(--dark-text-color);
 }

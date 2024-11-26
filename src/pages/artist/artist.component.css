@@ -1,27 +1,27 @@
-.library-artist-header {
+.artist-header {
   margin-bottom: 20px;
 }
 
-.library-artist-cover-picture {
+.artist-cover-picture {
   /* size for placeholder icon */
   font-size: 50px;
 }
 
-.library-artist-header-info-column {
+.artist-header-info-column {
   display: flex;
   flex-direction: column;
   align-self: flex-end;
   justify-items: flex-start;
 }
 
-.library-artist-header-label {
+.artist-header-label {
   font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: #e0e0e0;
 }
 
-.library-artist-header-name {
+.artist-header-name {
   font-size: 36px;
   font-weight: bold;
   overflow: hidden;
@@ -31,6 +31,6 @@
   -webkit-box-orient: horizontal;
 }
 
-.library-artist-header-info {
+.artist-header-info {
   color: var(--dark-text-color);
 }

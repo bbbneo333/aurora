@@ -9,11 +9,11 @@ import { MediaAlbums, MediaCoverPicture } from '../../components';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
 
-import styles from './library-artist.component.css';
+import styles from './artist.component.css';
 
 const cx = classNames.bind(styles);
 
-export function LibraryArtistPage() {
+export function ArtistPage() {
   const {
     artistId,
   } = useParams() as { artistId: string };
@@ -35,28 +35,28 @@ export function LibraryArtistPage() {
 
   return (
     <div className="container-fluid">
-      <div className={cx('library-artist-header')}>
+      <div className={cx('artist-header')}>
         <div className="row">
-          <div className={cx(Layout.Grid.LibraryArtistHeaderCoverColumn, 'library-artist-header-cover-column')}>
+          <div className={cx(Layout.Grid.ArtistHeaderCoverColumn, 'artist-header-cover-column')}>
             <MediaCoverPicture
               mediaPicture={mediaSelectedArtist.artist_feature_picture}
               mediaPictureAltText={mediaSelectedArtist.artist_name}
               mediaCoverPlaceholderIcon={Icons.ArtistPlaceholder}
-              className={cx('library-artist-cover-picture')}
+              className={cx('artist-cover-picture')}
             />
           </div>
-          <div className={cx(Layout.Grid.LibraryArtistHeaderInfoColumn, 'library-artist-header-info-column')}>
-            <div className={cx('library-artist-header-label')}>
-              {I18nService.getString('label_library_artist_header')}
+          <div className={cx(Layout.Grid.ArtistHeaderInfoColumn, 'artist-header-info-column')}>
+            <div className={cx('artist-header-label')}>
+              {I18nService.getString('label_artist_header')}
             </div>
-            <div className={cx('library-artist-header-name')}>
+            <div className={cx('artist-header-name')}>
               {mediaSelectedArtist.artist_name}
             </div>
-            <div className={cx('library-artist-header-info')}/>
+            <div className={cx('artist-header-info')}/>
           </div>
         </div>
       </div>
-      <div className={cx('library-artist-albums')}>
+      <div className={cx('artist-albums')}>
         <MediaAlbums mediaAlbums={mediaSelectedArtistAlbums}/>
       </div>
     </div>
