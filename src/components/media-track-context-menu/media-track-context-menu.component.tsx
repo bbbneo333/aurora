@@ -11,6 +11,7 @@ import {
 import { useContextMenu } from '../../contexts';
 import { IMediaQueueTrack, IMediaTrack } from '../../interfaces';
 import { I18nService, MediaPlayerService } from '../../services';
+
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
 export enum MediaTrackContextMenuItem {

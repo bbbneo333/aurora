@@ -11,6 +11,7 @@ import {
 import { useContextMenu } from '../../contexts';
 import { IMediaCollectionItem } from '../../interfaces';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
 export const MediaCollectionContextMenuId = 'media_collection_context_menu';
