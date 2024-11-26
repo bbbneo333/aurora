@@ -11,10 +11,7 @@ const ContextMenuContext = React.createContext<ContextMenuContextType<any> | nul
 export function ContextMenuProvider<T>(props: {
   children: React.ReactNode,
 }) {
-  const {
-    children,
-  } = props;
-
+  const { children } = props;
   const [menuProps, setMenuProps] = useState<T>();
   const { show } = useMenu();
 
