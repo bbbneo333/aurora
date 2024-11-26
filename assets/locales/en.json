@@ -12,7 +12,7 @@
   "label_player_queue_upcoming_tracks": "Up next",
   "label_player_queue_empty": "You got nothing playing right now",
   "label_playlist_subtitle": "{trackCount} tracks",
-  "label_playlist_rename": "Rename Playlist",
+  "label_playlist_edit": "Edit Playlist",
   "label_playlist_delete": "Delete Playlist",
   "label_new_playlist_default_name": "Playlist #{playlistCount}",
   "label_submenu_media_track_add_to_queue": "Add to queue",

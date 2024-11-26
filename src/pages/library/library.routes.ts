@@ -4,9 +4,7 @@ import { ArtistPage } from '../artist/artist.component';
 import { ArtistsPage } from '../artists/artists.component';
 import { AlbumPage } from '../album/album.component';
 import { AlbumsPage } from '../albums/albums.component';
-
-// import { LibraryPlaylistsPage } from '../library-playlists/library-playlists.component';
-// import { LibraryPlaylistPage } from '../library-playlist/library-playlist.component';
+import { PlaylistsPage } from '../playlists/playlists.component';
 
 export default [
   {
@@ -21,16 +19,16 @@ export default [
     tHeaderName: 'link_library_albums',
     exact: true,
   },
+  {
+    path: Routes.LibraryPlaylists,
+    component: PlaylistsPage,
+    tHeaderName: 'link_library_playlists',
+    exact: true,
+  },
   // TODO: Add this back
   // {
-  //   path: Routes.LibraryPlaylists,
-  //   component: LibraryPlaylistsPage,
-  //   tHeaderName: 'link_library_playlists',
-  //   exact: true,
-  // },
-  // {
   //   path: Routes.LibraryPlaylist,
-  //   component: LibraryPlaylistPage,
+  //   component: PlaylistPage,
   //   exact: true,
   // },
   {

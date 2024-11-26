@@ -18,7 +18,7 @@ export enum MediaPlaylistContextMenuItemAction {
   SearchPlaylist = 'media/playlist/searchPlaylist',
   CreatePlaylist = 'media/playlist/createPlaylist',
   AddToPlaylist = 'media/playlist/addToPlaylist',
-  RenamePlaylist = 'media/playlist/renamePlaylist',
+  EditPlaylist = 'media/playlist/editPlaylist',
   DeletePlaylist = 'media/playlist/deletePlaylist',
 }
 
@@ -86,11 +86,11 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
           await MediaLibraryService.addMediaTracksToPlaylist(mediaPlaylistId, mediaTracks);
         });
         break;
-      case MediaPlaylistContextMenuItemAction.RenamePlaylist:
+      case MediaPlaylistContextMenuItemAction.EditPlaylist:
         if (!mediaItem) {
-          throw new Error('MediaPlaylistContextMenu encountered error at RenamePlaylist - mediaItem is required');
+          throw new Error('MediaPlaylistContextMenu encountered error at EditPlaylist - mediaItem is required');
         }
-        // TODO: Add support for renaming playlist
+        // TODO: Add support for editing playlist
         break;
       case MediaPlaylistContextMenuItemAction.DeletePlaylist:
         if (!mediaItem) {
@@ -168,11 +168,11 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
     return (
       <>
         <Item
-          key={MediaPlaylistContextMenuItemAction.RenamePlaylist}
-          id={MediaPlaylistContextMenuItemAction.RenamePlaylist}
+          key={MediaPlaylistContextMenuItemAction.EditPlaylist}
+          id={MediaPlaylistContextMenuItemAction.EditPlaylist}
           onClick={handleMenuItemClick}
         >
-          {I18nService.getString('label_playlist_rename')}
+          {I18nService.getString('label_playlist_edit')}
         </Item>
         <Item
           key={MediaPlaylistContextMenuItemAction.DeletePlaylist}
