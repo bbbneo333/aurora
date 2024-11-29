@@ -1,11 +1,11 @@
 .button {
-  color: var(--dark-button-color);
+  color: var(--selectable-color);
   display: inline-block;
   transition: var(--selectable-item-transition);
 }
 
 .button[disabled] {
-  color: var(--dark-disabled-button-color) !important;
+  color: var(--button-disabled-color) !important;
   outline: none;
 }
 
@@ -18,7 +18,7 @@
 }
 
 .button[disabled] > .button-icon {
-  color: var(--dark-disabled-button-color);
+  color: var(--button-disabled-color);
 }
 
 .button:not([disabled]):hover {

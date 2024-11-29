@@ -1,12 +1,12 @@
 .collection-tile {
-  background-color: var(--dark-card-bg-color);
+  background-color: var(--selectable-bg-color);
   border-radius: 4px;
   transition: var(--selectable-item-transition);
   height: 100%;
 }
 
 .collection-tile:hover {
-  background-color: var(--selected-bg-color);
+  background-color: var(--selectable-hovered-bg-color);
 }
 
 .collection-tile-body {
@@ -17,11 +17,11 @@
 }
 
 .collection-tile-link {
-  color: var(--light-text-color);
+  color: var(--text-light-color);
 }
 
 .collection-tile:hover .collection-tile-link {
-  color: var(--light-text-color);
+  color: var(--text-light-color);
 }
 
 .collection-tile-cover {
@@ -62,8 +62,8 @@
 
 .collection-tile-action-button {
   border: none;
-  color: var(--light-button-color);
-  background-color: var(--light-toggle-active-color);
+  color: var(--text-light-color);
+  background-color: var(--button-primary-bg-color);
   font-size: 14px;
   padding: 10px 15px;
   border-radius: 50%;
@@ -71,7 +71,7 @@
 }
 
 .collection-tile-action-button:hover {
-  background-color: var(--light-toggle-color);
+  background-color: var(--button-primary-hovered-bg-color);
 }
 
 .collection-tile-title {
@@ -83,7 +83,7 @@
 
 .collection-tile-subtitle {
   font-size: smaller;
-  color: var(--dark-text-color);
+  color: var(--text-dark-color);
   white-space: nowrap;
   overflow: hidden;
 }

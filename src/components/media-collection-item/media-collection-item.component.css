@@ -9,7 +9,7 @@
 }
 
 .collection-item:hover {
-  background-color: var(--selected-bg-color);
+  background-color: var(--selectable-hovered-bg-color);
 }
 
 .collection-item-main-column {
@@ -25,7 +25,7 @@
 .collection-item-action-button {
   background: none;
   border: none;
-  color: var(--dark-button-color);
+  color: var(--selectable-color);
   font-size: 14px;
 }
 
@@ -45,10 +45,10 @@
 
 .collection-item-info-title {
   font-size: 15px;
-  color: var(--light-text-color);
+  color: var(--text-light-color);
 }
 
 .collection-item-info-subtitle {
   font-size: 13px;
-  color: var(--dark-text-color);
+  color: var(--text-dark-color);
 }

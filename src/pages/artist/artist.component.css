@@ -18,7 +18,7 @@
   font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #e0e0e0;
+  color: var(--text-light-color);
 }
 
 .artist-header-name {
@@ -32,5 +32,5 @@
 }
 
 .artist-header-info {
-  color: var(--dark-text-color);
+  color: var(--text-dark-color);
 }

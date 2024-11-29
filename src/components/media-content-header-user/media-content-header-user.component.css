@@ -4,8 +4,8 @@
 }
 
 .media-content-user {
-  background-color: var(--dark-bg-color);
-  color: var(--light-text-color);
+  background-color: var(--stage-bg-color);
+  color: var(--text-light-color);
   display: flex;
   align-self: center;
   padding: 8px 12px;

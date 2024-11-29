@@ -3,7 +3,7 @@
 }
 
 .player-queue-section-header {
-  color: var(--dark-text-color);
+  color: var(--text-dark-color);
   font-size: 15px;
   padding: 10px 0;
   font-weight: bold;
