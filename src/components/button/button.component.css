@@ -1,11 +1,24 @@
 .button {
-  color: var(--selectable-color);
+  color: var(--text-dark-color);
   display: inline-block;
   transition: var(--selectable-item-transition);
 }
 
+.button:not([disabled]):hover {
+  color: var(--text-light-color);
+}
+
+.button.primary {
+  color: var(--text-light-color);
+  background-color: var(--button-primary-bg-color);
+}
+
+.button.primary:not([disabled]):hover {
+  background-color: var(--button-primary-hovered-bg-color);
+}
+
 .button[disabled] {
-  color: var(--button-disabled-color) !important;
+  color: var(--text-disabled-color) !important;
   outline: none;
 }
 
@@ -18,9 +31,5 @@
 }
 
 .button[disabled] > .button-icon {
-  color: var(--button-disabled-color);
-}
-
-.button:not([disabled]):hover {
-  color: var(--light-text-color);
+  color: var(--text-disabled-color);
 }

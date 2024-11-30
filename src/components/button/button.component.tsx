@@ -13,12 +13,12 @@ const cx = classNames.bind(styles);
 require('../../vendor/js/outline');
 
 export type ButtonProps = {
-  children?: any,
-  disabled?: boolean,
-  icon?: string,
-  iconClassName?: string,
-  onButtonSubmit?(event: Event): void,
-  onButtonMove?(event: KeyboardEvent): void,
+  children?: any;
+  disabled?: boolean;
+  icon?: string;
+  iconClassName?: string;
+  onButtonSubmit?(event: Event): void;
+  onButtonMove?(event: KeyboardEvent): void;
 };
 
 export function Button(props: ButtonProps & DetailsHTMLAttributes<HTMLDivElement>) {

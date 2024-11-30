@@ -19,7 +19,6 @@
   /*button*/
   --button-primary-bg-color: #009233;
   --button-primary-hovered-bg-color: #1db954;
-  --button-disabled-color: #383838;
   /*selectable*/
   --selectable-color: #b3b3b3;
   --selectable-bg-color: #181818;
@@ -139,4 +138,35 @@ body {
 .contexify_separator {
   background-color: var(--selectable-focused-bg-color);
   margin: 5px 0;
+}
+
+/*modal*/
+
+.modal-content {
+  background-color: var(--stage-overlay-bg-color);
+  color: var(--text-dark-color);
+  border: var(--stage-overlay-outline-color);
+}
+
+.modal-header {
+  border: none;
+}
+
+.modal-title {
+  font-weight: bold;
+  color: var(--text-light-color);
+}
+
+.modal-footer {
+  border: none;
+}
+
+.modal-footer [role="button"] {
+  padding: 15px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.modal-footer [role="button"]:not([disabled]):hover {
+  transform: scale(1.05);
 }

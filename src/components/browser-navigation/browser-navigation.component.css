@@ -20,7 +20,7 @@
 }
 
 .browser-navigation-button.disabled {
-  color: var(--button-disabled-color);
+  color: var(--text-disabled-color);
 }
 
 .browser-navigation-button:not(.disabled):hover {
