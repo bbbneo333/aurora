@@ -44,6 +44,10 @@ class MediaPlaylistDatastore {
       filter: mediaPlaylistFilterData,
     });
   }
+
+  deleteMediaPlaylist(mediaPlaylistFilterData?: DataStoreFilterData<IMediaPlaylistData>): Promise<void> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemoveOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
+  }
 }
 
 export default new MediaPlaylistDatastore();

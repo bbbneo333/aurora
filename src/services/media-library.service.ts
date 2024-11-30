@@ -267,15 +267,34 @@ class MediaLibraryService {
     }));
 
     const mediaPlaylistData = await MediaPlaylistDatastore.insertMediaPlaylist(inputData);
+    const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
-    return this.buildMediaPlaylist(mediaPlaylistData);
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      data: {
+        mediaPlaylist,
+      },
+    });
+
+    return mediaPlaylist;
   }
 
-  async addMediaTracksToPlaylist(mediaPlaylistId: string, mediaPlaylistTracks: IMediaPlaylistTrackInputData[]): Promise<void> {
-    await MediaPlaylistDatastore.insertMediaTracksIntoPlaylist(mediaPlaylistId, mediaPlaylistTracks.map(trackInputData => ({
+  async addMediaTracksToPlaylist(mediaPlaylistId: string, mediaPlaylistTracks: IMediaPlaylistTrackInputData[]): Promise<IMediaPlaylist> {
+    const mediaPlaylistData = await MediaPlaylistDatastore.insertMediaTracksIntoPlaylist(mediaPlaylistId, mediaPlaylistTracks.map(trackInputData => ({
       id: trackInputData.id,
       added_at: Date.now(),
     })));
+
+    const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
+
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      data: {
+        mediaPlaylist,
+      },
+    });
+
+    return mediaPlaylist;
   }
 
   // load API
@@ -345,6 +364,21 @@ class MediaLibraryService {
           },
         });
       });
+  }
+
+  // delete API
+
+  async deleteMediaPlaylist(mediaPlaylistId: string): Promise<void> {
+    await MediaPlaylistDatastore.deleteMediaPlaylist({
+      id: mediaPlaylistId,
+    });
+
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.RemovePlaylist,
+      data: {
+        mediaPlaylistId,
+      },
+    });
   }
 
   private async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {

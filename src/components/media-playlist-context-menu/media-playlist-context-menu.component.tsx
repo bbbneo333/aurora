@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 import { useHistory } from 'react-router-dom';
 
 import { Icons, Routes } from '../../constants';
-import { useContextMenu } from '../../contexts';
+import { useContextMenu, useModal } from '../../contexts';
 import { IMediaCollectionItem, IMediaTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
@@ -13,6 +13,7 @@ import { StringUtils, useSearch } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
 import { TextInput } from '../text-input/text-input.component';
+import { MediaPlaylistDeleteModal } from '../media-playlist-delete-modal/media-playlist-delete-modal.component';
 
 export enum MediaPlaylistContextMenuItemAction {
   SearchPlaylist = 'media/playlist/searchPlaylist',
@@ -43,6 +44,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
   const [searchInputFocus, setSearchInputFocus] = useState(false);
   const { menuProps } = useContextMenu<MediaPlaylistContextMenuItemProps>();
   const mediaPlaylistsToShow = useSearch(mediaPlaylists, mediaPlaylistsSearchStr);
+  const { showModal } = useModal();
 
   useEffect(() => {
     MediaLibraryService.loadMediaPlaylists();
@@ -96,7 +98,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
         if (!mediaItem) {
           throw new Error('MediaPlaylistContextMenu encountered error at DeletePlaylist - mediaItem is required');
         }
-        // TODO: Add support for deleting playlist
+        showModal(<MediaPlaylistDeleteModal mediaPlaylistId={mediaItem.id}/>);
         break;
       default:
       // unsupported action, do nothing

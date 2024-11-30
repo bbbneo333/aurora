@@ -211,6 +211,37 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaPlaylists,
       };
     }
+    case MediaEnums.MediaLibraryActions.RemovePlaylist: {
+      // data.mediaPlaylistId: string - playlist id which need to be removed
+      const {
+        mediaPlaylistId,
+      } = action.data;
+
+      const { mediaPlaylists } = state;
+      const mediaPlaylistsUpdated = mediaPlaylists.filter(playlist => playlist.id !== mediaPlaylistId);
+
+      return {
+        ...state,
+        mediaPlaylists: mediaPlaylistsUpdated,
+      };
+    }
+    case MediaEnums.MediaLibraryActions.AddPlaylist: {
+      // data.mediaPlaylist: IMediaPlaylist - playlist need to be added
+      const { mediaPlaylist } = action.data;
+      const { mediaPlaylists } = state;
+
+      const mediaPlaylistIdx = mediaPlaylists.findIndex(exMediaPlaylist => mediaPlaylist.id === exMediaPlaylist.id);
+      if (mediaPlaylistIdx === -1) {
+        ArrayUtils.updateSortedArray<IMediaPlaylist>(mediaPlaylists, mediaPlaylist, MediaUtils.mediaPlaylistComparator);
+      } else {
+        mediaPlaylists[mediaPlaylistIdx] = mediaPlaylist;
+      }
+
+      return {
+        ...state,
+        mediaPlaylists,
+      };
+    }
     default:
       return state;
   }
