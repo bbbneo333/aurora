@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -6,6 +6,8 @@ import { isEmpty } from 'lodash';
 
 import { I18nService, MediaLibraryService } from '../../services';
 import { Layout } from '../../constants';
+import { RootState } from '../../reducers';
+import { IMediaPlaylistTrack } from '../../interfaces';
 
 import {
   MediaCoverPicture,
@@ -15,7 +17,6 @@ import {
 } from '../../components';
 
 import styles from './playlist.component.css';
-import { RootState } from '../../reducers';
 
 const cx = classNames.bind(styles);
 
@@ -25,15 +26,23 @@ enum MediaContextMenus {
 
 export function PlaylistPage() {
   const { playlistId } = useParams() as { playlistId: string };
-
-  const {
-    mediaSelectedPlaylist,
-  } = useSelector((state: RootState) => state.mediaLibrary);
+  const { mediaSelectedPlaylist } = useSelector((state: RootState) => state.mediaLibrary);
+  const [mediaPlaylistTracks, setMediaPlaylistTracks] = useState<IMediaPlaylistTrack[]>([]);
 
   useEffect(() => {
     MediaLibraryService.loadMediaPlaylist(playlistId);
   }, [
     playlistId,
+  ]);
+
+  useEffect(() => {
+    MediaLibraryService.getMediaPlaylistTracks(playlistId)
+      .then((tracks) => {
+        setMediaPlaylistTracks(tracks);
+      });
+  }, [
+    playlistId,
+    mediaSelectedPlaylist?.tracks,
   ]);
 
   if (!mediaSelectedPlaylist) {
@@ -62,7 +71,7 @@ export function PlaylistPage() {
         </div>
       </div>
       <div className={cx('playlist-actions')}/>
-      {isEmpty(mediaSelectedPlaylist.tracks) && (
+      {isEmpty(mediaPlaylistTracks) && (
         <div className="row">
           <div className="col-12">
             <div className={cx('playlist-empty-section')}>
@@ -73,10 +82,10 @@ export function PlaylistPage() {
           </div>
         </div>
       )}
-      {!isEmpty(mediaSelectedPlaylist.tracks) && (
+      {!isEmpty(mediaPlaylistTracks) && (
         <div className={cx('playlist-tracklist')}>
           <MediaTrackListComponent
-            mediaTracks={mediaSelectedPlaylist.tracks}
+            mediaTracks={mediaPlaylistTracks}
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
             }}

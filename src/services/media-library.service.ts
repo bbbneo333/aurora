@@ -594,9 +594,7 @@ class MediaLibraryService {
   }
 
   private async buildMediaPlaylist(mediaPlaylistData: IMediaPlaylistData) {
-    return assign(mediaPlaylistData, {
-      tracks: await this.buildMediaPlaylistTracks(mediaPlaylistData.tracks),
-    });
+    return assign(mediaPlaylistData, {});
   }
 
   private async buildMediaPlaylistTracks(mediaPlaylistTrackDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistTrack[]> {

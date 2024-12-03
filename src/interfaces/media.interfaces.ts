@@ -157,7 +157,6 @@ export interface IMediaPlaylistTrackData {
 }
 
 export interface IMediaPlaylist extends IMediaPlaylistData {
-  tracks: IMediaPlaylistTrack[];
 }
 
 export interface IMediaPlaylistTrack extends IMediaPlaylistTrackData, IMediaTrack {
