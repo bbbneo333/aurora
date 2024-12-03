@@ -115,6 +115,7 @@ export function MediaTrackComponent(props: {
   } = props;
 
   const { showMenu } = useContextMenu();
+  const { mediaTrackList } = useMediaTrackList();
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaTrackContextMenuId) {
@@ -123,6 +124,7 @@ export function MediaTrackComponent(props: {
         event: e,
         props: {
           mediaTrack,
+          mediaTrackList,
           // important - this component is also used for media queue tracks, in order to support actions for the same
           // we are supplying value for mediaQueueTrack as well
           mediaQueueTrack: mediaTrack,
@@ -132,6 +134,7 @@ export function MediaTrackComponent(props: {
   }, [
     showMenu,
     mediaTrack,
+    mediaTrackList,
     mediaTrackContextMenuId,
   ]);
 

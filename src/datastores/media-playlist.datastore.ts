@@ -35,6 +35,20 @@ class MediaPlaylistDatastore {
     });
   }
 
+  removeMediaTracksFromPlaylist(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylistData> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
+      id: mediaPlaylistId,
+    }, {
+      $pull: {
+        tracks: {
+          id: {
+            $in: mediaTrackIds,
+          },
+        },
+      },
+    });
+  }
+
   findMediaPlaylist(mediaPlaylistFilterData: DataStoreFilterData<IMediaPlaylistData>): Promise<IMediaPlaylistData | undefined> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
   }

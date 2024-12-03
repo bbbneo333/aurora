@@ -5,6 +5,7 @@ import { ArtistsPage } from '../artists/artists.component';
 import { AlbumPage } from '../album/album.component';
 import { AlbumsPage } from '../albums/albums.component';
 import { PlaylistsPage } from '../playlists/playlists.component';
+import { PlaylistPage } from '../playlist/playlist.component';
 
 export default [
   {
@@ -25,12 +26,11 @@ export default [
     tHeaderName: 'link_library_playlists',
     exact: true,
   },
-  // TODO: Add this back
-  // {
-  //   path: Routes.LibraryPlaylist,
-  //   component: PlaylistPage,
-  //   exact: true,
-  // },
+  {
+    path: Routes.LibraryPlaylist,
+    component: PlaylistPage,
+    exact: true,
+  },
   {
     path: Routes.LibraryAlbum,
     component: AlbumPage,

@@ -20,10 +20,12 @@
   "label_new_playlist_default_name": "Playlist #{playlistCount}",
   "label_submenu_media_track_add_to_queue": "Add to queue",
   "label_submenu_media_track_remove_from_queue": "Remove from queue",
+  "label_submenu_media_track_remove_from_playlist": "Remove from playlist",
   "label_submenu_media_track_add_to_liked_songs": "Save to your Liked Songs",
   "label_submenu_media_track_add_to_playlist": "Add to playlist",
   "label_submenu_media_collection_add_to_queue": "Add to queue",
   "label_submenu_media_collection_add_to_playlist": "Add to playlist",
   "label_playlists_empty": "No Playlists Found",
+  "label_playlist_empty": "Playlist has no tracks",
   "placeholder_playlist_context_menu_search_input": "Find a playlist"
 }

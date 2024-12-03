@@ -17,6 +17,7 @@ export type MediaLibraryState = {
   mediaSelectedArtistAlbums?: IMediaAlbum[],
   mediaIsSyncing: boolean,
   mediaPlaylists: IMediaPlaylist[],
+  mediaSelectedPlaylist?: IMediaPlaylist,
 };
 
 export type MediaLibraryStateAction = {
@@ -229,6 +230,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       // data.mediaPlaylist: IMediaPlaylist - playlist need to be added
       const { mediaPlaylist } = action.data;
       const { mediaPlaylists } = state;
+      let { mediaSelectedPlaylist } = state;
 
       const mediaPlaylistIdx = mediaPlaylists.findIndex(exMediaPlaylist => mediaPlaylist.id === exMediaPlaylist.id);
       if (mediaPlaylistIdx === -1) {
@@ -237,9 +239,23 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaPlaylists[mediaPlaylistIdx] = mediaPlaylist;
       }
 
+      if (mediaSelectedPlaylist?.id === mediaPlaylist.id) {
+        mediaSelectedPlaylist = mediaPlaylist;
+      }
+
       return {
         ...state,
         mediaPlaylists,
+        mediaSelectedPlaylist,
+      };
+    }
+    case MediaEnums.MediaLibraryActions.SetPlaylist: {
+      // data.mediaPlaylist: IMediaPlaylist - playlist need to be loaded
+      const { mediaPlaylist } = action.data;
+
+      return {
+        ...state,
+        mediaSelectedPlaylist: mediaPlaylist,
       };
     }
     default:
