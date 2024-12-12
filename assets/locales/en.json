@@ -10,6 +10,7 @@
   "link_player_queue": "Queue",
   "label_album_header": "Album",
   "label_artist_header": "Artist",
+  "label_playlist_header": "Playlist",
   "label_player_queue_current_track": "Now playing",
   "label_player_queue_upcoming_tracks": "Up next",
   "label_player_queue_empty": "You got nothing playing right now",

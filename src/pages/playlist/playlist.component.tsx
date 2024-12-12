@@ -53,16 +53,16 @@ export function PlaylistPage() {
     <div className="container-fluid">
       <div className={cx('playlist-header')}>
         <div className="row">
-          <div className={cx(Layout.Grid.AlbumHeaderCoverColumn, 'playlist-header-cover-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderCoverColumn, 'playlist-header-cover-column')}>
             <MediaCoverPicture
               mediaPicture={mediaSelectedPlaylist.cover_picture}
               mediaPictureAltText={mediaSelectedPlaylist.name}
               className={cx('playlist-cover-picture')}
             />
           </div>
-          <div className={cx(Layout.Grid.AlbumHeaderInfoColumn, 'playlist-header-info-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'playlist-header-info-column')}>
             <div className={cx('playlist-header-label')}>
-              {I18nService.getString('label_album_header')}
+              {I18nService.getString('label_playlist_header')}
             </div>
             <div className={cx('playlist-header-name')}>
               {mediaSelectedPlaylist.name}

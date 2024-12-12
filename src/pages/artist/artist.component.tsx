@@ -37,7 +37,7 @@ export function ArtistPage() {
     <div className="container-fluid">
       <div className={cx('artist-header')}>
         <div className="row">
-          <div className={cx(Layout.Grid.ArtistHeaderCoverColumn, 'artist-header-cover-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderCoverColumn, 'artist-header-cover-column')}>
             <MediaCoverPicture
               mediaPicture={mediaSelectedArtist.artist_feature_picture}
               mediaPictureAltText={mediaSelectedArtist.artist_name}
@@ -45,7 +45,7 @@ export function ArtistPage() {
               className={cx('artist-cover-picture')}
             />
           </div>
-          <div className={cx(Layout.Grid.ArtistHeaderInfoColumn, 'artist-header-info-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'artist-header-info-column')}>
             <div className={cx('artist-header-label')}>
               {I18nService.getString('label_artist_header')}
             </div>

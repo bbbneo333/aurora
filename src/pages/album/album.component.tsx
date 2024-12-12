@@ -47,14 +47,14 @@ export function AlbumPage() {
     <div className="container-fluid">
       <div className={cx('album-header')}>
         <div className="row">
-          <div className={cx(Layout.Grid.AlbumHeaderCoverColumn, 'album-header-cover-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderCoverColumn, 'album-header-cover-column')}>
             <MediaCoverPicture
               mediaPicture={mediaSelectedAlbum.album_cover_picture}
               mediaPictureAltText={mediaSelectedAlbum.album_name}
               className={cx('album-cover-picture')}
             />
           </div>
-          <div className={cx(Layout.Grid.AlbumHeaderInfoColumn, 'album-header-info-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'album-header-info-column')}>
             <div className={cx('album-header-label')}>
               {I18nService.getString('label_album_header')}
             </div>
