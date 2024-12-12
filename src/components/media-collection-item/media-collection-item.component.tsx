@@ -14,17 +14,21 @@ import styles from './media-collection-item.component.css';
 
 const cx = classNames.bind(styles);
 
-export function MediaCollectionItem(props: {
+export type MediaCollectionItemProps = {
   mediaItem: IMediaCollectionItem,
   routerLink: string,
   contextMenuId?: string,
   subtitle?: string,
-}) {
+  disablePlayback?: boolean,
+};
+
+export function MediaCollectionItem(props: MediaCollectionItemProps) {
   const {
     mediaItem,
     routerLink,
     subtitle,
     contextMenuId,
+    disablePlayback = false,
   } = props;
 
   const { showMenu } = useContextMenu();
@@ -70,6 +74,7 @@ export function MediaCollectionItem(props: {
                     : (
                       <Button
                         className={cx('collection-item-action-button')}
+                        disabled={disablePlayback}
                         onButtonSubmit={handleOnPlayButtonClick}
                       >
                         <Icon name={Icons.MediaPlay}/>

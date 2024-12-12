@@ -79,6 +79,7 @@ export function PlaylistsPage() {
               subtitle={I18nService.getString('label_playlist_subtitle', {
                 trackCount: mediaPlaylist.tracks.length.toString(),
               })}
+              disablePlayback={isEmpty(mediaPlaylist.tracks)}
             />
           );
         })}
