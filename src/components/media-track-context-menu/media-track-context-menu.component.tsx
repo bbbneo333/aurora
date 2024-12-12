@@ -65,7 +65,7 @@ export function MediaTrackContextMenu(props: {
         if (!mediaTrackList) {
           throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No media playlist was provided');
         }
-        await MediaLibraryService.removeMediaTracksFromPlaylist(mediaTrackList.id, [mediaTrack.id]);
+        await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [mediaTrack.id]);
         break;
       default:
       // unsupported action, do nothing

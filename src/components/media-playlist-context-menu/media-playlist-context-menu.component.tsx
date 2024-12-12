@@ -14,6 +14,7 @@ import { StringUtils, useSearch } from '../../utils';
 import { Icon } from '../icon/icon.component';
 import { TextInput } from '../text-input/text-input.component';
 import { MediaPlaylistDeleteModal } from '../media-playlist-delete-modal/media-playlist-delete-modal.component';
+import { MediaPlaylistEditModal } from '../media-playlist-edit-modal/media-playlist-edit-modal.component';
 
 export enum MediaPlaylistContextMenuItemAction {
   SearchPlaylist = 'media/playlist/searchPlaylist',
@@ -85,14 +86,14 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
         }
 
         getMediaTracks().then(async (mediaTracks) => {
-          await MediaLibraryService.addMediaTracksToPlaylist(mediaPlaylistId, mediaTracks);
+          await MediaLibraryService.createMediaPlaylistTracks(mediaPlaylistId, mediaTracks);
         });
         break;
       case MediaPlaylistContextMenuItemAction.EditPlaylist:
         if (!mediaItem) {
           throw new Error('MediaPlaylistContextMenu encountered error at EditPlaylist - mediaItem is required');
         }
-        // TODO: Add support for editing playlist
+        showModal(<MediaPlaylistEditModal mediaPlaylistId={mediaItem.id}/>);
         break;
       case MediaPlaylistContextMenuItemAction.DeletePlaylist:
         if (!mediaItem) {

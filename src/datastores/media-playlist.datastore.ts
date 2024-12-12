@@ -1,7 +1,7 @@
 import AppService from '../services/app.service';
 import { AppEnums } from '../enums';
-import { DataStoreFilterData, DataStoreInputData } from '../types';
-import { IMediaPlaylistData, IMediaPlaylistTrackData } from '../interfaces';
+import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
+import { IMediaPlaylistData, IMediaPlaylistInputData, IMediaPlaylistTrackData } from '../interfaces';
 
 class MediaPlaylistDatastore {
   private readonly mediaPlaylistsDatastoreName = 'media_playlists';
@@ -23,7 +23,7 @@ class MediaPlaylistDatastore {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaPlaylistsDatastoreName, mediaPlaylistInputData);
   }
 
-  insertMediaTracksIntoPlaylist(mediaPlaylistId: string, mediaTrackInputDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistData> {
+  createMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackInputDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
@@ -35,7 +35,7 @@ class MediaPlaylistDatastore {
     });
   }
 
-  removeMediaTracksFromPlaylist(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylistData> {
+  deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylistData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
@@ -61,6 +61,14 @@ class MediaPlaylistDatastore {
 
   deleteMediaPlaylist(mediaPlaylistFilterData?: DataStoreFilterData<IMediaPlaylistData>): Promise<void> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemoveOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
+  }
+
+  updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: DataStoreUpdateData<IMediaPlaylistInputData>) {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
+      id: mediaPlaylistId,
+    }, {
+      $set: mediaPlaylistUpdateData,
+    });
   }
 }
 

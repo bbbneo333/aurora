@@ -12,6 +12,7 @@ export * from './media-header-navigation-link/media-header-navigation-link.compo
 export * from './media-player-ribbon/media-player-ribbon.component';
 export * from './media-playlist-context-menu/media-playlist-context-menu.component';
 export * from './media-playlist-delete-modal/media-playlist-delete-modal.component';
+export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-progress-bar/media-progress-bar.component';
 export * from './media-session/media-session.component';
 export * from './media-track/media-track.component';

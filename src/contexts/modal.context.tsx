@@ -40,7 +40,6 @@ export const ModalProvider = (props: {
         show={isOpen}
         onHide={hideModal}
         backdrop="static"
-        keyboard={false}
         centered
       >
         {modalContent}

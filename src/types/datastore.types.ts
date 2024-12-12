@@ -34,4 +34,4 @@ export type DataStoreQueryData<T> = {
 
 export type DataStoreInputData<T = any> = Omit<T, 'id'>;
 
-export type DataStoreUpdateData<T = any> = Partial<Omit<T, 'id'>>;
+export type DataStoreUpdateData<T = any> = Partial<Omit<T, 'id' | 'created_at'>>;

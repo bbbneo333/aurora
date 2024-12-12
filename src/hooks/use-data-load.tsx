@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type DataLoadFn<T> = () => Promise<T>;
 
@@ -6,12 +6,18 @@ export type DataLoad<T> = {
   data?: T;
   error?: Error;
   loading: boolean;
+  refresh: () => void;
 };
 
 export function useDataLoad<T = any>(loader: DataLoadFn<T>): DataLoad<T> {
   const [data, setData] = useState<T>();
   const [error, setError] = useState<Error>();
   const [loading, setLoading] = useState(false);
+  const [counter, setCounter] = useState(0);
+
+  const refresh = useCallback(() => {
+    setCounter(ctr => ctr + 1);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -26,11 +32,14 @@ export function useDataLoad<T = any>(loader: DataLoadFn<T>): DataLoad<T> {
         setError(loadError);
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [
+    counter,
+  ]);
 
   return {
     data,
     error,
     loading,
+    refresh,
   };
 }

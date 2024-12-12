@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 
-export type DataActionFn<T> = () => Promise<T>;
+export type DataActionFn<T> = (...args: any[]) => Promise<T>;
 
 export type DataAction<T> = {
   data?: T;
   error?: Error;
   loading: boolean;
-  perform: () => void;
+  perform: (...args: any[]) => void;
 };
 
 export function useDataAction<T = any>(action: DataActionFn<T>): DataAction<T> {
@@ -14,12 +14,12 @@ export function useDataAction<T = any>(action: DataActionFn<T>): DataAction<T> {
   const [error, setError] = useState<Error>();
   const [loading, setLoading] = useState(false);
 
-  const perform = useCallback(() => {
+  const perform = useCallback((...args: any[]) => {
     setLoading(true);
     setData(undefined);
     setError(undefined);
 
-    Promise.resolve(action())
+    Promise.resolve(action(...args))
       .then((actionData) => {
         setData(actionData);
       })

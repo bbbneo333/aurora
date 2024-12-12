@@ -279,8 +279,8 @@ class MediaLibraryService {
     return mediaPlaylist;
   }
 
-  async addMediaTracksToPlaylist(mediaPlaylistId: string, mediaPlaylistTracks: IMediaPlaylistTrackInputData[]): Promise<IMediaPlaylist> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.insertMediaTracksIntoPlaylist(mediaPlaylistId, mediaPlaylistTracks.map(trackInputData => ({
+  async createMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTracks: IMediaPlaylistTrackInputData[]): Promise<IMediaPlaylist> {
+    const mediaPlaylistData = await MediaPlaylistDatastore.createMediaPlaylistTracks(mediaPlaylistId, mediaPlaylistTracks.map(trackInputData => ({
       id: trackInputData.id,
       added_at: Date.now(),
     })));
@@ -379,6 +379,22 @@ class MediaLibraryService {
       });
   }
 
+  // update API
+
+  async updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateParams: IMediaPlaylistInputData): Promise<IMediaPlaylist> {
+    const mediaPlaylistData = await MediaPlaylistDatastore.updateMediaPlaylist(mediaPlaylistId, mediaPlaylistUpdateParams);
+    const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
+
+    store.dispatch({
+      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      data: {
+        mediaPlaylist,
+      },
+    });
+
+    return mediaPlaylist;
+  }
+
   // delete API
 
   async deleteMediaPlaylist(mediaPlaylistId: string): Promise<void> {
@@ -394,8 +410,8 @@ class MediaLibraryService {
     });
   }
 
-  async removeMediaTracksFromPlaylist(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylist> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.removeMediaTracksFromPlaylist(mediaPlaylistId, mediaTrackIds);
+  async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylist> {
+    const mediaPlaylistData = await MediaPlaylistDatastore.deleteMediaPlaylistTracks(mediaPlaylistId, mediaTrackIds);
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({

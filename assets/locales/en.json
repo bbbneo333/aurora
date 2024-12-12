@@ -27,5 +27,6 @@
   "label_submenu_media_collection_add_to_playlist": "Add to playlist",
   "label_playlists_empty": "No playlists Found",
   "label_playlist_empty": "Playlist has no tracks",
+  "label_playlist_name": "Name",
   "placeholder_playlist_context_menu_search_input": "Find a playlist"
 }
