@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { Form, Modal } from 'react-bootstrap';
 
 import { useModal } from '../../contexts';
-import { useDataAction, useDataLoad } from '../../hooks';
 import { IMediaPlaylistInputData } from '../../interfaces';
 import { I18nService, MediaLibraryService } from '../../services';
 
@@ -13,14 +14,34 @@ export function MediaPlaylistEditModal(props: {
 }) {
   const { mediaPlaylistId } = props;
   const { hideModal } = useModal();
-  const [inputData, setInputData] = React.useState<IMediaPlaylistInputData>({});
-  const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
-  const editPlaylist = useDataAction(async (event) => {
-    event.preventDefault();
-    await MediaLibraryService.updateMediaPlaylist(mediaPlaylistId, inputData);
-    loadedPlaylist.refresh();
-    hideModal();
+  const [validated, setValidated] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [inputData, setInputData] = useState<IMediaPlaylistInputData>({
+    name: '',
   });
+
+  const handleSubmit = useCallback(async (event) => {
+    event.preventDefault();
+    setValidated(true);
+
+    if (formRef.current?.checkValidity()) {
+      await MediaLibraryService.updateMediaPlaylist(mediaPlaylistId, inputData);
+      hideModal();
+    }
+  }, [
+    inputData,
+  ]);
+
+  useEffect(() => {
+    MediaLibraryService.getMediaPlaylist(mediaPlaylistId)
+      .then((mediaPlaylist) => {
+        setInputData({
+          ...mediaPlaylist,
+        });
+      });
+  }, [
+    mediaPlaylistId,
+  ]);
 
   return (
     <>
@@ -30,7 +51,7 @@ export function MediaPlaylistEditModal(props: {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={editPlaylist.perform}>
+        <Form ref={formRef} noValidate validated={validated} onSubmit={handleSubmit}>
           <Form.Group>
             <Form.Label>
               {I18nService.getString('label_playlist_name')}
@@ -38,26 +59,27 @@ export function MediaPlaylistEditModal(props: {
             <Form.Control
               required
               type="text"
-              placeholder={loadedPlaylist.data?.name || ''}
-              defaultValue={loadedPlaylist.data?.name || ''}
-              onChange={event => setInputData({
+              value={inputData.name}
+              onChange={event => setInputData(data => ({
+                ...data,
                 name: event.target.value,
-              })}
+              }))}
             />
+            <Form.Control.Feedback type="invalid">
+              {I18nService.getString('message_value_invalid')}
+            </Form.Control.Feedback>
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
         <Button
-          disabled={editPlaylist.loading}
           onButtonSubmit={hideModal}
         >
           {I18nService.getString('button_dialog_cancel')}
         </Button>
         <Button
           className="primary"
-          disabled={editPlaylist.loading}
-          onButtonSubmit={editPlaylist.perform}
+          onButtonSubmit={handleSubmit}
         >
           {I18nService.getString('button_dialog_confirm')}
         </Button>

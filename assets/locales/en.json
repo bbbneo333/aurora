@@ -29,5 +29,6 @@
   "label_playlists_empty": "No playlists Found",
   "label_playlist_empty": "Playlist has no tracks",
   "label_playlist_name": "Name",
+  "message_value_invalid": "Please provide a valid input",
   "placeholder_playlist_context_menu_search_input": "Find a playlist"
 }
