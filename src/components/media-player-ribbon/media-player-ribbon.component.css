@@ -3,9 +3,9 @@
   flex-flow: row;
   align-items: center;
   height: 100%;
-  color: var(--light-text-color);
-  background-color: var(--dark-music-player-bg-color);
-  border-top: 1px solid var(--dark-music-player-border-color);
+  color: var(--text-dark-color);
+  background-color: var(--stage-overlay-bg-color);
+  border-top: 1px solid var(--stage-overlay-outline-color);
   padding: 10px;
   user-select: none;
 }
@@ -39,7 +39,7 @@
 
 .media-player-controls-container {
   text-align: center;
-  color: var(--light-text-color);
+  color: var(--text-light-color);
 }
 
 .media-player-controls-column {
@@ -53,38 +53,29 @@
   text-align: center;
   padding: 5px;
   margin: 2px;
-  transition: var(--selectable-item-transition);
-}
-
-.media-player-control[disabled] {
-  color: var(--dark-disabled-button-color) !important;
-}
-
-.media-player-control:not([disabled]):hover {
-  color: var(--light-text-color);
 }
 
 .media-player-control.media-player-control-sm {
   font-size: 15px;
-  color: var(--dark-button-color);
+  color: var(--selectable-color);
 }
 
 .media-player-control.media-player-control-md {
   font-size: 18px;
-  color: var(--dark-button-color);
+  color: var(--selectable-color);
 }
 
 .media-player-control.media-player-control-lg {
   font-size: 30px;
-  color: var(--light-button-color);
+  color: var(--selectable-color);
 }
 
 .media-player-toggle.active {
-  color: var(--light-toggle-active-color);
+  color: var(--button-primary-bg-color);
 }
 
 .media-player-toggle.active:hover {
-  color: var(--light-toggle-color);
+  color: var(--button-primary-hovered-bg-color);
 }
 
 .media-player-repeat-toggle {
@@ -124,7 +115,7 @@
 }
 
 .media-player-progress-counter {
-  color: var(--dark-text-color);
+  color: var(--text-dark-color);
   width: 20%;
   font-size: 10px;
   white-space: nowrap;

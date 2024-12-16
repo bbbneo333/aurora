@@ -1,0 +1,199 @@
+/*
+ * note - prepend a `~` to css file paths that are in your node_modules
+ * @see - https://github.com/webpack-contrib/sass-loader#imports
+ */
+@import '~@fortawesome/fontawesome-free/css/all.css';
+@import '~bootstrap/dist/css/bootstrap.css';
+@import '~react-contexify/dist/ReactContexify.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+
+* {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+:root {
+  /*context menu*/
+  --context-menu-color: #b3b3b3;
+  --context-menu-bg-color: #282828;
+  /*button*/
+  --button-primary-bg-color: #009233;
+  --button-primary-hovered-bg-color: #1db954;
+  /*selectable*/
+  --selectable-color: #b3b3b3;
+  --selectable-bg-color: #181818;
+  --selectable-active-color: #e9ecef;
+  --selectable-active-bg-color: #282828;
+  --selectable-outline-color: #282828;
+  --selectable-hovered-color: #e9ecef;
+  --selectable-hovered-bg-color: #282828;
+  --selectable-focused-bg-color: #3c3c3c;
+  --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, opacity 200ms ease, transform 100ms ease;
+  /*stage*/
+  --stage-bg-color: #121212;
+  --stage-content-bg-color: #1d1d1d;
+  --stage-overlay-bg-color: #181818;
+  --stage-overlay-outline-color: #282828;
+  --stage-scroll-bg-color: #6d6d6d;
+  /*text*/
+  --text-dark-color: #b3b3b3;
+  --text-light-color: #e9ecef;
+  --text-disabled-color: #383838;
+  /*progress*/
+  --progress-bar-bg-color: #b3b3b39e;
+  /*misc*/
+  --titlebar-overlay-height: 60px;
+  --scrollable-scrollbar-width: 15px;
+  --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;
+  /*input*/
+  --input-color: var(--text-light-color);
+  --input-bg-color: #3c3c3c;
+  --input-outline-color: #3c3c3c;
+  --input-focused-bg-color: #282828;
+  --input-focused-outline-color: #6d6d6d;
+  --input-transition: background-color 200ms ease;
+  /*--button-color: #b3b3b3;*/
+  /*--dark-music-player-bg-color: #181818;*/
+  /*--dark-music-player-border-color: #282828;*/
+  /*--selected-bg-color: #282828;*/
+  /*--selected-text-color: #fff;*/
+  /*--dark-button-color: #b3b3b3;*/
+  /*--light-bg-color: #1d1d1d;*/
+}
+
+body {
+  user-select: none;
+}
+
+/*overlay using as a title bar*/
+
+#title-bar-overlay {
+  width: 100%;
+  top: 0;
+  height: var(--titlebar-overlay-height);
+  left: 0;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+/*scrollable*/
+
+.app-scrollable {
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.app-scrollable::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.app-scrollable::-webkit-scrollbar {
+  width: var(--scrollable-scrollbar-width);
+  background-color: transparent;
+}
+
+.app-scrollable::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: var(--stage-scroll-bg-color);
+  /* Transparent border together with `background-clip: padding-box` does the trick */
+  /* See - https://gist.github.com/flekschas/a817fd1a67aaca511964 */
+  border: 4px solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+}
+
+/*navigation link*/
+
+.app-nav-link {
+  text-decoration: none;
+}
+
+/*context menu*/
+
+.contexify {
+  background-color: var(--context-menu-bg-color);
+  color: var(--context-menu-color);
+  border-radius: 4px;
+  padding: 4px;
+  font-size: 14px;
+  box-shadow: 0 16px 24px rgb(0 0 0 / 30%), 0 6px 8px rgb(0 0 0 / 20%);
+}
+
+.contexify_item {
+  color: inherit;
+}
+
+.contexify_itemContent {
+  color: inherit;
+  transition: var(--selectable-item-transition);
+  border-radius: 2px;
+}
+
+.contexify_itemContent > .icon {
+  margin-right: 5px;
+}
+
+.contexify_item:not(.contexify_item_inline) > .contexify_itemContent {
+  padding: 8px 16px;
+}
+
+.contexify_item:not(.contexify_item-disabled):hover > .contexify_itemContent,
+.contexify_item:not(.contexify_item-disabled):focus > .contexify_itemContent {
+  color: var(--selectable-hovered-color);
+  background-color: var(--selectable-focused-bg-color);
+}
+
+.contexify_separator {
+  background-color: var(--selectable-focused-bg-color);
+  margin: 5px 0;
+}
+
+/*modal*/
+
+.modal-content {
+  background-color: var(--stage-overlay-bg-color);
+  color: var(--text-dark-color);
+  border: var(--stage-overlay-outline-color);
+}
+
+.modal-header {
+  border: none;
+}
+
+.modal-title {
+  font-weight: bold;
+  color: var(--text-light-color);
+}
+
+.modal-footer {
+  border: none;
+}
+
+.modal-footer [role="button"] {
+  padding: 15px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.modal-footer [role="button"]:not([disabled]):hover {
+  transform: scale(1.05);
+}
+
+/*form control*/
+
+.form-control {
+  color: var(--input-color);
+  background-color: var(--input-bg-color);
+  outline: none;
+  box-shadow: none;
+  transition: var(--input-transition);
+  border: 1px solid var(--input-outline-color);
+  border-radius: 5px;
+}
+
+.form-control:focus {
+  color: var(--input-color);
+  background-color: var(--input-focused-bg-color);
+  border: 1px solid var(--input-focused-outline-color);
+  outline: none;
+  box-shadow: none;
+}

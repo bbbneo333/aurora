@@ -7,11 +7,12 @@
   cursor: pointer;
 
   .media-progress-bar {
-    background-color: var(--light-button-color);
+    background-color: var(--selectable-hovered-color);
   }
 
   .media-progress-handler {
     opacity: 1;
+    background-color: var(--selectable-hovered-color);
   }
 }
 
@@ -34,9 +35,7 @@
 
 .media-progress-container.disabled {
   .media-progress-bar-container {
-    // TODO: Find a way to apply alpha channel to CSS variable
-    //  Right now it's a hard coded value using dark-button-color
-    background-color: #b3b3b39e;
+    background-color: var(--progress-bar-bg-color);
   }
 }
 
@@ -44,9 +43,7 @@
   display: flex;
   height: 4px;
   overflow: hidden;
-  // TODO: Find a way to apply alpha channel to CSS variable
-  //  Right now it's a hard coded value using dark-button-color
-  background-color: #b3b3b345;
+  background-color: var(--progress-bar-bg-color);
   border-radius: 0.25rem;
   transition: background-color .5s ease;
 }
@@ -58,7 +55,7 @@
   overflow: hidden;
   text-align: center;
   white-space: nowrap;
-  background-color: var(--dark-button-color);
+  background-color: var(--selectable-color);
   transition: width .1s ease, background-color .1s ease;
 }
 
@@ -68,7 +65,7 @@
   width: 12px;
   top: -4px;
   left: 0;
-  background-color: var(--light-button-color);
+  background-color: var(--selectable-color);
   border-radius: 50%;
   margin-left: -6px;
   opacity: 0;

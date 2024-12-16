@@ -1,27 +1,27 @@
-.library-album-header {
+.playlist-header {
   margin-bottom: 20px;
 }
 
-.library-album-cover-picture {
+.playlist-cover-picture {
   /* size for placeholder icon */
   font-size: 50px;
 }
 
-.library-album-header-info-column {
+.playlist-header-info-column {
   display: flex;
   flex-direction: column;
   align-self: flex-end;
   justify-items: flex-start;
 }
 
-.library-album-header-label {
+.playlist-header-label {
   font-size: 12px;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: #e0e0e0;
+  color: var(--text-light-color);
 }
 
-.library-album-header-name {
+.playlist-header-name {
   font-size: 36px;
   font-weight: bold;
   overflow: hidden;
@@ -31,6 +31,19 @@
   -webkit-box-orient: horizontal;
 }
 
-.library-album-header-info {
-  color: var(--dark-text-color);
+.playlist-header-info {
+  color: var(--text-dark-color);
+}
+
+.playlist-empty-section {
+  width: 100%;
+  padding: 30px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.playlist-empty-label {
+  color: var(--text-dark-color);
 }

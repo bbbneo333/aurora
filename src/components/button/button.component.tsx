@@ -5,23 +5,23 @@ import classNames from 'classnames/bind';
 import { SystemEnums } from '../../enums';
 import { Icon } from '../icon/icon.component';
 
-import styles from './media-button.component.css';
+import styles from './button.component.css';
 
 const cx = classNames.bind(styles);
 
 // we are relying on outline script to remove outlines in case of mouse clicks
 require('../../vendor/js/outline');
 
-export type MediaButtonComponentProps = {
-  children?: any,
-  disabled?: boolean,
-  icon?: string,
-  iconClassName?: string,
-  onButtonSubmit?(event: Event): void,
-  onButtonMove?(event: KeyboardEvent): void,
+export type ButtonProps = {
+  children?: any;
+  disabled?: boolean;
+  icon?: string;
+  iconClassName?: string;
+  onButtonSubmit?(event: Event): void;
+  onButtonMove?(event: KeyboardEvent): void;
 };
 
-export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsHTMLAttributes<HTMLDivElement>) {
+export function Button(props: ButtonProps & DetailsHTMLAttributes<HTMLDivElement>) {
   const {
     children,
     className,
@@ -43,7 +43,7 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
   const mediaButtonContainerRef = useRef(null);
 
   // merge our own classnames with the provided ones
-  const mediaButtonClassName = cx('media-button', className);
+  const mediaButtonClassName = cx('button', className);
 
   useEffect(() => {
     // for adding listeners to button
@@ -109,7 +109,7 @@ export function MediaButtonComponent(props: MediaButtonComponentProps & DetailsH
     >
       {icon && (
         <Icon
-          className={cx('media-button-icon', iconClassName)}
+          className={cx('button-icon', iconClassName)}
           name={icon}
         />
       )}

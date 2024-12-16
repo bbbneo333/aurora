@@ -8,12 +8,12 @@
 
 .media-track-info-title {
   font-size: 15px;
-  color: var(--light-text-color);
+  color: var(--text-light-color);
 }
 
 .media-track-info-subtitle {
   font-size: 13px;
-  color: var(--dark-text-color);
+  color: var(--text-dark-color);
 }
 
 .media-track-album-link,
@@ -29,7 +29,7 @@
 
 .media-track-album-link:hover,
 .media-track-artist-link:hover {
-  color: var(--light-text-color) !important;
+  color: var(--text-light-color) !important;
   text-decoration: underline;
 }
 

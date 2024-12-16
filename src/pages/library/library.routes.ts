@@ -1,31 +1,44 @@
 import { Routes } from '../../constants';
 
-import { LibraryArtistsPage } from '../library-artists/library-artists.component';
-import { LibraryAlbumsPage } from '../library-albums/library-albums.component';
-import { LibraryAlbumPage } from '../library-album/library-album.component';
-import { LibraryArtistPage } from '../library-artist/library-artist.component';
+import { ArtistPage } from '../artist/artist.component';
+import { ArtistsPage } from '../artists/artists.component';
+import { AlbumPage } from '../album/album.component';
+import { AlbumsPage } from '../albums/albums.component';
+import { PlaylistsPage } from '../playlists/playlists.component';
+import { PlaylistPage } from '../playlist/playlist.component';
 
 export default [
   {
     path: Routes.LibraryArtists,
-    component: LibraryArtistsPage,
+    component: ArtistsPage,
     tHeaderName: 'link_library_artists',
     exact: true,
   },
   {
     path: Routes.LibraryAlbums,
-    component: LibraryAlbumsPage,
+    component: AlbumsPage,
     tHeaderName: 'link_library_albums',
     exact: true,
   },
   {
+    path: Routes.LibraryPlaylists,
+    component: PlaylistsPage,
+    tHeaderName: 'link_library_playlists',
+    exact: true,
+  },
+  {
+    path: Routes.LibraryPlaylist,
+    component: PlaylistPage,
+    exact: true,
+  },
+  {
     path: Routes.LibraryAlbum,
-    component: LibraryAlbumPage,
+    component: AlbumPage,
     exact: true,
   },
   {
     path: Routes.LibraryArtist,
-    component: LibraryArtistPage,
+    component: ArtistPage,
     exact: true,
   },
   {

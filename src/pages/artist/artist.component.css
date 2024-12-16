@@ -1,0 +1,36 @@
+.artist-header {
+  margin-bottom: 20px;
+}
+
+.artist-cover-picture {
+  /* size for placeholder icon */
+  font-size: 50px;
+}
+
+.artist-header-info-column {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  justify-items: flex-start;
+}
+
+.artist-header-label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-light-color);
+}
+
+.artist-header-name {
+  font-size: 36px;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: horizontal;
+}
+
+.artist-header-info {
+  color: var(--text-dark-color);
+}

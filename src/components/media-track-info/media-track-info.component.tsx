@@ -3,8 +3,7 @@ import classNames from 'classnames/bind';
 
 import { Routes } from '../../constants';
 import { IMediaArtist, IMediaTrack } from '../../interfaces';
-import { StringUtils } from '../../utils';
-import { withSeparator } from '../../utils/render.utils';
+import { StringUtils, withSeparator } from '../../utils';
 
 import { RouterLink } from '../router-link/router-link.component';
 

@@ -24,7 +24,9 @@ class MediaTrackDatastore {
   }
 
   findMediaTracks(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>): Promise<IMediaTrackData[]> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaTrackDatastoreName, mediaTrackFilterData);
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.mediaTrackDatastoreName, {
+      filter: mediaTrackFilterData,
+    });
   }
 
   updateTrackById(mediaTrackId: string, mediaTrackUpdateData: DataStoreUpdateData<IMediaTrackData>): Promise<IMediaTrackData> {

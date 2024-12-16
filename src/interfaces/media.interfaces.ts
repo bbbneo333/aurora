@@ -5,7 +5,7 @@ import { MediaEnums } from '../enums';
 export interface IMediaTrackData {
   id: string;
   provider: string;
-  provider_id?: string;
+  provider_id: string;
   sync_timestamp: number;
   track_name: string;
   track_number: number;
@@ -19,7 +19,7 @@ export interface IMediaTrackData {
 export interface IMediaAlbumData {
   id: string;
   provider: string;
-  provider_id?: string;
+  provider_id: string;
   sync_timestamp: number;
   album_name: string;
   album_artist_id: string;
@@ -30,7 +30,7 @@ export interface IMediaAlbumData {
 export interface IMediaArtistData {
   id: string;
   provider: string;
-  provider_id?: string;
+  provider_id: string;
   sync_timestamp: number;
   artist_name: string;
   artist_feature_picture?: IMediaPicture;
@@ -138,7 +138,36 @@ export interface IMediaProvider {
 
 export interface IMediaCollectionItem {
   id: string;
-  type: 'artist' | 'album';
+  type: 'artist' | 'album' | 'playlist';
   name: string;
   picture?: IMediaPicture;
+}
+
+export interface IMediaPlaylistData {
+  id: string;
+  name: string;
+  tracks: IMediaPlaylistTrackData[];
+  cover_picture?: IMediaPicture;
+  created_at: number;
+}
+
+export interface IMediaPlaylistTrackData {
+  id: string;
+  added_at: number;
+}
+
+export interface IMediaPlaylist extends IMediaPlaylistData {
+}
+
+export interface IMediaPlaylistTrack extends IMediaPlaylistTrackData, IMediaTrack {
+}
+
+export interface IMediaPlaylistInputData {
+  name?: string;
+  tracks?: IMediaPlaylistTrackInputData[];
+  cover_picture?: IMediaPicture;
+}
+
+export interface IMediaPlaylistTrackInputData {
+  id: string;
 }

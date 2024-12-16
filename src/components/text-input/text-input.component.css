@@ -1,0 +1,38 @@
+.text-input-container {
+  width: 100%;
+  position: relative;
+}
+
+.text-input {
+  width: inherit;
+  color: var(--text-dark-color);
+  background: none;
+  border: none;
+  padding: 0 20px;
+}
+
+.text-input-overlay {
+  position: absolute;
+  left: 0;
+  display: flex;
+  height: 100%;
+  width: inherit;
+  pointer-events: none;
+  align-items: center;
+}
+
+.text-input-icon {
+  color: var(--text-dark-color);
+  opacity: .2;
+  transition: var(--selectable-item-transition);
+}
+
+.text-input-clear-button {
+  /* for aligning close icon to extreme end */
+  margin-left: auto;
+  pointer-events: auto;
+}
+
+.text-input-clear-button:hover .text-input-icon {
+  opacity: 1;
+}

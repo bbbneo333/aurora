@@ -6,29 +6,31 @@ import {
   Item,
   Submenu,
   ItemParams,
-  animation,
 } from 'react-contexify';
 
-import { IMediaQueueTrack, IMediaTrack } from '../../interfaces';
-import { I18nService, MediaPlayerService } from '../../services';
+import { useContextMenu } from '../../contexts';
+import { IMediaQueueTrack, IMediaTrack, IMediaTrackList } from '../../interfaces';
+import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+
+import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
 export enum MediaTrackContextMenuItem {
   AddToQueue,
-  AddToLikedSongs,
   AddToPlaylist,
   RemoveFromQueue,
+  RemoveFromPlaylist,
   Separator,
 }
 
 export enum MediaTrackContextMenuItemAction {
   AddToQueue = 'media/track/action/addToQueue',
-  AddToLikedSongs = 'media/track/action/addToLikedSongs',
-  AddToPlaylist = 'media/track/action/addToPlaylist',
   RemoveFromQueue = 'media/track/action/removeFromQueue',
+  RemoveFromPlaylist = 'media/track/action/removeFromPlaylist',
 }
 
 export interface MediaTrackContextMenuItemProps {
   mediaTrack?: IMediaTrack;
+  mediaTrackList?: IMediaTrackList;
   mediaQueueTrack?: IMediaQueueTrack;
 }
 
@@ -36,16 +38,12 @@ export function MediaTrackContextMenu(props: {
   id: string;
   menuItems: MediaTrackContextMenuItem[],
 }) {
-  const {
-    id,
-    menuItems,
-  } = props;
+  const { id, menuItems } = props;
+  const { menuProps } = useContextMenu<MediaTrackContextMenuItemProps>();
 
-  const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
-    const itemAction: MediaTrackContextMenuItemAction = itemParams.event.currentTarget.id as MediaTrackContextMenuItemAction;
-
-    const mediaTrack: IMediaTrack | undefined = itemParams.props?.mediaTrack;
-    const mediaQueueTrack: IMediaQueueTrack | undefined = itemParams.props?.mediaQueueTrack;
+  const handleMenuItemClick = useCallback(async (itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
+    const itemAction: MediaTrackContextMenuItemAction = itemParams.id as MediaTrackContextMenuItemAction;
+    const { mediaTrack, mediaTrackList, mediaQueueTrack } = menuProps;
 
     switch (itemAction) {
       case MediaTrackContextMenuItemAction.AddToQueue:
@@ -60,13 +58,24 @@ export function MediaTrackContextMenu(props: {
         }
         MediaPlayerService.removeMediaTrackFromQueue(mediaQueueTrack);
         break;
+      case MediaTrackContextMenuItemAction.RemoveFromPlaylist:
+        if (!mediaTrack) {
+          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No media track was provided');
+        }
+        if (!mediaTrackList) {
+          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No media playlist was provided');
+        }
+        await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [mediaTrack.id]);
+        break;
       default:
       // unsupported action, do nothing
     }
-  }, []);
+  }, [
+    menuProps,
+  ]);
 
   return (
-    <Menu id={id} animation={animation.fade}>
+    <Menu id={id}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaTrackContextMenuItem.AddToQueue:
@@ -89,26 +98,23 @@ export function MediaTrackContextMenu(props: {
                 {I18nService.getString('label_submenu_media_track_remove_from_queue')}
               </Item>
             );
-          case MediaTrackContextMenuItem.AddToLikedSongs:
+          case MediaTrackContextMenuItem.RemoveFromPlaylist:
             return (
               <Item
-                disabled
-                key={MediaTrackContextMenuItem.AddToLikedSongs}
-                id={MediaTrackContextMenuItemAction.AddToLikedSongs}
+                key={MediaTrackContextMenuItem.RemoveFromPlaylist}
+                id={MediaTrackContextMenuItemAction.RemoveFromPlaylist}
                 onClick={handleMenuItemClick}
               >
-                {I18nService.getString('label_submenu_media_track_add_to_liked_songs')}
+                {I18nService.getString('label_submenu_media_track_remove_from_playlist')}
               </Item>
             );
           case MediaTrackContextMenuItem.AddToPlaylist:
             return (
               <Submenu
-                disabled
                 key={MediaTrackContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_track_add_to_playlist')}
               >
-                {/* <Item id={MediaTrackContextMenuItemAction.AddToPlaylist} onClick={handleMenuItemClick}> */}
-                {/* </Item> */}
+                <MediaPlaylistContextMenu type="add"/>
               </Submenu>
             );
           case MediaTrackContextMenuItem.Separator: {

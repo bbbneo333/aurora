@@ -1,4 +1,5 @@
 import React, { ReactElement } from 'react';
+import { get } from 'lodash';
 
 export function withSeparator<T>(
   list: T[],
@@ -16,4 +17,13 @@ export function withSeparator<T>(
       }),
       curr,
     ]);
+}
+
+export function useSearch<T>(items: T[], query: string, key = 'name'): T[] {
+  const searchTerm = query.trim().toLowerCase();
+
+  return items.filter((item) => {
+    const itemTerm = get(item, key) as string;
+    return itemTerm.toLowerCase().includes(searchTerm);
+  });
 }

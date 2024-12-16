@@ -21,6 +21,17 @@ export type DataStoreFilterData<T> = {
   [P in keyof T]?: T[P] | DataStoreComparisonOperators<T[P]>;
 } & DataStoreLogicalOperators<T>;
 
+export type DataStoreSortData<T> = {
+  [P in keyof T]?: number
+};
+
+export type DataStoreQueryData<T> = {
+  filter: DataStoreFilterData<T>,
+  sort?: DataStoreSortData<T>,
+  skip?: number,
+  limit?: number,
+};
+
 export type DataStoreInputData<T = any> = Omit<T, 'id'>;
 
-export type DataStoreUpdateData<T = any> = Partial<Omit<T, 'id'>>;
+export type DataStoreUpdateData<T = any> = Partial<Omit<T, 'id' | 'created_at'>>;

@@ -3,15 +3,15 @@
   padding: 10px 15px;
   font-size: 15px;
   border-radius: 5px;
-  color: var(--dark-text-color);
+  color: var(--selectable-color);
   transition: var(--selectable-item-transition);
 }
 
 .media-header-navigation-link:hover {
-  color: var(--selected-text-color);
+  color: var(--selectable-hovered-color);
 }
 
 .media-header-navigation-link.selected {
-  background-color: var(--selected-bg-color);
-  color: var(--light-text-color);
+  background-color: var(--selectable-active-bg-color);
+  color: var(--selectable-active-color);
 }

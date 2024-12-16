@@ -15,7 +15,7 @@ import { Layout } from '../../constants';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
 
-import styles from './library-album.component.css';
+import styles from './album.component.css';
 
 const cx = classNames.bind(styles);
 
@@ -23,7 +23,7 @@ enum MediaContextMenus {
   AlbumTrack = 'media_album_track_context_menu',
 }
 
-export function LibraryAlbumPage() {
+export function AlbumPage() {
   const {
     albumId,
   } = useParams() as { albumId: string };
@@ -45,30 +45,30 @@ export function LibraryAlbumPage() {
 
   return (
     <div className="container-fluid">
-      <div className={cx('library-album-header')}>
+      <div className={cx('album-header')}>
         <div className="row">
-          <div className={cx(Layout.Grid.LibraryAlbumHeaderCoverColumn, 'library-album-header-cover-column')}>
+          <div className={cx(Layout.Grid.CollectionHeaderCoverColumn, 'album-header-cover-column')}>
             <MediaCoverPicture
               mediaPicture={mediaSelectedAlbum.album_cover_picture}
               mediaPictureAltText={mediaSelectedAlbum.album_name}
-              className={cx('library-album-cover-picture')}
+              className={cx('album-cover-picture')}
             />
           </div>
-          <div className={cx(Layout.Grid.LibraryAlbumHeaderInfoColumn, 'library-album-header-info-column')}>
-            <div className={cx('library-album-header-label')}>
-              {I18nService.getString('label_library_album_header')}
+          <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'album-header-info-column')}>
+            <div className={cx('album-header-label')}>
+              {I18nService.getString('label_album_header')}
             </div>
-            <div className={cx('library-album-header-name')}>
+            <div className={cx('album-header-name')}>
               {mediaSelectedAlbum.album_name}
             </div>
-            <div className={cx('library-album-header-info')}>
+            <div className={cx('album-header-info')}>
               <MediaArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
             </div>
           </div>
         </div>
       </div>
-      <div className={cx('library-album-actions')}/>
-      <div className={cx('library-album-tracklist')}>
+      <div className={cx('album-actions')}/>
+      <div className={cx('album-tracklist')}>
         <MediaTrackListComponent
           mediaTracks={mediaSelectedAlbumTracks}
           mediaTrackList={{
@@ -83,7 +83,6 @@ export function LibraryAlbumPage() {
           menuItems={[
             MediaTrackContextMenuItem.AddToQueue,
             MediaTrackContextMenuItem.Separator,
-            MediaTrackContextMenuItem.AddToLikedSongs,
             MediaTrackContextMenuItem.AddToPlaylist,
           ]}
         />

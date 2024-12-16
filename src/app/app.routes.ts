@@ -1,5 +1,5 @@
-import { Icons, Routes } from './constants';
-import * as AppPages from './pages';
+import { Icons, Routes } from '../constants';
+import * as AppPages from '../pages';
 
 export default {
   main: [

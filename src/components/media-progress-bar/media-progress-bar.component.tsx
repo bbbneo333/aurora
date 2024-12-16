@@ -10,7 +10,7 @@ import classNames from 'classnames/bind';
 
 import { SystemEnums } from '../../enums';
 
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 
 import styles from './media-progress-bar.component.scss';
 
@@ -508,7 +508,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
           className={cx('media-progress-bar', progressBarClassName)}
         />
       </div>
-      <MediaButtonComponent
+      <Button
         style={{
           left: mediaProgressPercentage,
         }}

@@ -8,6 +8,7 @@ import {
   IAppMain,
   IAppModule,
   IFSAssetReadOptions,
+  IFSDirectoryFile,
   IFSDirectoryReadOptions,
   IFSDirectoryReadResponse,
 } from '../../interfaces';
@@ -44,9 +45,7 @@ export class FileSystemModule implements IAppModule {
   }
 
   private readDirectory(fsDirPath: string, fsDirReadOptions: IFSDirectoryReadOptions = {}): Promise<IFSDirectoryReadResponse> {
-    const dirReadFiles: {
-      path: string,
-    }[] = [];
+    const dirReadFiles: IFSDirectoryFile[] = [];
     const dirReadStats = {
       total_files_scanned: 0,
       total_files_selected: 0,
@@ -105,6 +104,7 @@ export class FileSystemModule implements IAppModule {
             // add file
             dirReadFiles.push({
               path: dirItem,
+              name: path.basename(dirItem),
             });
 
             // continue iteration

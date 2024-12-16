@@ -1,7 +1,7 @@
 .action-list {
   border-radius: 5px;
-  border: 1px solid var(--dark-selectable-outline-color);
-  color: var(--light-text-color);
+  border: 1px solid var(--selectable-outline-color);
+  color: var(--selectable-active-color);
 }
 
 .action-list-item {
@@ -11,7 +11,7 @@
 }
 
 .action-list > .action-list-item:not(:last-child) {
-  border-bottom: 1px solid var(--dark-selectable-outline-color);
+  border-bottom: 1px solid var(--selectable-outline-color);
 }
 
 .action-list-item-label {
@@ -19,5 +19,5 @@
 }
 
 .action-list-item.empty > .action-list-item-label {
-  color: var(--dark-disabled-button-color);
+  color: var(--text-disabled-color);
 }

@@ -65,7 +65,6 @@ export function PlayerQueueComponent() {
                   menuItems={[
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.Separator,
-                    MediaTrackContextMenuItem.AddToLikedSongs,
                     MediaTrackContextMenuItem.AddToPlaylist,
                   ]}
                 />
@@ -99,7 +98,6 @@ export function PlayerQueueComponent() {
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.RemoveFromQueue,
                     MediaTrackContextMenuItem.Separator,
-                    MediaTrackContextMenuItem.AddToLikedSongs,
                     MediaTrackContextMenuItem.AddToPlaylist,
                   ]}
                 />

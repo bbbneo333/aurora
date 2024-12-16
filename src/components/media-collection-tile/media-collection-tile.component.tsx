@@ -1,17 +1,14 @@
 import React, { useCallback } from 'react';
-import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
-import { useContextMenu } from 'react-contexify';
 import { capitalize } from 'lodash';
 
 import { Icons, Layout } from '../../constants';
-import { MediaEnums } from '../../enums';
+import { useContextMenu } from '../../contexts';
+import { useMediaPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
-import { RootState } from '../../reducers';
-import { MediaLibraryService, MediaPlayerService } from '../../services';
 
 import { Icon } from '../icon/icon.component';
-import { MediaButtonComponent } from '../media-button/media-button.component';
+import { Button } from '../button/button.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { RouterLink } from '../router-link/router-link.component';
 
@@ -32,54 +29,21 @@ export function MediaCollectionTile(props: {
     mediaContextMenuId,
   } = props;
 
-  const { show } = useContextMenu();
-
-  const {
-    mediaPlaybackState,
-    mediaPlaybackCurrentTrackList,
-  } = useSelector((state: RootState) => state.mediaPlayer);
-
-  const isMediaPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
-    && mediaPlaybackCurrentTrackList
-    && mediaPlaybackCurrentTrackList.id === mediaItem.id;
-
-  const handleOnPlayButtonClick = useCallback((e: Event) => {
-    MediaLibraryService
-      .getMediaCollectionTracks(mediaItem)
-      .then((mediaTracks) => {
-        MediaPlayerService.playMediaTracks(mediaTracks, {
-          id: mediaItem.id,
-        });
-      });
-
-    // this action button resides within a link
-    // stop propagation to prevent that
-    e.preventDefault();
-    e.stopPropagation();
-  }, [
-    mediaItem.id,
-  ]);
-
-  const handleOnPauseButtonClick = useCallback((e: Event) => {
-    MediaPlayerService.pauseMediaPlayer();
-
-    // this action button resides within a link
-    // stop propagation to prevent that
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
+  const { showMenu } = useContextMenu();
+  const { isMediaPlaying, handleOnPlayButtonClick, handleOnPauseButtonClick } = useMediaPlayback({
+    mediaItem,
+  });
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaContextMenuId) {
-      show(e, {
+      showMenu({
         id: mediaContextMenuId,
-        props: {
-          mediaItem,
-        },
+        event: e,
+        props: { mediaItem },
       });
     }
   }, [
-    show,
+    showMenu,
     mediaItem,
     mediaContextMenuId,
   ]);
@@ -109,20 +73,20 @@ export function MediaCollectionTile(props: {
                   {
                     isMediaPlaying
                       ? (
-                        <MediaButtonComponent
+                        <Button
                           className={cx('collection-tile-action-button')}
                           onButtonSubmit={handleOnPauseButtonClick}
                         >
                           <Icon name={Icons.MediaPause}/>
-                        </MediaButtonComponent>
+                        </Button>
                       )
                       : (
-                        <MediaButtonComponent
+                        <Button
                           className={cx('collection-tile-action-button')}
                           onButtonSubmit={handleOnPlayButtonClick}
                         >
                           <Icon name={Icons.MediaPlay}/>
-                        </MediaButtonComponent>
+                        </Button>
                       )
                   }
                 </div>

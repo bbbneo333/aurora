@@ -6,11 +6,13 @@ import {
   Item,
   Submenu,
   ItemParams,
-  animation,
 } from 'react-contexify';
 
+import { useContextMenu } from '../../contexts';
 import { IMediaCollectionItem } from '../../interfaces';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+
+import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
 export const MediaCollectionContextMenuId = 'media_collection_context_menu';
 
@@ -18,11 +20,11 @@ export enum MediaCollectionContextMenuItem {
   AddToQueue,
   AddToPlaylist,
   Separator,
+  ManagePlaylist,
 }
 
 export enum MediaCollectionContextMenuItemAction {
   AddToQueue = 'media/collection/action/addToQueue',
-  AddToPlaylist = 'media/collection/addToPlaylist',
 }
 
 export interface MediaCollectionContextMenuItemProps {
@@ -32,13 +34,12 @@ export interface MediaCollectionContextMenuItemProps {
 export function MediaCollectionContextMenu(props: {
   menuItems: MediaCollectionContextMenuItem[],
 }) {
-  const {
-    menuItems,
-  } = props;
+  const { menuItems } = props;
+  const { menuProps } = useContextMenu<MediaCollectionContextMenuItemProps>();
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaCollectionContextMenuItemProps>) => {
-    const itemAction: MediaCollectionContextMenuItemAction = itemParams.event.currentTarget.id as MediaCollectionContextMenuItemAction;
-    const mediaItem: IMediaCollectionItem | undefined = itemParams.props?.mediaItem;
+    const itemAction: MediaCollectionContextMenuItemAction = itemParams.id as MediaCollectionContextMenuItemAction;
+    const { mediaItem } = menuProps;
 
     switch (itemAction) {
       case MediaCollectionContextMenuItemAction.AddToQueue: {
@@ -55,10 +56,12 @@ export function MediaCollectionContextMenu(props: {
       default:
       // unsupported action, do nothing
     }
-  }, []);
+  }, [
+    menuProps,
+  ]);
 
   return (
-    <Menu id={MediaCollectionContextMenuId} animation={animation.fade}>
+    <Menu id={MediaCollectionContextMenuId}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaCollectionContextMenuItem.AddToQueue:
@@ -74,13 +77,21 @@ export function MediaCollectionContextMenu(props: {
           case MediaCollectionContextMenuItem.AddToPlaylist:
             return (
               <Submenu
-                disabled
                 key={MediaCollectionContextMenuItem.AddToPlaylist}
                 label={I18nService.getString('label_submenu_media_collection_add_to_playlist')}
               >
-                {/* <Item id={MediaTrackContextMenuItemAction.AddToPlaylist} onClick={handleMenuItemClick}> */}
-                {/* </Item> */}
+                <MediaPlaylistContextMenu
+                  key={MediaCollectionContextMenuItem.AddToPlaylist}
+                  type="add"
+                />
               </Submenu>
+            );
+          case MediaCollectionContextMenuItem.ManagePlaylist:
+            return (
+              <MediaPlaylistContextMenu
+                key={MediaCollectionContextMenuItem.ManagePlaylist}
+                type="manage"
+              />
             );
           case MediaCollectionContextMenuItem.Separator: {
             return (

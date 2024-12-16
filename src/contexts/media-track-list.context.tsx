@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 
 import { IMediaTrack, IMediaTrackList } from '../interfaces';
 
@@ -14,7 +13,7 @@ const MediaTrackListContext = React.createContext<{
 }>(mediaTrackListInitialState);
 
 export function MediaTrackListProvider(props: {
-  children: PropTypes.ReactNodeArray,
+  children: React.ReactNode,
   mediaTracks: IMediaTrack[],
   mediaTrackList?: IMediaTrackList,
 }) {

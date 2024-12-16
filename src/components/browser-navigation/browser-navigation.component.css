@@ -4,8 +4,8 @@
 }
 
 .browser-navigation-button {
-  background-color: var(--dark-bg-color);
-  color: var(--light-text-color);
+  background-color: var(--stage-bg-color);
+  color: var(--text-light-color);
   display: flex;
   align-self: center;
   align-items: center;
@@ -14,15 +14,15 @@
   border-radius: 100%;
   margin: 0 15px;
   line-height: 100%;
-  -webkit-text-stroke: 1px var(--dark-bg-color);
+  -webkit-text-stroke: 1px var(--stage-bg-color);
   transition: var(--selectable-item-transition);
-  border: 2px solid var(--dark-bg-color);
+  border: 2px solid var(--stage-bg-color);
 }
 
 .browser-navigation-button.disabled {
-  color: var(--dark-disabled-button-color);
+  color: var(--text-disabled-color);
 }
 
 .browser-navigation-button:not(.disabled):hover {
-  border-color: var(--dark-selectable-outline-color);
+  border-color: var(--selectable-outline-color);
 }
