@@ -169,6 +169,15 @@ class MediaLibraryService {
     return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
   }
 
+  async getMediaTrackForProvider(provider: string, provider_id: string): Promise<IMediaTrack | undefined> {
+    const mediaTrackData = await MediaTrackDatastore.findMediaTrack({
+      provider,
+      provider_id,
+    });
+
+    return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
+  }
+
   async getMediaPlaylist(mediaPlaylistId: string): Promise<IMediaPlaylist | undefined> {
     const mediaPlaylistData = await MediaPlaylistDatastore.findMediaPlaylist({
       id: mediaPlaylistId,
@@ -261,10 +270,7 @@ class MediaLibraryService {
       tracks: [],
       created_at: Date.now(),
     });
-    inputData.tracks = inputData.tracks.map(trackInputData => ({
-      id: trackInputData.id,
-      added_at: Date.now(),
-    }));
+    inputData.tracks = inputData.tracks.map(trackInputData => this.buildMediaPlaylistTrackFromInput(trackInputData));
 
     const mediaPlaylistData = await MediaPlaylistDatastore.insertMediaPlaylist(inputData);
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
@@ -280,10 +286,10 @@ class MediaLibraryService {
   }
 
   async createMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTracks: IMediaPlaylistTrackInputData[]): Promise<IMediaPlaylist> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.createMediaPlaylistTracks(mediaPlaylistId, mediaPlaylistTracks.map(trackInputData => ({
-      id: trackInputData.id,
-      added_at: Date.now(),
-    })));
+    const mediaPlaylistData = await MediaPlaylistDatastore.createMediaPlaylistTracks(
+      mediaPlaylistId,
+      mediaPlaylistTracks.map(trackInputData => this.buildMediaPlaylistTrackFromInput(trackInputData)),
+    );
 
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
@@ -614,11 +620,20 @@ class MediaLibraryService {
   }
 
   private async buildMediaPlaylistTracks(mediaPlaylistTrackDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistTrack[]> {
-    return Promise.all(mediaPlaylistTrackDataList.map(mediaPlaylistTrackData => this.buildMediaPlaylistTrack(mediaPlaylistTrackData)));
+    // TODO: Added a hack here to ignore playlist tracks that could not be found locally anymore
+    //  Ideally, such entries should have a status like "unavailable"
+
+    // @ts-ignore
+    return Promise
+      .all(mediaPlaylistTrackDataList.map(mediaPlaylistTrackData => this.buildMediaPlaylistTrack(mediaPlaylistTrackData)))
+      .then(mediaPlaylistTracks => mediaPlaylistTracks.filter(mediaPlaylistTrack => !isNil(mediaPlaylistTrack)));
   }
 
-  private async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack> {
-    const mediaTrack = await this.getMediaTrack(mediaPlaylistTrackData.id);
+  private async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack | undefined> {
+    const mediaTrack = await this.getMediaTrackForProvider(mediaPlaylistTrackData.provider, mediaPlaylistTrackData.provider_id);
+    if (!mediaTrack) {
+      return undefined;
+    }
 
     return assign({}, mediaPlaylistTrackData, mediaTrack);
   }
@@ -629,6 +644,13 @@ class MediaLibraryService {
     return `${I18nService.getString('label_new_playlist_default_name', {
       playlistCount: (mediaPlaylistsCount + 1).toString(),
     })}`;
+  }
+
+  private buildMediaPlaylistTrackFromInput(trackInputData: IMediaPlaylistTrackInputData): IMediaPlaylistTrackData {
+    return {
+      ...trackInputData,
+      added_at: Date.now(),
+    };
   }
 }
 
