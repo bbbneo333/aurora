@@ -1,0 +1,19 @@
+.browser {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--stage-content-bg-color);
+  color: var(--text-light-color);
+}
+
+.browser-header {
+  display: flex;
+  flex: 0 0 50px;
+  height: var(--titlebar-overlay-height);
+  margin: 5px;
+}
+
+.browser-viewport {
+  flex: 1 0 0;
+  padding: 10px;
+}

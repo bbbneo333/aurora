@@ -1,17 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Provider, useSelector } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import _ from 'lodash';
 
 import {
-  BrowserNavigation,
-  BrowserScroll,
-  Icon,
-  RouterSwitchComponent,
   MediaSession,
   MediaPlayerRibbonComponent,
-  RouterLink,
 } from '../components';
 
 import { ContextMenuProvider, ModalProvider } from '../contexts';
@@ -19,127 +14,17 @@ import { AppEnums } from '../enums';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
 import { RootState } from '../reducers';
-import { AppService, I18nService, MediaProviderService } from '../services';
+import { AppService, MediaProviderService } from '../services';
 
 import statePersistors from '../persistors';
 import store from '../store';
 import { registerStatePersistor, loadState, removeStates } from '../store/persistor';
 
 import styles from './app.component.css';
-import routes from './app.routes';
+import { Sidebar } from './sidebar/sidebar.component';
+import { Browser } from './browser/browser.component';
 
 const cx = classNames.bind(styles);
-
-// app > stage > content > header > rows [navigator, page header, user]
-
-function AppContentHeaderPage() {
-  return (
-    <div className={cx('app-content-header-page-container')}>
-      <RouterSwitchComponent routes={routes.header}/>
-    </div>
-  );
-}
-
-// app > stage > content > columns [header, browser]
-
-function AppContentHeader() {
-  return (
-    <div className={cx('app-content-header-container')}>
-      <BrowserNavigation/>
-      <AppContentHeaderPage/>
-      {/* TODO: Add back MediaContentHeaderUserComponent once implemented */}
-      {/* <MediaContentHeaderUserComponent/> */}
-    </div>
-  );
-}
-
-function AppContentBrowser() {
-  const browserRef = useRef(null);
-
-  return (
-    <div ref={browserRef} className={cx('app-content-browser-container', 'app-scrollable')}>
-      <BrowserScroll browserRef={browserRef}/>
-      <RouterSwitchComponent routes={routes.main}/>
-    </div>
-  );
-}
-
-// app > stage > sidebar
-
-function AppSidebarQuickAccess() {
-  return (
-    <div className={cx('app-sidebar-quick-access', 'app-scrollable')}/>
-  );
-}
-
-function AppSidebarNavigationLink(props: {
-  route: {
-    path: string,
-    icon: string,
-    name: string,
-  }
-}) {
-  const {
-    route: {
-      icon,
-      name,
-      path,
-    },
-  } = props;
-
-  return (
-    <RouterLink
-      to={path}
-      activeClassName={cx('selected')}
-      className={cx('app-sidebar-navigation-item', 'app-nav-link')}
-    >
-      <span className={cx('app-sidebar-navigation-item-icon')}>
-        <Icon name={icon}/>
-      </span>
-      <span className={cx('app-sidebar-navigation-item-label')}>
-        {I18nService.getString(name)}
-      </span>
-    </RouterLink>
-  );
-}
-
-function AppSidebarNavigationList() {
-  return (
-    <div className={cx('app-sidebar-navigation-list')}>
-      {routes.sidebar.map(route => (
-        <AppSidebarNavigationLink key={route.path} route={route}/>
-      ))}
-    </div>
-  );
-}
-
-// function AppSidebarBrandingLogo() {
-//   return (
-//     <div className={cx('app-sidebar-logo')}/>
-//   );
-// }
-
-// app > stage > rows [sidebar, content]
-
-function AppSidebar() {
-  return (
-    <div className={cx('app-sidebar-container')}>
-      {/* TODO: Add back AppSidebarBrandingLogo when required */}
-      {/* <AppSidebarBrandingLogo/> */}
-      <AppSidebarNavigationList/>
-      <AppSidebarQuickAccess/>
-    </div>
-  );
-}
-
-function AppContent() {
-  return (
-    <div className={cx('app-content-container')}>
-      <AppContentHeader/>
-      <AppContentBrowser/>
-    </div>
-  );
-}
 
 // app > splash
 
@@ -154,8 +39,8 @@ function AppSplash() {
 function AppStage() {
   return (
     <div className={cx('app-stage-container')}>
-      <AppSidebar/>
-      <AppContent/>
+      <Sidebar/>
+      <Browser/>
     </div>
   );
 }
