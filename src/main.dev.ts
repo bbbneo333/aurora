@@ -314,12 +314,19 @@ class App implements IAppMain {
       }
     });
 
+    // TODO: For now we don't support opening up external links,
+    //  we are ignoring every external link for now
     // open urls in the user's browser
     // @ts-ignore
-    mainWindow.webContents.on('new-window', (event, url) => {
-      event.preventDefault();
-      shell.openExternal(url);
-    });
+    // mainWindow.webContents.on('new-window', (event, url) => {
+    //   event.preventDefault();
+    //   shell.openExternal(url);
+    // });
+
+    // prevent new window on Ctrl+Click or target="_blank"
+    mainWindow.webContents.setWindowOpenHandler(() => ({
+      action: 'deny',
+    }));
 
     // run builders
     this.runBuilders(mainWindow);
