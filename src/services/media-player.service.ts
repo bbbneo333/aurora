@@ -373,7 +373,7 @@ class MediaPlayerService {
     }
   }
 
-  // media player control API
+  // media playback control API
 
   pauseMediaPlayer(): void {
     const {
@@ -437,6 +437,22 @@ class MediaPlayerService {
 
         this.reportMediaPlaybackProgress();
       });
+  }
+
+  toggleMediaPlayback(): void {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaPlaybackState,
+    } = mediaPlayer;
+
+    if (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing) {
+      this.pauseMediaPlayer();
+    } else {
+      this.resumeMediaPlayer();
+    }
   }
 
   stopMediaPlayer(): void {
@@ -571,7 +587,7 @@ class MediaPlayerService {
       });
   }
 
-  // media playback control API
+  // media track control API
 
   seekMediaTrack(mediaTrackSeekPosition: number): void {
     const {

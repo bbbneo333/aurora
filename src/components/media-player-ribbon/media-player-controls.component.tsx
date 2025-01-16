@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
@@ -7,7 +7,7 @@ import _ from 'lodash';
 import { Icons } from '../../constants';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
-import { MediaEnums } from '../../enums';
+import { MediaEnums, SystemEnums } from '../../enums';
 
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
@@ -22,6 +22,21 @@ export function MediaPlayerControls() {
     mediaPlaybackQueueOnShuffle,
     mediaPlaybackQueueRepeatType,
   } = useSelector((state: RootState) => state.mediaPlayer);
+
+  useEffect(() => {
+    const handleOnKeyDown = (event: KeyboardEvent) => {
+      if (event.code === SystemEnums.KeyboardKeyCodes.Space) {
+        event.preventDefault();
+        MediaPlayerService.toggleMediaPlayback();
+      }
+    };
+
+    window.addEventListener('keydown', handleOnKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleOnKeyDown);
+    };
+  }, []);
 
   return (
     <Row className={cx('media-player-controls-container')}>
