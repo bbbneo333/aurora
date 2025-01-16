@@ -42,7 +42,7 @@
   /*progress*/
   --progress-bar-bg-color: #b3b3b39e;
   /*misc*/
-  --titlebar-overlay-height: 60px;
+  --title-bar-overlay-height: 60px;
   --scrollable-scrollbar-width: 15px;
   --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;
   /*input*/
@@ -63,17 +63,6 @@
 
 body {
   user-select: none;
-}
-
-/*overlay using as a title bar*/
-
-#title-bar-overlay {
-  width: 100%;
-  top: 0;
-  height: var(--titlebar-overlay-height);
-  left: 0;
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
 }
 
 /*scrollable*/
@@ -105,6 +94,8 @@ body {
 
 .app-nav-link {
   text-decoration: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /*context menu*/

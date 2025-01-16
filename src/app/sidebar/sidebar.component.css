@@ -4,7 +4,7 @@
   max-width: 350px;
   background-color: var(--stage-bg-color);
   color: var(--text-dark-color);
-  padding-top: var(--titlebar-overlay-height);
+  padding-top: var(--title-bar-overlay-height);
   display: flex;
   flex-direction: column;
 }

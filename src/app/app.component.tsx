@@ -23,12 +23,13 @@ import { registerStatePersistor, loadState, removeStates } from '../store/persis
 import styles from './app.component.css';
 import { Sidebar } from './sidebar/sidebar.component';
 import { Browser } from './browser/browser.component';
+import { TitleBar } from './titlebar/titlebar.component';
 
 const cx = classNames.bind(styles);
 
 // app > splash
 
-function AppSplash() {
+function Splash() {
   return (
     <div className={cx('app-splash-container')}/>
   );
@@ -36,7 +37,7 @@ function AppSplash() {
 
 // app > stage
 
-function AppStage() {
+function Stage() {
   return (
     <div className={cx('app-stage-container')}>
       <Sidebar/>
@@ -45,15 +46,15 @@ function AppStage() {
   );
 }
 
-// app > media player
+// app > player
 
-function AppMediaPlayer() {
+function Player() {
   const {
     mediaPlaybackCurrentMediaTrack,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
   return (
-    <div className={cx('app-media-player-container', {
+    <div className={cx('app-player-container', {
       active: !!mediaPlaybackCurrentMediaTrack,
     })}
     >
@@ -63,7 +64,7 @@ function AppMediaPlayer() {
   );
 }
 
-// app > columns [splash | stage, media player]
+// app > columns [splash | stage, player]
 
 export function App() {
   const [appStateIsLoading, setAppStateIsLoading] = useState<boolean>(true);
@@ -94,16 +95,17 @@ export function App() {
 
   return (
     <div className={cx('app-container')}>
+      <TitleBar/>
       <Provider store={store}>
         {appStateIsLoading && (
-          <AppSplash/>
+          <Splash/>
         )}
         {!appStateIsLoading && (
           <Router>
             <ModalProvider>
               <ContextMenuProvider>
-                <AppStage/>
-                <AppMediaPlayer/>
+                <Stage/>
+                <Player/>
               </ContextMenuProvider>
             </ModalProvider>
           </Router>

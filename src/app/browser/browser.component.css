@@ -9,7 +9,7 @@
 .browser-header {
   display: flex;
   flex: 0 0 50px;
-  height: var(--titlebar-overlay-height);
+  height: var(--title-bar-overlay-height);
   margin: 5px;
 }
 

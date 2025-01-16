@@ -1,11 +1,3 @@
-/*app > columns [splash, stage, media player]*/
-
-.app-splash-container {
-  width: 100%;
-  height: 100%;
-  background-color: var(--stage-content-bg-color);
-}
-
 .app-container {
   height: 100%;
   width: 100%;
@@ -16,7 +8,11 @@
   left: 0;
 }
 
-/*app > stage*/
+.app-splash-container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--stage-content-bg-color);
+}
 
 .app-stage-container {
   flex: 1 0 0;
@@ -24,14 +20,12 @@
   flex-flow: row;
 }
 
-/*app > media player*/
-
-.app-media-player-container {
+.app-player-container {
   flex: 0 0 100px;
   margin-bottom: -100px;
   transition: margin-bottom .4s ease;
 }
 
-.app-media-player-container.active {
+.app-player-container.active {
   margin-bottom: 0;
 }
