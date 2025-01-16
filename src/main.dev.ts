@@ -63,7 +63,7 @@ class App implements IAppMain {
 
   private mainWindow?: BrowserWindow;
   private readonly forceExtensionDownload: boolean;
-  private readonly startMinimized?: string;
+  private readonly startMinimized?: boolean;
   private readonly resourcesPath: string;
   private readonly enableAutoUpdater = false;
   private readonly htmlFilePath = path.join(__dirname, 'index.html');
@@ -74,13 +74,14 @@ class App implements IAppMain {
   private readonly windowMinWidth = 1024;
   private readonly windowMinHeight = 642;
   private readonly dataPath: string;
+  private isQuitting = false;
 
   constructor() {
     this.env = process.env.NODE_ENV;
     this.platform = process.platform;
     this.debug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
     this.forceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
-    this.startMinimized = process.env.START_MINIMIZED;
+    this.startMinimized = process.env.START_MINIMIZED === 'true';
     this.resourcesPath = process.resourcesPath;
     this.dataPath = this.debug ? 'Aurora-debug' : 'Aurora';
 
@@ -274,7 +275,6 @@ class App implements IAppMain {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-        enableRemoteModule: false,
       },
     });
 
@@ -303,7 +303,19 @@ class App implements IAppMain {
       this.mainWindow = undefined;
     });
 
+    mainWindow.on('close', (event) => {
+      // let the app quit if requested by user
+      // else simply hide the window, we let the app run in background
+      if (this.isQuitting) {
+        this.mainWindow = undefined;
+      } else {
+        event.preventDefault();
+        mainWindow.hide();
+      }
+    });
+
     // open urls in the user's browser
+    // @ts-ignore
     mainWindow.webContents.on('new-window', (event, url) => {
       event.preventDefault();
       shell.openExternal(url);
@@ -327,6 +339,11 @@ class App implements IAppMain {
       }
     });
 
+    app.on('before-quit', () => {
+      // this apparently called right before when user requests to quit (not close) the app
+      this.isQuitting = true;
+    });
+
     app.whenReady()
       .then(async () => {
         this.mainWindow = await this.createWindow();
@@ -338,6 +355,8 @@ class App implements IAppMain {
       // dock icon is clicked and there are no other windows open
       if (!this.mainWindow) {
         this.mainWindow = await this.createWindow();
+      } else {
+        this.mainWindow.show();
       }
     });
   }
