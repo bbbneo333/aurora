@@ -9,7 +9,10 @@ import {
   RouterSwitchComponent,
 } from '../../components';
 
+import { AppEnums } from '../../enums';
+
 import styles from './browser.component.css';
+import AppService from '../../services/app.service';
 
 const cx = classNames.bind(styles);
 
@@ -21,7 +24,12 @@ function BrowserLinks() {
 
 function BrowserHeader() {
   return (
-    <div className={cx('browser-header')}>
+    <div
+      className={cx('browser-header')}
+      onDoubleClick={() => {
+        AppService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
+      }}
+    >
       <BrowserNavigation/>
       <BrowserLinks/>
     </div>

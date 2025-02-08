@@ -4,9 +4,14 @@
   max-width: 350px;
   background-color: var(--stage-bg-color);
   color: var(--text-dark-color);
-  padding-top: var(--title-bar-overlay-height);
   display: flex;
   flex-direction: column;
+}
+
+.sidebar-header {
+  height: var(--title-bar-overlay-height);
+  /* according to electron docs, following property makes the frameless window draggable */
+  -webkit-app-region: drag;
 }
 
 .sidebar-navigation-list {

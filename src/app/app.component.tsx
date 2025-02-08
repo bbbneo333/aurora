@@ -23,7 +23,6 @@ import { registerStatePersistor, loadState, removeStates } from '../store/persis
 import styles from './app.component.css';
 import { Sidebar } from './sidebar/sidebar.component';
 import { Browser } from './browser/browser.component';
-import { TitleBar } from './titlebar/titlebar.component';
 
 const cx = classNames.bind(styles);
 
@@ -95,7 +94,6 @@ export function App() {
 
   return (
     <div className={cx('app-container')}>
-      <TitleBar/>
       <Provider store={store}>
         {appStateIsLoading && (
           <Splash/>

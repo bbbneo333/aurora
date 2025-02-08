@@ -63,6 +63,8 @@
 
 body {
   user-select: none;
+  /* This needs to match with our main stage color to ensure there's no white flash when resizing */
+  background-color: var(--stage-content-bg-color);
 }
 
 /*scrollable*/
