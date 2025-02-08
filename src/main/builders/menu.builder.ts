@@ -184,14 +184,20 @@ export default class MenuBuilder implements IAppBuilder {
       label: 'Window',
       submenu: [
         {
+          label: 'Close',
+          accelerator: 'Command+W',
+          selector: 'performClose:',
+        },
+        {
           label: 'Minimize',
           accelerator: 'Command+M',
           selector: 'performMiniaturize:',
         },
         {
-          label: 'Close',
-          accelerator: 'Command+W',
-          selector: 'performClose:',
+          label: 'Fill',
+          click: () => {
+            this.app.toggleWindowFill();
+          },
         },
         {
           type: 'separator',

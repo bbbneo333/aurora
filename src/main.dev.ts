@@ -178,6 +178,17 @@ class App implements IAppMain {
     this.sendSyncMessageToRenderer(AppEnums.IPCRendererCommChannels.StateRemovePersisted);
   }
 
+  toggleWindowFill() {
+    const { mainWindow } = this;
+    if (!mainWindow) return;
+
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+
   private removeDirectorySafe(directory: string) {
     try {
       fs.rmdirSync(directory, {
@@ -333,6 +344,11 @@ class App implements IAppMain {
 
     // register handler for auto-updates
     this.registerAutoUpdater();
+
+    // register handlers for renderer messages
+    this.registerSyncMessageHandler(AppEnums.IPCCommChannels.AppToggleWindowFill, () => {
+      this.toggleWindowFill();
+    });
 
     return mainWindow;
   }

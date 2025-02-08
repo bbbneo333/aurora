@@ -63,17 +63,8 @@
 
 body {
   user-select: none;
-}
-
-/*overlay using as a title bar*/
-
-#title-bar-overlay {
-  width: 100%;
-  top: 0;
-  height: var(--titlebar-overlay-height);
-  left: 0;
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
+  /* This needs to match with our main stage color to ensure there's no white flash when resizing */
+  background-color: var(--stage-content-bg-color);
 }
 
 /*scrollable*/
@@ -105,6 +96,8 @@ body {
 
 .app-nav-link {
   text-decoration: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /*context menu*/
