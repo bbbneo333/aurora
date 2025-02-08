@@ -1,4 +1,4 @@
-.app-container {
+.app {
   height: 100%;
   width: 100%;
   display: flex;
@@ -8,24 +8,24 @@
   left: 0;
 }
 
-.app-splash-container {
+.app-splash {
   width: 100%;
   height: 100%;
   background-color: var(--stage-content-bg-color);
 }
 
-.app-stage-container {
+.app-stage {
   flex: 1 0 0;
   display: flex;
   flex-flow: row;
 }
 
-.app-player-container {
+.app-player {
   flex: 0 0 100px;
   margin-bottom: -100px;
   transition: margin-bottom .4s ease;
 }
 
-.app-player-container.active {
+.app-player.active {
   margin-bottom: 0;
 }

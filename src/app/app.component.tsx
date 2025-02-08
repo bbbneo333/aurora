@@ -30,7 +30,7 @@ const cx = classNames.bind(styles);
 
 function Splash() {
   return (
-    <div className={cx('app-splash-container')}/>
+    <div className={cx('app-splash')}/>
   );
 }
 
@@ -38,7 +38,7 @@ function Splash() {
 
 function Stage() {
   return (
-    <div className={cx('app-stage-container')}>
+    <div className={cx('app-stage')}>
       <Sidebar/>
       <Browser/>
     </div>
@@ -53,7 +53,7 @@ function Player() {
   } = useSelector((state: RootState) => state.mediaPlayer);
 
   return (
-    <div className={cx('app-player-container', {
+    <div className={cx('app-player', {
       active: !!mediaPlaybackCurrentMediaTrack,
     })}
     >
@@ -93,7 +93,7 @@ export function App() {
   }, []);
 
   return (
-    <div className={cx('app-container')}>
+    <div className={cx('app')}>
       <Provider store={store}>
         {appStateIsLoading && (
           <Splash/>
