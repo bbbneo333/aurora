@@ -42,7 +42,7 @@
   /*progress*/
   --progress-bar-bg-color: #b3b3b39e;
   /*misc*/
-  --title-bar-overlay-height: 60px;
+  --titlebar-overlay-height: 60px;
   --scrollable-scrollbar-width: 15px;
   --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;
   /*input*/

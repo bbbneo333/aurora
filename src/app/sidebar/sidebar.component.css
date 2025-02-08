@@ -9,7 +9,7 @@
 }
 
 .sidebar-header {
-  height: var(--title-bar-overlay-height);
+  height: var(--titlebar-overlay-height);
   /* according to electron docs, following property makes the frameless window draggable */
   -webkit-app-region: drag;
 }

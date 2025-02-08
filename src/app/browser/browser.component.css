@@ -9,7 +9,7 @@
 .browser-header {
   display: flex;
   flex: 0 0 50px;
-  height: var(--title-bar-overlay-height);
+  height: var(--titlebar-overlay-height);
   margin: 5px;
   /* according to electron docs, following property makes the frameless window draggable */
   -webkit-app-region: drag;
