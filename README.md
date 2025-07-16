@@ -1,14 +1,22 @@
-## Install
+# Aurora
 
-- **If you have installation or compilation issues with this project, please see [our debugging guide](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/400)**
+**Aurora** is a lightweight, cross-platform music player built for audiophiles and casual listeners alike. It delivers a clean, intuitive interface and broad audio format support — including high-quality lossless formats.
 
-First, clone the repo via git and install dependencies:
+<img width="1728" height="1080" alt="Screenshot 2024-12-24 at 16 39 16" src="https://github.com/user-attachments/assets/5877a9f3-a3a8-4995-9b35-77a5cf9e5bfd" />
 
-```bash
-git clone --depth 1 --single-branch https://github.com/electron-react-boilerplate/electron-react-boilerplate.git your-project-name
-cd your-project-name
-yarn
-```
+## Features
+
+- Select a directory to add tracks
+- View music by album and artist
+- Playlist management: create, edit, and manage playlists locally
+- Manage playback queue
+- Clean and simple user interface
+- Works across platforms (Windows, macOS, Linux)
+
+## Roadmap
+
+- Native support for Spotify, YouTube Music, and Amazon Music
+- Theme customization support
 
 ## Starting Development
 
@@ -25,7 +33,3 @@ To package apps for the local platform:
 ```bash
 yarn package
 ```
-
-## Docs
-
-See our [docs and guides here](https://electron-react-boilerplate.js.org/docs/installation)
