@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
 import _ from 'lodash';
 
-import { MediaTrackComponent, MediaTrackContextMenu, MediaTrackContextMenuItem } from '../../components';
+import { MediaTrack, MediaTrackContextMenu, MediaTrackContextMenuItem } from '../../components';
 import { MediaEnums } from '../../enums';
 import { IMediaQueueTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
@@ -52,7 +52,7 @@ export function PlayerQueueComponent() {
                 {I18nService.getString('label_player_queue_current_track')}
               </div>
               <div className={cx('player-queue-section-content')}>
-                <MediaTrackComponent
+                <MediaTrack
                   mediaTrack={mediaPlaybackCurrentMediaTrack}
                   mediaTrackContextMenuId={MediaContextMenus.PlayingTrack}
                   isPlaying={mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing}
@@ -82,7 +82,7 @@ export function PlayerQueueComponent() {
               </div>
               <div className={cx('player-queue-section-content')}>
                 {mediaPlaybackUpcomingTracks.map((mediaTrack, mediaTrackPointer) => (
-                  <MediaTrackComponent
+                  <MediaTrack
                     key={mediaTrack.queue_entry_id}
                     mediaTrack={mediaTrack}
                     mediaTrackPointer={mediaTrackPointer}

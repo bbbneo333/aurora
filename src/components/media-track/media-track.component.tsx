@@ -19,17 +19,17 @@ import styles from './media-track.component.css';
 
 const cx = classNames.bind(styles);
 
-function MediaTrackActionButton(props: {
+function useMediaTrackPlayback(props: {
   mediaTrack: IMediaTrack,
   mediaTrackPointer?: number,
   handleOnPlayButtonClick?: () => void,
-  isPlaying?: boolean,
+  isPlaying?: boolean, // use the flag to force the playback state, otherwise uses the global playback state
 }) {
   const {
     mediaTrack,
     mediaTrackPointer,
     handleOnPlayButtonClick,
-    isPlaying,
+    isPlaying = false,
   } = props;
 
   const {
@@ -42,7 +42,12 @@ function MediaTrackActionButton(props: {
     mediaTrackList,
   } = useMediaTrackList();
 
-  const handleOnMediaTrackPlayButtonClick = useCallback(() => {
+  const isTrackPlaying = isPlaying || (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
+    && mediaPlaybackCurrentMediaTrack
+    && mediaPlaybackCurrentMediaTrack.tracklist_id === mediaTrackList?.id
+    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id);
+
+  const play = useCallback(() => {
     if (handleOnPlayButtonClick) {
       handleOnPlayButtonClick();
     } else if (!_.isEmpty(mediaTracks)) {
@@ -63,39 +68,31 @@ function MediaTrackActionButton(props: {
     mediaTrackList,
   ]);
 
-  const handleOnMediaTrackPauseButtonClick = useCallback(() => {
+  const pause = useCallback(() => {
     MediaPlayerService.pauseMediaPlayer();
   }, []);
 
-  const isMediaTrackPlaying = isPlaying || (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
-    && mediaPlaybackCurrentMediaTrack
-    && mediaPlaybackCurrentMediaTrack.tracklist_id === mediaTrackList?.id
-    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id);
+  const toggle = useCallback(() => {
+    if (isTrackPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  }, [
+    isTrackPlaying,
+    pause,
+    play,
+  ]);
 
-  return (
-    isMediaTrackPlaying
-      ? (
-        <button
-          type="submit"
-          className={cx('media-track-action-button')}
-          onClick={handleOnMediaTrackPauseButtonClick}
-        >
-          <Icon name={Icons.MediaPause}/>
-        </button>
-      )
-      : (
-        <button
-          type="submit"
-          className={cx('media-track-action-button')}
-          onClick={handleOnMediaTrackPlayButtonClick}
-        >
-          <Icon name={Icons.MediaPlay}/>
-        </button>
-      )
-  );
+  return {
+    isTrackPlaying,
+    play,
+    pause,
+    toggle,
+  };
 }
 
-export function MediaTrackComponent(props: {
+export function MediaTrack(props: {
   mediaTrack: IMediaTrack,
   mediaTrackPointer?: number,
   mediaTrackContextMenuId?: string;
@@ -109,13 +106,25 @@ export function MediaTrackComponent(props: {
     mediaTrackPointer,
     mediaTrackContextMenuId,
     handleOnPlayButtonClick,
-    isPlaying,
+    isPlaying = false,
     disableCover = false,
     disableAlbumLink = false,
   } = props;
 
   const { showMenu } = useContextMenu();
   const { mediaTrackList } = useMediaTrackList();
+
+  const {
+    play,
+    pause,
+    toggle,
+    isTrackPlaying,
+  } = useMediaTrackPlayback({
+    mediaTrack,
+    mediaTrackPointer,
+    handleOnPlayButtonClick,
+    isPlaying,
+  });
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaTrackContextMenuId) {
@@ -147,17 +156,34 @@ export function MediaTrackComponent(props: {
   };
 
   return (
-    <div className={cx('col-12 mb-3')} onContextMenu={handleOnContextMenu}>
+    <div
+      className={cx('col-12 mb-3')}
+      onContextMenu={handleOnContextMenu}
+      onDoubleClick={() => {
+        toggle();
+      }}
+    >
       <div className={cx('media-track')} {...mediaTrackAriaProps}>
         <div className="row">
           <div className={cx('col-10', 'media-track-main-column')}>
             <div className={cx('media-track-section')}>
-              <MediaTrackActionButton
-                mediaTrack={mediaTrack}
-                mediaTrackPointer={mediaTrackPointer}
-                isPlaying={isPlaying}
-                handleOnPlayButtonClick={handleOnPlayButtonClick}
-              />
+              {isTrackPlaying ? (
+                <button
+                  type="submit"
+                  className={cx('media-track-action-button')}
+                  onClick={pause}
+                >
+                  <Icon name={Icons.MediaPause}/>
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className={cx('media-track-action-button')}
+                  onClick={play}
+                >
+                  <Icon name={Icons.MediaPlay}/>
+                </button>
+              )}
             </div>
             {!disableCover && (
               <div className={cx('media-track-section')}>
