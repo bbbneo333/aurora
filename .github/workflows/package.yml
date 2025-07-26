@@ -1,0 +1,77 @@
+name: package
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - '*'  # Trigger on all tags like v1.0.0, v2.1.0-beta
+
+jobs:
+  macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Package macOS App
+        run: npm run package
+
+      # runs when running on PR, gets the branch name and uploads an artifact
+      # branch name gets sanitized and artifacts gets uploaded for the branch with format - macos-build-branch-name
+      - name: Extract branch name
+        if: github.event_name == 'pull_request'
+        run: |
+          RAW_BRANCH="${{ github.head_ref }}"
+          SAFE_BRANCH=$(echo "$RAW_BRANCH" | sed 's#[^a-zA-Z0-9_.-]#-#g')
+          echo "BRANCH_NAME=$SAFE_BRANCH" >> $GITHUB_ENV
+
+      - name: Upload GitHub Artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-build-${{ env.BRANCH_NAME }}
+          path: release/*.dmg
+
+      # runs when running on tag, gets the version name from tag and publishes a release
+      # if tag uses a suffix (like: v2.1.0-beta, v3.0.0-rc.1) it will publish a prerelease
+      - name: Extract version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "TAG_NAME=$TAG" >> $GITHUB_ENV
+          if [[ "$TAG" == *-* ]]; then
+            echo "PRERELEASE=true" >> $GITHUB_ENV
+          else
+            echo "PRERELEASE=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
+          draft: false
+          prerelease: ${{ env.PRERELEASE }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload DMG to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
