@@ -30,6 +30,13 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+
+      # package macos app, we perform following steps here:
+      # - build the app at Aurora.app
+      # - perform ad-hoc code signing to prevent app broken error (as we do not sign or notarize as of now)
+      # - remove gatekeeper quarantine attributes to prevent app broken error (as we do not sign or notarize as of now)
+      # - create zip file out of updated Aurora.app file
+      # these steps are not required if decide to sign and notarize the app in the future
       - name: Package macOS App
         run: |
           yarn package:mac
