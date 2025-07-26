@@ -31,7 +31,11 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Package macOS App
-        run: npm run package
+        run: |
+          yarn package:mac
+          codesign --deep --force --sign - "release/mac-arm64/Aurora.app"
+          xattr -rd com.apple.quarantine "release/mac-arm64/Aurora.app"
+          ditto -c -k --sequesterRsrc --keepParent "release/mac-arm64/Aurora.app" "release/mac-arm64/Aurora.zip"
 
       # runs when running on PR, gets the branch name and uploads an artifact
       # branch name gets sanitized and artifacts gets uploaded for the branch with format - macos-build-branch-name
@@ -47,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-build-${{ env.BRANCH_NAME }}
-          path: release/*.dmg
+          path: release/mac-arm64/Aurora.zip
           overwrite: true
 
       # runs when running on tag, gets the version name from tag and publishes a release

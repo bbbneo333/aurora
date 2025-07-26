@@ -25,5 +25,5 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Run npm lint
+      - name: Run lint
         run: yarn lint
