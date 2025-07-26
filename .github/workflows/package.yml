@@ -39,10 +39,11 @@ jobs:
 
       - name: Upload GitHub Artifact
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-build-${{ env.BRANCH_NAME }}
           path: release/*.dmg
+          overwrite: true
 
       # runs when running on tag, gets the version name from tag and publishes a release
       # if tag uses a suffix (like: v2.1.0-beta, v3.0.0-rc.1) it will publish a prerelease
