@@ -8,5 +8,6 @@
   "LibraryPlaylist": "/library/playlists/:playlistId",
   "Player": "/player",
   "PlayerQueue": "/player/queue",
-  "Settings": "/settings"
+  "Settings": "/settings",
+  "Search": "/search"
 }
