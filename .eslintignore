@@ -43,6 +43,8 @@ dist
 dll
 main.js
 main.js.map
+src/main.dev.js
+src/main.dev.js.map
 
 # App vendor
 src/vendor
