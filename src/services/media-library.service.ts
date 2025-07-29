@@ -337,7 +337,7 @@ class MediaLibraryService {
       .getMediaArtists()
       .then((mediaArtists) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.AddArtists,
+          type: MediaEnums.MediaLibraryActions.SetArtists,
           data: {
             mediaArtists,
           },
