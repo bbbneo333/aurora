@@ -35,7 +35,7 @@ export function ArtistsPage() {
             <MediaCollectionTile
               key={mediaArtist.id}
               mediaItem={mediaItem}
-              mediaRouterLink={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
+              mediaLink={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
                 artistId: mediaArtist.id,
               })}
               mediaContextMenuId={MediaCollectionContextMenuId}

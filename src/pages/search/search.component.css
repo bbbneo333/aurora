@@ -1,0 +1,10 @@
+.search-header {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  background-color: var(--input-bg-color);
+  color: var(--input-color);
+  padding: 10px;
+  border-radius: 5px;
+}

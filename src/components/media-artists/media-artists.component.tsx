@@ -1,39 +1,42 @@
 import React from 'react';
 
-import { IMediaAlbum, IMediaCollectionItem } from '../../interfaces';
+import { IMediaArtist, IMediaCollectionItem } from '../../interfaces';
 import { StringUtils } from '../../utils';
 import { Routes } from '../../constants';
+
 import {
-  MediaCollectionContextMenu, MediaCollectionContextMenuId, MediaCollectionContextMenuItem,
+  MediaCollectionContextMenu,
+  MediaCollectionContextMenuId,
+  MediaCollectionContextMenuItem,
 } from '../media-collection-context-menu/media-collection-context-menu.component';
+
 import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
 
-export function MediaAlbums(props: {
-  mediaAlbums: IMediaAlbum[],
+export function MediaArtists(props: {
+  mediaArtists: IMediaArtist[],
 }) {
   const {
-    mediaAlbums,
+    mediaArtists,
   } = props;
 
   return (
     <div>
       <div className="row">
-        {mediaAlbums.map((mediaAlbum) => {
+        {mediaArtists.map((mediaArtist) => {
           const mediaItem: IMediaCollectionItem = {
-            id: mediaAlbum.id,
-            name: mediaAlbum.album_name,
-            type: 'album',
-            picture: mediaAlbum.album_cover_picture,
+            id: mediaArtist.id,
+            name: mediaArtist.artist_name,
+            type: 'artist',
+            picture: mediaArtist.artist_feature_picture,
           };
 
           return (
             <MediaCollectionTile
-              key={mediaAlbum.id}
+              key={mediaArtist.id}
               mediaItem={mediaItem}
-              mediaLink={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
-                albumId: mediaAlbum.id,
+              mediaLink={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
+                artistId: mediaArtist.id,
               })}
-              mediaSubtitle={mediaAlbum.album_artist.artist_name}
               mediaContextMenuId={MediaCollectionContextMenuId}
             />
           );

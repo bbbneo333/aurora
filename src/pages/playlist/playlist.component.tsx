@@ -11,18 +11,13 @@ import { IMediaPlaylistTrack } from '../../interfaces';
 
 import {
   MediaCoverPicture,
-  MediaTrackContextMenu,
   MediaTrackContextMenuItem,
-  MediaTrackListComponent,
+  MediaTracks,
 } from '../../components';
 
 import styles from './playlist.component.css';
 
 const cx = classNames.bind(styles);
-
-enum MediaContextMenus {
-  PlaylistTrack = 'media_playlist_track_context_menu',
-}
 
 export function PlaylistPage() {
   const { playlistId } = useParams() as { playlistId: string };
@@ -84,22 +79,18 @@ export function PlaylistPage() {
       )}
       {!isEmpty(mediaPlaylistTracks) && (
         <div className={cx('playlist-tracklist')}>
-          <MediaTrackListComponent
+          <MediaTracks
             mediaTracks={mediaPlaylistTracks}
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
             }}
-            mediaTrackContextMenuId={MediaContextMenus.PlaylistTrack}
-            disableCovers
-            disableAlbumLinks
-          />
-          <MediaTrackContextMenu
-            id={MediaContextMenus.PlaylistTrack}
-            menuItems={[
+            contextMenuItems={[
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
+            disableCovers
+            disableAlbumLinks
           />
         </div>
       )}

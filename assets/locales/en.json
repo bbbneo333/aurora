@@ -31,5 +31,10 @@
   "label_playlist_empty": "Playlist has no tracks",
   "label_playlist_name": "Name",
   "message_value_invalid": "Please provide a valid input",
-  "placeholder_playlist_context_menu_search_input": "Find a playlist"
+  "placeholder_playlist_context_menu_search_input": "Find a playlist",
+  "placeholder_search_input": "What do you want to play?",
+  "search_result_heading_tracks": "Tracks",
+  "search_result_heading_albums": "Albums",
+  "search_result_heading_artists": "Artists",
+  "search_result_heading_playlists": "Playlists"
 }

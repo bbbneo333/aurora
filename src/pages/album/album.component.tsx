@@ -6,8 +6,7 @@ import { useSelector } from 'react-redux';
 import {
   MediaCoverPicture,
   MediaArtistLinkComponent,
-  MediaTrackContextMenu,
-  MediaTrackListComponent,
+  MediaTracks,
   MediaTrackContextMenuItem,
 } from '../../components';
 
@@ -18,10 +17,6 @@ import { I18nService, MediaLibraryService } from '../../services';
 import styles from './album.component.css';
 
 const cx = classNames.bind(styles);
-
-enum MediaContextMenus {
-  AlbumTrack = 'media_album_track_context_menu',
-}
 
 export function AlbumPage() {
   const {
@@ -69,22 +64,18 @@ export function AlbumPage() {
       </div>
       <div className={cx('album-actions')}/>
       <div className={cx('album-tracklist')}>
-        <MediaTrackListComponent
+        <MediaTracks
           mediaTracks={mediaSelectedAlbumTracks}
           mediaTrackList={{
             id: mediaSelectedAlbum.id,
           }}
-          mediaTrackContextMenuId={MediaContextMenus.AlbumTrack}
-          disableCovers
-          disableAlbumLinks
-        />
-        <MediaTrackContextMenu
-          id={MediaContextMenus.AlbumTrack}
-          menuItems={[
+          contextMenuItems={[
             MediaTrackContextMenuItem.AddToQueue,
             MediaTrackContextMenuItem.Separator,
             MediaTrackContextMenuItem.AddToPlaylist,
           ]}
+          disableCovers
+          disableAlbumLinks
         />
       </div>
     </div>

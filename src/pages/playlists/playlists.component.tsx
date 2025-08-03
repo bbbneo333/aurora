@@ -5,17 +5,13 @@ import classNames from 'classnames/bind';
 import { useHistory } from 'react-router-dom';
 
 import { Icons, Routes } from '../../constants';
-import { IMediaCollectionItem } from '../../interfaces';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
 import { StringUtils } from '../../utils';
 
 import {
   Button,
-  MediaCollectionItem,
-  MediaCollectionContextMenu,
-  MediaCollectionContextMenuId,
-  MediaCollectionContextMenuItem,
+  MediaPlaylists,
 } from '../../components';
 
 import styles from './playlists.component.css';
@@ -59,38 +55,7 @@ export function PlaylistsPage() {
           </div>
         </div>
       )}
-      <div className="row">
-        {mediaPlaylists.map((mediaPlaylist) => {
-          const mediaItem: IMediaCollectionItem = {
-            id: mediaPlaylist.id,
-            name: mediaPlaylist.name,
-            type: 'playlist',
-            picture: mediaPlaylist.cover_picture,
-          };
-
-          return (
-            <MediaCollectionItem
-              key={mediaPlaylist.id}
-              mediaItem={mediaItem}
-              contextMenuId={MediaCollectionContextMenuId}
-              routerLink={StringUtils.buildRouteFromMappings(Routes.LibraryPlaylist, {
-                playlistId: mediaPlaylist.id,
-              })}
-              subtitle={I18nService.getString('label_playlist_subtitle', {
-                trackCount: mediaPlaylist.tracks.length.toString(),
-              })}
-              disablePlayback={isEmpty(mediaPlaylist.tracks)}
-            />
-          );
-        })}
-      </div>
-      <MediaCollectionContextMenu
-        menuItems={[
-          MediaCollectionContextMenuItem.AddToQueue,
-          MediaCollectionContextMenuItem.Separator,
-          MediaCollectionContextMenuItem.ManagePlaylist,
-        ]}
-      />
+      <MediaPlaylists mediaPlaylists={mediaPlaylists}/>
     </div>
   );
 }

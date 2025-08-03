@@ -13,23 +13,21 @@
 
 .text-input-overlay {
   position: absolute;
-  left: 0;
+  inset: 10px;
   display: flex;
-  height: 100%;
-  width: inherit;
   pointer-events: none;
   align-items: center;
+  justify-content: space-between;
 }
 
 .text-input-icon {
   color: var(--text-dark-color);
   opacity: .2;
   transition: var(--selectable-item-transition);
+  text-align: center;
 }
 
 .text-input-clear-button {
-  /* for aligning close icon to extreme end */
-  margin-left: auto;
   pointer-events: auto;
 }
 

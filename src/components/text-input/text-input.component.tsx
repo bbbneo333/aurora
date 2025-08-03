@@ -15,31 +15,39 @@ export type TextInputProps = {
   clearable?: boolean;
   focus?: boolean;
   icon?: string;
+  iconClassName?: string;
   placeholder?: string;
+  value?: string;
   onInputValue?: (value: string) => void;
 };
 
 export function TextInput(props: TextInputProps & DetailsHTMLAttributes<HTMLInputElement> = {}) {
   const {
+    className,
     clearable,
     focus,
     icon,
+    iconClassName,
+    value = '',
     onInputValue,
   } = props;
 
-  const [textInputValue, setTextInputValue] = useState<string>('');
+  const [textInputValue, setTextInputValue] = useState<string>(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const textInputElementProps = omit(props, [
+    'className',
     'clearable',
     'focus',
     'icon',
+    'iconClassName',
+    'value',
     'onInputValue',
   ]);
 
   const onTextInputChange = useCallback((e) => {
-    const { value } = e.target as HTMLInputElement;
-    setTextInputValue(value);
+    const { value: v } = e.target as HTMLInputElement;
+    setTextInputValue(v);
   }, []);
 
   useEffect(() => {
@@ -62,11 +70,11 @@ export function TextInput(props: TextInputProps & DetailsHTMLAttributes<HTMLInpu
   ]);
 
   return (
-    <div className={cx('text-input-container')}>
+    <div className={cx(className, 'text-input-container')}>
       <div className={cx('text-input-overlay')}>
         {icon && (
           <Icon
-            className={cx('text-input-icon')}
+            className={cx(iconClassName, 'text-input-icon')}
             name={icon}
           />
         )}
