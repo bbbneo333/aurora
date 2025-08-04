@@ -25,7 +25,7 @@ export function MediaTrackAlbumLinkComponent(props: {
   return (
     <RouterLink
       exact
-      to={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
+      to={StringUtils.buildRoute(Routes.LibraryAlbum, {
         albumId: mediaTrack.track_album.id,
       })}
       className={cx('media-track-album-link', 'app-nav-link')}
@@ -57,7 +57,7 @@ export function MediaArtistLinkComponent(props: {
   return (
     <RouterLink
       exact
-      to={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
+      to={StringUtils.buildRoute(Routes.LibraryArtist, {
         artistId: mediaArtist.id,
       })}
       className={cx('media-track-artist-link', 'app-nav-link')}

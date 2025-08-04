@@ -40,7 +40,7 @@ export function PlaylistsPage() {
                   icon={Icons.AddCircle}
                   onButtonSubmit={() => {
                     MediaLibraryService.createMediaPlaylist().then((mediaPlaylist) => {
-                      const pathToPlaylist = StringUtils.buildRouteFromMappings(Routes.LibraryPlaylist, {
+                      const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
                         playlistId: mediaPlaylist.id,
                       });
 

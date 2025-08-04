@@ -30,7 +30,7 @@ export function MediaAlbums(props: {
             <MediaCollectionTile
               key={mediaAlbum.id}
               mediaItem={mediaItem}
-              mediaLink={StringUtils.buildRouteFromMappings(Routes.LibraryAlbum, {
+              mediaLink={StringUtils.buildRoute(Routes.LibraryAlbum, {
                 albumId: mediaAlbum.id,
               })}
               mediaSubtitle={mediaAlbum.album_artist.artist_name}

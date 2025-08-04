@@ -34,7 +34,7 @@ export function MediaArtists(props: {
             <MediaCollectionTile
               key={mediaArtist.id}
               mediaItem={mediaItem}
-              mediaLink={StringUtils.buildRouteFromMappings(Routes.LibraryArtist, {
+              mediaLink={StringUtils.buildRoute(Routes.LibraryArtist, {
                 artistId: mediaArtist.id,
               })}
               mediaContextMenuId={MediaCollectionContextMenuId}

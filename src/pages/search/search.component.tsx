@@ -1,13 +1,16 @@
 import React, { useCallback, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import { isEmpty } from 'lodash';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import { TextInput } from '../../components';
-import { Icons } from '../../constants';
+import { Icons, Routes } from '../../constants';
 import { I18nService, MediaLibraryService } from '../../services';
+import { StringUtils } from '../../utils';
 import { MediaSearchResults } from '../../services/media-library.service';
 
 import styles from './search.component.css';
+
 import {
   AlbumsSearchResults,
   ArtistsSearchResults,
@@ -17,8 +20,20 @@ import {
 
 const cx = classNames.bind(styles);
 
+const useQuery = () => {
+  const params = new URLSearchParams(useLocation().search);
+  return params.get('q') || '';
+};
+
+const buildQueryPath = (query: string) => StringUtils.buildRoute(Routes.Search, {}, {
+  q: query,
+});
+
 export function SearchPage() {
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const history = useHistory();
+  const query = useQuery();
+
+  const [searchInput, setSearchInput] = React.useState(query);
   const [searchLoading, setSearchLoading] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<Partial<MediaSearchResults>>({});
 
@@ -41,15 +56,16 @@ export function SearchPage() {
     MediaLibraryService.search(searchTerm)
       .then((results) => {
         setSearchResults(results);
+        history.replace(buildQueryPath(searchTerm));
       })
       .finally(() => setSearchLoading(false));
   }, []);
 
   useEffect(() => {
-    search(searchQuery);
+    search(searchInput);
   }, [
     search,
-    searchQuery,
+    searchInput,
   ]);
 
   return (
@@ -61,7 +77,8 @@ export function SearchPage() {
             clearable
             className={cx('search-input')}
             placeholder={I18nService.getString('placeholder_search_input')}
-            onInputValue={value => setSearchQuery(value)}
+            value={searchInput}
+            onInputValue={value => setSearchInput(value)}
             icon={Icons.Search}
             iconClassName={cx('search-input-icon')}
           />

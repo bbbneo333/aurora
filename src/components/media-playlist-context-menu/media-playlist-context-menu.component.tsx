@@ -73,7 +73,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
           const mediaPlaylist = await MediaLibraryService.createMediaPlaylist({
             tracks: mediaTracks,
           });
-          const pathToPlaylist = StringUtils.buildRouteFromMappings(Routes.LibraryPlaylist, {
+          const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
             playlistId: mediaPlaylist.id,
           });
 

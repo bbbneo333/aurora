@@ -37,7 +37,7 @@ export function MediaPlaylists(props: {
               key={mediaPlaylist.id}
               mediaItem={mediaItem}
               contextMenuId={MediaCollectionContextMenuId}
-              routerLink={StringUtils.buildRouteFromMappings(Routes.LibraryPlaylist, {
+              routerLink={StringUtils.buildRoute(Routes.LibraryPlaylist, {
                 playlistId: mediaPlaylist.id,
               })}
               subtitle={I18nService.getString('label_playlist_subtitle', {
