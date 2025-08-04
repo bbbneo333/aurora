@@ -62,7 +62,7 @@ export function SearchPage() {
   }, []);
 
   useEffect(() => {
-    search(searchInput);
+    search(searchInput.trim());
   }, [
     search,
     searchInput,
