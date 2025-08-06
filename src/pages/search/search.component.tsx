@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { isEmpty } from 'lodash';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -18,6 +18,8 @@ import {
   TracksSearchResults,
 } from './results.component';
 
+import { NavigationPills } from './navigation.component';
+
 const cx = classNames.bind(styles);
 
 const useQuery = () => {
@@ -36,6 +38,8 @@ export function SearchPage() {
   const [searchInput, setSearchInput] = React.useState(query);
   const [searchLoading, setSearchLoading] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<Partial<MediaSearchResults>>({});
+  const [searchCategory, setSearchCategory] = useState<string>();
+  const searchingAll = searchCategory === 'all';
 
   useEffect(() => {
     console.log({ searchLoading, searchResults });
@@ -84,19 +88,65 @@ export function SearchPage() {
           />
         </div>
       </div>
-      <div className="row">
+      <div className={cx('row', 'navigation-header')}>
         <div className="col-12">
-          {searchResults.tracks && !isEmpty(searchResults.tracks) && (
-            <TracksSearchResults tracks={searchResults.tracks}/>
+          <NavigationPills
+            categories={[
+              {
+                id: 'all',
+                label: I18nService.getString('search_result_heading_all'),
+              },
+              {
+                id: 'tracks',
+                label: I18nService.getString('search_result_heading_tracks'),
+                count: searchResults.tracks?.length,
+              },
+              {
+                id: 'artists',
+                label: I18nService.getString('search_result_heading_artists'),
+                count: searchResults.artists?.length,
+              },
+              {
+                id: 'albums',
+                label: I18nService.getString('search_result_heading_albums'),
+                count: searchResults.albums?.length,
+              },
+              {
+                id: 'playlists',
+                label: I18nService.getString('search_result_heading_playlists'),
+                count: searchResults.playlists?.length,
+              },
+            ]}
+            selected={searchCategory}
+            onSelectCategory={setSearchCategory}
+          />
+        </div>
+      </div>
+      <div className={cx('row', 'search-content')}>
+        <div className="col-12">
+          {searchResults.tracks && !isEmpty(searchResults.tracks) && (searchCategory === 'tracks' || searchingAll) && (
+            <TracksSearchResults
+              tracks={searchResults.tracks}
+              trim={searchingAll}
+            />
           )}
-          {searchResults.artists && !isEmpty(searchResults.artists) && (
-            <ArtistsSearchResults artists={searchResults.artists}/>
+          {searchResults.artists && !isEmpty(searchResults.artists) && (searchCategory === 'artists' || searchingAll) && (
+            <ArtistsSearchResults
+              artists={searchResults.artists}
+              trim={searchingAll}
+            />
           )}
-          {searchResults.albums && !isEmpty(searchResults.albums) && (
-            <AlbumsSearchResults albums={searchResults.albums}/>
+          {searchResults.albums && !isEmpty(searchResults.albums) && (searchCategory === 'albums' || searchingAll) && (
+            <AlbumsSearchResults
+              albums={searchResults.albums}
+              trim={searchingAll}
+            />
           )}
-          {searchResults.playlists && !isEmpty(searchResults.playlists) && (
-            <PlaylistsSearchResults playlists={searchResults.playlists}/>
+          {searchResults.playlists && !isEmpty(searchResults.playlists) && (searchCategory === 'playlists' || searchingAll) && (
+            <PlaylistsSearchResults
+              playlists={searchResults.playlists}
+              trim={searchingAll}
+            />
           )}
         </div>
       </div>
