@@ -21,7 +21,9 @@ import styles from './results.component.css';
 
 const cx = classNames.bind(styles);
 
-export function TracksSearchResults({ tracks }: { tracks: IMediaTrack[] }) {
+export function TracksSearchResults({ tracks }: {
+  tracks: IMediaTrack[],
+}) {
   return (
     <div className={cx('row', 'search-results-section')}>
       <div className="col-12">
@@ -34,6 +36,11 @@ export function TracksSearchResults({ tracks }: { tracks: IMediaTrack[] }) {
           <div className={cx('col-12', 'search-results-content')}>
             <MediaTracks
               mediaTracks={tracks}
+              mediaTrackList={{
+                // provide consistent id to this tracklist to maintain playback state
+                // it can be anything, just keep it consistent
+                id: 'search-results',
+              }}
               contextMenuItems={[
                 MediaTrackContextMenuItem.AddToQueue,
                 MediaTrackContextMenuItem.Separator,
@@ -47,7 +54,9 @@ export function TracksSearchResults({ tracks }: { tracks: IMediaTrack[] }) {
   );
 }
 
-export function ArtistsSearchResults({ artists }: { artists: IMediaArtist[] }) {
+export function ArtistsSearchResults({ artists }: {
+  artists: IMediaArtist[],
+}) {
   return (
     <div className={cx('row', 'search-results-section')}>
       <div className="col-12">
@@ -66,7 +75,9 @@ export function ArtistsSearchResults({ artists }: { artists: IMediaArtist[] }) {
   );
 }
 
-export function AlbumsSearchResults({ albums }: { albums: IMediaAlbum[] }) {
+export function AlbumsSearchResults({ albums }: {
+  albums: IMediaAlbum[],
+}) {
   return (
     <div className={cx('row', 'search-results-section')}>
       <div className="col-12">
@@ -85,7 +96,9 @@ export function AlbumsSearchResults({ albums }: { albums: IMediaAlbum[] }) {
   );
 }
 
-export function PlaylistsSearchResults({ playlists }: { playlists: IMediaPlaylist[] }) {
+export function PlaylistsSearchResults({ playlists }: {
+  playlists: IMediaPlaylist[],
+}) {
   return (
     <div className={cx('row', 'search-results-section')}>
       <div className="col-12">
