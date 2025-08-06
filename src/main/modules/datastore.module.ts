@@ -1,7 +1,7 @@
 import Datastore from 'nedb-promises';
 import fs from 'fs';
 import {
-  isNil, omit, forEach, set,
+  isNil, omit, forEach, set, get,
 } from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
@@ -111,9 +111,15 @@ export class DatastoreModule implements IAppModule {
 
   private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData<never>): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-
     const cursor = datastore.find(datastoreQueryDoc.filter);
-    forEach(datastoreQueryDoc, (value, key) => {
+
+    forEach([
+      'sort',
+      'skip',
+      'limit',
+    ], (key) => {
+      const value = get(datastoreName, key);
+
       if (!isNil(value)) {
         set(cursor, key, value);
       }

@@ -73,7 +73,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
           const mediaPlaylist = await MediaLibraryService.createMediaPlaylist({
             tracks: mediaTracks,
           });
-          const pathToPlaylist = StringUtils.buildRouteFromMappings(Routes.LibraryPlaylist, {
+          const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
             playlistId: mediaPlaylist.id,
           });
 
@@ -123,9 +123,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
           }}
         >
           <TextInput
-            clearable
             focus={searchInputFocus}
-            icon={Icons.Search}
             placeholder={I18nService.getString('placeholder_playlist_context_menu_search_input')}
             onInputValue={(value) => {
               setMediaPlaylistsSearchStr(value);

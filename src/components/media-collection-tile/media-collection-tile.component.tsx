@@ -18,13 +18,13 @@ const cx = classNames.bind(styles);
 
 export function MediaCollectionTile(props: {
   mediaItem: IMediaCollectionItem,
-  mediaRouterLink: string,
+  mediaLink: string,
   mediaSubtitle?: string,
   mediaContextMenuId?: string,
 }) {
   const {
     mediaItem,
-    mediaRouterLink,
+    mediaLink,
     mediaSubtitle,
     mediaContextMenuId,
   } = props;
@@ -56,7 +56,7 @@ export function MediaCollectionTile(props: {
       >
         <RouterLink
           exact
-          to={mediaRouterLink}
+          to={mediaLink}
           className={cx('collection-tile-link', 'app-nav-link')}
         >
           <div className={cx('collection-tile-body')}>

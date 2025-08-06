@@ -201,6 +201,15 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedArtistAlbums: mediaArtistAlbums,
       };
     }
+    case MediaEnums.MediaLibraryActions.SetArtists: {
+      // data.mediaArtists: MediaArtist[] - artists which are needed to be added
+      const { mediaArtists } = action.data;
+
+      return {
+        ...state,
+        mediaArtists: MediaUtils.sortMediaArtists(mediaArtists),
+      };
+    }
     case MediaEnums.MediaLibraryActions.SetPlaylists: {
       // data.mediaPlaylists: MediaPlaylist - playlists which need to be loaded
       const {

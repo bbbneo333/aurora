@@ -16,6 +16,10 @@ export default {
       component: AppPages.PlayerPage,
     },
     {
+      path: Routes.Search,
+      component: AppPages.SearchPage,
+    },
+    {
       path: '/',
       redirect: Routes.Library,
     },
@@ -31,6 +35,11 @@ export default {
     },
   ],
   sidebar: [
+    {
+      path: Routes.Search,
+      name: 'link_search',
+      icon: Icons.Search,
+    },
     {
       path: Routes.Library,
       name: 'link_library',

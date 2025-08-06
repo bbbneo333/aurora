@@ -8,6 +8,7 @@ import { Icons } from '../../constants';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 import { MediaEnums, SystemEnums } from '../../enums';
+import { DOMUtils } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
@@ -25,7 +26,11 @@ export function MediaPlayerControls() {
 
   useEffect(() => {
     const handleOnKeyDown = (event: KeyboardEvent) => {
-      if (event.code === SystemEnums.KeyboardKeyCodes.Space) {
+      if (
+        event.code === SystemEnums.KeyboardKeyCodes.Space
+        && document.activeElement
+        && !DOMUtils.isElementEditable(document.activeElement)
+      ) {
         event.preventDefault();
         MediaPlayerService.toggleMediaPlayback();
       }

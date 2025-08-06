@@ -1,33 +1,32 @@
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
 
-import { RootState } from '../../reducers';
-import { MediaLibraryService } from '../../services';
-import {
-  MediaCollectionContextMenu,
-  MediaCollectionContextMenuItem,
-  MediaCollectionTile,
-  MediaCollectionContextMenuId,
-} from '../../components';
+import { IMediaArtist, IMediaCollectionItem } from '../../interfaces';
 import { StringUtils } from '../../utils';
 import { Routes } from '../../constants';
-import { IMediaCollectionItem } from '../../interfaces';
 
-export function ArtistsPage() {
-  const { mediaArtists } = useSelector((state: RootState) => state.mediaLibrary);
+import {
+  MediaCollectionContextMenu,
+  MediaCollectionContextMenuId,
+  MediaCollectionContextMenuItem,
+} from '../media-collection-context-menu/media-collection-context-menu.component';
 
-  useEffect(() => {
-    MediaLibraryService.loadMediaArtists();
-  }, []);
+import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
+
+export function MediaArtists(props: {
+  mediaArtists: IMediaArtist[],
+}) {
+  const {
+    mediaArtists,
+  } = props;
 
   return (
-    <div className="container-fluid">
+    <div>
       <div className="row">
         {mediaArtists.map((mediaArtist) => {
           const mediaItem: IMediaCollectionItem = {
             id: mediaArtist.id,
-            type: 'artist',
             name: mediaArtist.artist_name,
+            type: 'artist',
             picture: mediaArtist.artist_feature_picture,
           };
 

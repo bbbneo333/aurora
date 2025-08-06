@@ -3,9 +3,10 @@ import { Semaphore } from 'async-mutex';
 
 import { AppEnums, MediaEnums } from '../enums';
 import { MediaUtils } from '../utils';
-import AppService from './app.service';
 import store from '../store';
 import { DataStoreInputData } from '../types';
+
+import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
 
 import {
@@ -34,7 +35,14 @@ import {
 } from '../interfaces';
 import I18nService from './i18n.service';
 
-type MediaSyncFunction = () => Promise<void>;
+export type MediaSyncFunction = () => Promise<void>;
+
+export type MediaSearchResults = {
+  tracks: IMediaTrack[],
+  artists: IMediaArtist[],
+  albums: IMediaAlbum[],
+  playlists: IMediaPlaylist[],
+};
 
 const debug = require('debug')('app:service:media_library_service');
 
@@ -157,6 +165,57 @@ class MediaLibraryService {
     }
 
     return this.buildMediaTrack(mediaTrackData, true);
+  }
+
+  // search API
+
+  async search(query: string): Promise<MediaSearchResults> {
+    return {
+      tracks: await this.searchTracksByName(query),
+      albums: await this.searchAlbumsByName(query),
+      artists: await this.searchArtistsByName(query),
+      playlists: await this.searchPlaylistsByName(query),
+    };
+  }
+
+  async searchTracksByName(query: string): Promise<IMediaTrack[]> {
+    const tracks = await MediaTrackDatastore.findMediaTracks({
+      track_name: {
+        $regex: new RegExp(query, 'i'),
+      },
+    });
+
+    return this.buildMediaTracks(tracks);
+  }
+
+  async searchAlbumsByName(query: string): Promise<IMediaAlbum[]> {
+    const albums = await MediaAlbumDatastore.findMediaAlbums({
+      album_name: {
+        $regex: new RegExp(query, 'i'),
+      },
+    });
+
+    return this.buildMediaAlbums(albums);
+  }
+
+  async searchArtistsByName(query: string): Promise<IMediaArtist[]> {
+    const artists = await MediaArtistDatastore.findMediaArtists({
+      artist_name: {
+        $regex: new RegExp(query, 'i'),
+      },
+    });
+
+    return this.buildMediaArtists(artists);
+  }
+
+  async searchPlaylistsByName(query: string): Promise<IMediaPlaylist[]> {
+    const playlists = await MediaPlaylistDatastore.findMediaPlaylists({
+      name: {
+        $regex: new RegExp(query, 'i'),
+      },
+    });
+
+    return this.buildMediaPlaylists(playlists);
   }
 
   // fetch API
@@ -337,7 +396,7 @@ class MediaLibraryService {
       .getMediaArtists()
       .then((mediaArtists) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.AddArtists,
+          type: MediaEnums.MediaLibraryActions.SetArtists,
           data: {
             mediaArtists,
           },
@@ -532,6 +591,10 @@ class MediaLibraryService {
     return mediaAlbumBuilt;
   }
 
+  private async buildMediaAlbums(mediaAlbums: string[] | IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
+    return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
+  }
+
   private async buildMediaArtist(mediaArtist: string | IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
     // info - no further processing required for MediaArtistData -> MediaArtist
     let mediaArtistData;
@@ -617,6 +680,10 @@ class MediaLibraryService {
 
   private async buildMediaPlaylist(mediaPlaylistData: IMediaPlaylistData) {
     return assign(mediaPlaylistData, {});
+  }
+
+  private async buildMediaPlaylists(mediaPlaylistDataList: IMediaPlaylistData[]) {
+    return Promise.all(mediaPlaylistDataList.map((mediaPlaylistData: any) => this.buildMediaPlaylist(mediaPlaylistData)));
   }
 
   private async buildMediaPlaylistTracks(mediaPlaylistTrackDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistTrack[]> {
