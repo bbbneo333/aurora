@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 import { isEmpty } from 'lodash';
 import { useHistory, useLocation } from 'react-router-dom';
 
-import { TextInput } from '../../components';
+import { TextInput, NavigationPills } from '../../components';
 import { Icons, Routes } from '../../constants';
 import { I18nService, MediaLibraryService } from '../../services';
 import { StringUtils } from '../../utils';
@@ -17,8 +17,6 @@ import {
   PlaylistsSearchResults,
   TracksSearchResults,
 } from './results.component';
-
-import { NavigationPills } from './navigation.component';
 
 const cx = classNames.bind(styles);
 
@@ -38,8 +36,8 @@ export function SearchPage() {
   const [searchInput, setSearchInput] = React.useState(query);
   const [searchLoading, setSearchLoading] = React.useState(false);
   const [searchResults, setSearchResults] = React.useState<Partial<MediaSearchResults>>({});
-  const [searchCategory, setSearchCategory] = useState<string>();
-  const searchingAll = searchCategory === 'all';
+  const [searchCategory, setSearchCategory] = useState('all');
+  const isSearchingAll = searchCategory === 'all';
 
   useEffect(() => {
     console.log({ searchLoading, searchResults });
@@ -49,6 +47,8 @@ export function SearchPage() {
   ]);
 
   const search = useCallback((searchTerm) => {
+    setSearchCategory('all');
+
     if (isEmpty(searchTerm)) {
       setSearchResults({});
       setSearchLoading(false);
@@ -91,7 +91,7 @@ export function SearchPage() {
       <div className={cx('row', 'navigation-header')}>
         <div className="col-12">
           <NavigationPills
-            categories={[
+            items={[
               {
                 id: 'all',
                 label: I18nService.getString('search_result_heading_all'),
@@ -100,52 +100,56 @@ export function SearchPage() {
                 id: 'tracks',
                 label: I18nService.getString('search_result_heading_tracks'),
                 count: searchResults.tracks?.length,
+                disabled: !searchResults.tracks?.length,
               },
               {
                 id: 'artists',
                 label: I18nService.getString('search_result_heading_artists'),
                 count: searchResults.artists?.length,
+                disabled: !searchResults.artists?.length,
               },
               {
                 id: 'albums',
                 label: I18nService.getString('search_result_heading_albums'),
                 count: searchResults.albums?.length,
+                disabled: !searchResults.albums?.length,
               },
               {
                 id: 'playlists',
                 label: I18nService.getString('search_result_heading_playlists'),
                 count: searchResults.playlists?.length,
+                disabled: !searchResults.playlists?.length,
               },
             ]}
             selected={searchCategory}
-            onSelectCategory={setSearchCategory}
+            onSelectItem={setSearchCategory}
           />
         </div>
       </div>
       <div className={cx('row', 'search-content')}>
         <div className="col-12">
-          {searchResults.tracks && !isEmpty(searchResults.tracks) && (searchCategory === 'tracks' || searchingAll) && (
+          {searchResults.tracks && !isEmpty(searchResults.tracks) && (searchCategory === 'tracks' || isSearchingAll) && (
             <TracksSearchResults
               tracks={searchResults.tracks}
-              trim={searchingAll}
+              trim={isSearchingAll}
             />
           )}
-          {searchResults.artists && !isEmpty(searchResults.artists) && (searchCategory === 'artists' || searchingAll) && (
+          {searchResults.artists && !isEmpty(searchResults.artists) && (searchCategory === 'artists' || isSearchingAll) && (
             <ArtistsSearchResults
               artists={searchResults.artists}
-              trim={searchingAll}
+              trim={isSearchingAll}
             />
           )}
-          {searchResults.albums && !isEmpty(searchResults.albums) && (searchCategory === 'albums' || searchingAll) && (
+          {searchResults.albums && !isEmpty(searchResults.albums) && (searchCategory === 'albums' || isSearchingAll) && (
             <AlbumsSearchResults
               albums={searchResults.albums}
-              trim={searchingAll}
+              trim={isSearchingAll}
             />
           )}
-          {searchResults.playlists && !isEmpty(searchResults.playlists) && (searchCategory === 'playlists' || searchingAll) && (
+          {searchResults.playlists && !isEmpty(searchResults.playlists) && (searchCategory === 'playlists' || isSearchingAll) && (
             <PlaylistsSearchResults
               playlists={searchResults.playlists}
-              trim={searchingAll}
+              trim={isSearchingAll}
             />
           )}
         </div>

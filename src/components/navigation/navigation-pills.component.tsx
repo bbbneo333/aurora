@@ -1,15 +1,22 @@
 import React from 'react';
 import { Box, Chip } from '@mui/material';
 
+export type NavigationItem = {
+  id: string;
+  label: string;
+  count?: number;
+  disabled?: boolean;
+};
+
 export function NavigationPills(props: {
-  categories: { id: string, label: string, count?: number }[],
+  items: NavigationItem[],
   selected?: string;
-  onSelectCategory?: (category: string) => void;
+  onSelectItem?: (itemId: string) => void;
 }) {
   const {
-    categories,
+    items,
     selected,
-    onSelectCategory,
+    onSelectItem,
   } = props;
 
   return (
@@ -19,11 +26,19 @@ export function NavigationPills(props: {
       overflowX: 'auto',
     }}
     >
-      {categories.map(({ id, label, count = undefined }) => (
+      {items.map((
+        {
+          id,
+          label,
+          count = undefined,
+          disabled = false,
+        },
+      ) => (
         <Chip
           key={id}
-          onClick={() => onSelectCategory && onSelectCategory(id)}
+          onClick={() => onSelectItem && !disabled && onSelectItem(id)}
           variant={selected === id ? 'filled' : 'outlined'}
+          disabled={disabled}
           label={(
             <Box sx={{
               display: 'flex',
@@ -32,7 +47,7 @@ export function NavigationPills(props: {
             }}
             >
               <span>{label}</span>
-              {typeof count === 'number' && (
+              {typeof count === 'number' && !disabled && (
                 <Box
                   component="span"
                   sx={{
