@@ -48,9 +48,21 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    const fsDirectoryReadResponse: IFSDirectoryReadResponse = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
-      fileExtensions: this.mediaTrackSupportedFileTypes,
-    });
+    const fsDirectoryReadResponse: IFSDirectoryReadResponse|undefined = await AppService
+      .sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
+        fileExtensions: this.mediaTrackSupportedFileTypes,
+      }).catch((error) => {
+        // handle in case existing directory could not be found now
+        if (error.code === 'ENOENT') {
+          return;
+        }
+        throw error;
+      });
+
+    if (!fsDirectoryReadResponse) {
+      debug('addTracksFromDirectory - no contents received, skipping directory - %s', mediaLibraryDirectory);
+      return;
+    }
 
     await Promise.mapSeries(fsDirectoryReadResponse.files, async (fsDirectoryReadFile) => {
       debug('addTracksFromDirectory - found file - %s', fsDirectoryReadFile.path);
@@ -124,7 +136,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     return parseFile(filePath);
   }
 
-  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture | null {
+  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture|null {
     return selectCover(audioMetadata.common.picture);
   }
 }

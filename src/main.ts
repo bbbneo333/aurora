@@ -113,9 +113,15 @@ class App implements IAppMain {
   }
 
   registerAsyncMessageHandler(messageChannel: string, messageHandler: AppAsyncMessageHandler, messageHandlerCtx?: any): void {
-    ipcMain.handle(messageChannel, (_event, ...args) => {
-      debug('ipc (async) - received message - channel - %s', messageChannel);
-      return messageHandler.apply(messageHandlerCtx, args);
+    ipcMain.handle(messageChannel, async (_event, ...args) => {
+      try {
+        debug('ipc (async) - received message - channel - %s', messageChannel);
+        return await messageHandler.apply(messageHandlerCtx, args);
+      } catch (err) {
+        // electron serializes the error before sending it back to the renderer
+        // explicitly send the full shape, set a flag and handle on renderer accordingly
+        return { __isError: true, ...err };
+      }
     });
   }
 

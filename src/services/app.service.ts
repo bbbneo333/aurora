@@ -1,4 +1,6 @@
 import { ipcRenderer } from 'electron';
+import { assign } from 'lodash';
+
 import { AppSyncMessageHandler } from '../types';
 
 const debug = require('debug')('app:service:app_service');
@@ -8,8 +10,18 @@ class AppService {
     return ipcRenderer.sendSync(messageChannel, ...messageArgs);
   }
 
-  sendAsyncMessage(messageChannel: string, ...messageArgs: any[]): Promise<any> {
-    return ipcRenderer.invoke(messageChannel, ...messageArgs);
+  async sendAsyncMessage(messageChannel: string, ...messageArgs: any[]): Promise<any> {
+    const result = await ipcRenderer.invoke(messageChannel, ...messageArgs);
+
+    // custom handling for errors received from main process
+    // eslint-disable-next-line no-underscore-dangle
+    if (result?.__isError) {
+      const error = new Error(result.message);
+      assign(error, result);
+      throw error;
+    }
+
+    return result;
   }
 
   registerSyncMessageHandler(messageChannel: string, messageHandler: AppSyncMessageHandler, messageHandlerCtx?: any): void {
