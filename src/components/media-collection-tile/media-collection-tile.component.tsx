@@ -7,9 +7,8 @@ import { useContextMenu } from '../../contexts';
 import { useMediaPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
 
-import { Icon } from '../icon/icon.component';
-import { Button } from '../button/button.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
+import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
 import { RouterLink } from '../router-link/router-link.component';
 
 import styles from './media-collection-tile.component.css';
@@ -70,25 +69,12 @@ export function MediaCollectionTile(props: {
               />
               <div className={cx('collection-tile-cover-overlay')}>
                 <div className={cx('collection-tile-cover-action')}>
-                  {
-                    isMediaPlaying
-                      ? (
-                        <Button
-                          className={cx('collection-tile-action-button')}
-                          onButtonSubmit={handleOnPauseButtonClick}
-                        >
-                          <Icon name={Icons.MediaPause}/>
-                        </Button>
-                      )
-                      : (
-                        <Button
-                          className={cx('collection-tile-action-button')}
-                          onButtonSubmit={handleOnPlayButtonClick}
-                        >
-                          <Icon name={Icons.MediaPlay}/>
-                        </Button>
-                      )
-                  }
+                  <MediaPlaybackButton
+                    isPlaying={isMediaPlaying}
+                    onPlay={handleOnPlayButtonClick}
+                    onPause={handleOnPauseButtonClick}
+                    variant="outlined"
+                  />
                 </div>
               </div>
             </div>

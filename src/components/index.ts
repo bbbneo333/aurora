@@ -10,6 +10,7 @@ export * from './media-collection-tile/media-collection-tile.component';
 export * from './media-collection-context-menu/media-collection-context-menu.component';
 export * from './media-content-header-user/media-content-header-user.component';
 export * from './media-header-navigation-link/media-header-navigation-link.component';
+export * from './media-playback-button/media-playback-button.component';
 export * from './media-player-ribbon/media-player-ribbon.component';
 export * from './media-playlist-context-menu/media-playlist-context-menu.component';
 export * from './media-playlist-delete-modal/media-playlist-delete-modal.component';

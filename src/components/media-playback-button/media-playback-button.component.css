@@ -1,0 +1,13 @@
+.media-playback-button.outlined {
+  border: none;
+  color: var(--text-light-color);
+  background-color: var(--button-primary-bg-color);
+  font-size: 14px;
+  padding: 10px 15px;
+  border-radius: 50%;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
+}
+
+.media-playback-button.outlined:hover {
+  background-color: var(--button-primary-hovered-bg-color);
+}
