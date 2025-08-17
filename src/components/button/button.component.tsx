@@ -21,7 +21,7 @@ export type ButtonProps = DetailsHTMLAttributes<HTMLDivElement> & {
   disabled?: boolean;
   icon?: string;
   iconClassName?: string;
-  onButtonSubmit?(event: Event): void;
+  onButtonSubmit?(event: MouseEvent | KeyboardEvent): void;
   onButtonMove?(event: KeyboardEvent): void;
   variant?: ButtonVariant | ButtonVariant[];
   tooltip?: string;
