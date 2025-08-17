@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
+import classNames from 'classnames/bind';
 
 import {
   NavLink,
@@ -9,6 +9,10 @@ import {
 } from 'react-router-dom';
 
 import { AppBrowserHistory } from '../../types';
+
+import styles from './router-link-toggle.component.css';
+
+const cx = classNames.bind(styles);
 
 type RouterLinkToggleProps = NavLinkProps & {
   fallbackPath?: string,
@@ -46,7 +50,7 @@ export function RouterLinkToggle(props: RouterLinkToggleProps) {
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       to={togglePath}
-      className={classNames(className, activeClassName && {
+      className={cx('router-link-toggle', className, activeClassName && {
         [activeClassName]: pathname === to,
       })}
     >

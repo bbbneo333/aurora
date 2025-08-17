@@ -1,0 +1,9 @@
+.router-link-toggle {
+  color: var(--text-dark-color);
+  display: inline-block;
+  transition: var(--selectable-item-transition);
+}
+
+.router-link-toggle:hover {
+  color: var(--selectable-hovered-color);
+}
