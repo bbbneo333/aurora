@@ -30,6 +30,10 @@
   background-color: var(--button-primary-hovered-bg-color);
 }
 
+.button.primary:not([disabled]):active {
+  background-color: var(--button-primary-active-bg-color);
+}
+
 .button.primary[disabled] {
   background-color: var(--selectable-bg-color);
 }
