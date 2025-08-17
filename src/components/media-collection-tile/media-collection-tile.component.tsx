@@ -73,7 +73,7 @@ export function MediaCollectionTile(props: {
                     isPlaying={isMediaPlaying}
                     onPlay={handleOnPlayButtonClick}
                     onPause={handleOnPauseButtonClick}
-                    variant="outlined"
+                    variant={['rounded', 'primary']}
                   />
                 </div>
               </div>

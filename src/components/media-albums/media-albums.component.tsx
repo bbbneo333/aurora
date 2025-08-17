@@ -1,30 +1,24 @@
 import React from 'react';
 
-import { IMediaAlbum, IMediaCollectionItem } from '../../interfaces';
-import { StringUtils } from '../../utils';
+import { IMediaAlbum } from '../../interfaces';
+import { MediaUtils, StringUtils } from '../../utils';
 import { Routes } from '../../constants';
 import {
-  MediaCollectionContextMenu, MediaCollectionContextMenuId, MediaCollectionContextMenuItem,
+  MediaCollectionContextMenu, MediaCollectionContextMenuItem,
 } from '../media-collection-context-menu/media-collection-context-menu.component';
 import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
 
 export function MediaAlbums(props: {
   mediaAlbums: IMediaAlbum[],
 }) {
-  const {
-    mediaAlbums,
-  } = props;
+  const { mediaAlbums } = props;
+  const mediaContextMenuId = 'media_albums_context_menu';
 
   return (
     <div>
       <div className="row">
         {mediaAlbums.map((mediaAlbum) => {
-          const mediaItem: IMediaCollectionItem = {
-            id: mediaAlbum.id,
-            name: mediaAlbum.album_name,
-            type: 'album',
-            picture: mediaAlbum.album_cover_picture,
-          };
+          const mediaItem = MediaUtils.getMediaItemFromAlbum(mediaAlbum);
 
           return (
             <MediaCollectionTile
@@ -34,12 +28,13 @@ export function MediaAlbums(props: {
                 albumId: mediaAlbum.id,
               })}
               mediaSubtitle={mediaAlbum.album_artist.artist_name}
-              mediaContextMenuId={MediaCollectionContextMenuId}
+              mediaContextMenuId={mediaContextMenuId}
             />
           );
         })}
       </div>
       <MediaCollectionContextMenu
+        id={mediaContextMenuId}
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
           MediaCollectionContextMenuItem.Separator,

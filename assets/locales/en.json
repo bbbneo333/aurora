@@ -37,5 +37,8 @@
   "search_result_heading_tracks": "Tracks",
   "search_result_heading_albums": "Albums",
   "search_result_heading_artists": "Artists",
-  "search_result_heading_playlists": "Playlists"
+  "search_result_heading_playlists": "Playlists",
+  "tooltip_play_collection": "Play",
+  "tooltip_add_collection_to_queue": "Add to Queue",
+  "tooltip_add_collection_to_playlist": "Add to Playlist"
 }

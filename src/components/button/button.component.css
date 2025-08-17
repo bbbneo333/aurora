@@ -4,13 +4,46 @@
   transition: var(--selectable-item-transition);
 }
 
-.button:not([disabled]):hover {
-  color: var(--text-light-color);
-}
-
 .button.primary {
   color: var(--text-light-color);
   background-color: var(--button-primary-bg-color);
+}
+
+.button.rounded {
+  --size: 2.75rem;
+  --scale: 1;
+
+  inline-size: calc(var(--size) * var(--scale));
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  user-select: none;
+  font-size: calc(var(--size) * 0.35 * var(--scale));
+}
+
+.button.rounded.lg {
+  --scale: 1.2;
+}
+
+.button.rounded.outline {
+  color: var(--selectable-color);
+  background: var(--selectable-bg-color);
+}
+
+.button.rounded.primary {
+  background: var(--button-primary-bg-color);
+  color: var(--text-light-color);
+  box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
+}
+
+.button:not([disabled]):hover {
+  color: var(--text-light-color);
 }
 
 .button.primary:not([disabled]):hover {
