@@ -4,12 +4,12 @@ import React, {
 
 import { isEmpty, omit } from 'lodash';
 import classNames from 'classnames/bind';
-import { Tooltip } from '@mui/material';
 
 import { SystemEnums } from '../../enums';
 import { Icon } from '../icon/icon.component';
 
 import styles from './button.component.css';
+import { ButtonTooltip } from './button-tooltip.component';
 
 const cx = classNames.bind(styles);
 
@@ -135,18 +135,11 @@ export function Button(props: ButtonProps) {
         {children}
       </div>
       {hasTooltip && (
-        <Tooltip
-          open={tooltipOpen}
+        <ButtonTooltip
           title={tooltip}
-          slotProps={{
-            popper: {
-              anchorEl: mediaButtonContainerRef.current,
-            },
-          }}
-        >
-          {/* Tooltip still requires a child — can be dummy */}
-          <span/>
-        </Tooltip>
+          open={tooltipOpen}
+          anchorEl={mediaButtonContainerRef.current}
+        />
       )}
     </>
   );
