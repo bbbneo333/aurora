@@ -41,5 +41,5 @@
   border-bottom: 1px solid var(--selectable-outline-color);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }

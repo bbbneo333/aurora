@@ -8,60 +8,16 @@ import {
   MediaArtistLinkComponent,
   MediaTracks,
   MediaTrackContextMenuItem,
-  MediaPlaybackButton,
-  Button,
-  Icon,
 } from '../../components';
 
-import { Layout, Icons } from '../../constants';
+import { Layout } from '../../constants';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
-import { useMediaPlayback } from '../../hooks';
-import { IMediaAlbum } from '../../interfaces';
-import { MediaUtils } from '../../utils';
 
 import styles from './album.component.css';
+import { AlbumActions } from './album-actions.component';
 
 const cx = classNames.bind(styles);
-
-function AlbumActions(props: {
-  mediaAlbum: IMediaAlbum;
-}) {
-  const { mediaAlbum } = props;
-  const mediaItem = MediaUtils.getMediaItemFromAlbum(mediaAlbum);
-
-  const {
-    isMediaPlaying,
-    handleOnPlayButtonClick,
-    handleOnPauseButtonClick,
-  } = useMediaPlayback({
-    mediaItem,
-  });
-
-  return (
-    <>
-      <MediaPlaybackButton
-        isPlaying={isMediaPlaying}
-        onPlay={handleOnPlayButtonClick}
-        onPause={handleOnPauseButtonClick}
-        variant={['rounded', 'primary', 'lg']}
-        tooltip={I18nService.getString('tooltip_play_collection')}
-      />
-      <Button
-        variant={['rounded', 'outline']}
-        tooltip={I18nService.getString('tooltip_add_collection_to_queue')}
-      >
-        <Icon name={Icons.PlayerQueue}/>
-      </Button>
-      <Button
-        variant={['rounded', 'outline']}
-        tooltip={I18nService.getString('tooltip_add_collection_to_playlist')}
-      >
-        <Icon name={Icons.Add}/>
-      </Button>
-    </>
-  );
-}
 
 export function AlbumPage() {
   const {
