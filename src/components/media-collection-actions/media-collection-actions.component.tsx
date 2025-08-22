@@ -1,27 +1,28 @@
 import React from 'react';
 import { Menu } from 'react-contexify';
+import classNames from 'classnames/bind';
 
-import { MediaUtils } from '../../utils';
+import { useContextMenu } from '../../contexts';
 import { useMediaPlayback } from '../../hooks';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
 import { Icons } from '../../constants';
-import { useContextMenu } from '../../contexts';
-import { IMediaAlbum } from '../../interfaces';
+import { IMediaCollectionItem } from '../../interfaces';
 
-import {
-  Button,
-  Icon,
-  MediaPlaybackButton,
-  MediaPlaylistContextMenu,
-} from '../../components';
+import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
+import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
+import { Button } from '../button/button.component';
+import { Icon } from '../icon/icon.component';
 
-export function AlbumActions(props: {
-  mediaAlbum: IMediaAlbum;
+import styles from './media-collection-actions.component.css';
+
+const cx = classNames.bind(styles);
+
+export function MediaCollectionActions(props: {
+  mediaItem: IMediaCollectionItem;
 }) {
-  const { mediaAlbum } = props;
-  const mediaItem = MediaUtils.getMediaItemFromAlbum(mediaAlbum);
+  const { mediaItem } = props;
   const { showMenu } = useContextMenu();
-  const mediaContextMenuId = 'media_album_context_menu';
+  const mediaContextMenuId = 'media_collection_context_menu';
 
   const {
     isMediaPlaying,
@@ -32,7 +33,7 @@ export function AlbumActions(props: {
   });
 
   return (
-    <>
+    <div className={cx('media-collection-actions')}>
       <MediaPlaybackButton
         isPlaying={isMediaPlaying}
         onPlay={handleOnPlayButtonClick}
@@ -69,6 +70,6 @@ export function AlbumActions(props: {
       <Menu id={mediaContextMenuId}>
         <MediaPlaylistContextMenu type="add"/>
       </Menu>
-    </>
+    </div>
   );
 }

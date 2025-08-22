@@ -5,6 +5,7 @@ export * from './button/button.component';
 export * from './icon/icon.component';
 export * from './media-albums/media-albums.component';
 export * from './media-artists/media-artists.component';
+export * from './media-collection-actions/media-collection-actions.component';
 export * from './media-collection-item/media-collection-item.component';
 export * from './media-collection-tile/media-collection-tile.component';
 export * from './media-collection-context-menu/media-collection-context-menu.component';

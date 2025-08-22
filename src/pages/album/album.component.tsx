@@ -8,14 +8,15 @@ import {
   MediaArtistLinkComponent,
   MediaTracks,
   MediaTrackContextMenuItem,
+  MediaCollectionActions,
 } from '../../components';
 
 import { Layout } from '../../constants';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
+import { MediaUtils } from '../../utils';
 
 import styles from './album.component.css';
-import { AlbumActions } from './album-actions.component';
 
 const cx = classNames.bind(styles);
 
@@ -64,7 +65,7 @@ export function AlbumPage() {
         </div>
       </div>
       <div className={cx('album-actions')}>
-        <AlbumActions mediaAlbum={mediaSelectedAlbum}/>
+        <MediaCollectionActions mediaItem={MediaUtils.getMediaItemFromAlbum(mediaSelectedAlbum)}/>
       </div>
       <div className={cx('album-tracklist')}>
         <MediaTracks

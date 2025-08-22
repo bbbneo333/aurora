@@ -39,7 +39,4 @@
   margin: 15px 0;
   padding-bottom: 15px;
   border-bottom: 1px solid var(--selectable-outline-color);
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
