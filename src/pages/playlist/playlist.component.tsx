@@ -16,6 +16,7 @@ import {
 } from '../../components';
 
 import styles from './playlist.component.css';
+import { PlaylistActions } from './playlist-actions.component';
 
 const cx = classNames.bind(styles);
 
@@ -65,7 +66,9 @@ export function PlaylistPage() {
           </div>
         </div>
       </div>
-      <div className={cx('playlist-actions')}/>
+      <div className={cx('playlist-actions')}>
+        <PlaylistActions mediaPlaylist={mediaSelectedPlaylist}/>
+      </div>
       {isEmpty(mediaPlaylistTracks) && (
         <div className="row">
           <div className="col-12">

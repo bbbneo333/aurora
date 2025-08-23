@@ -41,5 +41,7 @@
   "tooltip_play_collection": "Play",
   "tooltip_pause_collection": "Pause",
   "tooltip_add_collection_to_queue": "Add to Queue",
-  "tooltip_add_collection_to_playlist": "Add to Playlist"
+  "tooltip_add_collection_to_playlist": "Add to Playlist",
+  "tooltip_rename_playlist": "Rename",
+  "tooltip_delete_playlist": "Delete"
 }
