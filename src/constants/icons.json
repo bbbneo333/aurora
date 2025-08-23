@@ -4,6 +4,7 @@
   "AlbumPlaceholder": "fas fa-compact-disc",
   "ArtistPlaceholder": "fas fa-user",
   "Close": "fas fa-times",
+  "Delete": "fas fa-trash",
   "Edit": "fas fa-edit",
   "Folder": "fas fa-folder",
   "LinkLibrary": "fas fa-layer-group",

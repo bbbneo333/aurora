@@ -5,9 +5,10 @@ import { isEmpty } from 'lodash';
 import classNames from 'classnames/bind';
 
 import { Icons, Layout } from '../../constants';
-import { MediaAlbums, MediaCoverPicture } from '../../components';
+import { MediaAlbums, MediaCollectionActions, MediaCoverPicture } from '../../components';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
+import { MediaUtils } from '../../utils';
 
 import styles from './artist.component.css';
 
@@ -55,6 +56,9 @@ export function ArtistPage() {
             <div className={cx('artist-header-info')}/>
           </div>
         </div>
+      </div>
+      <div className={cx('artist-actions')}>
+        <MediaCollectionActions mediaItem={MediaUtils.getMediaItemFromArtist(mediaSelectedArtist)}/>
       </div>
       <div className={cx('artist-albums')}>
         <MediaAlbums mediaAlbums={mediaSelectedArtistAlbums}/>

@@ -14,8 +14,6 @@ import { I18nService, MediaLibraryService, MediaPlayerService } from '../../serv
 
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
-export const MediaCollectionContextMenuId = 'media_collection_context_menu';
-
 export enum MediaCollectionContextMenuItem {
   AddToQueue,
   AddToPlaylist,
@@ -32,9 +30,10 @@ export interface MediaCollectionContextMenuItemProps {
 }
 
 export function MediaCollectionContextMenu(props: {
+  id: string,
   menuItems: MediaCollectionContextMenuItem[],
 }) {
-  const { menuItems } = props;
+  const { id, menuItems } = props;
   const { menuProps } = useContextMenu<MediaCollectionContextMenuItemProps>();
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaCollectionContextMenuItemProps>) => {
@@ -61,7 +60,7 @@ export function MediaCollectionContextMenu(props: {
   ]);
 
   return (
-    <Menu id={MediaCollectionContextMenuId}>
+    <Menu id={id}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaCollectionContextMenuItem.AddToQueue:

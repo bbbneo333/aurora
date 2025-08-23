@@ -1,27 +1,35 @@
-import React, { DetailsHTMLAttributes, useEffect, useRef } from 'react';
-import _ from 'lodash';
+import React, {
+  DetailsHTMLAttributes, useEffect, useRef, useState,
+} from 'react';
+
+import { isEmpty, omit } from 'lodash';
 import classNames from 'classnames/bind';
 
 import { SystemEnums } from '../../enums';
 import { Icon } from '../icon/icon.component';
 
 import styles from './button.component.css';
+import { ButtonTooltip } from './button-tooltip.component';
 
 const cx = classNames.bind(styles);
 
 // we are relying on outline script to remove outlines in case of mouse clicks
 require('../../vendor/js/outline');
 
-export type ButtonProps = {
+export type ButtonProps = DetailsHTMLAttributes<HTMLDivElement> & {
   children?: any;
   disabled?: boolean;
   icon?: string;
   iconClassName?: string;
-  onButtonSubmit?(event: Event): void;
+  onButtonSubmit?(event: MouseEvent | KeyboardEvent): void;
   onButtonMove?(event: KeyboardEvent): void;
+  variant?: ButtonVariant | ButtonVariant[];
+  tooltip?: string;
 };
 
-export function Button(props: ButtonProps & DetailsHTMLAttributes<HTMLDivElement>) {
+export type ButtonVariant = 'primary' | 'rounded' | 'outline' | 'lg';
+
+export function Button(props: ButtonProps) {
   const {
     children,
     className,
@@ -30,20 +38,28 @@ export function Button(props: ButtonProps & DetailsHTMLAttributes<HTMLDivElement
     iconClassName,
     onButtonSubmit,
     onButtonMove,
+    variant,
+    tooltip,
   } = props;
 
-  const mediaButtonContainerProps = _.omit(props, [
+  const mediaButtonContainerProps = omit(props, [
     'children',
     'className',
     'icon',
     'iconClassName',
     'onButtonSubmit',
     'onButtonMove',
+    'variant',
+    'tooltip',
   ]);
   const mediaButtonContainerRef = useRef(null);
 
+  const hasTooltip = !isEmpty(tooltip);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
   // merge our own classnames with the provided ones
-  const mediaButtonClassName = cx('button', className);
+  // variant is simply applied as a classname
+  const mediaButtonClassName = cx('button', variant, className);
 
   useEffect(() => {
     // for adding listeners to button
@@ -99,21 +115,32 @@ export function Button(props: ButtonProps & DetailsHTMLAttributes<HTMLDivElement
   ]);
 
   return (
-    <div
-      className={mediaButtonClassName}
-      aria-disabled={disabled}
-      ref={mediaButtonContainerRef}
-      role="button"
-      tabIndex={0}
-      {...mediaButtonContainerProps}
-    >
-      {icon && (
-        <Icon
-          className={cx('button-icon', iconClassName)}
-          name={icon}
+    <>
+      <div
+        className={mediaButtonClassName}
+        aria-disabled={disabled}
+        ref={mediaButtonContainerRef}
+        role="button"
+        tabIndex={0}
+        onMouseEnter={() => setTooltipOpen(true)}
+        onMouseLeave={() => setTooltipOpen(false)}
+        {...mediaButtonContainerProps}
+      >
+        {icon && (
+          <Icon
+            className={cx('button-icon', iconClassName)}
+            name={icon}
+          />
+        )}
+        {children}
+      </div>
+      {hasTooltip && (
+        <ButtonTooltip
+          title={tooltip}
+          open={tooltipOpen}
+          anchorEl={mediaButtonContainerRef.current}
         />
       )}
-      {children}
-    </div>
+    </>
   );
 }

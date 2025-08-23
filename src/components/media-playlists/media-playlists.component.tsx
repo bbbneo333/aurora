@@ -1,8 +1,8 @@
 import { isEmpty } from 'lodash';
 import React from 'react';
 
-import { IMediaCollectionItem, IMediaPlaylist } from '../../interfaces';
-import { StringUtils } from '../../utils';
+import { IMediaPlaylist } from '../../interfaces';
+import { MediaUtils, StringUtils } from '../../utils';
 import { Routes } from '../../constants';
 import { I18nService } from '../../services';
 
@@ -10,33 +10,26 @@ import { MediaCollectionItem } from '../media-collection-item/media-collection-i
 
 import {
   MediaCollectionContextMenu,
-  MediaCollectionContextMenuId,
   MediaCollectionContextMenuItem,
 } from '../media-collection-context-menu/media-collection-context-menu.component';
 
 export function MediaPlaylists(props: {
   mediaPlaylists: IMediaPlaylist[],
 }) {
-  const {
-    mediaPlaylists,
-  } = props;
+  const { mediaPlaylists } = props;
+  const mediaContextMenuId = 'media_playlists_context_menu';
 
   return (
     <div>
       <div className="row">
         {mediaPlaylists.map((mediaPlaylist) => {
-          const mediaItem: IMediaCollectionItem = {
-            id: mediaPlaylist.id,
-            name: mediaPlaylist.name,
-            type: 'playlist',
-            picture: mediaPlaylist.cover_picture,
-          };
+          const mediaItem = MediaUtils.getMediaItemFromPlaylist(mediaPlaylist);
 
           return (
             <MediaCollectionItem
               key={mediaPlaylist.id}
               mediaItem={mediaItem}
-              contextMenuId={MediaCollectionContextMenuId}
+              contextMenuId={mediaContextMenuId}
               routerLink={StringUtils.buildRoute(Routes.LibraryPlaylist, {
                 playlistId: mediaPlaylist.id,
               })}
@@ -49,6 +42,7 @@ export function MediaPlaylists(props: {
         })}
       </div>
       <MediaCollectionContextMenu
+        id={mediaContextMenuId}
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
           MediaCollectionContextMenuItem.Separator,

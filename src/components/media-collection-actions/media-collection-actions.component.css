@@ -1,0 +1,5 @@
+.media-collection-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

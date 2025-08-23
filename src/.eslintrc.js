@@ -23,9 +23,7 @@ module.exports = {
         beforeClosing: 'never',
       },
     ],
-    'react/jsx-props-no-spreading': ['error', {
-      html: 'ignore',
-    }],
+    'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',
   },
 };

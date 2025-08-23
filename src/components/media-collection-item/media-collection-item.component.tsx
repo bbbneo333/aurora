@@ -3,12 +3,10 @@ import classNames from 'classnames/bind';
 
 import { useMediaPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
-import { Icons } from '../../constants';
 import { useContextMenu } from '../../contexts';
 
-import { Icon } from '../icon/icon.component';
-import { Button } from '../button/button.component';
 import { RouterLink } from '../router-link/router-link.component';
+import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
 
 import styles from './media-collection-item.component.css';
 
@@ -61,26 +59,13 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
           <div className="row">
             <div className={cx('col-10', 'collection-item-main-column')}>
               <div className={cx('collection-item-section')}>
-                {
-                  isMediaPlaying
-                    ? (
-                      <Button
-                        className={cx('collection-item-action-button')}
-                        onButtonSubmit={handleOnPauseButtonClick}
-                      >
-                        <Icon name={Icons.MediaPause}/>
-                      </Button>
-                    )
-                    : (
-                      <Button
-                        className={cx('collection-item-action-button')}
-                        disabled={disablePlayback}
-                        onButtonSubmit={handleOnPlayButtonClick}
-                      >
-                        <Icon name={Icons.MediaPlay}/>
-                      </Button>
-                    )
-                }
+                <MediaPlaybackButton
+                  isPlaying={isMediaPlaying}
+                  disabled={disablePlayback}
+                  className={cx('collection-item-playback-button')}
+                  onPlay={handleOnPlayButtonClick}
+                  onPause={handleOnPauseButtonClick}
+                />
               </div>
               <div className={cx('collection-item-section')}>
                 <div className={cx('collection-item-info')}>

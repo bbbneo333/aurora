@@ -1,3 +1,5 @@
+/*base button*/
+
 .button {
   color: var(--text-dark-color);
   display: inline-block;
@@ -5,8 +7,19 @@
 }
 
 .button:not([disabled]):hover {
-  color: var(--text-light-color);
+  color: var(--selectable-hovered-color);
 }
+
+.button[disabled] {
+  color: var(--text-disabled-color) !important;
+  outline: none;
+}
+
+.button[disabled]:hover {
+  cursor: not-allowed;
+}
+
+/*primary button*/
 
 .button.primary {
   color: var(--text-light-color);
@@ -17,14 +30,56 @@
   background-color: var(--button-primary-hovered-bg-color);
 }
 
-.button[disabled] {
-  color: var(--text-disabled-color) !important;
-  outline: none;
+.button.primary:not([disabled]):active {
+  background-color: var(--button-primary-active-bg-color);
 }
 
-.button[disabled]:hover {
-  cursor: default;
+.button.primary[disabled] {
+  background-color: var(--selectable-bg-color);
 }
+
+/*rounded button (variants - primary, outline, lg)*/
+
+.button.rounded {
+  --size: 2.75rem;
+  --scale: 1;
+
+  inline-size: calc(var(--size) * var(--scale));
+  aspect-ratio: 1 / 1;
+  border-radius: 9999px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  user-select: none;
+  font-size: calc(var(--size) * 0.35 * var(--scale));
+}
+
+.button.rounded.lg {
+  --scale: 1.2;
+}
+
+.button.rounded.outline {
+  color: var(--selectable-color);
+  background: var(--selectable-bg-color);
+}
+
+.button.rounded.primary {
+  box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
+}
+
+.button:not([disabled]).rounded.outline:hover {
+  background: var(--selectable-hovered-bg-color);
+}
+
+.button.rounded[disabled] {
+  box-shadow: none;
+}
+
+/*button icon*/
 
 .button-icon {
   margin-right: 5px;

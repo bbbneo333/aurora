@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 import _ from 'lodash';
 
-import { Icons } from '../../constants';
 import { useContextMenu, useMediaTrackList } from '../../contexts';
 import { MediaEnums } from '../../enums';
 import { IMediaTrack } from '../../interfaces';
@@ -11,9 +10,9 @@ import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 import { DateTimeUtils } from '../../utils';
 
-import { Icon } from '../icon/icon.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
+import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
 
 import styles from './media-track.component.css';
 
@@ -167,23 +166,12 @@ export function MediaTrack(props: {
         <div className="row">
           <div className={cx('col-10', 'media-track-main-column')}>
             <div className={cx('media-track-section')}>
-              {isTrackPlaying ? (
-                <button
-                  type="submit"
-                  className={cx('media-track-action-button')}
-                  onClick={pause}
-                >
-                  <Icon name={Icons.MediaPause}/>
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className={cx('media-track-action-button')}
-                  onClick={play}
-                >
-                  <Icon name={Icons.MediaPlay}/>
-                </button>
-              )}
+              <MediaPlaybackButton
+                isPlaying={isTrackPlaying}
+                className={cx('media-track-playback-button')}
+                onPlay={play}
+                onPause={pause}
+              />
             </div>
             {!disableCover && (
               <div className={cx('media-track-section')}>

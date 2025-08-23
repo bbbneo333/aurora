@@ -34,3 +34,9 @@
 .artist-header-info {
   color: var(--text-dark-color);
 }
+
+.artist-actions {
+  margin: 15px 0;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--selectable-outline-color);
+}

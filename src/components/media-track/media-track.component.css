@@ -12,7 +12,7 @@
   background-color: var(--selectable-hovered-bg-color);
 }
 
-.media-track:hover .media-track-action-button {
+.media-track:hover .media-track-playback-button {
   color: var(--selectable-hovered-color);
 }
 
@@ -29,14 +29,6 @@
 .media-track-cover {
   width: 50px;
   height: 50px;
-}
-
-.media-track-action-button {
-  background: none;
-  border: none;
-  color: var(--selectable-color);
-  font-size: 14px;
-  transition: var(--selectable-item-transition);
 }
 
 .media-track-side-column {

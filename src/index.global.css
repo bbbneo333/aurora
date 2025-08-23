@@ -18,7 +18,8 @@
   --context-menu-bg-color: #282828;
   /*button*/
   --button-primary-bg-color: #009233;
-  --button-primary-hovered-bg-color: #1db954;
+  --button-primary-hovered-bg-color: #007a2b;
+  --button-primary-active-bg-color: #004d19;
   /*selectable*/
   --selectable-color: #b3b3b3;
   --selectable-bg-color: #181818;
@@ -168,9 +169,9 @@ body {
   font-weight: bold;
 }
 
-.modal-footer [role="button"]:not([disabled]):hover {
-  transform: scale(1.05);
-}
+/*.modal-footer [role="button"]:not([disabled]):hover {*/
+/*  transform: scale(1.05);*/
+/*}*/
 
 /*form control*/
 
