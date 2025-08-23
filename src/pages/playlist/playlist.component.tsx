@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 
 import { I18nService, MediaLibraryService } from '../../services';
-import { Layout } from '../../constants';
+import { Layout, Routes } from '../../constants';
 import { RootState } from '../../reducers';
 import { IMediaPlaylistTrack } from '../../interfaces';
+import { useEntityMissing } from '../../hooks';
 
 import {
   MediaCoverPicture,
@@ -22,8 +23,10 @@ const cx = classNames.bind(styles);
 
 export function PlaylistPage() {
   const { playlistId } = useParams() as { playlistId: string };
+  const history = useHistory();
   const { mediaSelectedPlaylist } = useSelector((state: RootState) => state.mediaLibrary);
   const [mediaPlaylistTracks, setMediaPlaylistTracks] = useState<IMediaPlaylistTrack[]>([]);
+  const isPlaylistRemoved = useEntityMissing(mediaSelectedPlaylist);
 
   useEffect(() => {
     MediaLibraryService.loadMediaPlaylist(playlistId);
@@ -32,14 +35,22 @@ export function PlaylistPage() {
   ]);
 
   useEffect(() => {
-    MediaLibraryService.getMediaPlaylistTracks(playlistId)
+    if (!mediaSelectedPlaylist) {
+      return;
+    }
+
+    MediaLibraryService.getMediaPlaylistTracks(mediaSelectedPlaylist.id)
       .then((tracks) => {
         setMediaPlaylistTracks(tracks);
       });
   }, [
     playlistId,
-    mediaSelectedPlaylist?.tracks,
+    mediaSelectedPlaylist,
   ]);
+
+  if (isPlaylistRemoved) {
+    return history.replace(Routes.LibraryPlaylists);
+  }
 
   if (!mediaSelectedPlaylist) {
     return (<></>);

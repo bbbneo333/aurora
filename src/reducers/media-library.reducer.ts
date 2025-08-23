@@ -228,10 +228,14 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       } = action.data;
 
       const { mediaPlaylists } = state;
+      let { mediaSelectedPlaylist } = state;
+
       const mediaPlaylistsUpdated = mediaPlaylists.filter(playlist => playlist.id !== mediaPlaylistId);
+      mediaSelectedPlaylist = mediaSelectedPlaylist && mediaSelectedPlaylist.id !== mediaPlaylistId ? mediaSelectedPlaylist : undefined;
 
       return {
         ...state,
+        mediaSelectedPlaylist,
         mediaPlaylists: mediaPlaylistsUpdated,
       };
     }
