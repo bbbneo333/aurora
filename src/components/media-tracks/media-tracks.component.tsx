@@ -17,12 +17,14 @@ import {
 //
 // const cx = classNames.bind(styles);
 
-export function MediaTracks(props: {
-  mediaTracks: IMediaTrack[],
+export function MediaTracks<T extends IMediaTrack>(props: {
+  mediaTracks: T[],
   mediaTrackList?: IMediaTrackList,
   disableCovers?: boolean,
   disableAlbumLinks?: boolean,
   contextMenuItems?: MediaTrackContextMenuItem[],
+  getMediaTrackKey?: (mediaTrack: T) => string,
+  onMediaTrackPlay?: (mediaTrack: T) => void,
 }) {
   const {
     mediaTracks,
@@ -30,6 +32,8 @@ export function MediaTracks(props: {
     disableCovers = false,
     disableAlbumLinks = false,
     contextMenuItems,
+    getMediaTrackKey,
+    onMediaTrackPlay,
   } = props;
 
   const contextMenuId = !isEmpty(contextMenuItems) ? generateId() : undefined;
@@ -43,12 +47,13 @@ export function MediaTracks(props: {
         >
           {mediaTracks.map((mediaTrack, mediaTrackPointer) => (
             <MediaTrack
-              key={mediaTrack.id}
+              key={getMediaTrackKey ? getMediaTrackKey(mediaTrack) : mediaTrack.id}
               mediaTrack={mediaTrack}
               mediaTrackPointer={mediaTrackPointer}
               mediaTrackContextMenuId={contextMenuId}
               disableCover={disableCovers}
               disableAlbumLink={disableAlbumLinks}
+              handleOnPlayButtonClick={onMediaTrackPlay}
             />
           ))}
         </MediaTrackListProvider>

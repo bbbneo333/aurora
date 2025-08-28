@@ -18,10 +18,10 @@ import styles from './media-track.component.css';
 
 const cx = classNames.bind(styles);
 
-function useMediaTrackPlayback(props: {
-  mediaTrack: IMediaTrack,
+function useMediaTrackPlayback<T extends IMediaTrack>(props: {
+  mediaTrack: T,
   mediaTrackPointer?: number,
-  handleOnPlayButtonClick?: () => void,
+  handleOnPlayButtonClick?: (mediaTrack: T) => void,
   isPlaying?: boolean, // use the flag to force the playback state, otherwise uses the global playback state
 }) {
   const {
@@ -48,7 +48,7 @@ function useMediaTrackPlayback(props: {
 
   const play = useCallback(() => {
     if (handleOnPlayButtonClick) {
-      handleOnPlayButtonClick();
+      handleOnPlayButtonClick(mediaTrack);
     } else if (!_.isEmpty(mediaTracks)) {
       // when playing from a list, media track pointer is required to be provided
       if (_.isNil(mediaTrackPointer)) {
@@ -91,11 +91,11 @@ function useMediaTrackPlayback(props: {
   };
 }
 
-export function MediaTrack(props: {
-  mediaTrack: IMediaTrack,
+export function MediaTrack<T extends IMediaTrack>(props: {
+  mediaTrack: T,
   mediaTrackPointer?: number,
   mediaTrackContextMenuId?: string;
-  handleOnPlayButtonClick?: () => void,
+  handleOnPlayButtonClick?: (mediaTrack: T) => void,
   isPlaying?: boolean,
   disableCover?: boolean,
   disableAlbumLink?: boolean,
