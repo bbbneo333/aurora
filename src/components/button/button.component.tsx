@@ -124,6 +124,7 @@ export function Button(props: ButtonProps) {
         tabIndex={0}
         onMouseEnter={() => setTooltipOpen(true)}
         onMouseLeave={() => setTooltipOpen(false)}
+        data-dndkit-no-drag // do not allow drag events on our custom button
         {...mediaButtonContainerProps}
       >
         {icon && (

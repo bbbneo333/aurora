@@ -13,7 +13,7 @@ import { useEntityMissing } from '../../hooks';
 import {
   MediaCoverPicture,
   MediaTrackContextMenuItem,
-  MediaTracks,
+  MediaTrackList,
 } from '../../components';
 
 import styles from './playlist.component.css';
@@ -93,7 +93,7 @@ export function PlaylistPage() {
       )}
       {!isEmpty(mediaPlaylistTracks) && (
         <div className={cx('playlist-tracklist')}>
-          <MediaTracks
+          <MediaTrackList
             mediaTracks={mediaPlaylistTracks}
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,

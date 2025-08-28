@@ -664,6 +664,52 @@ class MediaPlayerService {
     return !_.isNil(this.getNextFromList());
   }
 
+  // read / write API
+
+  getMediaQueueTracks(): IMediaQueueTrack[] {
+    const {
+      mediaPlayer,
+    } = store.getState();
+
+    const {
+      mediaTracks,
+      mediaPlaybackCurrentMediaTrack,
+    } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack) {
+      return mediaTracks;
+    }
+
+    const currentIndex = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id);
+    return mediaTracks.slice(currentIndex + 1);
+  }
+
+  updateMediaQueueTracks(mediaQueueTracks: IMediaQueueTrack[]): void {
+    const { mediaPlayer } = store.getState();
+    const { mediaPlaybackCurrentMediaTrack, mediaPlaybackCurrentTrackList } = mediaPlayer;
+    let { mediaTracks } = mediaPlayer;
+
+    if (mediaPlaybackCurrentMediaTrack) {
+      const currentIndex = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id);
+      const existingMediaTracks = mediaTracks.slice(0, currentIndex + 1);
+
+      // replace everything after current with reordered tracks
+      mediaTracks = [...existingMediaTracks, ...mediaQueueTracks];
+    }
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks,
+        mediaTrackList: mediaPlaybackCurrentTrackList,
+        // important - upon updating media tracks in queue manually, we
+        // will no longer honor the inserted queue id
+        // let the player fallback to default when adding a media track to queue
+        mediaTrackLastInsertedQueueId: undefined,
+      },
+    });
+  }
+
   private loadMediaTrackToQueue(mediaTrack: IMediaTrack): IMediaQueueTrack {
     const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);
 

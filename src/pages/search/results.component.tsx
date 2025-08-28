@@ -16,7 +16,7 @@ import {
   MediaArtists,
   MediaPlaylists,
   MediaTrackContextMenuItem,
-  MediaTracks,
+  MediaTrackList,
 } from '../../components';
 
 import styles from './results.component.css';
@@ -41,7 +41,7 @@ export function TracksSearchResults({ tracks, trim }: {
         )}
         <div className="row">
           <div className={cx('col-12', 'search-results-content')}>
-            <MediaTracks
+            <MediaTrackList
               mediaTracks={trim ? take(tracks, defaultResultTrim) : tracks}
               mediaTrackList={{
                 // provide consistent id to this tracklist to maintain playback state

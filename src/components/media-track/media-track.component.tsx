@@ -18,16 +18,26 @@ import styles from './media-track.component.css';
 
 const cx = classNames.bind(styles);
 
+export type MediaTrackProps<T> = {
+  mediaTrack: T,
+  mediaTrackPointer?: number,
+  mediaTrackContextMenuId?: string;
+  onMediaTrackPlay?: (mediaTrack: T) => void,
+  isPlaying?: boolean,
+  disableCover?: boolean,
+  disableAlbumLink?: boolean,
+};
+
 function useMediaTrackPlayback<T extends IMediaTrack>(props: {
   mediaTrack: T,
   mediaTrackPointer?: number,
-  handleOnPlayButtonClick?: (mediaTrack: T) => void,
+  onMediaTrackPlay?: (mediaTrack: T) => void,
   isPlaying?: boolean, // use the flag to force the playback state, otherwise uses the global playback state
 }) {
   const {
     mediaTrack,
     mediaTrackPointer,
-    handleOnPlayButtonClick,
+    onMediaTrackPlay,
     isPlaying = false,
   } = props;
 
@@ -47,8 +57,8 @@ function useMediaTrackPlayback<T extends IMediaTrack>(props: {
     && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id);
 
   const play = useCallback(() => {
-    if (handleOnPlayButtonClick) {
-      handleOnPlayButtonClick(mediaTrack);
+    if (onMediaTrackPlay) {
+      onMediaTrackPlay(mediaTrack);
     } else if (!_.isEmpty(mediaTracks)) {
       // when playing from a list, media track pointer is required to be provided
       if (_.isNil(mediaTrackPointer)) {
@@ -60,7 +70,7 @@ function useMediaTrackPlayback<T extends IMediaTrack>(props: {
       MediaPlayerService.playMediaTrack(mediaTrack);
     }
   }, [
-    handleOnPlayButtonClick,
+    onMediaTrackPlay,
     mediaTrack,
     mediaTrackPointer,
     mediaTracks,
@@ -91,20 +101,12 @@ function useMediaTrackPlayback<T extends IMediaTrack>(props: {
   };
 }
 
-export function MediaTrack<T extends IMediaTrack>(props: {
-  mediaTrack: T,
-  mediaTrackPointer?: number,
-  mediaTrackContextMenuId?: string;
-  handleOnPlayButtonClick?: (mediaTrack: T) => void,
-  isPlaying?: boolean,
-  disableCover?: boolean,
-  disableAlbumLink?: boolean,
-}) {
+export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
   const {
     mediaTrack,
     mediaTrackPointer,
     mediaTrackContextMenuId,
-    handleOnPlayButtonClick,
+    onMediaTrackPlay,
     isPlaying = false,
     disableCover = false,
     disableAlbumLink = false,
@@ -121,7 +123,7 @@ export function MediaTrack<T extends IMediaTrack>(props: {
   } = useMediaTrackPlayback({
     mediaTrack,
     mediaTrackPointer,
-    handleOnPlayButtonClick,
+    onMediaTrackPlay,
     isPlaying,
   });
 
