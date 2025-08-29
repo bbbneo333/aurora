@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
 import _ from 'lodash';
 
-import { MediaTrack, MediaTrackContextMenu, MediaTrackContextMenuItem } from '../../components';
+import {
+  MediaTrack,
+  MediaTrackList,
+  MediaTrackContextMenu,
+  MediaTrackContextMenuItem,
+} from '../../components';
+
 import { MediaEnums } from '../../enums';
 import { IMediaQueueTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
@@ -15,7 +21,6 @@ const cx = classNames.bind(styles);
 
 enum MediaContextMenus {
   PlayingTrack = 'media_queue_playing_track_context_menu',
-  UpcomingTrack = 'media_queue_upcoming_track_context_menu',
 }
 
 export function PlayerQueueComponent() {
@@ -23,13 +28,24 @@ export function PlayerQueueComponent() {
     mediaTracks,
     mediaPlaybackState,
     mediaPlaybackCurrentMediaTrack,
+    mediaPlaybackQueueOnShuffle,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
-  let mediaPlaybackUpcomingTracks: IMediaQueueTrack[] = [];
-  if (mediaPlaybackCurrentMediaTrack) {
-    const mediaPlaybackCurrentMediaTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaPlaybackCurrentMediaTrack.queue_entry_id);
-    mediaPlaybackUpcomingTracks = _.slice(mediaTracks, mediaPlaybackCurrentMediaTrackPointer + 1);
-  }
+  const [mediaQueueTracks, setMediaQueueTracks] = useState<IMediaQueueTrack[]>([]);
+
+  const onMediaTracksSorted = useCallback((mediaQueueTracksUpdated: IMediaQueueTrack[]) => {
+    setMediaQueueTracks(mediaQueueTracksUpdated);
+    MediaPlayerService.updateMediaQueueTracks(mediaQueueTracksUpdated);
+  }, []);
+
+  useEffect(() => {
+    const mediaQueueTracksUpdated = MediaPlayerService.getMediaQueueTracks();
+    setMediaQueueTracks(mediaQueueTracksUpdated);
+  }, [
+    mediaTracks.length,
+    mediaPlaybackCurrentMediaTrack?.queue_entry_id,
+    mediaPlaybackQueueOnShuffle,
+  ]);
 
   return (
     <div className="container-fluid">
@@ -56,7 +72,7 @@ export function PlayerQueueComponent() {
                   mediaTrack={mediaPlaybackCurrentMediaTrack}
                   mediaTrackContextMenuId={MediaContextMenus.PlayingTrack}
                   isPlaying={mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing}
-                  handleOnPlayButtonClick={() => {
+                  onMediaTrackPlay={() => {
                     MediaPlayerService.playMediaTrackFromQueue(mediaPlaybackCurrentMediaTrack);
                   }}
                 />
@@ -73,7 +89,7 @@ export function PlayerQueueComponent() {
           </div>
         </div>
       )}
-      {!_.isEmpty(mediaPlaybackUpcomingTracks) && (
+      {!_.isEmpty(mediaQueueTracks) && (
         <div className={cx('player-queue-section')}>
           <div className="row">
             <div className="col-12">
@@ -81,25 +97,20 @@ export function PlayerQueueComponent() {
                 {I18nService.getString('label_player_queue_upcoming_tracks')}
               </div>
               <div className={cx('player-queue-section-content')}>
-                {mediaPlaybackUpcomingTracks.map((mediaTrack, mediaTrackPointer) => (
-                  <MediaTrack
-                    key={mediaTrack.queue_entry_id}
-                    mediaTrack={mediaTrack}
-                    mediaTrackPointer={mediaTrackPointer}
-                    mediaTrackContextMenuId={MediaContextMenus.UpcomingTrack}
-                    handleOnPlayButtonClick={() => {
-                      MediaPlayerService.playMediaTrackFromQueue(mediaTrack);
-                    }}
-                  />
-                ))}
-                <MediaTrackContextMenu
-                  id={MediaContextMenus.UpcomingTrack}
-                  menuItems={[
+                <MediaTrackList
+                  sortable
+                  mediaTracks={mediaQueueTracks}
+                  getMediaTrackKey={(mediaTrack: IMediaQueueTrack) => mediaTrack.queue_entry_id}
+                  contextMenuItems={[
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.RemoveFromQueue,
                     MediaTrackContextMenuItem.Separator,
                     MediaTrackContextMenuItem.AddToPlaylist,
                   ]}
+                  onMediaTrackPlay={(mediaTrack) => {
+                    MediaPlayerService.playMediaTrackFromQueue(mediaTrack);
+                  }}
+                  onMediaTracksSorted={onMediaTracksSorted}
                 />
               </div>
             </div>

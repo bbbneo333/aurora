@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -13,7 +13,7 @@ import { useEntityMissing } from '../../hooks';
 import {
   MediaCoverPicture,
   MediaTrackContextMenuItem,
-  MediaTracks,
+  MediaTrackList,
 } from '../../components';
 
 import styles from './playlist.component.css';
@@ -45,6 +45,20 @@ export function PlaylistPage() {
       });
   }, [
     playlistId,
+    mediaSelectedPlaylist,
+  ]);
+
+  const onMediaTracksSorted = useCallback(async (mediaTracks: IMediaPlaylistTrack[]) => {
+    if (!mediaSelectedPlaylist) {
+      return;
+    }
+
+    await MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
+      tracks: mediaTracks,
+    });
+
+    setMediaPlaylistTracks(mediaTracks);
+  }, [
     mediaSelectedPlaylist,
   ]);
 
@@ -93,18 +107,19 @@ export function PlaylistPage() {
       )}
       {!isEmpty(mediaPlaylistTracks) && (
         <div className={cx('playlist-tracklist')}>
-          <MediaTracks
+          <MediaTrackList
+            sortable
             mediaTracks={mediaPlaylistTracks}
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
             }}
+            getMediaTrackKey={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
             contextMenuItems={[
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
-            disableCovers
-            disableAlbumLinks
+            onMediaTracksSorted={onMediaTracksSorted}
           />
         </div>
       )}

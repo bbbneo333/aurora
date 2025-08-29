@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import {
   MediaCoverPicture,
   MediaArtistLinkComponent,
-  MediaTracks,
+  MediaTrackList,
   MediaTrackContextMenuItem,
   MediaCollectionActions,
 } from '../../components';
@@ -68,7 +68,7 @@ export function AlbumPage() {
         <MediaCollectionActions mediaItem={MediaUtils.getMediaItemFromAlbum(mediaSelectedAlbum)}/>
       </div>
       <div className={cx('album-tracklist')}>
-        <MediaTracks
+        <MediaTrackList
           mediaTracks={mediaSelectedAlbumTracks}
           mediaTrackList={{
             id: mediaSelectedAlbum.id,

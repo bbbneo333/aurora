@@ -19,8 +19,9 @@ function MediaArtistLinkSeparator() {
 
 export function MediaTrackAlbumLinkComponent(props: {
   mediaTrack: IMediaTrack,
+  onContextMenu?: (e: React.MouseEvent) => void,
 }) {
-  const { mediaTrack } = props;
+  const { mediaTrack, onContextMenu } = props;
 
   return (
     <RouterLink
@@ -29,6 +30,7 @@ export function MediaTrackAlbumLinkComponent(props: {
         albumId: mediaTrack.track_album.id,
       })}
       className={cx('media-track-album-link', 'app-nav-link')}
+      onContextMenu={onContextMenu}
     >
       {mediaTrack.track_name}
     </RouterLink>
@@ -37,11 +39,12 @@ export function MediaTrackAlbumLinkComponent(props: {
 
 export function MediaTrackNameComponent(props: {
   mediaTrack: IMediaTrack,
+  onContextMenu?: (e: React.MouseEvent) => void,
 }) {
-  const { mediaTrack } = props;
+  const { mediaTrack, onContextMenu } = props;
 
   return (
-    <div className={cx('media-track-name')}>
+    <div className={cx('media-track-name')} onContextMenu={onContextMenu}>
       {mediaTrack.track_name}
     </div>
   );
@@ -90,11 +93,13 @@ export function MediaTrackInfoComponent(props: {
   mediaTrack: IMediaTrack,
   disableAlbumLink?: boolean,
   className?: string,
+  onContextMenu?: (e: React.MouseEvent) => void,
 }) {
   const {
     mediaTrack,
     disableAlbumLink = false,
     className,
+    onContextMenu,
   } = props;
 
   return (
@@ -102,8 +107,18 @@ export function MediaTrackInfoComponent(props: {
       <div className={cx('media-track-info-title')}>
         {
           disableAlbumLink
-            ? <MediaTrackNameComponent mediaTrack={mediaTrack}/>
-            : <MediaTrackAlbumLinkComponent mediaTrack={mediaTrack}/>
+            ? (
+              <MediaTrackNameComponent
+                mediaTrack={mediaTrack}
+                onContextMenu={onContextMenu}
+              />
+            )
+            : (
+              <MediaTrackAlbumLinkComponent
+                mediaTrack={mediaTrack}
+                onContextMenu={onContextMenu}
+              />
+            )
         }
       </div>
       <div className={cx('media-track-info-subtitle')}>

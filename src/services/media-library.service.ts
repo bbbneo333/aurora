@@ -2,12 +2,13 @@ import { isNil, assign, defaults } from 'lodash';
 import { Semaphore } from 'async-mutex';
 
 import { AppEnums, MediaEnums } from '../enums';
-import { MediaUtils } from '../utils';
+import { MediaUtils, DatastoreUtils } from '../utils';
 import store from '../store';
-import { DataStoreInputData } from '../types';
+import { DataStoreInputData, DataStoreUpdateData } from '../types';
 
 import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
+import I18nService from './i18n.service';
 
 import {
   MediaAlbumDatastore,
@@ -30,10 +31,11 @@ import {
   IMediaPlaylistTrack,
   IMediaPlaylistTrackData,
   IMediaPlaylistTrackInputData,
+  IMediaPlaylistTrackUpdateData,
+  IMediaPlaylistUpdateData,
   IMediaTrack,
   IMediaTrackData,
 } from '../interfaces';
-import I18nService from './i18n.service';
 
 export type MediaSyncFunction = () => Promise<void>;
 
@@ -446,8 +448,8 @@ class MediaLibraryService {
 
   // update API
 
-  async updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateParams: IMediaPlaylistInputData): Promise<IMediaPlaylist> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.updateMediaPlaylist(mediaPlaylistId, mediaPlaylistUpdateParams);
+  async updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: IMediaPlaylistUpdateData): Promise<IMediaPlaylist> {
+    const mediaPlaylistData = await MediaPlaylistDatastore.updateMediaPlaylist(mediaPlaylistId, await this.buildMediaPlaylistUpdateDataFromInput(mediaPlaylistId, mediaPlaylistUpdateData));
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
@@ -475,8 +477,8 @@ class MediaLibraryService {
     });
   }
 
-  async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylist> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.deleteMediaPlaylistTracks(mediaPlaylistId, mediaTrackIds);
+  async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylist> {
+    const mediaPlaylistData = await MediaPlaylistDatastore.deleteMediaPlaylistTracks(mediaPlaylistId, mediaPlaylistTrackIds);
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
@@ -715,9 +717,53 @@ class MediaLibraryService {
 
   private buildMediaPlaylistTrackFromInput(trackInputData: IMediaPlaylistTrackInputData): IMediaPlaylistTrackData {
     return {
-      ...trackInputData,
+      playlist_track_id: DatastoreUtils.generateId(),
+      provider: trackInputData.provider,
+      provider_id: trackInputData.provider_id,
       added_at: Date.now(),
     };
+  }
+
+  private async buildMediaPlaylistUpdateDataFromInput(playlistId: string, playlistUpdateData: IMediaPlaylistUpdateData): Promise<DataStoreUpdateData<IMediaPlaylistData>> {
+    const data: DataStoreUpdateData<IMediaPlaylistData> = {};
+    if (playlistUpdateData.name) {
+      data.name = playlistUpdateData.name;
+    }
+    if (playlistUpdateData.cover_picture) {
+      data.cover_picture = playlistUpdateData.cover_picture;
+    }
+    if (playlistUpdateData.tracks) {
+      data.tracks = await this.buildMediaPlaylistTrackUpdateDataFromInput(playlistId, playlistUpdateData.tracks);
+    }
+
+    return data;
+  }
+
+  private async buildMediaPlaylistTrackUpdateDataFromInput(playlistId: string, playlistTrackUpdateDataList: IMediaPlaylistTrackUpdateData[]): Promise<IMediaPlaylistTrackData[]> {
+    // we got tracks to update, we only get playlist_track_id in the order we required
+    // we also can have deleted ids, no addition is allowed
+    // build the new set of playlist tracks in order we require and set them directly
+    const playlistData = await MediaPlaylistDatastore.findMediaPlaylist({
+      id: playlistId,
+    });
+    if (!playlistData) {
+      throw new Error(`MediaLibraryService encountered error at buildMediaPlaylistTrackUpdateDataFromInput - Could not find playlist - ${playlistId}`);
+    }
+
+    const playlistUpdatedTracks: IMediaPlaylistTrackData[] = [];
+    playlistTrackUpdateDataList.forEach((trackUpdateData) => {
+      const playlistTrackData = playlistData.tracks.find(
+        trackData => trackData.playlist_track_id === trackUpdateData.playlist_track_id,
+      );
+      // no addition allowed
+      if (!playlistTrackData) {
+        throw new Error(`MediaLibraryService encountered error at buildMediaPlaylistTrackUpdateDataFromInput - Could not find track in playlist - ${trackUpdateData.playlist_track_id}`);
+      }
+
+      playlistUpdatedTracks.push(playlistTrackData);
+    });
+
+    return playlistUpdatedTracks;
   }
 }
 

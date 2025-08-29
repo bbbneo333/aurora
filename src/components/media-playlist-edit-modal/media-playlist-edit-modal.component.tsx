@@ -4,7 +4,7 @@ import React, {
 import { Form, Modal } from 'react-bootstrap';
 
 import { useModal } from '../../contexts';
-import { IMediaPlaylistInputData } from '../../interfaces';
+import { IMediaPlaylistUpdateData } from '../../interfaces';
 import { I18nService, MediaLibraryService } from '../../services';
 
 import { Button } from '../button/button.component';
@@ -16,7 +16,7 @@ export function MediaPlaylistEditModal(props: {
   const { hideModal } = useModal();
   const [validated, setValidated] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
-  const [inputData, setInputData] = useState<IMediaPlaylistInputData>({
+  const [inputData, setInputData] = useState<IMediaPlaylistUpdateData>({
     name: '',
   });
 
@@ -25,7 +25,9 @@ export function MediaPlaylistEditModal(props: {
     setValidated(true);
 
     if (formRef.current?.checkValidity()) {
-      await MediaLibraryService.updateMediaPlaylist(mediaPlaylistId, inputData);
+      await MediaLibraryService.updateMediaPlaylist(mediaPlaylistId, {
+        name: inputData.name,
+      });
       hideModal();
     }
   }, [

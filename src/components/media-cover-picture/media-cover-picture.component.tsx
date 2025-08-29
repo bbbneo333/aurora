@@ -16,17 +16,19 @@ export function MediaCoverPicture(props: {
   mediaPictureAltText?: string,
   mediaCoverPlaceholderIcon?: string,
   className?: string,
+  onContextMenu?: (e: React.MouseEvent) => void,
 }) {
   const {
     mediaPicture,
     mediaPictureAltText,
     mediaCoverPlaceholderIcon,
     className,
+    onContextMenu,
   } = props;
 
   if (!mediaPicture) {
     return (
-      <div className={cx('media-cover-picture', className)}>
+      <div className={cx('media-cover-picture', className)} onContextMenu={onContextMenu}>
         <div className={cx('media-cover-placeholder')}>
           <Icon
             className={cx('media-cover-placeholder-icon')}
@@ -50,7 +52,7 @@ export function MediaCoverPicture(props: {
   }
 
   return (
-    <div className={cx('media-cover-picture', className)}>
+    <div className={cx('media-cover-picture', className)} onContextMenu={onContextMenu}>
       <img
         alt={mediaPictureAltText}
         src={mediaCoverPictureImageSrc}
