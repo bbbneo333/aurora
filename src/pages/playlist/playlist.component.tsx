@@ -117,8 +117,6 @@ export function PlaylistPage() {
         <div className={cx('playlist-tracklist')}>
           <MediaTrackList
             sortable
-            disableCovers
-            disableAlbumLinks
             mediaTracks={mediaPlaylistTracks}
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
