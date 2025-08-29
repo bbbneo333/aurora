@@ -1,7 +1,11 @@
 import AppService from '../services/app.service';
 import { AppEnums } from '../enums';
 import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
-import { IMediaPlaylistData, IMediaPlaylistInputData, IMediaPlaylistTrackData } from '../interfaces';
+
+import {
+  IMediaPlaylistData,
+  IMediaPlaylistTrackData,
+} from '../interfaces';
 
 class MediaPlaylistDatastore {
   private readonly mediaPlaylistsDatastoreName = 'media_playlists';
@@ -35,14 +39,14 @@ class MediaPlaylistDatastore {
     });
   }
 
-  deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackIds: string[]): Promise<IMediaPlaylistData> {
+  deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylistData> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
       $pull: {
         tracks: {
-          id: {
-            $in: mediaTrackIds,
+          playlist_track_id: {
+            $in: mediaPlaylistTrackIds,
           },
         },
       },
@@ -63,7 +67,7 @@ class MediaPlaylistDatastore {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSRemoveOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
   }
 
-  updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: DataStoreUpdateData<IMediaPlaylistInputData>) {
+  updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: DataStoreUpdateData<IMediaPlaylistData>) {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {

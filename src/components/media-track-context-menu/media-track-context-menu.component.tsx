@@ -9,8 +9,14 @@ import {
 } from 'react-contexify';
 
 import { useContextMenu } from '../../contexts';
-import { IMediaQueueTrack, IMediaTrack, IMediaTrackList } from '../../interfaces';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+
+import {
+  IMediaPlaylistTrack,
+  IMediaQueueTrack,
+  IMediaTrack,
+  IMediaTrackList,
+} from '../../interfaces';
 
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
@@ -31,7 +37,6 @@ export enum MediaTrackContextMenuItemAction {
 export interface MediaTrackContextMenuItemProps {
   mediaTrack?: IMediaTrack;
   mediaTrackList?: IMediaTrackList;
-  mediaQueueTrack?: IMediaQueueTrack;
 }
 
 export function MediaTrackContextMenu(props: {
@@ -43,30 +48,41 @@ export function MediaTrackContextMenu(props: {
 
   const handleMenuItemClick = useCallback(async (itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
     const itemAction: MediaTrackContextMenuItemAction = itemParams.id as MediaTrackContextMenuItemAction;
-    const { mediaTrack, mediaTrackList, mediaQueueTrack } = menuProps;
+    const { mediaTrack, mediaTrackList } = menuProps;
 
     switch (itemAction) {
-      case MediaTrackContextMenuItemAction.AddToQueue:
+      case MediaTrackContextMenuItemAction.AddToQueue: {
         if (!mediaTrack) {
           throw new Error('MediaTrackContextMenu encountered error while performing action AddToQueue - No media track was provided');
         }
         MediaPlayerService.addMediaTrackToQueue(mediaTrack);
         break;
-      case MediaTrackContextMenuItemAction.RemoveFromQueue:
-        if (!mediaQueueTrack) {
-          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromQueue - No media queue track was provided');
+      }
+      case MediaTrackContextMenuItemAction.RemoveFromQueue: {
+        // manually cast track and perform checks
+        const mediaQueueTrack = mediaTrack as IMediaQueueTrack;
+
+        if (!mediaQueueTrack || !mediaQueueTrack.queue_entry_id) {
+          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromQueue - No or invalid media queue track was provided');
         }
         MediaPlayerService.removeMediaTrackFromQueue(mediaQueueTrack);
         break;
-      case MediaTrackContextMenuItemAction.RemoveFromPlaylist:
-        if (!mediaTrack) {
-          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No media track was provided');
+      }
+      case MediaTrackContextMenuItemAction.RemoveFromPlaylist: {
+        // manually cast track and perform checks
+        const mediaPlaylistTrack = mediaTrack as IMediaPlaylistTrack;
+
+        if (!mediaPlaylistTrack || !mediaPlaylistTrack.playlist_track_id) {
+          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No or invalid playlist track was provided');
         }
         if (!mediaTrackList) {
           throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No media playlist was provided');
         }
-        await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [mediaTrack.id]);
+        await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [
+          mediaPlaylistTrack.playlist_track_id,
+        ]);
         break;
+      }
       default:
       // unsupported action, do nothing
     }

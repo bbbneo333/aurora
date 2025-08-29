@@ -135,9 +135,6 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
         props: {
           mediaTrack,
           mediaTrackList,
-          // important - this component is also used for media queue tracks, in order to support actions for the same
-          // we are supplying value for mediaQueueTrack as well
-          mediaQueueTrack: mediaTrack,
         },
       });
     }

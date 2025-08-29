@@ -152,6 +152,7 @@ export interface IMediaPlaylistData {
 }
 
 export interface IMediaPlaylistTrackData {
+  playlist_track_id: string;
   provider: string;
   provider_id: string;
   added_at: number;
@@ -172,4 +173,14 @@ export interface IMediaPlaylistInputData {
 export interface IMediaPlaylistTrackInputData {
   provider: string;
   provider_id: string;
+}
+
+export interface IMediaPlaylistUpdateData {
+  name?: string;
+  tracks?: IMediaPlaylistTrackUpdateData[];
+  cover_picture?: IMediaPicture;
+}
+
+export interface IMediaPlaylistTrackUpdateData {
+  playlist_track_id: string;
 }

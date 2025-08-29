@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useHistory, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -48,6 +48,28 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
+  const onMediaTracksSorted = useCallback((mediaTracks: IMediaPlaylistTrack[]) => {
+    if (!mediaSelectedPlaylist) {
+      return;
+    }
+
+    // TODO: Improve this experience
+    // ideally, tracks in playlist should freeze and remain to their updated position
+    // make the update call and let it take time
+    // unfreeze tracks with updated position if call succeeds
+    // revert back to old position if call fails
+
+    setMediaPlaylistTracks(mediaTracks);
+
+    MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
+      tracks: mediaTracks,
+    })
+      .then(() => {
+      });
+  }, [
+    mediaSelectedPlaylist,
+  ]);
+
   if (isPlaylistRemoved) {
     return history.replace(Routes.LibraryPlaylists);
   }
@@ -94,17 +116,20 @@ export function PlaylistPage() {
       {!isEmpty(mediaPlaylistTracks) && (
         <div className={cx('playlist-tracklist')}>
           <MediaTrackList
+            sortable
+            disableCovers
+            disableAlbumLinks
             mediaTracks={mediaPlaylistTracks}
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
             }}
+            getMediaTrackKey={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
             contextMenuItems={[
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
-            disableCovers
-            disableAlbumLinks
+            onMediaTracksSorted={onMediaTracksSorted}
           />
         </div>
       )}
