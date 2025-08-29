@@ -102,7 +102,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
               } catch (err) {
                 // commit failed: rollback request to parent on error
                 // eslint-disable-next-line no-console
-                console.error('onTracksSorted failed:', err);
+                console.error('onMediaTracksSorted failed:', err);
                 await onMediaTracksSorted(prevItems);
               } finally {
                 // ditch local state, back to controlled
