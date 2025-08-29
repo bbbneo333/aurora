@@ -48,24 +48,16 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
-  const onMediaTracksSorted = useCallback((mediaTracks: IMediaPlaylistTrack[]) => {
+  const onMediaTracksSorted = useCallback(async (mediaTracks: IMediaPlaylistTrack[]) => {
     if (!mediaSelectedPlaylist) {
       return;
     }
 
-    // TODO: Improve this experience
-    // ideally, tracks in playlist should freeze and remain to their updated position
-    // make the update call and let it take time
-    // unfreeze tracks with updated position if call succeeds
-    // revert back to old position if call fails
+    await MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
+      tracks: mediaTracks,
+    });
 
     setMediaPlaylistTracks(mediaTracks);
-
-    MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
-      tracks: mediaTracks,
-    })
-      .then(() => {
-      });
   }, [
     mediaSelectedPlaylist,
   ]);

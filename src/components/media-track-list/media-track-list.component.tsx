@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
@@ -36,7 +36,7 @@ export type MediaTracksProps<T> = {
   getMediaTrackKey?: (mediaTrack: T) => string,
   onMediaTrackPlay?: (mediaTrack: T) => void,
   sortable?: boolean,
-  onMediaTracksSorted?: (mediaTracks: T[]) => void,
+  onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void,
 };
 
 export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>) {
@@ -52,6 +52,10 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     onMediaTracksSorted,
   } = props;
 
+  const [dragItems, setDragItems] = useState<T[] | null>(null);
+  const [prevItems, setPrevItems] = useState<T[]>([]);
+  const [isSortingDisabled, setIsSortingDisabled] = useState(false);
+
   const contextMenuId = useMemo(
     () => (!isEmpty(contextMenuItems) ? StringUtils.generateId() : undefined),
     [contextMenuItems],
@@ -62,35 +66,60 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     getMediaTrackKey,
   ]);
 
+  const list = dragItems ?? mediaTracks;
+
   return (
     <div>
       <div className="row">
         <MediaTrackListProvider
-          mediaTracks={mediaTracks}
+          mediaTracks={list}
           mediaTrackList={mediaTrackList}
         >
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            onDragEnd={({ active, over }) => {
-              if (!sortable || !onMediaTracksSorted || !over || active.id === over.id) return;
+            onDragStart={() => {
+              // snapshot before change for rollback
+              setPrevItems(mediaTracks);
+            }}
+            onDragEnd={async ({ active, over }) => {
+              if (!sortable || !onMediaTracksSorted || !over || active.id === over.id) {
+                setDragItems(null);
+                return;
+              }
 
-              const oldIndex = mediaTracks.findIndex(t => getMediaTrackId(t) === active.id);
-              const newIndex = mediaTracks.findIndex(t => getMediaTrackId(t) === over.id);
+              const oldIndex = list.findIndex(t => getMediaTrackId(t) === active.id);
+              const newIndex = list.findIndex(t => getMediaTrackId(t) === over.id);
+              const newOrder = arrayMove(list, oldIndex, newIndex);
 
-              onMediaTracksSorted(arrayMove(mediaTracks, oldIndex, newIndex));
+              setDragItems(newOrder);
+              setIsSortingDisabled(true);
+
+              try {
+                // attempt commit: let the parent updates items
+                await onMediaTracksSorted(newOrder);
+              } catch (err) {
+                // commit failed: rollback request to parent on error
+                // eslint-disable-next-line no-console
+                console.error('onTracksSorted failed:', err);
+                await onMediaTracksSorted(prevItems);
+              } finally {
+                // ditch local state, back to controlled
+                setIsSortingDisabled(false);
+                setDragItems(null);
+              }
             }}
           >
             <SortableContext
-              items={mediaTracks.map(getMediaTrackId)}
+              items={list.map(getMediaTrackId)}
               strategy={verticalListSortingStrategy}
             >
-              {mediaTracks.map((mediaTrack, mediaTrackPointer) => (
+              {list.map((mediaTrack, mediaTrackPointer) => (
                 <MediaTrackListItem
                   key={getMediaTrackId(mediaTrack)}
                   id={getMediaTrackId(mediaTrack)}
-                  sortable={sortable}
+                  sortable={sortable && !isSortingDisabled}
                   mediaTrack={mediaTrack}
                   mediaTrackPointer={mediaTrackPointer}
                   mediaTrackContextMenuId={contextMenuId}
