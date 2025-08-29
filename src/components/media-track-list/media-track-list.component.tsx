@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { isEmpty } from 'lodash';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
@@ -52,8 +52,15 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     onMediaTracksSorted,
   } = props;
 
-  const contextMenuId = !isEmpty(contextMenuItems) ? StringUtils.generateId() : undefined;
+  const contextMenuId = useMemo(
+    () => (!isEmpty(contextMenuItems) ? StringUtils.generateId() : undefined),
+    [contextMenuItems],
+  );
   const sensors = useSensors(useSensor(SafePointerSensor));
+
+  const getMediaTrackId = useCallback((mediaTrack: T) => (getMediaTrackKey ? getMediaTrackKey(mediaTrack) : mediaTrack.id), [
+    getMediaTrackKey,
+  ]);
 
   return (
     <div>
@@ -67,23 +74,22 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
             collisionDetection={closestCenter}
             modifiers={[restrictToVerticalAxis, restrictToParentElement]}
             onDragEnd={({ active, over }) => {
-              if (sortable && onMediaTracksSorted && over && active.id !== over.id) {
-                const oldIndex = mediaTracks.findIndex(t => t.id === active.id);
-                const newIndex = mediaTracks.findIndex(t => t.id === over.id);
+              if (!sortable || !onMediaTracksSorted || !over || active.id === over.id) return;
 
-                if (onMediaTracksSorted) {
-                  onMediaTracksSorted(arrayMove(mediaTracks, oldIndex, newIndex));
-                }
-              }
+              const oldIndex = mediaTracks.findIndex(t => getMediaTrackId(t) === active.id);
+              const newIndex = mediaTracks.findIndex(t => getMediaTrackId(t) === over.id);
+
+              onMediaTracksSorted(arrayMove(mediaTracks, oldIndex, newIndex));
             }}
           >
             <SortableContext
-              items={mediaTracks.map(t => t.id)}
+              items={mediaTracks.map(getMediaTrackId)}
               strategy={verticalListSortingStrategy}
             >
               {mediaTracks.map((mediaTrack, mediaTrackPointer) => (
                 <MediaTrackListItem
-                  key={getMediaTrackKey ? getMediaTrackKey(mediaTrack) : mediaTrack.id}
+                  key={getMediaTrackId(mediaTrack)}
+                  id={getMediaTrackId(mediaTrack)}
                   sortable={sortable}
                   mediaTrack={mediaTrack}
                   mediaTrackPointer={mediaTrackPointer}

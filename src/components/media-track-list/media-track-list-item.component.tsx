@@ -6,11 +6,12 @@ import { IMediaTrack } from '../../interfaces';
 import { MediaTrack, MediaTrackProps } from '../media-track/media-track.component';
 
 export function MediaTrackListItem<T extends IMediaTrack>(props: MediaTrackProps<T> & {
+  id: string;
   sortable?: boolean;
 }) {
   const {
-    mediaTrack,
     sortable,
+    id,
   } = props;
 
   const {
@@ -20,7 +21,7 @@ export function MediaTrackListItem<T extends IMediaTrack>(props: MediaTrackProps
     transform,
     transition,
   } = useSortable({
-    id: mediaTrack.id,
+    id,
     disabled: !sortable,
   });
 
