@@ -10,9 +10,9 @@ import { RootState } from '../../reducers';
 import { Icon } from '../icon/icon.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
+import { MediaTrackContextMenu, MediaTrackContextMenuItem } from '../media-track-context-menu/media-track-context-menu.component';
 
 import styles from './media-player-ribbon.component.css';
-import { MediaTrackContextMenu, MediaTrackContextMenuItem } from '../media-track-context-menu/media-track-context-menu.component';
 
 const cx = classNames.bind(styles);
 
