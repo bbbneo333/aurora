@@ -36,6 +36,8 @@
   --stage-overlay-bg-color: #181818;
   --stage-overlay-outline-color: #282828;
   --stage-scroll-bg-color: #6d6d6d;
+  --stage-toast-bg-color: #f8f8f8;
+  --stage-toast-color: #1d1d1d;
   /*text*/
   --text-dark-color: #b3b3b3;
   --text-light-color: #e9ecef;

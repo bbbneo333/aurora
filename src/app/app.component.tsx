@@ -9,7 +9,7 @@ import {
   MediaPlayerRibbonComponent,
 } from '../components';
 
-import { ContextMenuProvider, ModalProvider } from '../contexts';
+import { ContextMenuProvider, ModalProvider, NotificationProvider } from '../contexts';
 import { AppEnums } from '../enums';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
@@ -100,12 +100,14 @@ export function App() {
         )}
         {!appStateIsLoading && (
           <Router>
-            <ModalProvider>
-              <ContextMenuProvider>
-                <Stage/>
-                <Player/>
-              </ContextMenuProvider>
-            </ModalProvider>
+            <NotificationProvider>
+              <ModalProvider>
+                <ContextMenuProvider>
+                  <Stage/>
+                  <Player/>
+                </ContextMenuProvider>
+              </ModalProvider>
+            </NotificationProvider>
           </Router>
         )}
       </Provider>

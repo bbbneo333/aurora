@@ -43,5 +43,6 @@
   "tooltip_add_collection_to_queue": "Add to Queue",
   "tooltip_add_collection_to_playlist": "Add to Playlist",
   "tooltip_rename_playlist": "Rename",
-  "tooltip_delete_playlist": "Delete"
+  "tooltip_delete_playlist": "Delete",
+  "message_added_to_queue": "Added to queue"
 }
