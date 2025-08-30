@@ -9,6 +9,7 @@ import { DataStoreInputData, DataStoreUpdateData } from '../types';
 import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
 import I18nService from './i18n.service';
+import NotificationService from './notification.service';
 
 import {
   MediaAlbumDatastore,
@@ -360,6 +361,10 @@ class MediaLibraryService {
         mediaPlaylist,
       },
     });
+
+    NotificationService.show(I18nService.getString('message_added_to_playlist', {
+      playlistName: mediaPlaylist.name,
+    }));
 
     return mediaPlaylist;
   }
