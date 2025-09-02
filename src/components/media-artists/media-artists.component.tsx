@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames/bind';
 
 import { IMediaArtist } from '../../interfaces';
 import { MediaUtils, StringUtils } from '../../utils';
@@ -11,6 +12,10 @@ import {
 
 import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
 
+import styles from './media-artists.component.css';
+
+const cx = classNames.bind(styles);
+
 export function MediaArtists(props: {
   mediaArtists: IMediaArtist[],
 }) {
@@ -19,7 +24,7 @@ export function MediaArtists(props: {
 
   return (
     <div>
-      <div className="row">
+      <div className={cx('row', 'media-artists')}>
         {mediaArtists.map((mediaArtist) => {
           const mediaItem = MediaUtils.getMediaItemFromArtist(mediaArtist);
 

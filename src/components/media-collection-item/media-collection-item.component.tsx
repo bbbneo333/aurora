@@ -49,7 +49,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
   ]);
 
   return (
-    <div className={cx('col-12 mb-3')} onContextMenu={handleOnContextMenu}>
+    <div className={cx('col-12')} onContextMenu={handleOnContextMenu}>
       <RouterLink
         exact
         to={routerLink}

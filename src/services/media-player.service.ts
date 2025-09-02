@@ -4,7 +4,6 @@ import { batch } from 'react-redux';
 import { MediaEnums } from '../enums';
 import store from '../store';
 import { ArrayUtils, StringUtils } from '../utils';
-import MediaProviderService from './media-provider.service';
 import { MediaTrackDatastore } from '../datastores';
 
 import {
@@ -13,6 +12,10 @@ import {
   IMediaTrack,
   IMediaTrackList,
 } from '../interfaces';
+
+import MediaProviderService from './media-provider.service';
+import NotificationService from './notification.service';
+import I18nService from './i18n.service';
 
 const debug = require('debug')('app:service:media_player_service');
 
@@ -228,8 +231,7 @@ class MediaPlayerService {
 
     // #7 - notify user
     if (!mediaTrackAddToQueueOptions?.skipUserNotification) {
-      // TODO: Add support for sending notification
-      //  "Track was added to the queue"
+      NotificationService.showMessage(I18nService.getString('message_added_to_queue'));
     }
   }
 
@@ -239,6 +241,8 @@ class MediaPlayerService {
         skipUserNotification: true,
       });
     });
+
+    NotificationService.showMessage(I18nService.getString('message_added_to_queue'));
   }
 
   removeMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack): void {

@@ -1,14 +1,18 @@
-import { isNil, assign, defaults } from 'lodash';
+import {
+  assign, defaults, isEmpty, isNil,
+} from 'lodash';
+
 import { Semaphore } from 'async-mutex';
 
 import { AppEnums, MediaEnums } from '../enums';
-import { MediaUtils, DatastoreUtils } from '../utils';
+import { DatastoreUtils, MediaUtils } from '../utils';
 import store from '../store';
-import { DataStoreInputData, DataStoreUpdateData } from '../types';
+import { AppError, DataStoreInputData, DataStoreUpdateData } from '../types';
 
 import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
 import I18nService from './i18n.service';
+import NotificationService from './notification.service';
 
 import {
   MediaAlbumDatastore,
@@ -47,6 +51,21 @@ export type MediaSearchResults = {
 };
 
 const debug = require('debug')('app:service:media_library_service');
+
+export class MediaLibraryPlaylistDuplicateTracksError extends AppError {
+  existingTrackDataList: IMediaPlaylistTrackInputData[] = [];
+  newTrackDataList: IMediaPlaylistTrackInputData[] = [];
+
+  constructor(
+    existingTrackDataList: IMediaPlaylistTrackInputData[],
+    newTrackDataList: IMediaPlaylistTrackInputData[] = [],
+  ) {
+    super('Duplicate tracks found in playlist');
+    this.name = 'MediaLibraryPlaylistDuplicateTracksError';
+    this.existingTrackDataList = existingTrackDataList;
+    this.newTrackDataList = newTrackDataList;
+  }
+}
 
 class MediaLibraryService {
   private readonly mediaPictureScaleWidth = 500;
@@ -346,22 +365,46 @@ class MediaLibraryService {
     return mediaPlaylist;
   }
 
-  async createMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTracks: IMediaPlaylistTrackInputData[]): Promise<IMediaPlaylist> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.createMediaPlaylistTracks(
+  /**
+   * @throws MediaLibraryPlaylistDuplicateTracksError
+   */
+  async addMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[], options?: {
+    // allowDuplicates: boolean;
+    ignoreExisting?: boolean; // only add new ones
+  }): Promise<IMediaPlaylist> {
+    const {
+      existingInputDataList,
+      newInputDataList,
+    } = await this.getExistingMediaPlaylistTrackInputData(
       mediaPlaylistId,
-      mediaPlaylistTracks.map(trackInputData => this.buildMediaPlaylistTrackFromInput(trackInputData)),
+      mediaPlaylistTrackInputDataList,
     );
 
-    const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
+    if (!isEmpty(existingInputDataList) && !options?.ignoreExisting) {
+      // not allowed to add duplicate tracks, throw error
+      throw new MediaLibraryPlaylistDuplicateTracksError(existingInputDataList, newInputDataList);
+    }
+
+    // all good
+    const mediaPlaylistData = await MediaPlaylistDatastore.addMediaPlaylistTracks(
+      mediaPlaylistId,
+      mediaPlaylistTrackInputDataList.map(trackInputData => this.buildMediaPlaylistTrackFromInput(trackInputData)),
+    );
+
+    const mediaPlaylistUpdated = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
       type: MediaEnums.MediaLibraryActions.AddPlaylist,
       data: {
-        mediaPlaylist,
+        mediaPlaylist: mediaPlaylistUpdated,
       },
     });
 
-    return mediaPlaylist;
+    NotificationService.showMessage(I18nService.getString('message_added_to_playlist', {
+      playlistName: mediaPlaylistUpdated.name,
+    }));
+
+    return mediaPlaylistUpdated;
   }
 
   // load API
@@ -475,6 +518,8 @@ class MediaLibraryService {
         mediaPlaylistId,
       },
     });
+
+    NotificationService.showMessage(I18nService.getString('message_playlist_deleted'));
   }
 
   async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylist> {
@@ -490,6 +535,8 @@ class MediaLibraryService {
 
     return mediaPlaylist;
   }
+
+  // private API
 
   private async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
@@ -764,6 +811,37 @@ class MediaLibraryService {
     });
 
     return playlistUpdatedTracks;
+  }
+
+  private async getExistingMediaPlaylistTrackInputData(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[]): Promise<{
+    existingInputDataList: IMediaPlaylistTrackInputData[],
+    newInputDataList: IMediaPlaylistTrackInputData[],
+  }> {
+    const playlist = await this.getMediaPlaylist(mediaPlaylistId);
+    if (!playlist) {
+      throw new Error(`MediaLibraryService encountered error at getExistingMediaPlaylistTrackInputData - Playlist not found - ${mediaPlaylistId}`);
+    }
+
+    const existingInputDataList: IMediaPlaylistTrackInputData[] = [];
+    const newInputDataList: IMediaPlaylistTrackInputData[] = [];
+
+    mediaPlaylistTrackInputDataList.forEach((trackData) => {
+      const playlistTrack = playlist.tracks.find(
+        data => data.provider === trackData.provider && data.provider_id === trackData.provider_id,
+      );
+      if (playlistTrack) {
+        // existing track
+        existingInputDataList.push(trackData);
+      } else {
+        // new track
+        newInputDataList.push(trackData);
+      }
+    });
+
+    return {
+      existingInputDataList,
+      newInputDataList,
+    };
   }
 }
 

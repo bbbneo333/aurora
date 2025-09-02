@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames/bind';
 
 import { IMediaAlbum } from '../../interfaces';
 import { MediaUtils, StringUtils } from '../../utils';
@@ -8,6 +9,10 @@ import {
 } from '../media-collection-context-menu/media-collection-context-menu.component';
 import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
 
+import styles from './media-albums.component.css';
+
+const cx = classNames.bind(styles);
+
 export function MediaAlbums(props: {
   mediaAlbums: IMediaAlbum[],
 }) {
@@ -16,7 +21,7 @@ export function MediaAlbums(props: {
 
   return (
     <div>
-      <div className="row">
+      <div className={cx('row', 'media-albums')}>
         {mediaAlbums.map((mediaAlbum) => {
           const mediaItem = MediaUtils.getMediaItemFromAlbum(mediaAlbum);
 
