@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import classNames from 'classnames/bind';
 
 import {
   closestCenter,
@@ -26,6 +27,9 @@ import {
 } from '../media-track-context-menu/media-track-context-menu.component';
 
 import { MediaTrackListItem } from './media-track-list-item.component';
+import styles from './media-track-list.component.css';
+
+const cx = classNames.bind(styles);
 
 export type MediaTracksProps<T> = {
   mediaTracks: T[],
@@ -70,7 +74,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
 
   return (
     <div>
-      <div className="row">
+      <div className={cx('media-track-list', 'row')}>
         <MediaTrackListProvider
           mediaTracks={list}
           mediaTrackList={mediaTrackList}

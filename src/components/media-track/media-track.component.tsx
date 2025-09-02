@@ -155,7 +155,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
 
   return (
     <div
-      className={cx('col-12 mb-3')}
+      className={cx('col-12')}
       onContextMenu={handleOnContextMenu}
       onDoubleClick={() => {
         toggle();

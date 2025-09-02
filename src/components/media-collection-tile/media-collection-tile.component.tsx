@@ -48,7 +48,7 @@ export function MediaCollectionTile(props: {
   ]);
 
   return (
-    <div className={cx(Layout.Grid.CollectionTile, 'mb-3')} onContextMenu={handleOnContextMenu}>
+    <div className={cx(Layout.Grid.CollectionTile)} onContextMenu={handleOnContextMenu}>
       <div className={cx('collection-tile', {
         playing: isMediaPlaying,
       })}

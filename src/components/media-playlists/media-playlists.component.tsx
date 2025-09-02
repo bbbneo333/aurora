@@ -1,5 +1,6 @@
 import { isEmpty } from 'lodash';
 import React from 'react';
+import classNames from 'classnames/bind';
 
 import { IMediaPlaylist } from '../../interfaces';
 import { MediaUtils, StringUtils } from '../../utils';
@@ -13,6 +14,10 @@ import {
   MediaCollectionContextMenuItem,
 } from '../media-collection-context-menu/media-collection-context-menu.component';
 
+import styles from './media-playlists.component.css';
+
+const cx = classNames.bind(styles);
+
 export function MediaPlaylists(props: {
   mediaPlaylists: IMediaPlaylist[],
 }) {
@@ -21,7 +26,7 @@ export function MediaPlaylists(props: {
 
   return (
     <div>
-      <div className="row">
+      <div className={cx('media-playlists', 'row')}>
         {mediaPlaylists.map((mediaPlaylist) => {
           const mediaItem = MediaUtils.getMediaItemFromPlaylist(mediaPlaylist);
 

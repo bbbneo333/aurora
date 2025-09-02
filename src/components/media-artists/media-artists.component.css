@@ -1,0 +1,5 @@
+.media-artists {
+  display: flex;
+  flex-direction: row;
+  gap: 20px 0;
+}
