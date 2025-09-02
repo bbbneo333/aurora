@@ -15,6 +15,8 @@ import { Icon } from '../icon/icon.component';
 import { TextInput } from '../text-input/text-input.component';
 import { MediaPlaylistDeleteModal } from '../media-playlist-delete-modal/media-playlist-delete-modal.component';
 import { MediaPlaylistEditModal } from '../media-playlist-edit-modal/media-playlist-edit-modal.component';
+import { MediaLibraryPlaylistDuplicateTracksError } from '../../services/media-library.service';
+import { MediaPlaylistDuplicateTrackModal } from '../media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 
 export enum MediaPlaylistContextMenuItemAction {
   SearchPlaylist = 'media/playlist/searchPlaylist',
@@ -86,7 +88,21 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
         }
 
         getMediaTracks().then(async (mediaTracks) => {
-          await MediaLibraryService.createMediaPlaylistTracks(mediaPlaylistId, mediaTracks);
+          try {
+            await MediaLibraryService.addMediaPlaylistTracks(mediaPlaylistId, mediaTracks);
+          } catch (error) {
+            if (error instanceof MediaLibraryPlaylistDuplicateTracksError) {
+              // in case of duplicate track, explicitly ask user what to do
+              showModal(<MediaPlaylistDuplicateTrackModal
+                mediaPlaylistId={mediaPlaylistId}
+                inputDataList={mediaTracks}
+                existingTrackDataList={error.existingTrackDataList}
+                newTrackDataList={error.newTrackDataList}
+              />);
+            } else {
+              throw error;
+            }
+          }
         });
         break;
       case MediaPlaylistContextMenuItemAction.EditPlaylist:

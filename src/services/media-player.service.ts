@@ -231,7 +231,7 @@ class MediaPlayerService {
 
     // #7 - notify user
     if (!mediaTrackAddToQueueOptions?.skipUserNotification) {
-      NotificationService.show(I18nService.getString('message_added_to_queue'));
+      NotificationService.showMessage(I18nService.getString('message_added_to_queue'));
     }
   }
 
@@ -242,7 +242,7 @@ class MediaPlayerService {
       });
     });
 
-    NotificationService.show(I18nService.getString('message_added_to_queue'));
+    NotificationService.showMessage(I18nService.getString('message_added_to_queue'));
   }
 
   removeMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack): void {

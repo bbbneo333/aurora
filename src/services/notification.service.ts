@@ -11,7 +11,7 @@ class NotificationService {
     };
   }
 
-  show(message: string) {
+  showMessage(message: string) {
     this.listeners.forEach(listener => listener(message));
   }
 }
