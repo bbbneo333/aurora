@@ -518,6 +518,8 @@ class MediaLibraryService {
         mediaPlaylistId,
       },
     });
+
+    NotificationService.showMessage(I18nService.getString('message_playlist_deleted'));
   }
 
   async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylist> {

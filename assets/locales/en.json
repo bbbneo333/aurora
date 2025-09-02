@@ -41,6 +41,7 @@
   "message_value_invalid": "Please provide a valid input",
   "message_added_to_queue": "Added to queue",
   "message_added_to_playlist": "Added to {playlistName}",
+  "message_playlist_deleted": "Playlist was deleted",
   "placeholder_playlist_context_menu_search_input": "Find a playlist",
   "placeholder_search_input": "What do you want to play?",
   "search_result_heading_all": "All",
