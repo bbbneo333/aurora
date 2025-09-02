@@ -73,8 +73,8 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
   const list = dragItems ?? mediaTracks;
 
   return (
-    <div>
-      <div className={cx('media-track-list', 'row')}>
+    <>
+      <div className={cx('media-track-list')}>
         <MediaTrackListProvider
           mediaTracks={list}
           mediaTrackList={mediaTrackList}
@@ -142,6 +142,6 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
           menuItems={contextMenuItems}
         />
       )}
-    </div>
+    </>
   );
 }

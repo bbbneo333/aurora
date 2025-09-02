@@ -155,45 +155,42 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
 
   return (
     <div
-      className={cx('col-12')}
+      className={cx('media-track')}
       onContextMenu={handleOnContextMenu}
       onDoubleClick={() => {
         toggle();
       }}
+      {...mediaTrackAriaProps}
     >
-      <div className={cx('media-track')} {...mediaTrackAriaProps}>
-        <div className="row">
-          <div className={cx('col-10', 'media-track-main-column')}>
-            <div className={cx('media-track-section')}>
-              <MediaPlaybackButton
-                isPlaying={isTrackPlaying}
-                className={cx('media-track-playback-button')}
-                onPlay={play}
-                onPause={pause}
-              />
-            </div>
-            {!disableCover && (
-              <div className={cx('media-track-section')}>
-                <MediaCoverPicture
-                  mediaPicture={mediaTrack.track_cover_picture}
-                  mediaPictureAltText={mediaTrack.track_name}
-                  className={cx('media-track-cover')}
-                />
-              </div>
-            )}
-            <div className={cx('media-track-section')}>
-              <MediaTrackInfoComponent
-                mediaTrack={mediaTrack}
-                disableAlbumLink={disableAlbumLink}
-                className={cx('media-track-info')}
-              />
-            </div>
+      <div className={cx('media-track-main-column')}>
+        <div className={cx('media-track-section')}>
+          <MediaPlaybackButton
+            isPlaying={isTrackPlaying}
+            className={cx('media-track-playback-button')}
+            onPlay={play}
+            onPause={pause}
+          />
+        </div>
+        {!disableCover && (
+          <div className={cx('media-track-section')}>
+            <MediaCoverPicture
+              mediaPicture={mediaTrack.track_cover_picture}
+              mediaPictureAltText={mediaTrack.track_name}
+              className={cx('media-track-cover')}
+            />
           </div>
-          <div className={cx('col-2', 'media-track-side-column')}>
-            <div className={cx('media-track-duration')}>
-              {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
-            </div>
-          </div>
+        )}
+        <div className={cx('media-track-section')}>
+          <MediaTrackInfoComponent
+            mediaTrack={mediaTrack}
+            disableAlbumLink={disableAlbumLink}
+            className={cx('media-track-info')}
+          />
+        </div>
+      </div>
+      <div className={cx('media-track-side-column')}>
+        <div className={cx('media-track-duration')}>
+          {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
         </div>
       </div>
     </div>
