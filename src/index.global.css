@@ -149,7 +149,10 @@ body {
 .modal-content {
   background-color: var(--stage-overlay-bg-color);
   color: var(--text-dark-color);
-  border: var(--stage-overlay-outline-color);
+  border: 1px solid var(--stage-overlay-outline-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  font-size: 16px;
 }
 
 .modal-header {
@@ -159,6 +162,7 @@ body {
 .modal-title {
   font-weight: bold;
   color: var(--text-light-color);
+  font-size: 18px;
 }
 
 .modal-footer {
@@ -169,6 +173,7 @@ body {
   padding: 15px;
   border-radius: 15px;
   font-weight: bold;
+  font-size: 16px;
 }
 
 /*.modal-footer [role="button"]:not([disabled]):hover {*/
