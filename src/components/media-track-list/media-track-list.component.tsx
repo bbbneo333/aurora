@@ -22,6 +22,7 @@ import { MediaTrackListProvider, useContextMenu } from '../../contexts';
 import { IMediaTrack, IMediaTrackList } from '../../interfaces';
 import { StringUtils } from '../../utils';
 import { SafePointerSensor } from '../../types';
+import { isSelectAllKey, isModifierKey } from '../../utils/event.utils';
 
 import {
   MediaTrackContextMenu,
@@ -79,6 +80,13 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
 
   const list = dragItems ?? mediaTracks;
 
+  const selectAll = useCallback(() => {
+    setSelectedTrackIds(list.map((track: T) => getMediaTrackId(track)));
+  }, [
+    list.length,
+    getMediaTrackId,
+  ]);
+
   const handleSelect = useCallback((e: React.MouseEvent, trackId: string, index: number) => {
     if (e.shiftKey) {
       // select range between last clicked index and this one
@@ -88,7 +96,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
         const newRange = mediaTracks.slice(start, end + 1).map(t => getMediaTrackId(t));
         setSelectedTrackIds(newRange);
       }
-    } else if (e.metaKey || e.ctrlKey) {
+    } else if (isModifierKey(e)) {
       // toggle
       setSelectedTrackIds(prev => (prev.includes(trackId)
         ? prev.filter(id => id !== trackId)
@@ -135,7 +143,6 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
 
   useEffect(() => {
     // for clearing selection on outside click
-
     function handleClickOutside(e: MouseEvent) {
       if (
         containerRef.current
@@ -148,6 +155,21 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     document.addEventListener('pointerdown', handleClickOutside);
     return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    // for selecting all on ctrl+a
+    function handleKeyDown(e: KeyboardEvent) {
+      if (isSelectAllKey(e)) {
+        e.preventDefault();
+        selectAll();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [
+    selectAll,
+  ]);
 
   return (
     <>
