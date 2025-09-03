@@ -34,17 +34,18 @@ export function MediaTrackListItem<T extends IMediaTrack>(props: MediaTrackProps
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...(sortable ? { ...attributes, ...listeners } : {})}
-      onPointerDown={(...args) => {
-        // manually hide all the active context menus first, then start drag
-        hideAll();
-        listeners?.onPointerDown?.call(null, ...args);
+    <MediaTrack
+      {...props}
+      containerRef={setNodeRef}
+      containerProps={{
+        style,
+        ...(sortable ? { ...attributes, ...listeners } : {}),
+        onPointerDown: (...args) => {
+          // manually hide all the active context menus first, then start drag
+          hideAll();
+          listeners?.onPointerDown?.call(null, ...args);
+        },
       }}
-    >
-      <MediaTrack {...props}/>
-    </div>
+    />
   );
 }
