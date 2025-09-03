@@ -113,7 +113,7 @@ export function PlaylistPage() {
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
             }}
-            getMediaTrackKey={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
+            getMediaTrackId={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
             contextMenuItems={[
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,

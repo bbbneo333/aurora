@@ -284,6 +284,12 @@ class MediaPlayerService {
     });
   }
 
+  removeMediaTracksFromQueue(mediaQueueTracks: IMediaQueueTrack[]) {
+    mediaQueueTracks.forEach((mediaQueueTrack) => {
+      this.removeMediaTrackFromQueue(mediaQueueTrack);
+    });
+  }
+
   loadMediaTrack(mediaQueueTrack: IMediaQueueTrack): IMediaPlayback {
     const {
       mediaPlayer,

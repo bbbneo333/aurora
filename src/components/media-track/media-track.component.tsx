@@ -55,7 +55,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
     isPlaying,
   });
 
-  const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
+  const handleDefaultContextMenu = useCallback((e: React.MouseEvent) => {
     if (mediaTrackContextMenuId) {
       showMenu({
         id: mediaTrackContextMenuId,
@@ -80,7 +80,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
       {...containerProps}
       ref={containerRef}
       className={cx('media-track')}
-      onContextMenu={handleOnContextMenu}
+      onContextMenu={containerProps.onContextMenu || handleDefaultContextMenu}
       onDoubleClick={() => {
         toggle();
       }}

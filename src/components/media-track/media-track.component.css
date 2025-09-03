@@ -6,7 +6,8 @@
   flex-direction: row;
 }
 
-.media-track:focus {
+.media-track:focus,
+.media-track[aria-selected="true"] {
   background-color: var(--selectable-focused-bg-color) !important;
 }
 

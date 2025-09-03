@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState, useEffect, useRef,
+} from 'react';
 import { isEmpty } from 'lodash';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import classNames from 'classnames/bind';
@@ -16,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { MediaTrackListProvider } from '../../contexts';
+import { MediaTrackListProvider, useContextMenu } from '../../contexts';
 import { IMediaTrack, IMediaTrackList } from '../../interfaces';
 import { StringUtils } from '../../utils';
 import { SafePointerSensor } from '../../types';
@@ -37,7 +39,7 @@ export type MediaTracksProps<T> = {
   disableCovers?: boolean,
   disableAlbumLinks?: boolean,
   contextMenuItems?: MediaTrackContextMenuItem[],
-  getMediaTrackKey?: (mediaTrack: T) => string,
+  getMediaTrackId?: (mediaTrack: T) => string,
   onMediaTrackPlay?: (mediaTrack: T) => void,
   sortable?: boolean,
   onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void,
@@ -50,7 +52,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     disableCovers = false,
     disableAlbumLinks = false,
     contextMenuItems,
-    getMediaTrackKey,
+    getMediaTrackId: getMediaTrackIdFn,
     onMediaTrackPlay,
     sortable = false,
     onMediaTracksSorted,
@@ -59,6 +61,11 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
   const [dragItems, setDragItems] = useState<T[] | null>(null);
   const [prevItems, setPrevItems] = useState<T[]>([]);
   const [isSortingDisabled, setIsSortingDisabled] = useState(false);
+  const [selectedTrackIds, setSelectedTrackIds] = useState<string[]>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { showMenu } = useContextMenu();
 
   const contextMenuId = useMemo(
     () => (!isEmpty(contextMenuItems) ? StringUtils.generateId() : undefined),
@@ -66,15 +73,85 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
   );
   const sensors = useSensors(useSensor(SafePointerSensor));
 
-  const getMediaTrackId = useCallback((mediaTrack: T) => (getMediaTrackKey ? getMediaTrackKey(mediaTrack) : mediaTrack.id), [
-    getMediaTrackKey,
+  const getMediaTrackId = useCallback((mediaTrack: T) => (getMediaTrackIdFn ? getMediaTrackIdFn(mediaTrack) : mediaTrack.id), [
+    getMediaTrackIdFn,
   ]);
 
   const list = dragItems ?? mediaTracks;
 
+  const handleSelect = useCallback((e: React.MouseEvent, trackId: string, index: number) => {
+    if (e.shiftKey) {
+      // select range between last clicked index and this one
+      if (lastSelectedIndex !== null) {
+        const start = Math.min(lastSelectedIndex, index);
+        const end = Math.max(lastSelectedIndex, index);
+        const newRange = mediaTracks.slice(start, end + 1).map(t => getMediaTrackId(t));
+        setSelectedTrackIds(newRange);
+      }
+    } else if (e.metaKey || e.ctrlKey) {
+      // toggle
+      setSelectedTrackIds(prev => (prev.includes(trackId)
+        ? prev.filter(id => id !== trackId)
+        : [...prev, trackId]));
+    } else {
+      // normal click = single select
+      setSelectedTrackIds([trackId]);
+    }
+
+    setLastSelectedIndex(index);
+  }, [
+    getMediaTrackId,
+    lastSelectedIndex,
+    mediaTracks,
+  ]);
+
+  const handleContextMenu = useCallback((e: React.MouseEvent, trackId: string) => {
+    e.preventDefault();
+    // ensure item is selected before opening context menu
+    if (!selectedTrackIds.includes(trackId)) {
+      setSelectedTrackIds([trackId]);
+    }
+
+    if (contextMenuId) {
+      const selectedTracks = list.filter(item => selectedTrackIds.includes(getMediaTrackId(item)));
+
+      showMenu({
+        id: contextMenuId,
+        event: e,
+        props: {
+          mediaTracks: selectedTracks,
+          mediaTrackList,
+        },
+      });
+    }
+  }, [
+    contextMenuId,
+    getMediaTrackId,
+    list,
+    mediaTrackList,
+    selectedTrackIds,
+    showMenu,
+  ]);
+
+  useEffect(() => {
+    // for clearing selection on outside click
+
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        containerRef.current
+        && !containerRef.current.contains(e.target as Node)
+      ) {
+        setSelectedTrackIds([]);
+      }
+    }
+
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
+  }, []);
+
   return (
     <>
-      <div className={cx('media-track-list')}>
+      <div ref={containerRef} className={cx('media-track-list')}>
         <MediaTrackListProvider
           mediaTracks={list}
           mediaTrackList={mediaTrackList}
@@ -119,19 +196,31 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
               items={list.map(getMediaTrackId)}
               strategy={verticalListSortingStrategy}
             >
-              {list.map((mediaTrack, mediaTrackPointer) => (
-                <MediaTrackListItem
-                  key={getMediaTrackId(mediaTrack)}
-                  id={getMediaTrackId(mediaTrack)}
-                  sortable={sortable && !isSortingDisabled}
-                  mediaTrack={mediaTrack}
-                  mediaTrackPointer={mediaTrackPointer}
-                  mediaTrackContextMenuId={contextMenuId}
-                  disableCover={disableCovers}
-                  disableAlbumLink={disableAlbumLinks}
-                  onMediaTrackPlay={onMediaTrackPlay}
-                />
-              ))}
+              {list.map((mediaTrack, mediaTrackPointer) => {
+                const mediaTrackId = getMediaTrackId(mediaTrack);
+
+                return (
+                  <MediaTrackListItem
+                    key={mediaTrackId}
+                    id={mediaTrackId}
+                    sortable={sortable && !isSortingDisabled}
+                    mediaTrack={mediaTrack}
+                    mediaTrackPointer={mediaTrackPointer}
+                    disableCover={disableCovers}
+                    disableAlbumLink={disableAlbumLinks}
+                    onMediaTrackPlay={onMediaTrackPlay}
+                    onSelect={(e) => {
+                      handleSelect(e, mediaTrackId, mediaTrackPointer);
+                    }}
+                    isSelected={selectedTrackIds.includes(mediaTrackId)}
+                    containerProps={{
+                      onContextMenu: (e) => {
+                        handleContextMenu(e, mediaTrackId);
+                      },
+                    }}
+                  />
+                );
+              })}
             </SortableContext>
           </DndContext>
         </MediaTrackListProvider>
