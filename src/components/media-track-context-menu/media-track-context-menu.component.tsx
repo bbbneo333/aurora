@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { isEmpty } from 'lodash';
 
 import {
   Menu,
@@ -37,6 +38,7 @@ export enum MediaTrackContextMenuItemAction {
 export interface MediaTrackContextMenuItemProps {
   mediaTrack?: IMediaTrack;
   mediaTrackList?: IMediaTrackList;
+  mediaTracks?: IMediaTrack[];
 }
 
 export function MediaTrackContextMenu(props: {
@@ -48,39 +50,57 @@ export function MediaTrackContextMenu(props: {
 
   const handleMenuItemClick = useCallback(async (itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
     const itemAction: MediaTrackContextMenuItemAction = itemParams.id as MediaTrackContextMenuItemAction;
-    const { mediaTrack, mediaTrackList } = menuProps;
+    const { mediaTrack, mediaTracks, mediaTrackList } = menuProps;
 
     switch (itemAction) {
       case MediaTrackContextMenuItemAction.AddToQueue: {
-        if (!mediaTrack) {
-          throw new Error('MediaTrackContextMenu encountered error while performing action AddToQueue - No media track was provided');
+        if (mediaTrack) {
+          MediaPlayerService.addMediaTrackToQueue(mediaTrack);
+        } else if (mediaTracks && !isEmpty(mediaTracks)) {
+          MediaPlayerService.addMediaTracksToQueue(mediaTracks);
+        } else {
+          throw new Error('MediaTrackContextMenu encountered error while performing action AddToQueue - No media track(s) provided');
         }
-        MediaPlayerService.addMediaTrackToQueue(mediaTrack);
         break;
       }
       case MediaTrackContextMenuItemAction.RemoveFromQueue: {
         // manually cast track and perform checks
         const mediaQueueTrack = mediaTrack as IMediaQueueTrack;
+        const mediaQueueTracks = mediaTracks as IMediaQueueTrack[];
 
-        if (!mediaQueueTrack || !mediaQueueTrack.queue_entry_id) {
-          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromQueue - No or invalid media queue track was provided');
+        if (mediaQueueTrack?.queue_entry_id) {
+          MediaPlayerService.removeMediaTrackFromQueue(mediaQueueTrack.queue_entry_id);
+        } else if (!isEmpty(mediaQueueTracks)) {
+          MediaPlayerService.removeMediaTracksFromQueue(mediaQueueTracks.map(track => track.queue_entry_id));
+        } else {
+          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromQueue - No or invalid media queue track(s) provided');
         }
-        MediaPlayerService.removeMediaTrackFromQueue(mediaQueueTrack);
         break;
       }
       case MediaTrackContextMenuItemAction.RemoveFromPlaylist: {
         // manually cast track and perform checks
         const mediaPlaylistTrack = mediaTrack as IMediaPlaylistTrack;
+        const mediaPlaylistTracks = mediaTracks as IMediaPlaylistTrack[];
 
-        if (!mediaPlaylistTrack || !mediaPlaylistTrack.playlist_track_id) {
-          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No or invalid playlist track was provided');
-        }
         if (!mediaTrackList) {
           throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No media playlist was provided');
         }
-        await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [
-          mediaPlaylistTrack.playlist_track_id,
-        ]);
+
+        if (mediaPlaylistTrack?.playlist_track_id) {
+          await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [
+            mediaPlaylistTrack.playlist_track_id,
+          ]);
+        } else if (!isEmpty(mediaPlaylistTracks)) {
+          await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, mediaPlaylistTracks.map((track) => {
+            if (!track.playlist_track_id) {
+              throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - Invalid playlist track provided');
+            }
+
+            return track.playlist_track_id;
+          }));
+        } else {
+          throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - No or invalid playlist track(s) provided');
+        }
         break;
       }
       default:

@@ -3,23 +3,28 @@ import { Modal } from 'react-bootstrap';
 import { isEmpty } from 'lodash';
 
 import { useModal } from '../../contexts';
-import { IMediaPlaylistTrackInputData } from '../../interfaces';
+import { IMediaPlaylist, IMediaPlaylistTrackInputData } from '../../interfaces';
 import { I18nService, MediaLibraryService } from '../../services';
 import { useDataAction, useDataLoad } from '../../hooks';
+import { WithModalBaseProps } from '../../types';
 
 import { Button } from '../button/button.component';
 
-export function MediaPlaylistDuplicateTrackModal(props: {
+export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
   mediaPlaylistId: string;
   inputDataList: IMediaPlaylistTrackInputData[],
   existingTrackDataList: IMediaPlaylistTrackInputData[],
   newTrackDataList?: IMediaPlaylistTrackInputData[],
-}) {
+}, {
+  updatedPlaylist: IMediaPlaylist,
+  addedTrackDataList: IMediaPlaylistTrackInputData[],
+}>) {
   const {
     mediaPlaylistId,
     inputDataList,
     existingTrackDataList,
     newTrackDataList = [],
+    onComplete,
   } = props;
 
   const hasNewTracks = !isEmpty(newTrackDataList);
@@ -33,11 +38,15 @@ export function MediaPlaylistDuplicateTrackModal(props: {
     playlistTracks: IMediaPlaylistTrackInputData[],
     ignoreExisting: boolean = false,
   ) => {
-    await MediaLibraryService.addMediaPlaylistTracks(playlistId, playlistTracks, {
+    const updatedPlaylist = await MediaLibraryService.addMediaPlaylistTracks(playlistId, playlistTracks, {
       ignoreExisting,
     });
 
     hideModal();
+    onComplete?.({
+      updatedPlaylist,
+      addedTrackDataList: playlistTracks,
+    });
   });
 
   return (
@@ -89,6 +98,7 @@ export function MediaPlaylistDuplicateTrackModal(props: {
             } else {
               // don't add
               hideModal();
+              onComplete?.();
             }
           }}
         >

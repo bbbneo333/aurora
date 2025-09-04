@@ -100,7 +100,7 @@ export function PlayerQueueComponent() {
                 <MediaTrackList
                   sortable
                   mediaTracks={mediaQueueTracks}
-                  getMediaTrackKey={(mediaTrack: IMediaQueueTrack) => mediaTrack.queue_entry_id}
+                  getMediaTrackId={(mediaTrack: IMediaQueueTrack) => mediaTrack.queue_entry_id}
                   contextMenuItems={[
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.RemoveFromQueue,
@@ -111,6 +111,10 @@ export function PlayerQueueComponent() {
                     MediaPlayerService.playMediaTrackFromQueue(mediaTrack);
                   }}
                   onMediaTracksSorted={onMediaTracksSorted}
+                  onSelectionDelete={(mediaTrackQueueIds) => {
+                    MediaPlayerService.removeMediaTracksFromQueue(mediaTrackQueueIds);
+                    return true;
+                  }}
                 />
               </div>
             </div>

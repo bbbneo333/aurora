@@ -9,10 +9,15 @@ import { MediaTrack, MediaTrackProps } from '../media-track/media-track.componen
 export function MediaTrackListItem<T extends IMediaTrack>(props: MediaTrackProps<T> & {
   id: string;
   sortable?: boolean;
+  isSelected?: boolean;
+  onSelect?: (e: React.MouseEvent) => void;
 }) {
   const {
-    sortable,
     id,
+    sortable = false,
+    isSelected = false,
+    onSelect,
+    containerProps = {},
   } = props;
 
   const { hideAll } = useMenu();
@@ -34,17 +39,24 @@ export function MediaTrackListItem<T extends IMediaTrack>(props: MediaTrackProps
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...(sortable ? { ...attributes, ...listeners } : {})}
-      onPointerDown={(...args) => {
-        // manually hide all the active context menus first, then start drag
-        hideAll();
-        listeners?.onPointerDown?.call(null, ...args);
+    <MediaTrack
+      {...props}
+      containerRef={setNodeRef}
+      containerProps={{
+        ...containerProps,
+        style,
+        ...(sortable ? { ...attributes, ...listeners } : {}),
+        'aria-selected': isSelected,
+        onPointerDown: (e) => {
+          // manually hide all the active context menus first, then start drag
+          hideAll();
+          listeners?.onPointerDown?.call(null, e);
+        },
+        onPointerUp: (e) => {
+          if (e.button !== 0) return; // ignore right click
+          onSelect?.call(null, e);
+        },
       }}
-    >
-      <MediaTrack {...props}/>
-    </div>
+    />
   );
 }
