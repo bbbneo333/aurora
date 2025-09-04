@@ -15,6 +15,7 @@ export * from './media-playback-button/media-playback-button.component';
 export * from './media-player-ribbon/media-player-ribbon.component';
 export * from './media-playlist-context-menu/media-playlist-context-menu.component';
 export * from './media-playlist-delete-modal/media-playlist-delete-modal.component';
+export * from './media-playlist-delete-tracks-modal/media-playlist-delete-tracks-modal.component';
 export * from './media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-playlists/media-playlists.component';

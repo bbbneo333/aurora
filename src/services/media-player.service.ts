@@ -160,9 +160,7 @@ class MediaPlayerService {
     this.loadAndPlayMediaTrack(mediaQueueTrack);
   }
 
-  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions?: {
-    skipUserNotification?: boolean
-  }): void {
+  addMediaTrackToQueue(mediaTrack: IMediaTrack, mediaTrackAddToQueueOptions?: { skipUserNotification?: boolean }): void {
     const {
       mediaPlayer,
     } = store.getState();
@@ -245,7 +243,7 @@ class MediaPlayerService {
     NotificationService.showMessage(I18nService.getString('message_added_to_queue'));
   }
 
-  removeMediaTrackFromQueue(mediaQueueTrack: IMediaQueueTrack): void {
+  removeMediaTrackFromQueue(mediaQueueTrackId: string): void {
     const {
       mediaPlayer,
     } = store.getState();
@@ -255,9 +253,10 @@ class MediaPlayerService {
       mediaPlaybackCurrentTrackList,
     } = mediaPlayer;
 
-    // #1 - determine the position from where the track needs to be removed
-    const mediaQueueTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaQueueTrack.queue_entry_id);
-    if (_.isNil(mediaQueueTrackPointer)) {
+    // #1 - get the track with position
+    const mediaQueueTrackPointer = _.findIndex(mediaTracks, mediaTrack => mediaTrack.queue_entry_id === mediaQueueTrackId);
+    const mediaQueueTrack = mediaTracks[mediaQueueTrackPointer];
+    if (!mediaQueueTrack) {
       throw new Error('MediaPlayerService encountered error at removeMediaTrackFromQueue - Provided media track was not found in the list');
     }
 
@@ -284,9 +283,9 @@ class MediaPlayerService {
     });
   }
 
-  removeMediaTracksFromQueue(mediaQueueTracks: IMediaQueueTrack[]) {
-    mediaQueueTracks.forEach((mediaQueueTrack) => {
-      this.removeMediaTrackFromQueue(mediaQueueTrack);
+  removeMediaTracksFromQueue(mediaQueueTrackIds: string[]) {
+    mediaQueueTrackIds.forEach((mediaQueueTrackId) => {
+      this.removeMediaTrackFromQueue(mediaQueueTrackId);
     });
   }
 

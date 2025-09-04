@@ -69,9 +69,9 @@ export function MediaTrackContextMenu(props: {
         const mediaQueueTracks = mediaTracks as IMediaQueueTrack[];
 
         if (mediaQueueTrack?.queue_entry_id) {
-          MediaPlayerService.removeMediaTrackFromQueue(mediaQueueTrack);
+          MediaPlayerService.removeMediaTrackFromQueue(mediaQueueTrack.queue_entry_id);
         } else if (!isEmpty(mediaQueueTracks)) {
-          MediaPlayerService.removeMediaTracksFromQueue(mediaQueueTracks);
+          MediaPlayerService.removeMediaTracksFromQueue(mediaQueueTracks.map(track => track.queue_entry_id));
         } else {
           throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromQueue - No or invalid media queue track(s) provided');
         }

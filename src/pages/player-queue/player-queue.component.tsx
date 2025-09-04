@@ -111,6 +111,10 @@ export function PlayerQueueComponent() {
                     MediaPlayerService.playMediaTrackFromQueue(mediaTrack);
                   }}
                   onMediaTracksSorted={onMediaTracksSorted}
+                  onSelectionDelete={(mediaTrackQueueIds) => {
+                    MediaPlayerService.removeMediaTracksFromQueue(mediaTrackQueueIds);
+                    return true;
+                  }}
                 />
               </div>
             </div>

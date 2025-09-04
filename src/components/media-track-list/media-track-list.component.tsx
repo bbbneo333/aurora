@@ -20,9 +20,8 @@ import {
 
 import { MediaTrackListProvider, useContextMenu } from '../../contexts';
 import { IMediaTrack, IMediaTrackList } from '../../interfaces';
-import { StringUtils } from '../../utils';
+import { StringUtils, Events } from '../../utils';
 import { SafePointerSensor } from '../../types';
-import { isSelectAllKey, isModifierKey } from '../../utils/event.utils';
 
 import {
   MediaTrackContextMenu,
@@ -44,6 +43,7 @@ export type MediaTracksProps<T> = {
   onMediaTrackPlay?: (mediaTrack: T) => void,
   sortable?: boolean,
   onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void,
+  onSelectionDelete?: (mediaTrackIds: string[]) => Promise<boolean> | boolean,
 };
 
 export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>) {
@@ -57,6 +57,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     onMediaTrackPlay,
     sortable = false,
     onMediaTracksSorted,
+    onSelectionDelete,
   } = props;
 
   const [dragItems, setDragItems] = useState<T[] | null>(null);
@@ -64,6 +65,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
   const [isSortingDisabled, setIsSortingDisabled] = useState(false);
   const [selectedTrackIds, setSelectedTrackIds] = useState<string[]>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+  const [selectionDeleteInProgress, setSelectionDeleteInProgress] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { showMenu } = useContextMenu();
@@ -87,8 +89,12 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     getMediaTrackId,
   ]);
 
+  const clearSelection = useCallback(() => {
+    setSelectedTrackIds([]);
+  }, []);
+
   const handleSelect = useCallback((e: React.MouseEvent, trackId: string, index: number) => {
-    if (e.shiftKey) {
+    if (Events.isShiftKey(e)) {
       // select range between last clicked index and this one
       if (lastSelectedIndex !== null) {
         const start = Math.min(lastSelectedIndex, index);
@@ -96,7 +102,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
         const newRange = mediaTracks.slice(start, end + 1).map(t => getMediaTrackId(t));
         setSelectedTrackIds(newRange);
       }
-    } else if (isModifierKey(e)) {
+    } else if (Events.isModifierKey(e)) {
       // toggle
       setSelectedTrackIds(prev => (prev.includes(trackId)
         ? prev.filter(id => id !== trackId)
@@ -147,21 +153,44 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
       if (
         containerRef.current
         && !containerRef.current.contains(e.target as Node)
+        && !selectionDeleteInProgress
       ) {
-        setSelectedTrackIds([]);
+        clearSelection();
       }
     }
 
     document.addEventListener('pointerdown', handleClickOutside);
     return () => document.removeEventListener('pointerdown', handleClickOutside);
-  }, []);
+  }, [
+    clearSelection,
+    selectionDeleteInProgress,
+  ]);
 
   useEffect(() => {
     // for selecting all on ctrl+a
     function handleKeyDown(e: KeyboardEvent) {
-      if (isSelectAllKey(e)) {
+      if (Events.isSelectAllKey(e)) {
         e.preventDefault();
         selectAll();
+      } else if (Events.isDeleteKey(e) && onSelectionDelete && !isEmpty(selectedTrackIds)) {
+        if (selectionDeleteInProgress) {
+          return;
+        }
+        setSelectionDeleteInProgress(true);
+
+        Promise.resolve(onSelectionDelete(selectedTrackIds))
+          .then((sig) => {
+            // only clear if signal received
+            if (sig) {
+              clearSelection();
+            }
+          })
+          .catch((err) => {
+            console.error('Encountered error at onSelectionDelete: ', err);
+          })
+          .finally(() => {
+            setSelectionDeleteInProgress(false);
+          });
       }
     }
 
@@ -169,6 +198,10 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [
     selectAll,
+    selectedTrackIds,
+    onSelectionDelete,
+    clearSelection,
+    selectionDeleteInProgress,
   ]);
 
   return (
