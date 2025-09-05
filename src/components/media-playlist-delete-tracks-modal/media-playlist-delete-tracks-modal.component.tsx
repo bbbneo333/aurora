@@ -1,23 +1,26 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import { useModal } from '../../contexts';
+import { ModalComponent } from '../../contexts';
 import { useDataAction, useDataLoad } from '../../hooks';
 import { I18nService, MediaLibraryService } from '../../services';
-import { WithModalBaseProps } from '../../types';
 
 import { Button } from '../button/button.component';
 import { IMediaPlaylist } from '../../interfaces';
 
-export function MediaPlaylistDeleteTracksModal(props: WithModalBaseProps<{
+export const MediaPlaylistDeleteTracksModal: ModalComponent<{
   mediaPlaylistId: string;
   mediaPlaylistTrackIds: string[];
 }, {
   updatedPlaylist: IMediaPlaylist,
   deletedPlaylistTrackIds: string[];
-}>) {
-  const { mediaPlaylistId, mediaPlaylistTrackIds, onComplete } = props;
-  const { hideModal } = useModal();
+}> = (props) => {
+  const {
+    mediaPlaylistId,
+    mediaPlaylistTrackIds,
+    onComplete,
+  } = props;
+
   const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
   const deletePlaylistTracks = useDataAction(async () => {
     const updatedPlaylist = await MediaLibraryService.deleteMediaPlaylistTracks(
@@ -25,8 +28,7 @@ export function MediaPlaylistDeleteTracksModal(props: WithModalBaseProps<{
       mediaPlaylistTrackIds,
     );
 
-    hideModal();
-    onComplete?.({
+    onComplete({
       updatedPlaylist,
       deletedPlaylistTrackIds: mediaPlaylistTrackIds,
     });
@@ -48,8 +50,7 @@ export function MediaPlaylistDeleteTracksModal(props: WithModalBaseProps<{
         <Button
           disabled={deletePlaylistTracks.loading}
           onButtonSubmit={() => {
-            hideModal();
-            onComplete?.();
+            onComplete();
           }}
         >
           {I18nService.getString('button_dialog_cancel')}
@@ -64,4 +65,4 @@ export function MediaPlaylistDeleteTracksModal(props: WithModalBaseProps<{
       </Modal.Footer>
     </>
   );
-}
+};

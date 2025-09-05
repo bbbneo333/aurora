@@ -97,12 +97,12 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
           } catch (error) {
             if (error instanceof MediaLibraryPlaylistDuplicateTracksError) {
               // in case of duplicate track, explicitly ask user what to do
-              showModal(<MediaPlaylistDuplicateTrackModal
-                mediaPlaylistId={mediaPlaylistId}
-                inputDataList={mediaTracksToAdd}
-                existingTrackDataList={error.existingTrackDataList}
-                newTrackDataList={error.newTrackDataList}
-              />);
+              showModal(MediaPlaylistDuplicateTrackModal, {
+                mediaPlaylistId,
+                inputDataList: mediaTracksToAdd,
+                existingTrackDataList: error.existingTrackDataList,
+                newTrackDataList: error.newTrackDataList,
+              });
             } else {
               throw error;
             }
@@ -113,13 +113,17 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
         if (!mediaItem) {
           throw new Error('MediaPlaylistContextMenu encountered error at EditPlaylist - mediaItem is required');
         }
-        showModal(<MediaPlaylistEditModal mediaPlaylistId={mediaItem.id}/>);
+        showModal(MediaPlaylistEditModal, {
+          mediaPlaylistId: mediaItem.id,
+        });
         break;
       case MediaPlaylistContextMenuItemAction.DeletePlaylist:
         if (!mediaItem) {
           throw new Error('MediaPlaylistContextMenu encountered error at DeletePlaylist - mediaItem is required');
         }
-        showModal(<MediaPlaylistDeleteModal mediaPlaylistId={mediaItem.id}/>);
+        showModal(MediaPlaylistDeleteModal, {
+          mediaPlaylistId: mediaItem.id,
+        });
         break;
       default:
       // unsupported action, do nothing

@@ -17,11 +17,3 @@ export abstract class AppError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
-
-export type WithModalBaseProps<
-  Props,
-  Result = unknown,
-  Err = Error,
-> = Props & {
-  onComplete?: (result?: Result, error?: Err) => void;
-};

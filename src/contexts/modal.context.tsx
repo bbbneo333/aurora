@@ -1,44 +1,67 @@
-import React, { createContext, useState } from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
+
+export type ModalComponent<P, R, E = Error> = React.ComponentType<P & {
+  onComplete: (result?: R, error?: E) => void;
+}>;
+
+export type ModalOptions<R = any, E = any> = {
+  onComplete?: (result?: R, error?: E) => void;
+};
+
+export type ShowModal = <P, R, E = Error>(
+  Component: ModalComponent<P, R, E>,
+  props: P,
+  options?: ModalOptions<R, E>
+) => void;
 
 export type ModalContextType = {
   isOpen: boolean;
   modalContent: React.ReactNode;
-  showModal: (content: React.ReactNode) => void;
-  hideModal: () => void;
+  showModal: ShowModal;
 };
 
-const ModalContext = createContext<ModalContextType | null>(null);
+const ModalContext = React.createContext<ModalContextType | null>(null);
 
-export const ModalProvider = (props: {
-  children: React.ReactNode,
-}) => {
-  const { children } = props;
-  const [modalContent, setModalContent] = useState<React.ReactNode | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
+export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
+  const [modalContent, setModalContent] = React.useState<React.ReactNode | null>(null);
+  const [isOpen, setIsOpen] = React.useState(false);
 
-  const showModal = (content: React.ReactNode) => {
-    setModalContent(content);
-    setIsOpen(true);
-  };
+  const modalOptionsRef = React.useRef<ModalOptions | null>(null);
 
-  const hideModal = () => {
+  const hideModal = React.useCallback(<R, E = Error>(result?: R, error?: E) => {
     setModalContent(null);
     setIsOpen(false);
-  };
+
+    try {
+      modalOptionsRef.current?.onComplete?.(result, error);
+    } catch (err) {
+      if (err instanceof Error) {
+        console.error('Error in onComplete:', err.message);
+      }
+      console.error(err);
+    } finally {
+      modalOptionsRef.current = null;
+    }
+  }, []);
+
+  const showModal: ShowModal = React.useCallback((Component, mProps, mOptions = {}) => {
+    modalOptionsRef.current = mOptions;
+    setModalContent(
+      <Component
+        {...mProps}
+        onComplete={hideModal}
+      />,
+    );
+    setIsOpen(true);
+  }, [hideModal]);
 
   return (
-    <ModalContext.Provider value={{
-      isOpen,
-      modalContent,
-      showModal,
-      hideModal,
-    }}
-    >
+    <ModalContext.Provider value={{ isOpen, modalContent, showModal }}>
       {children}
       <Modal
         show={isOpen}
-        onHide={hideModal}
+        onHide={() => hideModal()}
         backdrop="static"
         centered
       >
@@ -53,6 +76,5 @@ export const useModal = () => {
   if (!context) {
     throw new Error('useModal must be used within ModalContext');
   }
-
   return context;
 };

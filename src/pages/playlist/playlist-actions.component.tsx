@@ -61,7 +61,9 @@ export function PlaylistActions(props: {
         variant={['rounded', 'outline']}
         tooltip={I18nService.getString('tooltip_rename_playlist')}
         onButtonSubmit={() => {
-          showModal(<MediaPlaylistEditModal mediaPlaylistId={mediaPlaylist.id}/>);
+          showModal(MediaPlaylistEditModal, {
+            mediaPlaylistId: mediaPlaylist.id,
+          });
         }}
       >
         <Icon name={Icons.Edit}/>
@@ -70,7 +72,9 @@ export function PlaylistActions(props: {
         variant={['rounded', 'outline']}
         tooltip={I18nService.getString('tooltip_delete_playlist')}
         onButtonSubmit={() => {
-          showModal(<MediaPlaylistDeleteModal mediaPlaylistId={mediaItem.id}/>);
+          showModal(MediaPlaylistDeleteModal, {
+            mediaPlaylistId: mediaItem.id,
+          });
         }}
       >
         <Icon name={Icons.Delete}/>

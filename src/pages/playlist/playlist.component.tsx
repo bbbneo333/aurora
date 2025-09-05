@@ -66,13 +66,15 @@ export function PlaylistPage() {
   ]);
 
   const handleSelectionDelete = useCallback((mediaPlaylistId, mediaPlaylistTrackIds) => new Promise<boolean>((resolve) => {
-    showModal(<MediaPlaylistDeleteTracksModal
-      mediaPlaylistId={mediaPlaylistId}
-      mediaPlaylistTrackIds={mediaPlaylistTrackIds}
-      onComplete={(res) => {
+    showModal(MediaPlaylistDeleteTracksModal, {
+      mediaPlaylistId,
+      mediaPlaylistTrackIds,
+    }, {
+      onComplete: (res) => {
+        // success signal if selected were deleted
         resolve(!isEmpty(res?.deletedPlaylistTrackIds));
-      }}
-    />);
+      },
+    });
   }), [
     showModal,
   ]);

@@ -1,25 +1,26 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-import { useModal } from '../../contexts';
+import { ModalComponent } from '../../contexts';
 import { useDataAction, useDataLoad } from '../../hooks';
 import { I18nService, MediaLibraryService } from '../../services';
-import { WithModalBaseProps } from '../../types';
 
 import { Button } from '../button/button.component';
 
-export function MediaPlaylistDeleteModal(props: WithModalBaseProps<{
+export const MediaPlaylistDeleteModal: ModalComponent<{
   mediaPlaylistId: string;
 }, {
   deletedId: string
-}>) {
-  const { mediaPlaylistId, onComplete } = props;
-  const { hideModal } = useModal();
+}> = (props) => {
+  const {
+    mediaPlaylistId,
+    onComplete,
+  } = props;
+
   const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
   const deletePlaylist = useDataAction(async () => {
     await MediaLibraryService.deleteMediaPlaylist(mediaPlaylistId);
-    hideModal();
-    onComplete?.({ deletedId: mediaPlaylistId });
+    onComplete({ deletedId: mediaPlaylistId });
   });
 
   return (
@@ -38,8 +39,7 @@ export function MediaPlaylistDeleteModal(props: WithModalBaseProps<{
         <Button
           disabled={deletePlaylist.loading}
           onButtonSubmit={() => {
-            hideModal();
-            onComplete?.();
+            onComplete();
           }}
         >
           {I18nService.getString('button_dialog_cancel')}
@@ -54,4 +54,4 @@ export function MediaPlaylistDeleteModal(props: WithModalBaseProps<{
       </Modal.Footer>
     </>
   );
-}
+};

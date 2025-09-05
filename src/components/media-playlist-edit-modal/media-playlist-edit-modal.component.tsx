@@ -3,20 +3,22 @@ import React, {
 } from 'react';
 import { Form, Modal } from 'react-bootstrap';
 
-import { useModal } from '../../contexts';
+import { ModalComponent } from '../../contexts';
 import { IMediaPlaylist, IMediaPlaylistUpdateData } from '../../interfaces';
 import { I18nService, MediaLibraryService } from '../../services';
-import { WithModalBaseProps } from '../../types';
 
 import { Button } from '../button/button.component';
 
-export function MediaPlaylistEditModal(props: WithModalBaseProps<{
+export const MediaPlaylistEditModal: ModalComponent<{
   mediaPlaylistId: string;
 }, {
   updatedPlaylist: IMediaPlaylist,
-}>) {
-  const { mediaPlaylistId, onComplete } = props;
-  const { hideModal } = useModal();
+}> = (props) => {
+  const {
+    mediaPlaylistId,
+    onComplete,
+  } = props;
+
   const [validated, setValidated] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const [inputData, setInputData] = useState<IMediaPlaylistUpdateData>({
@@ -31,11 +33,9 @@ export function MediaPlaylistEditModal(props: WithModalBaseProps<{
       const updatedPlaylist = await MediaLibraryService.updateMediaPlaylist(mediaPlaylistId, {
         name: inputData.name,
       });
-      hideModal();
-      onComplete?.({ updatedPlaylist });
+      onComplete({ updatedPlaylist });
     }
   }, [
-    hideModal,
     inputData.name,
     mediaPlaylistId,
     onComplete,
@@ -83,8 +83,7 @@ export function MediaPlaylistEditModal(props: WithModalBaseProps<{
       <Modal.Footer>
         <Button
           onButtonSubmit={() => {
-            hideModal();
-            onComplete?.();
+            onComplete();
           }}
         >
           {I18nService.getString('button_dialog_cancel')}
@@ -98,4 +97,4 @@ export function MediaPlaylistEditModal(props: WithModalBaseProps<{
       </Modal.Footer>
     </>
   );
-}
+};

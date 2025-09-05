@@ -2,15 +2,14 @@ import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { isEmpty } from 'lodash';
 
-import { useModal } from '../../contexts';
+import { ModalComponent } from '../../contexts';
 import { IMediaPlaylist, IMediaPlaylistTrackInputData } from '../../interfaces';
 import { I18nService, MediaLibraryService } from '../../services';
 import { useDataAction, useDataLoad } from '../../hooks';
-import { WithModalBaseProps } from '../../types';
 
 import { Button } from '../button/button.component';
 
-export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
+export const MediaPlaylistDuplicateTrackModal: ModalComponent<{
   mediaPlaylistId: string;
   inputDataList: IMediaPlaylistTrackInputData[],
   existingTrackDataList: IMediaPlaylistTrackInputData[],
@@ -18,7 +17,7 @@ export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
 }, {
   updatedPlaylist: IMediaPlaylist,
   addedTrackDataList: IMediaPlaylistTrackInputData[],
-}>) {
+}> = (props) => {
   const {
     mediaPlaylistId,
     inputDataList,
@@ -30,7 +29,6 @@ export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
   const hasNewTracks = !isEmpty(newTrackDataList);
   const hasSingleDuplicateTrack = existingTrackDataList.length === 1;
 
-  const { hideModal } = useModal();
   const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
 
   const addPlaylistTracks = useDataAction(async (
@@ -42,8 +40,7 @@ export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
       ignoreExisting,
     });
 
-    hideModal();
-    onComplete?.({
+    onComplete({
       updatedPlaylist,
       addedTrackDataList: playlistTracks,
     });
@@ -97,8 +94,7 @@ export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
               );
             } else {
               // don't add
-              hideModal();
-              onComplete?.();
+              onComplete();
             }
           }}
         >
@@ -111,4 +107,4 @@ export function MediaPlaylistDuplicateTrackModal(props: WithModalBaseProps<{
       </Modal.Footer>
     </>
   );
-}
+};
