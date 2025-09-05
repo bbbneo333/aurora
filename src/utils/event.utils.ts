@@ -20,3 +20,7 @@ export function isSelectAllKey(e: GenericKeyboardEvent): boolean {
 export function isDeleteKey(e: GenericKeyboardEvent) {
   return e.key === 'Delete' || e.key === 'Backspace';
 }
+
+export function isEscapeKey(e: GenericKeyboardEvent) {
+  return e.key === 'Escape';
+}

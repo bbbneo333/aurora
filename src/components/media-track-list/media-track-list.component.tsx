@@ -167,12 +167,13 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
   ]);
 
   useEffect(() => {
-    // for selecting all on ctrl+a
     function handleKeyDown(e: KeyboardEvent) {
       if (Events.isSelectAllKey(e)) {
+        // for selecting all on ctrl+a
         e.preventDefault();
         selectAll();
       } else if (Events.isDeleteKey(e) && onSelectionDelete && !isEmpty(selectedTrackIds)) {
+        // for deleting selected on delete
         if (selectionDeleteInProgress) {
           return;
         }
@@ -191,6 +192,9 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>
           .finally(() => {
             setSelectionDeleteInProgress(false);
           });
+      } else if (Events.isEscapeKey(e)) {
+        // clearing selectio on escape
+        clearSelection();
       }
     }
 
