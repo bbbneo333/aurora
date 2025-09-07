@@ -29,10 +29,10 @@ export type InteractiveListItemType = {
 };
 
 export type InteractiveListProps<T> = {
-  items: T[],
+  items: T[];
   children: (item: T, index: number) => React.ReactElement;
-  sortable?: boolean,
-  getItemId?: (mediaTrack: T) => string;
+  sortable?: boolean;
+  getItemId?: (item: T) => string;
   onContextMenu?: (event: React.MouseEvent, itemIds: string[]) => void;
   onItemsSorted?: (items: T[]) => Promise<void> | void;
   onItemsDelete?: (itemIds: string[]) => Promise<boolean> | boolean;
