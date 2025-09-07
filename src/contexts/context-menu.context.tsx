@@ -4,6 +4,7 @@ import { ShowContextMenuParams, useContextMenu as useMenu } from 'react-contexif
 export type ContextMenuContextType<T> = {
   showMenu: (params: ShowContextMenuParams) => void;
   menuProps: T;
+  hideAll: () => void;
 };
 
 const ContextMenuContext = React.createContext<ContextMenuContextType<any> | null>(null);
@@ -13,7 +14,7 @@ export function ContextMenuProvider<T>(props: {
 }) {
   const { children } = props;
   const [menuProps, setMenuProps] = useState<T>();
-  const { show } = useMenu();
+  const { show, hideAll } = useMenu();
 
   const showMenu = useCallback((params: ShowContextMenuParams) => {
     setMenuProps(params.props as T);
@@ -23,7 +24,7 @@ export function ContextMenuProvider<T>(props: {
   ]);
 
   return (
-    <ContextMenuContext.Provider value={{ menuProps, showMenu }}>
+    <ContextMenuContext.Provider value={{ menuProps, showMenu, hideAll }}>
       {children}
     </ContextMenuContext.Provider>
   );

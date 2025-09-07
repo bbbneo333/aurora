@@ -1,10 +1,8 @@
-import React, { useCallback } from 'react';
+import React, { HTMLAttributes } from 'react';
 import classNames from 'classnames/bind';
 
-import { useContextMenu, useMediaTrackList } from '../../contexts';
-import { SystemEnums } from '../../enums';
 import { IMediaTrack } from '../../interfaces';
-import { DateTimeUtils } from '../../utils';
+import { DateTimeUtils, Events } from '../../utils';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
@@ -16,32 +14,27 @@ import { useMediaTrackPlayback } from './use-media-track-playback';
 const cx = classNames.bind(styles);
 
 export type MediaTrackProps<T> = {
-  mediaTrack: T,
-  mediaTrackPointer?: number,
-  mediaTrackContextMenuId?: string;
-  onMediaTrackPlay?: (mediaTrack: T) => void,
-  isPlaying?: boolean,
-  disableCover?: boolean,
-  disableAlbumLink?: boolean,
-  containerRef?: React.Ref<HTMLDivElement>,
-  containerProps?: React.HTMLProps<HTMLDivElement>,
-};
+  mediaTrack: T;
+  mediaTrackPointer?: number;
+  onMediaTrackPlay?: (mediaTrack: T) => void;
+  isPlaying?: boolean;
+  disableCover?: boolean;
+  disableAlbumLink?: boolean;
+} & HTMLAttributes<HTMLDivElement>;
 
-export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
+export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMediaTrack>>((props, ref) => {
   const {
     mediaTrack,
     mediaTrackPointer,
-    mediaTrackContextMenuId,
     onMediaTrackPlay,
     isPlaying = false,
     disableCover = false,
     disableAlbumLink = false,
-    containerRef,
-    containerProps = {},
+    className,
+    onDoubleClick,
+    onKeyDown,
+    ...rest
   } = props;
-
-  const { showMenu } = useContextMenu();
-  const { mediaTrackList } = useMediaTrackList();
 
   const {
     play,
@@ -55,41 +48,19 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
     isPlaying,
   });
 
-  const handleDefaultContextMenu = useCallback((e: React.MouseEvent) => {
-    if (mediaTrackContextMenuId) {
-      showMenu({
-        id: mediaTrackContextMenuId,
-        event: e,
-        props: {
-          mediaTrack,
-          mediaTrackList,
-        },
-      });
-    }
-  }, [
-    showMenu,
-    mediaTrack,
-    mediaTrackList,
-    mediaTrackContextMenuId,
-  ]);
-
   return (
-    // provide aria props via containerProps, setting anything here causes issues
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      {...containerProps}
-      ref={containerRef}
-      className={cx('media-track')}
-      onContextMenu={containerProps.onContextMenu || handleDefaultContextMenu}
-      onDoubleClick={() => {
+      {...rest}
+      ref={ref}
+      className={cx('media-track', className)}
+      onDoubleClick={(e) => {
+        onDoubleClick?.(e);
         toggle();
       }}
       onKeyDown={(e) => {
-        if (e.key === SystemEnums.KeyboardKeyCodes.Enter
-          || e.key === SystemEnums.KeyboardKeyCodes.Space) {
-          e.preventDefault();
-          toggle();
-        }
+        onKeyDown?.(e);
+        if (Events.isEnterKey(e) || Events.isSpaceKey(e)) toggle();
       }}
     >
       <div className={cx('media-track-main-column')}>
@@ -125,4 +96,4 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
       </div>
     </div>
   );
-}
+});

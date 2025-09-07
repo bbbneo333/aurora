@@ -48,7 +48,7 @@ export function TracksSearchResults({ tracks, trim }: {
                 // it can be anything, just keep it consistent
                 id: 'search-results',
               }}
-              contextMenuItems={[
+              mediaTrackContextMenuItems={[
                 MediaTrackContextMenuItem.AddToQueue,
                 MediaTrackContextMenuItem.Separator,
                 MediaTrackContextMenuItem.AddToPlaylist,

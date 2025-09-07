@@ -3,6 +3,7 @@ export * from './browser-navigation/browser-navigation.component';
 export * from './browser-scroll/browser-scroll.component';
 export * from './button/button.component';
 export * from './icon/icon.component';
+export * from './interactive-list/interactive-list.component';
 export * from './media-albums/media-albums.component';
 export * from './media-artists/media-artists.component';
 export * from './media-collection-actions/media-collection-actions.component';

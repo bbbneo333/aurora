@@ -24,3 +24,11 @@ export function isDeleteKey(e: GenericKeyboardEvent) {
 export function isEscapeKey(e: GenericKeyboardEvent) {
   return e.key === 'Escape';
 }
+
+export function isEnterKey(e: GenericKeyboardEvent) {
+  return e.key === 'Enter';
+}
+
+export function isSpaceKey(e: GenericKeyboardEvent) {
+  return e.key === 'Space';
+}
