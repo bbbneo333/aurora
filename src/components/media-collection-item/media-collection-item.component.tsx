@@ -52,11 +52,17 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
   ]);
 
   return (
-    <div className={cx('collection-item')} onContextMenu={handleOnContextMenu}>
+    <div
+      role="row"
+      tabIndex={0}
+      className={cx('collection-item')}
+      onContextMenu={handleOnContextMenu}
+    >
       <RouterLink
         exact
         to={routerLink}
         className={cx('collection-item-link', 'app-nav-link')}
+        tabIndex={-1}
       >
         <div className={cx('collection-item-content')}>
           <div className={cx('collection-item-section')}>
