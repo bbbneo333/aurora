@@ -52,49 +52,45 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
   ]);
 
   return (
-    <div
+    <RouterLink
       role="row"
       tabIndex={0}
-      className={cx('collection-item')}
+      exact
+      to={routerLink}
+      className={cx('collection-item', 'app-nav-link')}
       onContextMenu={handleOnContextMenu}
     >
-      <RouterLink
-        exact
-        to={routerLink}
-        className={cx('collection-item-link', 'app-nav-link')}
-        tabIndex={-1}
-      >
-        <div className={cx('collection-item-content')}>
+      <div className={cx('collection-item-content')}>
+        <div className={cx('collection-item-section')}>
+          <MediaPlaybackButton
+            isPlaying={isMediaPlaying}
+            disabled={disablePlayback}
+            className={cx('collection-item-playback-button')}
+            onPlay={handleOnPlayButtonClick}
+            onPause={handleOnPauseButtonClick}
+            tabIndex={-1}
+          />
+        </div>
+        {!disableCover && (
           <div className={cx('collection-item-section')}>
-            <MediaPlaybackButton
-              isPlaying={isMediaPlaying}
-              disabled={disablePlayback}
-              className={cx('collection-item-playback-button')}
-              onPlay={handleOnPlayButtonClick}
-              onPause={handleOnPauseButtonClick}
+            <MediaCoverPicture
+              mediaPicture={mediaItem.picture}
+              mediaPictureAltText={mediaItem.name}
+              className={cx('collection-item-cover')}
             />
           </div>
-          {!disableCover && (
-            <div className={cx('collection-item-section')}>
-              <MediaCoverPicture
-                mediaPicture={mediaItem.picture}
-                mediaPictureAltText={mediaItem.name}
-                className={cx('collection-item-cover')}
-              />
+        )}
+        <div className={cx('collection-item-section', 'collection-item-info')}>
+          <div className={cx('collection-item-info-title')}>
+            {mediaItem.name}
+          </div>
+          {subtitle && (
+            <div className={cx('collection-item-info-subtitle')}>
+              {subtitle}
             </div>
           )}
-          <div className={cx('collection-item-section', 'collection-item-info')}>
-            <div className={cx('collection-item-info-title')}>
-              {mediaItem.name}
-            </div>
-            {subtitle && (
-              <div className={cx('collection-item-info-subtitle')}>
-                {subtitle}
-              </div>
-            )}
-          </div>
         </div>
-      </RouterLink>
-    </div>
+      </div>
+    </RouterLink>
   );
 }

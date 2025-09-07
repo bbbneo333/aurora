@@ -1,12 +1,10 @@
 .collection-item {
   transition: var(--selectable-item-transition);
   border-radius: 5px;
+  display: block;
 }
 
-.collection-item:focus {
-  background-color: var(--selectable-focused-bg-color) !important;
-}
-
+.collection-item:focus,
 .collection-item:hover {
   background-color: var(--selectable-hovered-bg-color);
 }

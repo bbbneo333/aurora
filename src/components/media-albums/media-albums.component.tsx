@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 
 import { IMediaAlbum } from '../../interfaces';
 import { MediaUtils, StringUtils } from '../../utils';
-import { Routes } from '../../constants';
+import { Layout, Routes } from '../../constants';
 import {
   MediaCollectionContextMenu, MediaCollectionContextMenuItem,
 } from '../media-collection-context-menu/media-collection-context-menu.component';
@@ -26,15 +26,16 @@ export function MediaAlbums(props: {
           const mediaItem = MediaUtils.getMediaItemFromAlbum(mediaAlbum);
 
           return (
-            <MediaCollectionTile
-              key={mediaAlbum.id}
-              mediaItem={mediaItem}
-              mediaLink={StringUtils.buildRoute(Routes.LibraryAlbum, {
-                albumId: mediaAlbum.id,
-              })}
-              mediaSubtitle={mediaAlbum.album_artist.artist_name}
-              mediaContextMenuId={mediaContextMenuId}
-            />
+            <div className={Layout.Grid.CollectionTile} key={mediaAlbum.id}>
+              <MediaCollectionTile
+                mediaItem={mediaItem}
+                mediaLink={StringUtils.buildRoute(Routes.LibraryAlbum, {
+                  albumId: mediaAlbum.id,
+                })}
+                mediaSubtitle={mediaAlbum.album_artist.artist_name}
+                mediaContextMenuId={mediaContextMenuId}
+              />
+            </div>
           );
         })}
       </div>
