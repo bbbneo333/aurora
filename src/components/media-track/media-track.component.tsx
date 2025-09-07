@@ -63,33 +63,31 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
         if (Events.isEnterKey(e) || Events.isSpaceKey(e)) toggle();
       }}
     >
-      <div className={cx('media-track-main-column')}>
-        <div className={cx('media-track-section')}>
-          <MediaPlaybackButton
-            isPlaying={isTrackPlaying}
-            className={cx('media-track-playback-button')}
-            onPlay={play}
-            onPause={pause}
-          />
-        </div>
-        {!disableCover && (
-          <div className={cx('media-track-section')}>
-            <MediaCoverPicture
-              mediaPicture={mediaTrack.track_cover_picture}
-              mediaPictureAltText={mediaTrack.track_name}
-              className={cx('media-track-cover')}
-            />
-          </div>
-        )}
-        <div className={cx('media-track-section')}>
-          <MediaTrackInfoComponent
-            mediaTrack={mediaTrack}
-            disableAlbumLink={disableAlbumLink}
-            className={cx('media-track-info')}
-          />
-        </div>
+      <div className={cx('media-track-section')}>
+        <MediaPlaybackButton
+          isPlaying={isTrackPlaying}
+          className={cx('media-track-playback-button')}
+          onPlay={play}
+          onPause={pause}
+        />
       </div>
-      <div className={cx('media-track-side-column')}>
+      {!disableCover && (
+        <div className={cx('media-track-section')}>
+          <MediaCoverPicture
+            mediaPicture={mediaTrack.track_cover_picture}
+            mediaPictureAltText={mediaTrack.track_name}
+            className={cx('media-track-cover')}
+          />
+        </div>
+      )}
+      <div className={cx('media-track-section')}>
+        <MediaTrackInfoComponent
+          mediaTrack={mediaTrack}
+          disableAlbumLink={disableAlbumLink}
+          className={cx('media-track-info')}
+        />
+      </div>
+      <div className={cx('media-track-section', 'media-track-side-column')}>
         <div className={cx('media-track-duration')}>
           {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
         </div>

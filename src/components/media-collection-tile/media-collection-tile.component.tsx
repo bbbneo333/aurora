@@ -58,7 +58,7 @@ export function MediaCollectionTile(props: {
           to={mediaLink}
           className={cx('collection-tile-link', 'app-nav-link')}
         >
-          <div className={cx('collection-tile-body')}>
+          <div className={cx('collection-tile-content')}>
             <div className={cx('collection-tile-cover')}>
               <MediaCoverPicture
                 mediaPicture={mediaItem.picture}

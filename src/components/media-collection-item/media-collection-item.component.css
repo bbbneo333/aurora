@@ -1,5 +1,4 @@
 .collection-item {
-  padding: 10px;
   transition: var(--selectable-item-transition);
   border-radius: 5px;
 }
@@ -12,24 +11,21 @@
   background-color: var(--selectable-hovered-bg-color);
 }
 
-.collection-item-main-column {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.collection-item-main-column .collection-item-section:not(:last-child) {
-  margin-right: 20px;
-}
-
 .collection-item:hover .collection-item-playback-button {
   color: var(--selectable-hovered-color);
 }
 
-.collection-item-side-column {
+.collection-item-content {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: flex-end;
+  gap: 20px;
+  padding: 10px;
+}
+
+.collection-item-cover {
+  width: 50px;
+  height: 50px;
 }
 
 .collection-item-info {
@@ -38,6 +34,7 @@
   align-items: flex-start;
   white-space: nowrap;
   overflow: hidden;
+  gap: 5px;
 }
 
 .collection-item-info-title {

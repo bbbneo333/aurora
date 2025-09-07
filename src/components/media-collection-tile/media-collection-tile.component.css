@@ -1,6 +1,6 @@
 .collection-tile {
   background-color: var(--selectable-bg-color);
-  border-radius: 4px;
+  border-radius: 5px;
   transition: var(--selectable-item-transition);
   height: 100%;
 }
@@ -9,23 +9,15 @@
   background-color: var(--selectable-hovered-bg-color);
 }
 
-.collection-tile-body {
+.collection-tile-content {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px;
-}
-
-.collection-tile-link {
-  color: var(--text-light-color);
-}
-
-.collection-tile:hover .collection-tile-link {
-  color: var(--text-light-color);
+  gap: 15px;
+  padding: 15px;
 }
 
 .collection-tile-cover {
-  margin-bottom: 16px;
   flex-grow: 1;
   position: relative;
 }
@@ -55,21 +47,28 @@
 }
 
 .collection-tile:hover .collection-tile-cover-action,
+.collection-tile:focus .collection-tile-cover-action,
 .collection-tile.playing .collection-tile-cover-action {
   margin-bottom: 0;
   opacity: 1;
 }
 
-.collection-tile-title {
-  font-weight: bold;
-  margin-bottom: 4px;
+.collection-tile-info {
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
   white-space: nowrap;
   overflow: hidden;
+  gap: 5px;
+}
+
+.collection-tile-title {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--text-light-color);
 }
 
 .collection-tile-subtitle {
-  font-size: smaller;
+  font-size: 13px;
   color: var(--text-dark-color);
-  white-space: nowrap;
-  overflow: hidden;
 }

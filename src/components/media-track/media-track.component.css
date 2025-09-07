@@ -4,6 +4,8 @@
   border-radius: 5px;
   display: flex;
   flex-direction: row;
+  align-items: center;
+  gap: 20px;
 }
 
 .media-track[aria-selected="true"] {
@@ -18,27 +20,14 @@
   color: var(--selectable-hovered-color);
 }
 
-.media-track-main-column {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex: 1; /* grow to fill remaining space */
-}
-
-.media-track-main-column .media-track-section:not(:last-child) {
-  margin-right: 20px;
-}
-
 .media-track-cover {
   width: 50px;
   height: 50px;
 }
 
+
 .media-track-side-column {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-left: auto; /* push this all the way to the right */
+  margin-left: auto; /* push side column all the way to the end */
 }
 
 .media-track-duration {
