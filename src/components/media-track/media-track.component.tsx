@@ -61,7 +61,7 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
       }}
       onKeyDown={(e) => {
         onKeyDown?.(e);
-        if (Events.isEnterKey(e) || Events.isSpaceKey(e)) toggle();
+        if (Events.isEnterKey(e) && e.target === e.currentTarget) toggle();
       }}
     >
       <div className={cx('media-track-content')}>
@@ -71,6 +71,7 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
             className={cx('media-track-playback-button')}
             onPlay={play}
             onPause={pause}
+            tabIndex={-1}
           />
         </div>
         {!disableCover && (
