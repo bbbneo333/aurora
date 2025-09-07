@@ -9,7 +9,7 @@ import { useContextMenu, useModal } from '../../contexts';
 import { IMediaCollectionItem, IMediaTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
 import { I18nService, MediaLibraryService } from '../../services';
-import { StringUtils, useSearch } from '../../utils';
+import { Events, StringUtils, useSearch } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
 import { TextInput } from '../text-input/text-input.component';
@@ -155,7 +155,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
             onKeyDown={(event) => {
               // pressing space bar closes the context menu for unknown reasons
               // adding this to handle such cases
-              if (event.key === ' ') {
+              if (Events.isSpaceKey(event)) {
                 event.stopPropagation();
               }
             }}

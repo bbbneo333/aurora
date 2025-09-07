@@ -30,5 +30,5 @@ export function isEnterKey(e: GenericKeyboardEvent) {
 }
 
 export function isSpaceKey(e: GenericKeyboardEvent) {
-  return e.key === 'Space';
+  return e.key === ' ';
 }

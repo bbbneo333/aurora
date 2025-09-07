@@ -7,8 +7,8 @@ import _ from 'lodash';
 import { Icons } from '../../constants';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
-import { MediaEnums, SystemEnums } from '../../enums';
-import { DOMUtils } from '../../utils';
+import { MediaEnums } from '../../enums';
+import { DOMUtils, Events } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
@@ -27,7 +27,7 @@ export function MediaPlayerControls() {
   useEffect(() => {
     const handleOnKeyDown = (event: KeyboardEvent) => {
       if (
-        event.code === SystemEnums.KeyboardKeyCodes.Space
+        Events.isSpaceKey(event)
         && document.activeElement
         && !DOMUtils.isElementEditable(document.activeElement)
       ) {
