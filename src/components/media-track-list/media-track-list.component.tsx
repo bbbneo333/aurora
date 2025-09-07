@@ -13,20 +13,20 @@ import {
 import { InteractiveList } from '../interactive-list/interactive-list.component';
 import { MediaTrack } from '../media-track/media-track.component';
 
-export type MediaTracksProps<T> = {
-  mediaTracks: T[],
-  mediaTrackList?: IMediaTrackList,
-  contextMenuItems?: MediaTrackContextMenuItem[],
-  disableCovers?: boolean,
+export type MediaTrackListProps<T> = {
+  mediaTracks: T[];
+  mediaTrackList?: IMediaTrackList;
+  contextMenuItems?: MediaTrackContextMenuItem[];
+  disableCovers?: boolean;
   disableAlbumLinks?: boolean,
-  getMediaTrackId?: (mediaTrack: T) => string,
-  onMediaTrackPlay?: (mediaTrack: T) => void,
-  sortable?: boolean,
-  onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void,
-  onSelectionDelete?: (mediaTrackIds: string[]) => Promise<boolean> | boolean,
+  getMediaTrackId?: (mediaTrack: T) => string;
+  onMediaTrackPlay?: (mediaTrack: T) => void;
+  sortable?: boolean;
+  onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void;
+  onSelectionDelete?: (mediaTrackIds: string[]) => Promise<boolean> | boolean;
 };
 
-export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>) {
+export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps<T>) {
   const {
     mediaTracks,
     mediaTrackList,
