@@ -28,6 +28,7 @@ export enum MediaPlaylistContextMenuItemAction {
 
 export type MediaPlaylistContextMenuItemProps = {
   mediaTrack?: IMediaTrack;
+  mediaTracks?: IMediaTrack[];
   mediaItem?: IMediaCollectionItem,
 };
 
@@ -56,11 +57,14 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaPlaylistContextMenuItemProps, MediaPlaylistContextMenuItemData>) => {
     const itemAction: MediaPlaylistContextMenuItemAction = itemParams.id as MediaPlaylistContextMenuItemAction;
     const mediaPlaylistId = itemParams.data?.mediaPlaylistId;
-    const { mediaTrack, mediaItem } = menuProps;
+    const { mediaTrack, mediaTracks, mediaItem } = menuProps;
 
     async function getMediaTracks(): Promise<IMediaTrack[]> {
       if (mediaTrack) {
         return [mediaTrack];
+      }
+      if (mediaTracks && !isEmpty(mediaTracks)) {
+        return mediaTracks;
       }
       if (mediaItem) {
         return MediaLibraryService.getMediaCollectionTracks(mediaItem);
@@ -71,9 +75,9 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
 
     switch (itemAction) {
       case MediaPlaylistContextMenuItemAction.CreatePlaylist:
-        getMediaTracks().then(async (mediaTracks) => {
+        getMediaTracks().then(async (mediaTracksToAdd) => {
           const mediaPlaylist = await MediaLibraryService.createMediaPlaylist({
-            tracks: mediaTracks,
+            tracks: mediaTracksToAdd,
           });
           const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
             playlistId: mediaPlaylist.id,
@@ -87,18 +91,18 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
           throw new Error('MediaPlaylistContextMenu encountered error at AddToPlaylist - mediaPlaylistId is required');
         }
 
-        getMediaTracks().then(async (mediaTracks) => {
+        getMediaTracks().then(async (mediaTracksToAdd) => {
           try {
-            await MediaLibraryService.addMediaPlaylistTracks(mediaPlaylistId, mediaTracks);
+            await MediaLibraryService.addMediaPlaylistTracks(mediaPlaylistId, mediaTracksToAdd);
           } catch (error) {
             if (error instanceof MediaLibraryPlaylistDuplicateTracksError) {
               // in case of duplicate track, explicitly ask user what to do
-              showModal(<MediaPlaylistDuplicateTrackModal
-                mediaPlaylistId={mediaPlaylistId}
-                inputDataList={mediaTracks}
-                existingTrackDataList={error.existingTrackDataList}
-                newTrackDataList={error.newTrackDataList}
-              />);
+              showModal(MediaPlaylistDuplicateTrackModal, {
+                mediaPlaylistId,
+                inputDataList: mediaTracksToAdd,
+                existingTrackDataList: error.existingTrackDataList,
+                newTrackDataList: error.newTrackDataList,
+              });
             } else {
               throw error;
             }
@@ -109,13 +113,17 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
         if (!mediaItem) {
           throw new Error('MediaPlaylistContextMenu encountered error at EditPlaylist - mediaItem is required');
         }
-        showModal(<MediaPlaylistEditModal mediaPlaylistId={mediaItem.id}/>);
+        showModal(MediaPlaylistEditModal, {
+          mediaPlaylistId: mediaItem.id,
+        });
         break;
       case MediaPlaylistContextMenuItemAction.DeletePlaylist:
         if (!mediaItem) {
           throw new Error('MediaPlaylistContextMenu encountered error at DeletePlaylist - mediaItem is required');
         }
-        showModal(<MediaPlaylistDeleteModal mediaPlaylistId={mediaItem.id}/>);
+        showModal(MediaPlaylistDeleteModal, {
+          mediaPlaylistId: mediaItem.id,
+        });
         break;
       default:
       // unsupported action, do nothing

@@ -6,12 +6,14 @@ import { isEmpty } from 'lodash';
 
 import { I18nService, MediaLibraryService } from '../../services';
 import { Layout, Routes } from '../../constants';
+import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
 import { IMediaPlaylistTrack } from '../../interfaces';
 import { useEntityMissing } from '../../hooks';
 
 import {
   MediaCoverPicture,
+  MediaPlaylistDeleteTracksModal,
   MediaTrackContextMenuItem,
   MediaTrackList,
 } from '../../components';
@@ -27,6 +29,7 @@ export function PlaylistPage() {
   const { mediaSelectedPlaylist } = useSelector((state: RootState) => state.mediaLibrary);
   const [mediaPlaylistTracks, setMediaPlaylistTracks] = useState<IMediaPlaylistTrack[]>([]);
   const isPlaylistRemoved = useEntityMissing(mediaSelectedPlaylist);
+  const { showModal } = useModal();
 
   useEffect(() => {
     MediaLibraryService.loadMediaPlaylist(playlistId);
@@ -48,7 +51,7 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
-  const onMediaTracksSorted = useCallback(async (mediaTracks: IMediaPlaylistTrack[]) => {
+  const handleMediaTracksSorted = useCallback(async (mediaTracks: IMediaPlaylistTrack[]) => {
     if (!mediaSelectedPlaylist) {
       return;
     }
@@ -60,6 +63,20 @@ export function PlaylistPage() {
     setMediaPlaylistTracks(mediaTracks);
   }, [
     mediaSelectedPlaylist,
+  ]);
+
+  const handleSelectionDelete = useCallback((mediaPlaylistId, mediaPlaylistTrackIds) => new Promise<boolean>((resolve) => {
+    showModal(MediaPlaylistDeleteTracksModal, {
+      mediaPlaylistId,
+      mediaPlaylistTrackIds,
+    }, {
+      onComplete: (res) => {
+        // success signal if selected were deleted
+        resolve(!isEmpty(res?.deletedPlaylistTrackIds));
+      },
+    });
+  }), [
+    showModal,
   ]);
 
   if (isPlaylistRemoved) {
@@ -113,13 +130,14 @@ export function PlaylistPage() {
             mediaTrackList={{
               id: mediaSelectedPlaylist.id,
             }}
-            getMediaTrackKey={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
+            getMediaTrackId={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
             contextMenuItems={[
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
-            onMediaTracksSorted={onMediaTracksSorted}
+            onMediaTracksSorted={handleMediaTracksSorted}
+            onSelectionDelete={mediaTrackIds => handleSelectionDelete(mediaSelectedPlaylist.id, mediaTrackIds)}
           />
         </div>
       )}

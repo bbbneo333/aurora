@@ -6,38 +6,49 @@ import { useDataAction, useDataLoad } from '../../hooks';
 import { I18nService, MediaLibraryService } from '../../services';
 
 import { Button } from '../button/button.component';
+import { IMediaPlaylist } from '../../interfaces';
 
-export const MediaPlaylistDeleteModal: ModalComponent<{
+export const MediaPlaylistDeleteTracksModal: ModalComponent<{
   mediaPlaylistId: string;
+  mediaPlaylistTrackIds: string[];
 }, {
-  deletedId: string
+  updatedPlaylist: IMediaPlaylist,
+  deletedPlaylistTrackIds: string[];
 }> = (props) => {
   const {
     mediaPlaylistId,
+    mediaPlaylistTrackIds,
     onComplete,
   } = props;
 
   const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
-  const deletePlaylist = useDataAction(async () => {
-    await MediaLibraryService.deleteMediaPlaylist(mediaPlaylistId);
-    onComplete({ deletedId: mediaPlaylistId });
+  const deletePlaylistTracks = useDataAction(async () => {
+    const updatedPlaylist = await MediaLibraryService.deleteMediaPlaylistTracks(
+      mediaPlaylistId,
+      mediaPlaylistTrackIds,
+    );
+
+    onComplete({
+      updatedPlaylist,
+      deletedPlaylistTrackIds: mediaPlaylistTrackIds,
+    });
   });
 
   return (
     <>
       <Modal.Header>
         <Modal.Title>
-          {I18nService.getString('label_playlist_delete')}
+          {I18nService.getString('label_playlist_tracks_delete')}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {I18nService.getString('label_playlist_delete_details', {
+        {I18nService.getString('label_playlist_tracks_delete_details', {
           playlistName: <b>{loadedPlaylist.data?.name || ''}</b>,
         })}
       </Modal.Body>
       <Modal.Footer>
         <Button
-          disabled={deletePlaylist.loading}
+          disabled={deletePlaylistTracks.loading}
           onButtonSubmit={() => {
             onComplete();
           }}
@@ -46,8 +57,8 @@ export const MediaPlaylistDeleteModal: ModalComponent<{
         </Button>
         <Button
           className="primary"
-          disabled={deletePlaylist.loading}
-          onButtonSubmit={deletePlaylist.perform}
+          disabled={deletePlaylistTracks.loading}
+          onButtonSubmit={deletePlaylistTracks.perform}
         >
           {I18nService.getString('button_dialog_confirm')}
         </Button>

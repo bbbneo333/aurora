@@ -15,6 +15,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'max-len': ['error', 200],
     'max-classes-per-file': 'off',
+    'no-console': ['warn', { allow: ['error'] }],
     'react/jsx-tag-spacing': [
       'error',
       {
@@ -26,5 +27,6 @@ module.exports = {
     ],
     'react/jsx-props-no-spreading': 'off',
     'react/require-default-props': 'off',
+    'react/prop-types': 'off',
   },
 };

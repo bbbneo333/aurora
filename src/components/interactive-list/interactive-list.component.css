@@ -1,5 +1,8 @@
-.media-track-list {
+.interactive-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
+}
+
+.interactive-list-item {
 }

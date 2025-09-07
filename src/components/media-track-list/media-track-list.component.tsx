@@ -1,147 +1,115 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { isEmpty } from 'lodash';
-import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import classNames from 'classnames/bind';
 
-import {
-  closestCenter,
-  DndContext,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
-
-import {
-  arrayMove,
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-
-import { MediaTrackListProvider } from '../../contexts';
+import { MediaTrackListProvider, useContextMenu } from '../../contexts';
 import { IMediaTrack, IMediaTrackList } from '../../interfaces';
 import { StringUtils } from '../../utils';
-import { SafePointerSensor } from '../../types';
 
 import {
   MediaTrackContextMenu,
   MediaTrackContextMenuItem,
 } from '../media-track-context-menu/media-track-context-menu.component';
 
-import { MediaTrackListItem } from './media-track-list-item.component';
-import styles from './media-track-list.component.css';
+import { InteractiveList } from '../interactive-list/interactive-list.component';
+import { MediaTrack } from '../media-track/media-track.component';
 
-const cx = classNames.bind(styles);
-
-export type MediaTracksProps<T> = {
-  mediaTracks: T[],
-  mediaTrackList?: IMediaTrackList,
-  disableCovers?: boolean,
+export type MediaTrackListProps<T> = {
+  mediaTracks: T[];
+  mediaTrackList?: IMediaTrackList;
+  contextMenuItems?: MediaTrackContextMenuItem[];
+  disableCovers?: boolean;
   disableAlbumLinks?: boolean,
-  contextMenuItems?: MediaTrackContextMenuItem[],
-  getMediaTrackKey?: (mediaTrack: T) => string,
-  onMediaTrackPlay?: (mediaTrack: T) => void,
-  sortable?: boolean,
-  onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void,
+  getMediaTrackId?: (mediaTrack: T) => string;
+  onMediaTrackPlay?: (mediaTrack: T) => void;
+  sortable?: boolean;
+  onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void;
+  onSelectionDelete?: (mediaTrackIds: string[]) => Promise<boolean> | boolean;
 };
 
-export function MediaTrackList<T extends IMediaTrack>(props: MediaTracksProps<T>) {
+export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps<T>) {
   const {
     mediaTracks,
     mediaTrackList,
+    contextMenuItems,
     disableCovers = false,
     disableAlbumLinks = false,
-    contextMenuItems,
-    getMediaTrackKey,
+    getMediaTrackId,
     onMediaTrackPlay,
     sortable = false,
     onMediaTracksSorted,
+    onSelectionDelete,
   } = props;
 
-  const [dragItems, setDragItems] = useState<T[] | null>(null);
-  const [prevItems, setPrevItems] = useState<T[]>([]);
-  const [isSortingDisabled, setIsSortingDisabled] = useState(false);
+  const { showMenu, hideAll } = useContextMenu();
 
   const contextMenuId = useMemo(
     () => (!isEmpty(contextMenuItems) ? StringUtils.generateId() : undefined),
-    [contextMenuItems],
+    [
+      contextMenuItems,
+    ],
   );
-  const sensors = useSensors(useSensor(SafePointerSensor));
 
-  const getMediaTrackId = useCallback((mediaTrack: T) => (getMediaTrackKey ? getMediaTrackKey(mediaTrack) : mediaTrack.id), [
-    getMediaTrackKey,
+  const handleContextMenu = useCallback((e, mediaTrackIds: string[]) => {
+    if (!contextMenuId) {
+      return;
+    }
+
+    const selectedTracks = mediaTracks.filter(track => mediaTrackIds.includes(
+      getMediaTrackId?.(track) || track.id,
+    ));
+
+    showMenu({
+      id: contextMenuId,
+      event: e,
+      props: {
+        mediaTracks: selectedTracks,
+        mediaTrackList,
+      },
+    });
+  }, [
+    contextMenuId,
+    getMediaTrackId,
+    mediaTrackList,
+    mediaTracks,
+    showMenu,
   ]);
 
-  const list = dragItems ?? mediaTracks;
+  const handlePointerDown = () => {
+    hideAll();
+  };
 
   return (
-    <>
-      <div className={cx('media-track-list')}>
-        <MediaTrackListProvider
-          mediaTracks={list}
-          mediaTrackList={mediaTrackList}
-        >
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            onDragStart={() => {
-              // snapshot before change for rollback
-              setPrevItems(mediaTracks);
-            }}
-            onDragEnd={async ({ active, over }) => {
-              if (!sortable || !onMediaTracksSorted || !over || active.id === over.id) {
-                setDragItems(null);
-                return;
-              }
-
-              const oldIndex = list.findIndex(t => getMediaTrackId(t) === active.id);
-              const newIndex = list.findIndex(t => getMediaTrackId(t) === over.id);
-              const newOrder = arrayMove(list, oldIndex, newIndex);
-
-              setDragItems(newOrder);
-              setIsSortingDisabled(true);
-
-              try {
-                // attempt commit: let the parent updates items
-                await onMediaTracksSorted(newOrder);
-              } catch (err) {
-                // commit failed: rollback request to parent on error
-                // eslint-disable-next-line no-console
-                console.error('onMediaTracksSorted failed:', err);
-                await onMediaTracksSorted(prevItems);
-              } finally {
-                // ditch local state, back to controlled
-                setIsSortingDisabled(false);
-                setDragItems(null);
-              }
-            }}
-          >
-            <SortableContext
-              items={list.map(getMediaTrackId)}
-              strategy={verticalListSortingStrategy}
-            >
-              {list.map((mediaTrack, mediaTrackPointer) => (
-                <MediaTrackListItem
-                  key={getMediaTrackId(mediaTrack)}
-                  id={getMediaTrackId(mediaTrack)}
-                  sortable={sortable && !isSortingDisabled}
-                  mediaTrack={mediaTrack}
-                  mediaTrackPointer={mediaTrackPointer}
-                  mediaTrackContextMenuId={contextMenuId}
-                  disableCover={disableCovers}
-                  disableAlbumLink={disableAlbumLinks}
-                  onMediaTrackPlay={onMediaTrackPlay}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-        </MediaTrackListProvider>
-      </div>
+    <MediaTrackListProvider
+      mediaTracks={mediaTracks}
+      mediaTrackList={mediaTrackList}
+    >
+      <InteractiveList
+        items={mediaTracks}
+        sortable={sortable}
+        getItemId={getMediaTrackId}
+        onItemsSorted={onMediaTracksSorted}
+        onItemsDelete={onSelectionDelete}
+        onContextMenu={handleContextMenu}
+      >
+        {(mediaTrack, index) => (
+          <MediaTrack
+            mediaTrack={mediaTrack}
+            mediaTrackPointer={index}
+            disableCover={disableCovers}
+            disableAlbumLink={disableAlbumLinks}
+            // TODO: Fix generic typing issue with MediaTrack
+            // @ts-ignore
+            onMediaTrackPlay={onMediaTrackPlay}
+            onPointerDown={handlePointerDown}
+          />
+        )}
+      </InteractiveList>
       {contextMenuId && contextMenuItems && (
         <MediaTrackContextMenu
           id={contextMenuId}
           menuItems={contextMenuItems}
         />
       )}
-    </>
+    </MediaTrackListProvider>
   );
 }

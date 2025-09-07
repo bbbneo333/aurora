@@ -10,6 +10,7 @@ import {
   MediaTrackContextMenuItem,
 } from '../../components';
 
+import { useContextMenu } from '../../contexts';
 import { MediaEnums } from '../../enums';
 import { IMediaQueueTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
@@ -19,10 +20,6 @@ import styles from './player-queue.component.css';
 
 const cx = classNames.bind(styles);
 
-enum MediaContextMenus {
-  PlayingTrack = 'media_queue_playing_track_context_menu',
-}
-
 export function PlayerQueueComponent() {
   const {
     mediaTracks,
@@ -31,6 +28,8 @@ export function PlayerQueueComponent() {
     mediaPlaybackQueueOnShuffle,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
+  const { showMenu } = useContextMenu();
+  const mediaTrackContextMenuId = 'media_queue_playing_track_context_menu';
   const [mediaQueueTracks, setMediaQueueTracks] = useState<IMediaQueueTrack[]>([]);
 
   const onMediaTracksSorted = useCallback((mediaQueueTracksUpdated: IMediaQueueTrack[]) => {
@@ -70,14 +69,20 @@ export function PlayerQueueComponent() {
               <div className={cx('player-queue-section-content')}>
                 <MediaTrack
                   mediaTrack={mediaPlaybackCurrentMediaTrack}
-                  mediaTrackContextMenuId={MediaContextMenus.PlayingTrack}
                   isPlaying={mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing}
-                  onMediaTrackPlay={() => {
-                    MediaPlayerService.playMediaTrackFromQueue(mediaPlaybackCurrentMediaTrack);
+                  onMediaTrackPlay={() => MediaPlayerService.playMediaTrackFromQueue(mediaPlaybackCurrentMediaTrack)}
+                  onContextMenu={(e) => {
+                    showMenu({
+                      id: mediaTrackContextMenuId,
+                      event: e,
+                      props: {
+                        mediaTrack: mediaPlaybackCurrentMediaTrack,
+                      },
+                    });
                   }}
                 />
                 <MediaTrackContextMenu
-                  id={MediaContextMenus.PlayingTrack}
+                  id={mediaTrackContextMenuId}
                   menuItems={[
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.Separator,
@@ -100,7 +105,7 @@ export function PlayerQueueComponent() {
                 <MediaTrackList
                   sortable
                   mediaTracks={mediaQueueTracks}
-                  getMediaTrackKey={(mediaTrack: IMediaQueueTrack) => mediaTrack.queue_entry_id}
+                  getMediaTrackId={(mediaTrack: IMediaQueueTrack) => mediaTrack.queue_entry_id}
                   contextMenuItems={[
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.RemoveFromQueue,
@@ -111,6 +116,10 @@ export function PlayerQueueComponent() {
                     MediaPlayerService.playMediaTrackFromQueue(mediaTrack);
                   }}
                   onMediaTracksSorted={onMediaTracksSorted}
+                  onSelectionDelete={(mediaTrackQueueIds) => {
+                    MediaPlayerService.removeMediaTracksFromQueue(mediaTrackQueueIds);
+                    return true;
+                  }}
                 />
               </div>
             </div>
