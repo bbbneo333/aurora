@@ -44,6 +44,7 @@
   --text-disabled-color: #383838;
   /*progress*/
   --progress-bar-bg-color: #b3b3b39e;
+  --loader-color: #b3b3b3;
   /*misc*/
   --titlebar-overlay-height: 60px;
   --scrollable-scrollbar-width: 15px;

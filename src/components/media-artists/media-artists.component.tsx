@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 
 import { IMediaArtist } from '../../interfaces';
 import { MediaUtils, StringUtils } from '../../utils';
-import { Routes } from '../../constants';
+import { Layout, Routes } from '../../constants';
 
 import {
   MediaCollectionContextMenu,
@@ -29,14 +29,15 @@ export function MediaArtists(props: {
           const mediaItem = MediaUtils.getMediaItemFromArtist(mediaArtist);
 
           return (
-            <MediaCollectionTile
-              key={mediaArtist.id}
-              mediaItem={mediaItem}
-              mediaLink={StringUtils.buildRoute(Routes.LibraryArtist, {
-                artistId: mediaArtist.id,
-              })}
-              mediaContextMenuId={mediaContextMenuId}
-            />
+            <div className={Layout.Grid.CollectionTile} key={mediaArtist.id}>
+              <MediaCollectionTile
+                mediaItem={mediaItem}
+                mediaLink={StringUtils.buildRoute(Routes.LibraryArtist, {
+                  artistId: mediaArtist.id,
+                })}
+                mediaContextMenuId={mediaContextMenuId}
+              />
+            </div>
           );
         })}
       </div>

@@ -7,17 +7,19 @@ import { useContextMenu } from '../../contexts';
 
 import { RouterLink } from '../router-link/router-link.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
+import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 
 import styles from './media-collection-item.component.css';
 
 const cx = classNames.bind(styles);
 
 export type MediaCollectionItemProps = {
-  mediaItem: IMediaCollectionItem,
-  routerLink: string,
-  contextMenuId?: string,
-  subtitle?: string,
-  disablePlayback?: boolean,
+  mediaItem: IMediaCollectionItem;
+  routerLink: string;
+  contextMenuId?: string;
+  subtitle?: string;
+  disablePlayback?: boolean;
+  disableCover?: boolean;
 };
 
 export function MediaCollectionItem(props: MediaCollectionItemProps) {
@@ -27,6 +29,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
     subtitle,
     contextMenuId,
     disablePlayback = false,
+    disableCover = false,
   } = props;
 
   const { showMenu } = useContextMenu();
@@ -49,40 +52,45 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
   ]);
 
   return (
-    <div className={cx('col-12')} onContextMenu={handleOnContextMenu}>
-      <RouterLink
-        exact
-        to={routerLink}
-        className={cx('collection-item-link', 'app-nav-link')}
-      >
-        <div className={cx('collection-item')}>
-          <div className="row">
-            <div className={cx('col-10', 'collection-item-main-column')}>
-              <div className={cx('collection-item-section')}>
-                <MediaPlaybackButton
-                  isPlaying={isMediaPlaying}
-                  disabled={disablePlayback}
-                  className={cx('collection-item-playback-button')}
-                  onPlay={handleOnPlayButtonClick}
-                  onPause={handleOnPauseButtonClick}
-                />
-              </div>
-              <div className={cx('collection-item-section')}>
-                <div className={cx('collection-item-info')}>
-                  <div className={cx('collection-item-info-title')}>
-                    {mediaItem.name}
-                  </div>
-                  {subtitle && (
-                    <div className={cx('collection-item-info-subtitle')}>
-                      {subtitle}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+    <RouterLink
+      role="row"
+      tabIndex={0}
+      exact
+      to={routerLink}
+      className={cx('collection-item', 'app-nav-link')}
+      onContextMenu={handleOnContextMenu}
+    >
+      <div className={cx('collection-item-content')}>
+        <div className={cx('collection-item-section')}>
+          <MediaPlaybackButton
+            isPlaying={isMediaPlaying}
+            disabled={disablePlayback}
+            className={cx('collection-item-playback-button')}
+            onPlay={handleOnPlayButtonClick}
+            onPause={handleOnPauseButtonClick}
+            tabIndex={-1}
+          />
         </div>
-      </RouterLink>
-    </div>
+        {!disableCover && (
+          <div className={cx('collection-item-section')}>
+            <MediaCoverPicture
+              mediaPicture={mediaItem.picture}
+              mediaPictureAltText={mediaItem.name}
+              className={cx('collection-item-cover')}
+            />
+          </div>
+        )}
+        <div className={cx('collection-item-section', 'collection-item-info')}>
+          <div className={cx('collection-item-info-title')}>
+            {mediaItem.name}
+          </div>
+          {subtitle && (
+            <div className={cx('collection-item-info-subtitle')}>
+              {subtitle}
+            </div>
+          )}
+        </div>
+      </div>
+    </RouterLink>
   );
 }

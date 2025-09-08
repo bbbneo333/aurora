@@ -62,7 +62,6 @@ export interface IMediaArtist extends IMediaArtistData {
 export interface IMediaPicture {
   image_data: any;
   image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType;
-  image_format: string;
 }
 
 export interface IMediaPlayback {

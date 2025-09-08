@@ -23,25 +23,15 @@ export class FileSystemModule implements IAppModule {
 
   private registerMessageHandlers() {
     this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadAsset, this.readAsset, this);
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectDirectory, this.selectDirectory, this);
     this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.FSReadDirectory, this.readDirectory, this);
     this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadFile, this.readFile, this);
+    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectDirectory, this.selectDirectory, this);
+    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectFile, this.selectFile, this);
   }
 
   private readAsset(fsAssetPath: string[], fsAssetReadOptions: IFSAssetReadOptions = {}) {
     const assetResourcePath = this.app.getAssetPath(...fsAssetPath);
     return fs.readFileSync(assetResourcePath, fsAssetReadOptions.encoding);
-  }
-
-  private selectDirectory(): string | undefined {
-    // prompt user to select a directory, showOpenDialogSync will either returns string[] or undefined (in case user cancels the operation)
-    // important - this will only select a single directory (openDirectory will make sure only single directory is allowed to be selected)
-    // @see - https://www.electronjs.org/docs/api/dialog#dialogshowopendialogsyncbrowserwindow-options
-    const fsSelectedDirectories = dialog.showOpenDialogSync(this.app.getCurrentWindow(), {
-      properties: ['openDirectory'],
-    });
-
-    return fsSelectedDirectories ? fsSelectedDirectories[0] : undefined;
   }
 
   private readDirectory(fsDirPath: string, fsDirReadOptions: IFSDirectoryReadOptions = {}): Promise<IFSDirectoryReadResponse> {
@@ -133,5 +123,29 @@ export class FileSystemModule implements IAppModule {
 
   private readFile(fsFilePath: string) {
     return fs.readFileSync(fsFilePath);
+  }
+
+  private selectDirectory(): string | undefined {
+    // prompt user to select a directory, showOpenDialogSync will either returns string[] or undefined (in case user cancels the operation)
+    // important - this will only select a single directory (openDirectory will make sure only single directory is allowed to be selected)
+    // @see - https://www.electronjs.org/docs/api/dialog#dialogshowopendialogsyncbrowserwindow-options
+    const fsSelectedDirectories = dialog.showOpenDialogSync(this.app.getCurrentWindow(), {
+      properties: ['openDirectory'],
+    });
+
+    return fsSelectedDirectories ? fsSelectedDirectories[0] : undefined;
+  }
+
+  private selectFile(options?: {
+    title?: string;
+    extensions?: string[];
+  }) {
+    const selection = dialog.showOpenDialogSync(this.app.getCurrentWindow(), {
+      title: options?.title || 'Select file',
+      properties: ['openFile'],
+      filters: [{ name: 'Selection', extensions: options?.extensions || ['*'] }],
+    });
+
+    return selection?.[0];
   }
 }

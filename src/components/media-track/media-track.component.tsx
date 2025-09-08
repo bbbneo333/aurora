@@ -49,8 +49,9 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
   });
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
+      role="row"
+      tabIndex={0}
       {...rest}
       ref={ref}
       className={cx('media-track', className)}
@@ -60,16 +61,17 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
       }}
       onKeyDown={(e) => {
         onKeyDown?.(e);
-        if (Events.isEnterKey(e) || Events.isSpaceKey(e)) toggle();
+        if (Events.isEnterKey(e) && e.target === e.currentTarget) toggle();
       }}
     >
-      <div className={cx('media-track-main-column')}>
+      <div className={cx('media-track-content')}>
         <div className={cx('media-track-section')}>
           <MediaPlaybackButton
             isPlaying={isTrackPlaying}
             className={cx('media-track-playback-button')}
             onPlay={play}
             onPause={pause}
+            tabIndex={-1}
           />
         </div>
         {!disableCover && (
@@ -88,10 +90,10 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
             className={cx('media-track-info')}
           />
         </div>
-      </div>
-      <div className={cx('media-track-side-column')}>
-        <div className={cx('media-track-duration')}>
-          {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
+        <div className={cx('media-track-section', 'media-track-side-column')}>
+          <div className={cx('media-track-duration')}>
+            {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
+          </div>
         </div>
       </div>
     </div>

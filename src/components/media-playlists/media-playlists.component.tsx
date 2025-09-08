@@ -26,7 +26,7 @@ export function MediaPlaylists(props: {
 
   return (
     <div>
-      <div className={cx('media-playlists', 'row')}>
+      <div className={cx('media-playlists')}>
         {mediaPlaylists.map((mediaPlaylist) => {
           const mediaItem = MediaUtils.getMediaItemFromPlaylist(mediaPlaylist);
 

@@ -5,7 +5,7 @@ import {
   selectCover,
 } from 'music-metadata';
 
-import { AppEnums, MediaEnums } from '../../enums';
+import { AppEnums, AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
 import { AppService, MediaProviderService, MediaLibraryService } from '../../services';
 
@@ -16,13 +16,6 @@ import MediaLocalUtils from './media-local.utils';
 const debug = require('debug')('app:provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
-  private readonly mediaTrackSupportedFileTypes = [
-    MediaEnums.MediaFileExtensions.MP3,
-    MediaEnums.MediaFileExtensions.FLAC,
-    MediaEnums.MediaFileExtensions.M4A,
-    MediaEnums.MediaFileExtensions.WAV,
-  ];
-
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
     debug('onProviderRegistered - starting sync');
@@ -48,9 +41,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    const fsDirectoryReadResponse: IFSDirectoryReadResponse|undefined = await AppService
+    const fsDirectoryReadResponse: IFSDirectoryReadResponse | undefined = await AppService
       .sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
-        fileExtensions: this.mediaTrackSupportedFileTypes,
+        fileExtensions: AudioFileExtensionList,
       }).catch((error) => {
         // handle in case existing directory could not be found now
         if (error.code === 'ENOENT') {
@@ -96,7 +89,6 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         album_cover_picture: audioCoverPicture ? {
           image_data: audioCoverPicture.data,
           image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-          image_format: audioCoverPicture.format,
         } : undefined,
         provider: MediaLocalConstants.Provider,
         provider_id: MediaLocalLibraryService.getMediaId(mediaAlbumName),
@@ -113,7 +105,6 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         track_cover_picture: audioCoverPicture ? {
           image_data: audioCoverPicture.data,
           image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-          image_format: audioCoverPicture.format,
         } : undefined,
         track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
         track_album_id: mediaAlbumData.id,
@@ -136,7 +127,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     return parseFile(filePath);
   }
 
-  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture|null {
+  private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture | null {
     return selectCover(audioMetadata.common.picture);
   }
 }
