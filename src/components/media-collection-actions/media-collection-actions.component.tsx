@@ -3,7 +3,7 @@ import { Menu } from 'react-contexify';
 import classNames from 'classnames/bind';
 
 import { useContextMenu } from '../../contexts';
-import { useMediaPlayback } from '../../hooks';
+import { useMediaCollectionPlayback } from '../../hooks';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
 import { Icons } from '../../constants';
 import { IMediaCollectionItem } from '../../interfaces';
@@ -26,9 +26,9 @@ export function MediaCollectionActions(props: {
 
   const {
     isMediaPlaying,
-    handleOnPlayButtonClick,
-    handleOnPauseButtonClick,
-  } = useMediaPlayback({
+    play,
+    pause,
+  } = useMediaCollectionPlayback({
     mediaItem,
   });
 
@@ -36,8 +36,8 @@ export function MediaCollectionActions(props: {
     <div className={cx('media-collection-actions')}>
       <MediaPlaybackButton
         isPlaying={isMediaPlaying}
-        onPlay={handleOnPlayButtonClick}
-        onPause={handleOnPauseButtonClick}
+        onPlay={play}
+        onPause={pause}
         variant={['rounded', 'primary', 'lg']}
         tooltip={I18nService.getString(!isMediaPlaying ? 'tooltip_play_collection' : 'tooltip_pause_collection')}
       />

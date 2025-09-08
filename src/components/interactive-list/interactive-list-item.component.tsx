@@ -67,7 +67,7 @@ export function InteractiveListItem(props: {
     style,
     className: cx('interactive-list-item', child.props.className),
     ...(sortable ? { ...attributes, ...listeners } : {}),
-    'aria-selected': isSelected,
+    isSelected,
     onPointerDown: handlePointerDown,
     onPointerUp: handlePointerUp,
     onContextMenu: handleContextMenu,

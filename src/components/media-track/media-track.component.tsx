@@ -3,13 +3,13 @@ import classNames from 'classnames/bind';
 
 import { IMediaTrack } from '../../interfaces';
 import { DateTimeUtils, Events } from '../../utils';
+import { useMediaTrackPlayback } from '../../hooks';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
 
 import styles from './media-track.component.css';
-import { useMediaTrackPlayback } from './use-media-track-playback';
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +20,7 @@ export type MediaTrackProps<T> = {
   isPlaying?: boolean;
   disableCover?: boolean;
   disableAlbumLink?: boolean;
+  isSelected?: boolean;
 } & HTMLAttributes<HTMLDivElement>;
 
 export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMediaTrack>>((props, ref) => {
@@ -30,6 +31,7 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
     isPlaying = false,
     disableCover = false,
     disableAlbumLink = false,
+    isSelected = false,
     className,
     onDoubleClick,
     onKeyDown,
@@ -40,6 +42,7 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
     play,
     pause,
     toggle,
+    isTrackActive,
     isTrackPlaying,
   } = useMediaTrackPlayback({
     mediaTrack,
@@ -54,7 +57,11 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
       tabIndex={0}
       {...rest}
       ref={ref}
-      className={cx('media-track', className)}
+      aria-selected={isSelected}
+      className={cx('media-track', className, {
+        selected: isSelected,
+        active: isTrackActive,
+      })}
       onDoubleClick={(e) => {
         onDoubleClick?.(e);
         toggle();
