@@ -1,0 +1,41 @@
+.upload-overlay {
+  position: relative;
+}
+
+.upload-overlay:not(.disabled).uploading .upload-overlay-zone,
+.upload-overlay:not(.disabled):hover .upload-overlay-zone,
+.upload-overlay:not(.disabled):focus .upload-overlay-zone {
+  display: flex;
+}
+
+.upload-overlay-zone {
+  position: absolute;
+  background-color: rgba(0, 0, 0, .7);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  text-align: center;
+}
+
+.upload-overlay.disabled,
+.upload-overlay.uploading {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+.upload-icon {
+  font-size: 2.5em;
+  color: var(--text-light-color);
+}
+
+.upload-title {
+  font-size: 1em;
+  font-weight: 400;
+  color: var(--text-light-color);
+}

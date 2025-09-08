@@ -1,18 +1,11 @@
 import Jimp from 'jimp';
 
-import { AppEnums } from '../../enums';
+import { AppEnums, ImageFileExtensions } from '../../enums';
 import { IAppMain, IAppModule } from '../../interfaces';
 import { StringUtils } from '../../utils';
 
-const debug = require('debug')('app:module:media_module');
-
-export type ScaleAndCacheImageResponse = {
-  processed: boolean,
-  path?: string,
-  error?: string,
-};
-
 export class MediaModule implements IAppModule {
+  readonly defaultImageExtension = ImageFileExtensions.JPG;
   private readonly app: IAppMain;
 
   constructor(app: IAppMain) {
@@ -24,31 +17,20 @@ export class MediaModule implements IAppModule {
     this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, this.scaleAndCacheImage, this);
   }
 
-  private async scaleAndCacheImage(imageData: Buffer, imageScaleOptions: {
+  private async scaleAndCacheImage(imageData: Buffer | string, imageScaleOptions: {
     width: number,
     height: number,
-  }): Promise<ScaleAndCacheImageResponse> {
-    let image;
+  }): Promise<string> {
+    // for usage see - https://www.npmjs.com/package/jimp#basic-usage
+    // this will scale the image to the given width and height, some parts of the image may be letter boxed
+    const source = typeof imageData === 'string' ? imageData : Buffer.from(imageData);
+    // @ts-ignore
+    const image = await Jimp.read(source);
+    image.cover(imageScaleOptions.width, imageScaleOptions.height);
 
-    try {
-      // for usage see - https://www.npmjs.com/package/jimp#basic-usage
-      // this will scale the image to the given width and height, some parts of the image may be letter boxed
-      image = await Jimp.read(Buffer.from(imageData));
-      image.cover(imageScaleOptions.width, imageScaleOptions.height);
-    } catch (error) {
-      debug('encountered error while processing image - %s, marking as corrupted...', error.message);
-      return {
-        processed: false,
-        error: error.message,
-      };
-    }
-
-    const imageCachePath = this.app.getDataPath('cache', 'images', StringUtils.generateId());
+    const imageCachePath = this.app.getDataPath('cache', 'images', `${StringUtils.generateId()}.${this.defaultImageExtension}`);
     await image.writeAsync(imageCachePath);
 
-    return {
-      processed: true,
-      path: imageCachePath,
-    };
+    return imageCachePath;
   }
 }

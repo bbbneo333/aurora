@@ -68,8 +68,8 @@ export class MediaLibraryPlaylistDuplicateTracksError extends AppError {
 }
 
 class MediaLibraryService {
-  private readonly mediaPictureScaleWidth = 500;
-  private readonly mediaPictureScaleHeight = 500;
+  readonly mediaPictureScaleWidth = 500;
+  readonly mediaPictureScaleHeight = 500;
   private readonly mediaSyncLock = new Semaphore(1);
 
   // sync API
@@ -681,23 +681,23 @@ class MediaLibraryService {
     }
 
     if (mediaPicture.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Buffer) {
-      const imageCached: {
-        path?: string,
-      } = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
-        width: this.mediaPictureScaleWidth,
-        height: this.mediaPictureScaleHeight,
-      });
+      let imageCachePath;
 
-      // imageCached: {processed: boolean, path?: string, error?: string}
-      // path would not be present if image could not be processed
-      // most likely due to corrupted image
-      if (!imageCached.path) {
+      try {
+        imageCachePath = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
+          width: this.mediaPictureScaleWidth,
+          height: this.mediaPictureScaleHeight,
+        });
+      } catch (error) {
+        debug('encountered error while processing image - %s', error);
+      }
+
+      if (!imageCachePath) {
         return undefined;
       }
 
       return {
-        ...mediaPicture,
-        image_data: imageCached.path,
+        image_data: imageCachePath,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Path,
       };
     }

@@ -1,10 +1,3 @@
-export enum MediaFileExtensions {
-  FLAC = 'flac',
-  MP3 = 'mp3',
-  M4A = 'm4a',
-  WAV = 'wav',
-}
-
 export enum MediaLibraryActions {
   Initialize = 'media/library/initialize',
   StartSync = 'media/library/startSync',

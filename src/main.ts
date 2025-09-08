@@ -118,6 +118,8 @@ class App implements IAppMain {
         debug('ipc (async) - received message - channel - %s', messageChannel);
         return await messageHandler.apply(messageHandlerCtx, args);
       } catch (err) {
+        console.error(`Encountered error while handling message for - ${messageChannel}, ${args}`);
+        console.error(err);
         // electron serializes the error before sending it back to the renderer
         // explicitly send the full shape, set a flag and handle on renderer accordingly
         return { __isError: true, ...err };

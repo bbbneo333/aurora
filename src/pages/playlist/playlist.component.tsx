@@ -8,11 +8,11 @@ import { I18nService, MediaLibraryService } from '../../services';
 import { Layout, Routes } from '../../constants';
 import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
-import { IMediaPlaylistTrack } from '../../interfaces';
+import { IMediaPicture, IMediaPlaylistTrack } from '../../interfaces';
 import { useEntityMissing } from '../../hooks';
 
 import {
-  MediaCoverPicture,
+  MediaCoverPictureUploadable,
   MediaPlaylistDeleteTracksModal,
   MediaTrackContextMenuItem,
   MediaTrackList,
@@ -79,6 +79,18 @@ export function PlaylistPage() {
     showModal,
   ]);
 
+  const handleOnPictureUpdate = useCallback(async (picture: IMediaPicture) => {
+    if (!mediaSelectedPlaylist) {
+      return;
+    }
+
+    await MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
+      cover_picture: picture,
+    });
+  }, [
+    mediaSelectedPlaylist,
+  ]);
+
   if (isPlaylistRemoved) {
     return history.replace(Routes.LibraryPlaylists);
   }
@@ -92,10 +104,11 @@ export function PlaylistPage() {
       <div className={cx('playlist-header')}>
         <div className="row">
           <div className={cx(Layout.Grid.CollectionHeaderCoverColumn, 'playlist-header-cover-column')}>
-            <MediaCoverPicture
+            <MediaCoverPictureUploadable
               mediaPicture={mediaSelectedPlaylist.cover_picture}
               mediaPictureAltText={mediaSelectedPlaylist.name}
               className={cx('playlist-cover-picture')}
+              onPictureUpdate={handleOnPictureUpdate}
             />
           </div>
           <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'playlist-header-info-column')}>
