@@ -6,6 +6,7 @@
   "button_playlist_add_existing_tracks": "Add all",
   "button_playlist_ignore_existing_track": "Don't add",
   "button_playlist_ignore_existing_tracks": "Add new ones",
+  "button_queue_clear": "Clear queue",
   "link_library": "Library",
   "link_library_artists": "Artists",
   "link_library_albums": "Albums",

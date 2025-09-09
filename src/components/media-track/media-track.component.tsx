@@ -21,6 +21,7 @@ export type MediaTrackProps<T> = {
   disableCover?: boolean;
   disableAlbumLink?: boolean;
   isSelected?: boolean;
+  isActive?: boolean;
 } & HTMLAttributes<HTMLDivElement>;
 
 export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMediaTrack>>((props, ref) => {
@@ -32,6 +33,7 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
     disableCover = false,
     disableAlbumLink = false,
     isSelected = false,
+    isActive = false,
     className,
     onDoubleClick,
     onKeyDown,
@@ -60,7 +62,7 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
       aria-selected={isSelected}
       className={cx('media-track', className, {
         selected: isSelected,
-        active: isTrackActive,
+        active: isActive || isTrackActive,
       })}
       onDoubleClick={(e) => {
         onDoubleClick?.(e);

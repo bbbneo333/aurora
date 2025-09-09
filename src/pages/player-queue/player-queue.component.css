@@ -3,10 +3,14 @@
 /*}*/
 
 .player-queue-section-header {
-  color: var(--text-dark-color);
+  color: var(--text-light-color);
   font-size: 15px;
   padding: 10px 0;
   font-weight: bold;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
 }
 
 .player-queue-empty {
@@ -17,4 +21,9 @@
 
 .player-queue-section-content {
   padding: 10px 0;
+}
+
+.player-queue-clear-button {
+  color: var(--text-dark-color);
+  font-size: 13px;
 }
