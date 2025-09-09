@@ -64,6 +64,7 @@ export function InteractiveListItem(props: {
 
   return React.cloneElement(child, {
     ref: setNodeRef,
+    'data-interactive-item-id': itemId,
     style,
     className: cx('interactive-list-item', child.props.className),
     ...(sortable ? { ...attributes, ...listeners } : {}),

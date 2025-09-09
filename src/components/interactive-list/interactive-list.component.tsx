@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import classNames from 'classnames/bind';
 
@@ -23,6 +23,10 @@ import styles from './interactive-list.component.css';
 import { InteractiveListItem } from './interactive-list-item.component';
 
 const cx = classNames.bind(styles);
+
+function isElementInteractive(element: HTMLElement) {
+  return !isNil(element.dataset?.interactiveItemId);
+}
 
 export type InteractiveListItemType = {
   id?: string;
@@ -75,6 +79,18 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
 
   const clearSelection = React.useCallback(() => {
     setSelectedItemIds([]);
+  }, []);
+
+  const clearFocus = React.useCallback(() => {
+    const { activeElement } = document;
+
+    if (
+      activeElement
+      && activeElement instanceof HTMLElement
+      && isElementInteractive(activeElement)
+    ) {
+      activeElement.blur();
+    }
   }, []);
 
   const handleSelect = React.useCallback((e: React.MouseEvent, itemId: string, index: number) => {
@@ -214,9 +230,10 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
           });
       }
 
-      // clearing selectio on escape
+      // clearing selection and focus on escape
       if (Events.isEscapeKey(e)) {
         clearSelection();
+        clearFocus();
       }
     }
 
@@ -225,6 +242,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   }, [
     selectAll,
     clearSelection,
+    clearFocus,
     selectionDeleteInProgress,
     onItemsDelete,
     selectedItemIds,
