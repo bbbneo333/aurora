@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames/bind';
 
-import { useMediaPlayback } from '../../hooks';
+import { useMediaCollectionPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
 import { useContextMenu } from '../../contexts';
 
@@ -33,7 +33,12 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
   } = props;
 
   const { showMenu } = useContextMenu();
-  const { isMediaPlaying, handleOnPlayButtonClick, handleOnPauseButtonClick } = useMediaPlayback({
+
+  const {
+    isMediaPlaying,
+    play,
+    pause,
+  } = useMediaCollectionPlayback({
     mediaItem,
   });
 
@@ -66,8 +71,8 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
             isPlaying={isMediaPlaying}
             disabled={disablePlayback}
             className={cx('collection-item-playback-button')}
-            onPlay={handleOnPlayButtonClick}
-            onPause={handleOnPauseButtonClick}
+            onPlay={play}
+            onPause={pause}
             tabIndex={-1}
           />
         </div>

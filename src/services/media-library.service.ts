@@ -95,16 +95,12 @@ class MediaLibraryService {
         provider_id: mediaArtistInputData.provider_id,
       });
     } else {
-      mediaArtistData = await MediaArtistDatastore.findMediaArtist({
-        provider: mediaArtistInputData.provider,
-        artist_name: mediaArtistInputData.artist_name,
-      });
+      throw new Error('Provider id is required for checkAndInsertMediaArtist');
     }
 
     if (mediaArtistData) {
       mediaArtistData = await MediaArtistDatastore.updateArtistById(mediaArtistData.id, {
-        ...mediaArtistInputData,
-        artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
+        sync_timestamp: mediaArtistInputData.sync_timestamp,
       });
     } else {
       mediaArtistData = await MediaArtistDatastore.insertMediaArtist({
@@ -129,16 +125,12 @@ class MediaLibraryService {
         provider_id: mediaAlbumInputData.provider_id,
       });
     } else {
-      mediaTrackAlbumData = await MediaAlbumDatastore.findMediaAlbum({
-        provider: mediaAlbumInputData.provider,
-        album_name: mediaAlbumInputData.album_name,
-      });
+      throw new Error('Provider id is required for checkAndInsertMediaAlbum');
     }
 
     if (mediaTrackAlbumData) {
       mediaTrackAlbumData = await MediaAlbumDatastore.updateAlbumById(mediaTrackAlbumData.id, {
-        ...mediaAlbumInputData,
-        album_cover_picture: await this.processPicture(mediaAlbumInputData.album_cover_picture),
+        sync_timestamp: mediaAlbumInputData.sync_timestamp,
       });
     } else {
       mediaTrackAlbumData = await MediaAlbumDatastore.insertMediaAlbum({
@@ -163,12 +155,13 @@ class MediaLibraryService {
         provider: mediaTrackInputData.provider,
         provider_id: mediaTrackInputData.provider_id,
       });
+    } else {
+      throw new Error('Provider id is required for checkAndInsertMediaTrack');
     }
 
     if (mediaTrackData) {
       mediaTrackData = await MediaTrackDatastore.updateTrackById(mediaTrackData.id, {
-        ...mediaTrackInputData,
-        track_cover_picture: await this.processPicture(mediaTrackInputData.track_cover_picture),
+        sync_timestamp: mediaTrackInputData.sync_timestamp,
       });
     } else {
       mediaTrackData = await MediaTrackDatastore.insertMediaTrack({

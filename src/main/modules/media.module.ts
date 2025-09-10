@@ -1,4 +1,5 @@
-import Jimp from 'jimp';
+import path from 'path';
+import sharp from 'sharp';
 
 import { AppEnums, ImageFileExtensions } from '../../enums';
 import { IAppMain, IAppModule } from '../../interfaces';
@@ -7,6 +8,7 @@ import { StringUtils } from '../../utils';
 export class MediaModule implements IAppModule {
   readonly defaultImageExtension = ImageFileExtensions.JPG;
   private readonly app: IAppMain;
+  private readonly imagesDataPath = path.join('cache', 'images');
 
   constructor(app: IAppMain) {
     this.app = app;
@@ -21,15 +23,16 @@ export class MediaModule implements IAppModule {
     width: number,
     height: number,
   }): Promise<string> {
-    // for usage see - https://www.npmjs.com/package/jimp#basic-usage
-    // this will scale the image to the given width and height, some parts of the image may be letter boxed
     const source = typeof imageData === 'string' ? imageData : Buffer.from(imageData);
-    // @ts-ignore
-    const image = await Jimp.read(source);
-    image.cover(imageScaleOptions.width, imageScaleOptions.height);
+    const imageCacheDir = this.app.createDataDir(this.imagesDataPath);
+    const imageCachePath = path.join(imageCacheDir, `${StringUtils.generateId()}.${this.defaultImageExtension}`);
 
-    const imageCachePath = this.app.getDataPath('cache', 'images', `${StringUtils.generateId()}.${this.defaultImageExtension}`);
-    await image.writeAsync(imageCachePath);
+    await sharp(source)
+      .resize(imageScaleOptions.width, imageScaleOptions.height, {
+        fit: 'cover',
+        position: 'center',
+      })
+      .toFile(imageCachePath);
 
     return imageCachePath;
   }

@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 import {
+  Button,
   MediaTrack,
   MediaTrackList,
   MediaTrackContextMenu,
@@ -48,7 +49,7 @@ export function PlayerQueueComponent() {
 
   return (
     <div className="container-fluid">
-      {!mediaPlaybackCurrentMediaTrack && _.isEmpty(mediaTracks) && (
+      {!mediaPlaybackCurrentMediaTrack && isEmpty(mediaTracks) && (
         <div className={cx('player-queue-section')}>
           <div className="row">
             <div className="col-12">
@@ -68,6 +69,7 @@ export function PlayerQueueComponent() {
               </div>
               <div className={cx('player-queue-section-content')}>
                 <MediaTrack
+                  isActive
                   mediaTrack={mediaPlaybackCurrentMediaTrack}
                   isPlaying={mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing}
                   onMediaTrackPlay={() => MediaPlayerService.playMediaTrackFromQueue(mediaPlaybackCurrentMediaTrack)}
@@ -94,12 +96,20 @@ export function PlayerQueueComponent() {
           </div>
         </div>
       )}
-      {!_.isEmpty(mediaQueueTracks) && (
+      {!isEmpty(mediaQueueTracks) && (
         <div className={cx('player-queue-section')}>
           <div className="row">
             <div className="col-12">
               <div className={cx('player-queue-section-header')}>
                 {I18nService.getString('label_player_queue_upcoming_tracks')}
+                <Button
+                  className={cx('player-queue-clear-button')}
+                  onButtonSubmit={() => {
+                    MediaPlayerService.clearMediaQueueTracks();
+                  }}
+                >
+                  {I18nService.getString('button_queue_clear')}
+                </Button>
               </div>
               <div className={cx('player-queue-section-content')}>
                 <MediaTrackList

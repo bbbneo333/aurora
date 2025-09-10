@@ -16,6 +16,10 @@
   color: var(--selectable-hovered-color);
 }
 
+.media-track.active .media-track-info {
+  font-weight: bold;
+}
+
 .media-track-content {
   padding: 10px;
   display: flex;

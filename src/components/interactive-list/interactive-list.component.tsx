@@ -1,5 +1,5 @@
 import React from 'react';
-import { isEmpty } from 'lodash';
+import { isEmpty, isNil } from 'lodash';
 import { restrictToParentElement, restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import classNames from 'classnames/bind';
 
@@ -17,12 +17,16 @@ import {
 } from '@dnd-kit/sortable';
 
 import { SafePointerSensor } from '../../types';
-import { Events } from '../../utils';
+import { DOMUtils, Events } from '../../utils';
 
 import styles from './interactive-list.component.css';
 import { InteractiveListItem } from './interactive-list-item.component';
 
 const cx = classNames.bind(styles);
+
+function isElementInteractive(element: HTMLElement) {
+  return !isNil(element.dataset?.interactiveItemId);
+}
 
 export type InteractiveListItemType = {
   id?: string;
@@ -77,6 +81,18 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     setSelectedItemIds([]);
   }, []);
 
+  const clearFocus = React.useCallback(() => {
+    const { activeElement } = document;
+
+    if (
+      activeElement
+      && activeElement instanceof HTMLElement
+      && isElementInteractive(activeElement)
+    ) {
+      activeElement.blur();
+    }
+  }, []);
+
   const handleSelect = React.useCallback((e: React.MouseEvent, itemId: string, index: number) => {
     if (Events.isShiftKey(e)) {
       // select range between last clicked index and this one
@@ -107,14 +123,18 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     if (!onContextMenu) {
       return;
     }
-
     e.preventDefault();
-    // ensure item is selected before opening context menu
-    if (!selectedItemIds.includes(itemId)) {
-      setSelectedItemIds([itemId]);
+
+    const updatedSelectedIds = selectedItemIds.includes(itemId)
+      ? selectedItemIds
+      : [...selectedItemIds, itemId];
+
+    // update state only if something changed
+    if (updatedSelectedIds !== selectedItemIds) {
+      setSelectedItemIds(updatedSelectedIds);
     }
 
-    onContextMenu(e, selectedItemIds);
+    onContextMenu(e, updatedSelectedIds);
   }, [
     onContextMenu,
     selectedItemIds,
@@ -182,12 +202,14 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   // keyboard events
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (Events.isSelectAllKey(e)) {
-        // for selecting all on ctrl+a
+      // for selecting all on ctrl+a
+      if (Events.isSelectAllKey(e) && document.activeElement && !DOMUtils.isElementEditable(document.activeElement)) {
         e.preventDefault();
         selectAll();
-      } else if (Events.isDeleteKey(e) && onItemsDelete && !isEmpty(selectedItemIds)) {
-        // for deleting selected on delete
+      }
+
+      // for deleting selected on delete
+      if (Events.isDeleteKey(e) && onItemsDelete && !isEmpty(selectedItemIds)) {
         if (selectionDeleteInProgress) {
           return;
         }
@@ -206,9 +228,12 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
           .finally(() => {
             setSelectionDeleteInProgress(false);
           });
-      } else if (Events.isEscapeKey(e)) {
-        // clearing selectio on escape
+      }
+
+      // clearing selection and focus on escape
+      if (Events.isEscapeKey(e)) {
         clearSelection();
+        clearFocus();
       }
     }
 
@@ -217,6 +242,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   }, [
     selectAll,
     clearSelection,
+    clearFocus,
     selectionDeleteInProgress,
     onItemsDelete,
     selectedItemIds,

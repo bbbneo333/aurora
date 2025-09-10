@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 
 import { useModal } from '../../contexts';
 import { Icons } from '../../constants';
-import { useMediaPlayback } from '../../hooks';
+import { useMediaCollectionPlayback } from '../../hooks';
 import { IMediaPlaylist } from '../../interfaces';
 import { MediaUtils } from '../../utils';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
@@ -29,9 +29,9 @@ export function PlaylistActions(props: {
 
   const {
     isMediaPlaying,
-    handleOnPlayButtonClick,
-    handleOnPauseButtonClick,
-  } = useMediaPlayback({
+    play,
+    pause,
+  } = useMediaCollectionPlayback({
     mediaItem,
   });
 
@@ -39,8 +39,8 @@ export function PlaylistActions(props: {
     <div className={cx('media-playlist-actions')}>
       <MediaPlaybackButton
         isPlaying={isMediaPlaying}
-        onPlay={handleOnPlayButtonClick}
-        onPause={handleOnPauseButtonClick}
+        onPlay={play}
+        onPause={pause}
         variant={['rounded', 'primary', 'lg']}
         tooltip={I18nService.getString(!isMediaPlaying ? 'tooltip_play_collection' : 'tooltip_pause_collection')}
       />

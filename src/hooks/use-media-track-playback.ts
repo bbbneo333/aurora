@@ -1,12 +1,12 @@
-import _ from 'lodash';
+import _, { isNil } from 'lodash';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
-import { IMediaTrack } from '../../interfaces';
-import { RootState } from '../../reducers';
-import { useMediaTrackList } from '../../contexts';
-import { MediaEnums } from '../../enums';
-import { MediaPlayerService } from '../../services';
+import { IMediaTrack } from '../interfaces';
+import { RootState } from '../reducers';
+import { useMediaTrackList } from '../contexts';
+import { MediaEnums } from '../enums';
+import { MediaPlayerService } from '../services';
 
 export function useMediaTrackPlayback<T extends IMediaTrack>(props: {
   mediaTrack: T,
@@ -31,10 +31,12 @@ export function useMediaTrackPlayback<T extends IMediaTrack>(props: {
     mediaTrackList,
   } = useMediaTrackList();
 
-  const isTrackPlaying = isPlaying || (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
-    && mediaPlaybackCurrentMediaTrack
+  const isTrackActive = !isNil(mediaPlaybackCurrentMediaTrack)
     && mediaPlaybackCurrentMediaTrack.tracklist_id === mediaTrackList?.id
-    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id);
+    && mediaPlaybackCurrentMediaTrack.id === mediaTrack.id;
+
+  const isTrackPlaying = isPlaying || (mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
+    && isTrackActive);
 
   const play = useCallback(() => {
     if (onMediaTrackPlay) {
@@ -74,6 +76,7 @@ export function useMediaTrackPlayback<T extends IMediaTrack>(props: {
   ]);
 
   return {
+    isTrackActive,
     isTrackPlaying,
     play,
     pause,

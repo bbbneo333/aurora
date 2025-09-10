@@ -6,11 +6,11 @@ import { IMediaCollectionItem } from '../interfaces';
 import { MediaLibraryService, MediaPlayerService } from '../services';
 import { RootState } from '../reducers';
 
-export type UseMediaPlaybackProps = {
+export type UseMediaCollectionPlaybackProps = {
   mediaItem: IMediaCollectionItem,
 };
 
-export function useMediaPlayback(props: UseMediaPlaybackProps) {
+export function useMediaCollectionPlayback(props: UseMediaCollectionPlaybackProps) {
   const {
     mediaItem,
   } = props;
@@ -24,7 +24,7 @@ export function useMediaPlayback(props: UseMediaPlaybackProps) {
     && mediaPlaybackCurrentTrackList
     && mediaPlaybackCurrentTrackList.id === mediaItem.id;
 
-  const handleOnPlayButtonClick = useCallback((e: Event) => {
+  const play = useCallback((e: Event) => {
     MediaLibraryService
       .getMediaCollectionTracks(mediaItem)
       .then((mediaTracks) => {
@@ -41,7 +41,7 @@ export function useMediaPlayback(props: UseMediaPlaybackProps) {
     mediaItem,
   ]);
 
-  const handleOnPauseButtonClick = useCallback((e: Event) => {
+  const pause = useCallback((e: Event) => {
     MediaPlayerService.pauseMediaPlayer();
 
     // this action button resides within a link
@@ -52,7 +52,7 @@ export function useMediaPlayback(props: UseMediaPlaybackProps) {
 
   return {
     isMediaPlaying,
-    handleOnPlayButtonClick,
-    handleOnPauseButtonClick,
+    play,
+    pause,
   };
 }

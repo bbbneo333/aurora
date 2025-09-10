@@ -289,6 +289,29 @@ class MediaPlayerService {
     });
   }
 
+  clearMediaQueueTracks(): void {
+    const { mediaPlayer } = store.getState();
+    const { mediaTracks, mediaPlaybackCurrentTrackList } = mediaPlayer;
+
+    const queueTracks = this.getMediaQueueTracks();
+    if (_.isEmpty(queueTracks)) {
+      return;
+    }
+
+    // remove everything from current main list including and after the first track in queue
+    const index = _.findIndex(mediaTracks, track => track.queue_entry_id === queueTracks[0].queue_entry_id);
+    const updatedMediaTracks = mediaTracks.slice(0, index);
+
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.SetTracks,
+      data: {
+        mediaTracks: updatedMediaTracks,
+        mediaTrackList: mediaPlaybackCurrentTrackList,
+        mediaTrackLastInsertedQueueId: undefined,
+      },
+    });
+  }
+
   loadMediaTrack(mediaQueueTrack: IMediaQueueTrack): IMediaPlayback {
     const {
       mediaPlayer,
@@ -718,6 +741,8 @@ class MediaPlayerService {
       },
     });
   }
+
+  // private API
 
   private loadMediaTrackToQueue(mediaTrack: IMediaTrack): IMediaQueueTrack {
     const mediaQueueTrack = this.getMediaQueueTrack(mediaTrack);

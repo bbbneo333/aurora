@@ -4,7 +4,7 @@ import { capitalize } from 'lodash';
 
 import { Icons } from '../../constants';
 import { useContextMenu } from '../../contexts';
-import { useMediaPlayback } from '../../hooks';
+import { useMediaCollectionPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
@@ -29,7 +29,12 @@ export function MediaCollectionTile(props: {
   } = props;
 
   const { showMenu } = useContextMenu();
-  const { isMediaPlaying, handleOnPlayButtonClick, handleOnPauseButtonClick } = useMediaPlayback({
+
+  const {
+    isMediaPlaying,
+    play,
+    pause,
+  } = useMediaCollectionPlayback({
     mediaItem,
   });
 
@@ -71,8 +76,8 @@ export function MediaCollectionTile(props: {
             <div className={cx('collection-tile-cover-action')}>
               <MediaPlaybackButton
                 isPlaying={isMediaPlaying}
-                onPlay={handleOnPlayButtonClick}
-                onPause={handleOnPauseButtonClick}
+                onPlay={play}
+                onPause={pause}
                 variant={['rounded', 'primary']}
                 tabIndex={-1}
               />
