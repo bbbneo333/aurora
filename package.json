@@ -81,7 +81,12 @@
       "owner": "bbbneo333",
       "repo": "aurora",
       "private": false
-    }
+    },
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/sharp/**/*",
+      "**/node_modules/@img/**/*"
+    ]
   },
   "repository": {
     "type": "git",
