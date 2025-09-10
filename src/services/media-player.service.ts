@@ -459,7 +459,7 @@ class MediaPlayerService {
         store.dispatch({
           type: MediaEnums.MediaPlayerActions.Play,
           data: {
-            mediaPlaybackProgress: mediaPlaybackCurrentPlayingInstance.getPlaybackProgress(),
+            mediaPlaybackProgress: this.getCurrentPlaybackProgress(),
           },
         });
 
@@ -835,7 +835,7 @@ class MediaPlayerService {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.Play,
       data: {
-        mediaPlaybackProgress: mediaPlayback.getPlaybackProgress(),
+        mediaPlaybackProgress: this.getCurrentPlaybackProgress(),
       },
     });
 
@@ -976,7 +976,7 @@ class MediaPlayerService {
       return;
     }
 
-    const mediaPlaybackProgress = mediaPlaybackCurrentPlayingInstance.getPlaybackProgress();
+    const mediaPlaybackProgress = this.getCurrentPlaybackProgress();
     this.updateMediaPlaybackProgress(mediaPlaybackProgress);
 
     if (mediaPlaybackCurrentPlayingInstance.checkIfPlaying()) {
@@ -1026,6 +1026,22 @@ class MediaPlayerService {
         mediaPlaybackProgress,
       },
     });
+  }
+
+  private getCurrentPlaybackProgress(): number {
+    const { mediaPlayer } = store.getState();
+    const { mediaPlaybackCurrentMediaTrack, mediaPlaybackCurrentPlayingInstance } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      throw new Error('Cannot get current playback progress - track or instance missing');
+    }
+
+    // providers are not allowed to report progress greater than the
+    // set track duration
+    return Math.min(
+      mediaPlaybackCurrentPlayingInstance.getPlaybackProgress(),
+      mediaPlaybackCurrentMediaTrack.track_duration,
+    );
   }
 
   private retryMediaProgressReporting(): boolean {
