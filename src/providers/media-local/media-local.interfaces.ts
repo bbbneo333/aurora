@@ -1,17 +1,15 @@
-import {
-  IMediaTrack,
-} from '../../interfaces';
+import { IMediaTrack } from '../../interfaces';
 
 export interface IMediaLocalSettings {
   library: {
-    directories: string[]
+    directories: string[];
   }
 }
 
 export interface IMediaLocalTrack extends IMediaTrack {
   extra: {
     location: {
-      address: string,
-    },
-  },
+      address: string;
+    }
+  }
 }

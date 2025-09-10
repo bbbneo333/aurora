@@ -1,6 +1,4 @@
-import {
-  assign, defaults, isEmpty, isNil,
-} from 'lodash';
+import _ from 'lodash';
 
 import { Semaphore } from 'async-mutex';
 
@@ -89,7 +87,7 @@ class MediaLibraryService {
   async checkAndInsertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtist> {
     let mediaArtistData;
 
-    if (!isNil(mediaArtistInputData.provider_id)) {
+    if (!_.isNil(mediaArtistInputData.provider_id)) {
       mediaArtistData = await MediaArtistDatastore.findMediaArtist({
         provider: mediaArtistInputData.provider,
         provider_id: mediaArtistInputData.provider_id,
@@ -99,9 +97,11 @@ class MediaLibraryService {
     }
 
     if (mediaArtistData) {
-      mediaArtistData = await MediaArtistDatastore.updateArtistById(mediaArtistData.id, {
-        sync_timestamp: mediaArtistInputData.sync_timestamp,
-      });
+      mediaArtistData = await MediaArtistDatastore.updateArtistById(mediaArtistData.id, _.pick(mediaArtistInputData, [
+        'sync_timestamp',
+        'artist_name',
+        'extra',
+      ]));
     } else {
       mediaArtistData = await MediaArtistDatastore.insertMediaArtist({
         provider: mediaArtistInputData.provider,
@@ -119,7 +119,7 @@ class MediaLibraryService {
   async checkAndInsertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbum> {
     let mediaTrackAlbumData;
 
-    if (!isNil(mediaAlbumInputData.provider_id)) {
+    if (!_.isNil(mediaAlbumInputData.provider_id)) {
       mediaTrackAlbumData = await MediaAlbumDatastore.findMediaAlbum({
         provider: mediaAlbumInputData.provider,
         provider_id: mediaAlbumInputData.provider_id,
@@ -129,9 +129,12 @@ class MediaLibraryService {
     }
 
     if (mediaTrackAlbumData) {
-      mediaTrackAlbumData = await MediaAlbumDatastore.updateAlbumById(mediaTrackAlbumData.id, {
-        sync_timestamp: mediaAlbumInputData.sync_timestamp,
-      });
+      mediaTrackAlbumData = await MediaAlbumDatastore.updateAlbumById(mediaTrackAlbumData.id, _.pick(mediaAlbumInputData, [
+        'sync_timestamp',
+        'album_name',
+        'album_artist_id',
+        'extra',
+      ]));
     } else {
       mediaTrackAlbumData = await MediaAlbumDatastore.insertMediaAlbum({
         provider: mediaAlbumInputData.provider,
@@ -150,7 +153,7 @@ class MediaLibraryService {
   async checkAndInsertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrack> {
     let mediaTrackData;
 
-    if (!isNil(mediaTrackInputData.provider_id)) {
+    if (!_.isNil(mediaTrackInputData.provider_id)) {
       mediaTrackData = await MediaTrackDatastore.findMediaTrack({
         provider: mediaTrackInputData.provider,
         provider_id: mediaTrackInputData.provider_id,
@@ -160,9 +163,15 @@ class MediaLibraryService {
     }
 
     if (mediaTrackData) {
-      mediaTrackData = await MediaTrackDatastore.updateTrackById(mediaTrackData.id, {
-        sync_timestamp: mediaTrackInputData.sync_timestamp,
-      });
+      mediaTrackData = await MediaTrackDatastore.updateTrackById(mediaTrackData.id, _.pick(mediaTrackInputData, [
+        'sync_timestamp',
+        'track_name',
+        'track_number',
+        'track_duration',
+        'track_artist_ids',
+        'track_album_id',
+        'extra',
+      ]));
     } else {
       mediaTrackData = await MediaTrackDatastore.insertMediaTrack({
         provider: mediaTrackInputData.provider,
@@ -338,7 +347,7 @@ class MediaLibraryService {
   // create API
 
   async createMediaPlaylist(mediaPlaylistInputData?: IMediaPlaylistInputData): Promise<IMediaPlaylist> {
-    const inputData: DataStoreInputData<IMediaPlaylistData> = defaults(mediaPlaylistInputData, {
+    const inputData: DataStoreInputData<IMediaPlaylistData> = _.defaults(mediaPlaylistInputData, {
       name: await this.getDefaultNewPlaylistName(),
       tracks: [],
       created_at: Date.now(),
@@ -373,7 +382,7 @@ class MediaLibraryService {
       mediaPlaylistTrackInputDataList,
     );
 
-    if (!isEmpty(existingInputDataList) && !options?.ignoreExisting) {
+    if (!_.isEmpty(existingInputDataList) && !options?.ignoreExisting) {
       // not allowed to add duplicate tracks, throw error
       throw new MediaLibraryPlaylistDuplicateTracksError(existingInputDataList, newInputDataList);
     }
@@ -584,7 +593,7 @@ class MediaLibraryService {
   }
 
   private async buildMediaTrack(mediaTrackData: IMediaTrackData, loadMediaTrack = false): Promise<IMediaTrack> {
-    const mediaTrack = assign({}, mediaTrackData, {
+    const mediaTrack = _.assign({}, mediaTrackData, {
       track_artists: await this.buildMediaArtists(mediaTrackData.track_artist_ids, loadMediaTrack),
       track_album: await this.buildMediaAlbum(mediaTrackData.track_album_id, loadMediaTrack),
     });
@@ -617,7 +626,7 @@ class MediaLibraryService {
       mediaAlbumData = mediaAlbum;
     }
 
-    const mediaAlbumBuilt = assign({}, mediaAlbumData, {
+    const mediaAlbumBuilt = _.assign({}, mediaAlbumData, {
       album_artist: await this.buildMediaArtist(mediaAlbumData.album_artist_id),
     });
 
@@ -721,7 +730,7 @@ class MediaLibraryService {
   }
 
   private async buildMediaPlaylist(mediaPlaylistData: IMediaPlaylistData) {
-    return assign(mediaPlaylistData, {});
+    return _.assign(mediaPlaylistData, {});
   }
 
   private async buildMediaPlaylists(mediaPlaylistDataList: IMediaPlaylistData[]) {
@@ -735,7 +744,7 @@ class MediaLibraryService {
     // @ts-ignore
     return Promise
       .all(mediaPlaylistTrackDataList.map(mediaPlaylistTrackData => this.buildMediaPlaylistTrack(mediaPlaylistTrackData)))
-      .then(mediaPlaylistTracks => mediaPlaylistTracks.filter(mediaPlaylistTrack => !isNil(mediaPlaylistTrack)));
+      .then(mediaPlaylistTracks => mediaPlaylistTracks.filter(mediaPlaylistTrack => !_.isNil(mediaPlaylistTrack)));
   }
 
   private async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack | undefined> {
@@ -744,7 +753,7 @@ class MediaLibraryService {
       return undefined;
     }
 
-    return assign({}, mediaPlaylistTrackData, mediaTrack);
+    return _.assign({}, mediaPlaylistTrackData, mediaTrack);
   }
 
   private async getDefaultNewPlaylistName(): Promise<string> {
