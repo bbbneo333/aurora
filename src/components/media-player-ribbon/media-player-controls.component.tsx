@@ -24,12 +24,15 @@ export function MediaPlayerControls() {
     mediaPlaybackQueueRepeatType,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
+  const isPlaybackDisabled = mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading;
+
   useEffect(() => {
     const handleOnKeyDown = (event: KeyboardEvent) => {
       if (
         Events.isSpaceKey(event)
         && document.activeElement
         && !DOMUtils.isElementEditable(document.activeElement)
+        && !isPlaybackDisabled
       ) {
         event.preventDefault();
         MediaPlayerService.toggleMediaPlayback();
@@ -41,7 +44,9 @@ export function MediaPlayerControls() {
     return () => {
       window.removeEventListener('keydown', handleOnKeyDown);
     };
-  }, []);
+  }, [
+    isPlaybackDisabled,
+  ]);
 
   return (
     <Row className={cx('media-player-controls-container')}>
@@ -77,7 +82,7 @@ export function MediaPlayerControls() {
           )
           : (
             <Button
-              disabled={mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
+              disabled={isPlaybackDisabled}
               className={cx('media-player-control', 'media-player-control-lg')}
               onButtonSubmit={() => {
                 MediaPlayerService.resumeMediaPlayer();
