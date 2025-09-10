@@ -1,8 +1,7 @@
 import Datastore from 'nedb-promises';
 import fs from 'fs';
-import {
-  isNil, omit, forEach, set, get,
-} from 'lodash';
+import path from 'path';
+import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
 import { AppEnums } from '../../enums';
@@ -84,8 +83,9 @@ export class DatastoreModule implements IAppModule {
 
   private registerDatastore(datastoreName: string, datastoreOptions: DatastoreOptions = {}): void {
     // obtain datastore path and create datastore
-    const datastorePath = this.app.getDataPath(this.datastoreDataPath, datastoreName);
+    const datastorePath = this.getDatastorePath(datastoreName);
     const datastore = Datastore.create(datastorePath);
+    debug('registerDatastore - created datastore - %s at - %s', datastoreName, datastorePath);
 
     // configure datastore
     datastore.on('error', (_datastore, event: string, error: Error) => {
@@ -113,15 +113,15 @@ export class DatastoreModule implements IAppModule {
     const datastore = this.getDatastore(datastoreName);
     const cursor = datastore.find(datastoreQueryDoc.filter);
 
-    forEach([
+    _.forEach([
       'sort',
       'skip',
       'limit',
     ], (key) => {
-      const value = get(datastoreName, key);
+      const value = _.get(datastoreName, key);
 
-      if (!isNil(value)) {
-        set(cursor, key, value);
+      if (!_.isNil(value)) {
+        _.set(cursor, key, value);
       }
     });
 
@@ -147,7 +147,7 @@ export class DatastoreModule implements IAppModule {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore
-    return datastore.update(datastoreFindOneDoc, omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
+    return datastore.update(datastoreFindOneDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
       multi: false,
       upsert: false,
       returnUpdatedDocs: true,
@@ -188,5 +188,10 @@ export class DatastoreModule implements IAppModule {
     // for some reason, filename is not declared in types by NeDb
     // @ts-ignore
     return datastore.persistence.filename;
+  }
+
+  private getDatastorePath(datastoreName: string): string {
+    const dir = this.app.createDataDir(this.datastoreDataPath);
+    return path.join(dir, `${datastoreName}.db`);
   }
 }

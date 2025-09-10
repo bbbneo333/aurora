@@ -22,6 +22,8 @@ export interface IAppMain {
 
   getDataPath(...paths: string[]): string;
 
+  createDataDir(...paths: string[]): string;
+
   getCurrentWindow(): BrowserWindow;
 
   getModule<T>(type: new (data: any) => T): T;

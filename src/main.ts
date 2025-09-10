@@ -144,6 +144,13 @@ class App implements IAppMain {
     return path.join(app.getPath('appData'), this.dataPath, ...paths);
   }
 
+  createDataDir(...paths: string[]): string {
+    const dataPath = this.getDataPath(...paths);
+    fs.mkdirSync(dataPath, { recursive: true });
+
+    return dataPath;
+  }
+
   getCurrentWindow(): BrowserWindow {
     if (!this.mainWindow) {
       throw new Error('App encountered error at getCurrentWindow - App currently has no current window');
