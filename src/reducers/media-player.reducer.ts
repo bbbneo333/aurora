@@ -129,13 +129,17 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
     }
     case MediaEnums.MediaPlayerActions.UpdatePlaybackProgress: {
       // data.mediaPlaybackProgress: number
+      // data.mediaPlaybackState
+      const { mediaPlaybackState, mediaPlaybackProgress } = action.data;
+
       if (!state.mediaPlaybackCurrentMediaTrack) {
         throw new Error('MediaPlayerReducer encountered error at UpdatePlaybackProgress - No loaded media track was found');
       }
 
       return {
         ...state,
-        mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress,
+        mediaPlaybackState,
+        mediaPlaybackCurrentMediaProgress: mediaPlaybackProgress,
       };
     }
     case MediaEnums.MediaPlayerActions.UpdatePlaybackVolume: {

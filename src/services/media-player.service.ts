@@ -448,10 +448,6 @@ class MediaPlayerService {
       return;
     }
 
-    store.dispatch({
-      type: MediaEnums.MediaPlayerActions.LoadingTrack,
-    });
-
     mediaPlaybackCurrentPlayingInstance
       .resumePlayback()
       .then((mediaPlaybackResumed) => {
@@ -463,7 +459,7 @@ class MediaPlayerService {
         store.dispatch({
           type: MediaEnums.MediaPlayerActions.Play,
           data: {
-            mediaPlaybackProgress: mediaPlaybackCurrentPlayingInstance.getPlaybackProgress(),
+            mediaPlaybackProgress: this.getCurrentPlaybackProgress(),
           },
         });
 
@@ -638,7 +634,7 @@ class MediaPlayerService {
 
     // update playback progress state to the requested one right away
     // this is being done in order to prevent delay between seek request and actual audio seek success response
-    this.updateMediaPlaybackProgress(mediaTrackSeekPosition);
+    this.updateMediaPlaybackProgress(mediaTrackSeekPosition, true);
 
     mediaPlaybackCurrentPlayingInstance
       .seekPlayback(mediaTrackSeekPosition)
@@ -839,7 +835,7 @@ class MediaPlayerService {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.Play,
       data: {
-        mediaPlaybackProgress: mediaPlayback.getPlaybackProgress(),
+        mediaPlaybackProgress: this.getCurrentPlaybackProgress(),
       },
     });
 
@@ -980,7 +976,7 @@ class MediaPlayerService {
       return;
     }
 
-    const mediaPlaybackProgress = mediaPlaybackCurrentPlayingInstance.getPlaybackProgress();
+    const mediaPlaybackProgress = this.getCurrentPlaybackProgress();
     this.updateMediaPlaybackProgress(mediaPlaybackProgress);
 
     if (mediaPlaybackCurrentPlayingInstance.checkIfPlaying()) {
@@ -1005,12 +1001,15 @@ class MediaPlayerService {
     }
   }
 
-  private updateMediaPlaybackProgress(mediaPlaybackProgress: number): void {
+  // when seeking, we will preserve the playback state (example: playback might be paused but user still requests seek)
+  // when not seeking, playback state will be forced to Playing
+  private updateMediaPlaybackProgress(mediaPlaybackProgress: number, seeking?: boolean): void {
     const {
       mediaPlayer,
     } = store.getState();
 
     const {
+      mediaPlaybackState,
       mediaPlaybackCurrentMediaProgress = 0,
     } = mediaPlayer;
 
@@ -1023,9 +1022,26 @@ class MediaPlayerService {
     store.dispatch({
       type: MediaEnums.MediaPlayerActions.UpdatePlaybackProgress,
       data: {
+        mediaPlaybackState: seeking ? mediaPlaybackState : MediaEnums.MediaPlaybackState.Playing,
         mediaPlaybackProgress,
       },
     });
+  }
+
+  private getCurrentPlaybackProgress(): number {
+    const { mediaPlayer } = store.getState();
+    const { mediaPlaybackCurrentMediaTrack, mediaPlaybackCurrentPlayingInstance } = mediaPlayer;
+
+    if (!mediaPlaybackCurrentMediaTrack || !mediaPlaybackCurrentPlayingInstance) {
+      throw new Error('Cannot get current playback progress - track or instance missing');
+    }
+
+    // providers are not allowed to report progress greater than the
+    // set track duration
+    return Math.min(
+      mediaPlaybackCurrentPlayingInstance.getPlaybackProgress(),
+      mediaPlaybackCurrentMediaTrack.track_duration,
+    );
   }
 
   private retryMediaProgressReporting(): boolean {
