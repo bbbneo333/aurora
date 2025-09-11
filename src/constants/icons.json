@@ -12,6 +12,7 @@
   "MediaPlay": "fas fa-play",
   "MediaPause": "fas fa-pause",
   "MediaLike": "far fa-heart",
+  "MediaLiked": "fas fa-heart",
   "NavigationBack": "fas fa-chevron-left",
   "NavigationForward": "fas fa-chevron-right",
   "PlaylistPlaceholder": "fas fa-play",

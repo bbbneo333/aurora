@@ -1,0 +1,7 @@
+.media-track-like-button:global(.active) {
+  color: var(--button-primary-bg-color);
+}
+
+.media-track-like-button:global(.active):hover {
+  color: var(--button-primary-hovered-bg-color);
+}

@@ -28,6 +28,7 @@ export * from './media-track-context-menu/media-track-context-menu.component';
 export * from './media-track-list/media-track-list.component';
 export * from './navigation/navigation-pills.component';
 export * from './media-track-info/media-track-info.component';
+export * from './media-track-like-button/media-track-like-button.component';
 export * from './media-cover-picture/media-cover-picture.component';
 export * from './media-cover-picture/media-cover-picture-uploadable.component';
 export * from './router-switch/router-switch.component';

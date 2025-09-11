@@ -135,6 +135,11 @@ export interface IMediaProvider {
   onMediaProviderSettingsUpdated?(existingSettings: object, updatedSettings: object): void;
 }
 
+export interface IMediaProviderTrackData {
+  provider: string;
+  provider_id: string;
+}
+
 export interface IMediaCollectionItem {
   id: string;
   type: 'artist' | 'album' | 'playlist';
@@ -150,10 +155,8 @@ export interface IMediaPlaylistData {
   created_at: number;
 }
 
-export interface IMediaPlaylistTrackData {
+export interface IMediaPlaylistTrackData extends IMediaProviderTrackData {
   playlist_track_id: string;
-  provider: string;
-  provider_id: string;
   added_at: number;
 }
 
@@ -169,9 +172,7 @@ export interface IMediaPlaylistInputData {
   cover_picture?: IMediaPicture;
 }
 
-export interface IMediaPlaylistTrackInputData {
-  provider: string;
-  provider_id: string;
+export interface IMediaPlaylistTrackInputData extends IMediaProviderTrackData {
 }
 
 export interface IMediaPlaylistUpdateData {
@@ -182,4 +183,15 @@ export interface IMediaPlaylistUpdateData {
 
 export interface IMediaPlaylistTrackUpdateData {
   playlist_track_id: string;
+}
+
+export interface IMediaLikedTrackData extends IMediaProviderTrackData {
+  id: string;
+  created_at: number;
+}
+
+export interface IMediaLikedTrack extends IMediaLikedTrackData {
+}
+
+export interface IMediaLikedTrackInputData extends IMediaProviderTrackData {
 }

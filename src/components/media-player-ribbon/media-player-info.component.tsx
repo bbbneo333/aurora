@@ -3,14 +3,13 @@ import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
 
-import { Icons } from '../../constants';
 import { useContextMenu } from '../../contexts';
 import { RootState } from '../../reducers';
 
-import { Icon } from '../icon/icon.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 import { MediaTrackContextMenu, MediaTrackContextMenuItem } from '../media-track-context-menu/media-track-context-menu.component';
+import { MediaTrackLikeButton } from '../media-track-like-button/media-track-like-button.component';
 
 import styles from './media-player-ribbon.component.css';
 
@@ -63,7 +62,7 @@ export function MediaPlayerInfo() {
           onContextMenu={onMediaTrackInfoContextMenu}
         />
         <div className={cx('media-player-control', 'media-player-control-sm')}>
-          <Icon name={Icons.MediaLike}/>
+          <MediaTrackLikeButton mediaTrack={mediaPlaybackCurrentMediaTrack}/>
         </div>
         <MediaTrackContextMenu
           id={mediaTrackContextMenuId}

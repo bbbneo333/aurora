@@ -8,7 +8,7 @@ import { Icons } from '../../constants';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 import { MediaEnums } from '../../enums';
-import { DOMUtils, Events } from '../../utils';
+import { DOM, Events } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
@@ -30,8 +30,7 @@ export function MediaPlayerControls() {
     const handleOnKeyDown = (event: KeyboardEvent) => {
       if (
         Events.isSpaceKey(event)
-        && document.activeElement
-        && !DOMUtils.isElementEditable(document.activeElement)
+        && !DOM.isElementEditable(document.activeElement)
         && !isPlaybackDisabled
       ) {
         event.preventDefault();

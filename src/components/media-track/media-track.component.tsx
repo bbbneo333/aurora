@@ -8,6 +8,7 @@ import { useMediaTrackPlayback } from '../../hooks';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
+import { MediaTrackLikeButton } from '../media-track-like-button/media-track-like-button.component';
 
 import styles from './media-track.component.css';
 
@@ -100,6 +101,12 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
           />
         </div>
         <div className={cx('media-track-section', 'media-track-side-column')}>
+          <div className={cx('media-track-like')}>
+            <MediaTrackLikeButton
+              mediaTrack={mediaTrack}
+              className={cx('media-track-like-button')}
+            />
+          </div>
           <div className={cx('media-track-duration')}>
             {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
           </div>

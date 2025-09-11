@@ -1,5 +1,4 @@
 import _ from 'lodash';
-
 import { Semaphore } from 'async-mutex';
 
 import { AppEnums, MediaEnums } from '../enums';
@@ -18,6 +17,7 @@ import {
   MediaProviderDatastore,
   MediaTrackDatastore,
   MediaPlaylistDatastore,
+  MediaLikedTrackDatastore,
 } from '../datastores';
 
 import {
@@ -26,6 +26,8 @@ import {
   IMediaArtist,
   IMediaArtistData,
   IMediaCollectionItem,
+  IMediaLikedTrack,
+  IMediaLikedTrackInputData,
   IMediaPicture,
   IMediaPlaylist,
   IMediaPlaylistData,
@@ -371,7 +373,6 @@ class MediaLibraryService {
    * @throws MediaLibraryPlaylistDuplicateTracksError
    */
   async addMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[], options?: {
-    // allowDuplicates: boolean;
     ignoreExisting?: boolean; // only add new ones
   }): Promise<IMediaPlaylist> {
     const {
@@ -536,6 +537,34 @@ class MediaLibraryService {
     });
 
     return mediaPlaylist;
+  }
+
+  // likes API
+
+  async checkIfTrackIsLiked(mediaLikedTrackData: IMediaLikedTrackInputData): Promise<boolean> {
+    return !_.isNil(await this.getLikedTrack(mediaLikedTrackData));
+  }
+
+  async getLikedTrack(mediaLikedTrackData: IMediaLikedTrackInputData): Promise<IMediaLikedTrack | undefined> {
+    return MediaLikedTrackDatastore.findLikedTrack({
+      provider: mediaLikedTrackData.provider,
+      provider_id: mediaLikedTrackData.provider_id,
+    });
+  }
+
+  async addTrackToLiked(mediaLikedTrackData: IMediaLikedTrackInputData): Promise<IMediaLikedTrack> {
+    return MediaLikedTrackDatastore.insertLikedTrack({
+      provider: mediaLikedTrackData.provider,
+      provider_id: mediaLikedTrackData.provider_id,
+      created_at: Date.now(),
+    });
+  }
+
+  async removeTrackFromLiked(mediaLikedTrackData: IMediaLikedTrackInputData): Promise<void> {
+    await MediaLikedTrackDatastore.deleteLikedTrack({
+      provider: mediaLikedTrackData.provider,
+      provider_id: mediaLikedTrackData.provider_id,
+    });
   }
 
   // private API
