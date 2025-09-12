@@ -106,7 +106,7 @@ class MediaLibraryLikedTrackService {
     });
 
     if (!options?.skipUserNotification) {
-      NotificationService.showMessage(I18nService.getString('message_track_unliked'));
+      NotificationService.showMessage(I18nService.getString('message_track_disliked'));
     }
   }
 
@@ -123,7 +123,7 @@ class MediaLibraryLikedTrackService {
     ));
 
     if (!options?.skipUserNotification) {
-      NotificationService.showMessage(I18nService.getString('message_tracks_unliked'));
+      NotificationService.showMessage(I18nService.getString('message_tracks_disliked'));
     }
   }
 }

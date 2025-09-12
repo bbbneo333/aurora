@@ -135,7 +135,7 @@ export function Button(props: ButtonProps) {
         )}
         {children}
       </div>
-      {hasTooltip && (
+      {hasTooltip && !disabled && (
         <ButtonTooltip
           title={tooltip}
           open={tooltipOpen}

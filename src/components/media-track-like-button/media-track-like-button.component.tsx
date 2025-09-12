@@ -4,6 +4,7 @@ import classNames from 'classnames/bind';
 import { IMediaTrack } from '../../interfaces';
 import { Icons } from '../../constants';
 import { useMediaTrackLike } from '../../hooks';
+import { I18nService } from '../../services';
 
 import { Icon } from '../icon/icon.component';
 import { Button, ButtonProps } from '../button/button.component';
@@ -24,6 +25,7 @@ export function MediaTrackLikeButton(props: {
       className={cx(className, 'media-track-like-button', { active: isTrackLiked })}
       disabled={isLikeStatusLoading}
       onButtonSubmit={toggleLike}
+      tooltip={I18nService.getString(isTrackLiked ? 'tooltip_track_dislike' : 'tooltip_track_like')}
     >
       <Icon
         className={cx('media-track-like-icon')}
