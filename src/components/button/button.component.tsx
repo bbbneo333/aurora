@@ -25,6 +25,7 @@ export type ButtonProps = DetailsHTMLAttributes<HTMLDivElement> & {
   onButtonMove?(event: KeyboardEvent): void;
   variant?: ButtonVariant | ButtonVariant[];
   tooltip?: string;
+  tooltipDelayMS?: number;
 };
 
 export type ButtonVariant = 'primary' | 'rounded' | 'outline' | 'lg';
@@ -40,6 +41,7 @@ export function Button(props: ButtonProps) {
     onButtonMove,
     variant,
     tooltip,
+    tooltipDelayMS = 300,
   } = props;
 
   const mediaButtonContainerProps = omit(props, [
@@ -122,7 +124,9 @@ export function Button(props: ButtonProps) {
         ref={mediaButtonContainerRef}
         role="button"
         tabIndex={0}
-        onMouseEnter={() => setTooltipOpen(true)}
+        // for some reason, in our custom implementation setting delay directly to tooltip is not working
+        // we use timeout then to open up the tooltip
+        onMouseEnter={() => setTimeout(() => setTooltipOpen(true), tooltipDelayMS)}
         onMouseLeave={() => setTooltipOpen(false)}
         data-dndkit-no-drag // do not allow drag events on our custom button
         {...mediaButtonContainerProps}
