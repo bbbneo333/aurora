@@ -74,6 +74,7 @@ export function AlbumPage() {
             id: mediaSelectedAlbum.id,
           }}
           contextMenuItems={[
+            MediaTrackContextMenuItem.Like,
             MediaTrackContextMenuItem.AddToQueue,
             MediaTrackContextMenuItem.Separator,
             MediaTrackContextMenuItem.AddToPlaylist,

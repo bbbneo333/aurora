@@ -1,23 +1,27 @@
+import { omit } from 'lodash';
+
 import { MediaEnums } from '../enums';
 import { ArrayUtils, MediaUtils } from '../utils';
 
 import {
   IMediaAlbum,
   IMediaArtist,
+  IMediaLikedTrack,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
 
 export type MediaLibraryState = {
-  mediaAlbums: IMediaAlbum[],
-  mediaArtists: IMediaArtist[],
-  mediaSelectedAlbum?: IMediaAlbum,
-  mediaSelectedAlbumTracks?: IMediaTrack[],
-  mediaSelectedArtist?: IMediaArtist,
-  mediaSelectedArtistAlbums?: IMediaAlbum[],
-  mediaIsSyncing: boolean,
-  mediaPlaylists: IMediaPlaylist[],
-  mediaSelectedPlaylist?: IMediaPlaylist,
+  mediaAlbums: IMediaAlbum[];
+  mediaArtists: IMediaArtist[];
+  mediaSelectedAlbum?: IMediaAlbum;
+  mediaSelectedAlbumTracks?: IMediaTrack[];
+  mediaSelectedArtist?: IMediaArtist;
+  mediaSelectedArtistAlbums?: IMediaAlbum[];
+  mediaIsSyncing: boolean;
+  mediaPlaylists: IMediaPlaylist[];
+  mediaSelectedPlaylist?: IMediaPlaylist;
+  mediaTracksLiked: Record<string, IMediaLikedTrack>;
 };
 
 export type MediaLibraryStateAction = {
@@ -30,6 +34,7 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaArtists: [],
   mediaIsSyncing: false,
   mediaPlaylists: [],
+  mediaTracksLiked: {},
 };
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
@@ -269,6 +274,29 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       return {
         ...state,
         mediaSelectedPlaylist: mediaPlaylist,
+      };
+    }
+    case MediaEnums.MediaLibraryActions.AddMediaTrackToLiked: {
+      // data.mediaTrackId: string - media track id
+      // data.mediaLikedTrack: IMediaPlaylist - liked track to be added
+      const { mediaTrackId, mediaLikedTrack } = action.data;
+
+      return {
+        ...state,
+        mediaTracksLiked: {
+          ...state.mediaTracksLiked,
+          [mediaTrackId]: mediaLikedTrack,
+        },
+      };
+    }
+    case MediaEnums.MediaLibraryActions.RemoveMediaTrackFromLiked: {
+      // data.mediaTrackId: string - media track id
+      const { mediaTrackId } = action.data;
+      const { mediaTracksLiked } = state;
+
+      return {
+        ...state,
+        mediaTracksLiked: omit(mediaTracksLiked, mediaTrackId),
       };
     }
     default:

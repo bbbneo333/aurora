@@ -86,6 +86,7 @@ export function PlayerQueueComponent() {
                 <MediaTrackContextMenu
                   id={mediaTrackContextMenuId}
                   menuItems={[
+                    MediaTrackContextMenuItem.Like,
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.Separator,
                     MediaTrackContextMenuItem.AddToPlaylist,
@@ -117,6 +118,7 @@ export function PlayerQueueComponent() {
                   mediaTracks={mediaQueueTracks}
                   getMediaTrackId={(mediaTrack: IMediaQueueTrack) => mediaTrack.queue_entry_id}
                   contextMenuItems={[
+                    MediaTrackContextMenuItem.Like,
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.RemoveFromQueue,
                     MediaTrackContextMenuItem.Separator,

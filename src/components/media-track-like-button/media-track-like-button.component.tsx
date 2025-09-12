@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import classNames from 'classnames/bind';
 
 import { IMediaTrack } from '../../interfaces';
 import { Icons } from '../../constants';
-import { MediaLibraryService } from '../../services';
+import { useMediaTrackLike } from '../../hooks';
 
 import { Icon } from '../icon/icon.component';
 import { Button, ButtonProps } from '../button/button.component';
@@ -16,59 +16,18 @@ export function MediaTrackLikeButton(props: {
   mediaTrack: IMediaTrack;
 } & ButtonProps) {
   const { mediaTrack, className, ...rest } = props;
-  const [mediaTrackIsLiked, setMediaTrackIsLiked] = useState(false);
-  const [mediaTrackLikeDisabled, setMediaTrackLikeDisabled] = useState(false);
-
-  useEffect(() => {
-    setMediaTrackLikeDisabled(true);
-
-    MediaLibraryService.checkIfTrackIsLiked(mediaTrack)
-      .then((isLiked) => {
-        setMediaTrackIsLiked(isLiked);
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-      .finally(() => {
-        setMediaTrackLikeDisabled(false);
-      });
-  }, [
-    mediaTrack,
-  ]);
-
-  const handleButtonClick = useCallback(async () => {
-    setMediaTrackLikeDisabled(true);
-
-    try {
-      if (mediaTrackIsLiked) {
-        // remove
-        await MediaLibraryService.removeTrackFromLiked(mediaTrack);
-        setMediaTrackIsLiked(false);
-      } else {
-        // add
-        await MediaLibraryService.addTrackToLiked(mediaTrack);
-        setMediaTrackIsLiked(true);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setMediaTrackLikeDisabled(false);
-    }
-  }, [
-    mediaTrack,
-    mediaTrackIsLiked,
-  ]);
+  const { isTrackLiked, isLikeStatusLoading, toggleLike } = useMediaTrackLike({ mediaTrack });
 
   return (
     <Button
       {...rest}
-      className={cx(className, 'media-track-like-button', { active: mediaTrackIsLiked })}
-      disabled={mediaTrackLikeDisabled}
-      onButtonSubmit={handleButtonClick}
+      className={cx(className, 'media-track-like-button', { active: isTrackLiked })}
+      disabled={isLikeStatusLoading}
+      onButtonSubmit={toggleLike}
     >
       <Icon
         className={cx('media-track-like-icon')}
-        name={mediaTrackIsLiked ? Icons.MediaLiked : Icons.MediaLike}
+        name={isTrackLiked ? Icons.MediaLiked : Icons.MediaLike}
       />
     </Button>
   );

@@ -65,7 +65,7 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
-  const handleSelectionDelete = useCallback((mediaPlaylistId, mediaPlaylistTrackIds) => new Promise<boolean>((resolve) => {
+  const handleSelectionDelete = useCallback((mediaPlaylistId: string, mediaPlaylistTrackIds: string[]) => new Promise<boolean>((resolve) => {
     showModal(MediaPlaylistDeleteTracksModal, {
       mediaPlaylistId,
       mediaPlaylistTrackIds,
@@ -145,6 +145,7 @@ export function PlaylistPage() {
             }}
             getMediaTrackId={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
             contextMenuItems={[
+              MediaTrackContextMenuItem.Like,
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
