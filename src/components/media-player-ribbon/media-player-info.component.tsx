@@ -35,7 +35,7 @@ export function MediaPlayerInfo() {
       },
       position: {
         x: rect.left,
-        y: rect.top - 100, // TODO: Hack to place menu just above element
+        y: rect.top - 150, // TODO: Hack to place menu just above element
       },
     });
   }, [
