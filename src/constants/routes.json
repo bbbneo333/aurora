@@ -6,6 +6,7 @@
   "LibraryAlbum": "/library/albums/:albumId",
   "LibraryPlaylists": "/library/playlists",
   "LibraryPlaylist": "/library/playlists/:playlistId",
+  "LibraryLikedTracks": "/library/liked-tracks",
   "Player": "/player",
   "PlayerQueue": "/player/queue",
   "Settings": "/settings",

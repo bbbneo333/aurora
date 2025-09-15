@@ -16,15 +16,17 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
+import type { DragEndEvent } from '@dnd-kit/core/dist/types';
+
 import { SafePointerSensor } from '../../types';
-import { DOMUtils, Events } from '../../utils';
+import { DOM, Events } from '../../utils';
 
 import styles from './interactive-list.component.css';
 import { InteractiveListItem } from './interactive-list-item.component';
 
 const cx = classNames.bind(styles);
 
-function isElementInteractive(element: HTMLElement) {
+function isElementInteractiveItem(element: HTMLElement) {
   return !isNil(element.dataset?.interactiveItemId);
 }
 
@@ -87,7 +89,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     if (
       activeElement
       && activeElement instanceof HTMLElement
-      && isElementInteractive(activeElement)
+      && isElementInteractiveItem(activeElement)
     ) {
       activeElement.blur();
     }
@@ -145,7 +147,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     setPrevItems(items);
   };
 
-  const handleDragEnd = React.useCallback(async ({ active, over }) => {
+  const handleDragEnd = React.useCallback(async ({ active, over }: DragEndEvent) => {
     if (!sortable || !onItemsSorted || !over || active.id === over.id) {
       setDragItems(null);
       return;
@@ -203,7 +205,8 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       // for selecting all on ctrl+a
-      if (Events.isSelectAllKey(e) && document.activeElement && !DOMUtils.isElementEditable(document.activeElement)) {
+      // important - ignore events originating from editable elements
+      if (Events.isSelectAllKey(e) && !DOM.isElementEditable(document.activeElement)) {
         e.preventDefault();
         selectAll();
       }

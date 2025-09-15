@@ -1,12 +1,16 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { IMediaAlbum } from '../../interfaces';
-import { MediaUtils, StringUtils } from '../../utils';
 import { Layout, Routes } from '../../constants';
+import { IMediaAlbum } from '../../interfaces';
+import { MediaCollectionService } from '../../services';
+import { StringUtils } from '../../utils';
+
 import {
-  MediaCollectionContextMenu, MediaCollectionContextMenuItem,
+  MediaCollectionContextMenu,
+  MediaCollectionContextMenuItem,
 } from '../media-collection-context-menu/media-collection-context-menu.component';
+
 import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
 
 import styles from './media-albums.component.css';
@@ -23,7 +27,7 @@ export function MediaAlbums(props: {
     <div>
       <div className={cx('row', 'media-albums')}>
         {mediaAlbums.map((mediaAlbum) => {
-          const mediaItem = MediaUtils.getMediaItemFromAlbum(mediaAlbum);
+          const mediaItem = MediaCollectionService.getMediaItemFromAlbum(mediaAlbum);
 
           return (
             <div className={Layout.Grid.CollectionTile} key={mediaAlbum.id}>

@@ -47,14 +47,10 @@ function Stage() {
 
 // app > player
 
-function Player() {
-  const {
-    mediaPlaybackCurrentMediaTrack,
-  } = useSelector((state: RootState) => state.mediaPlayer);
-
+function Player({ active = false }) {
   return (
     <div className={cx('app-player', {
-      active: !!mediaPlaybackCurrentMediaTrack,
+      active,
     })}
     >
       <MediaSession/>
@@ -63,7 +59,30 @@ function Player() {
   );
 }
 
-// app > columns [splash | stage, player]
+// app > stage, player
+
+function Window() {
+  const playerCurrentTrack = useSelector((state: RootState) => state.mediaPlayer.mediaPlaybackCurrentMediaTrack);
+  const playerIsActive = !!playerCurrentTrack;
+
+  return (
+    <Router>
+      <NotificationProvider snackbarSx={{
+        bottom: playerIsActive ? '110px !important' : undefined, // TODO: Hack to keep it floating above player ribbon
+      }}
+      >
+        <ModalProvider>
+          <ContextMenuProvider>
+            <Stage/>
+            <Player active={playerIsActive}/>
+          </ContextMenuProvider>
+        </ModalProvider>
+      </NotificationProvider>
+    </Router>
+  );
+}
+
+// app > columns [splash | window]
 
 export function App() {
   const [appStateIsLoading, setAppStateIsLoading] = useState<boolean>(true);
@@ -99,16 +118,7 @@ export function App() {
           <Splash/>
         )}
         {!appStateIsLoading && (
-          <Router>
-            <NotificationProvider>
-              <ModalProvider>
-                <ContextMenuProvider>
-                  <Stage/>
-                  <Player/>
-                </ContextMenuProvider>
-              </ModalProvider>
-            </NotificationProvider>
-          </Router>
+          <Window/>
         )}
       </Provider>
     </div>

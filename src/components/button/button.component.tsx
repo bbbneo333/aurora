@@ -1,8 +1,5 @@
-import React, {
-  DetailsHTMLAttributes, useEffect, useRef, useState,
-} from 'react';
-
-import { isEmpty, omit } from 'lodash';
+import React from 'react';
+import { isEmpty } from 'lodash';
 import classNames from 'classnames/bind';
 
 import { SystemEnums } from '../../enums';
@@ -16,7 +13,7 @@ const cx = classNames.bind(styles);
 // we are relying on outline script to remove outlines in case of mouse clicks
 require('../../vendor/js/outline');
 
-export type ButtonProps = DetailsHTMLAttributes<HTMLDivElement> & {
+export type ButtonProps = React.DetailsHTMLAttributes<HTMLDivElement> & {
   children?: any;
   disabled?: boolean;
   icon?: string;
@@ -40,28 +37,19 @@ export function Button(props: ButtonProps) {
     onButtonMove,
     variant,
     tooltip,
+    ...rest
   } = props;
 
-  const mediaButtonContainerProps = omit(props, [
-    'children',
-    'className',
-    'icon',
-    'iconClassName',
-    'onButtonSubmit',
-    'onButtonMove',
-    'variant',
-    'tooltip',
-  ]);
-  const mediaButtonContainerRef = useRef(null);
+  const mediaButtonContainerRef = React.useRef(null);
 
   const hasTooltip = !isEmpty(tooltip);
-  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
 
   // merge our own classnames with the provided ones
   // variant is simply applied as a classname
   const mediaButtonClassName = cx('button', variant, className);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // for adding listeners to button
     if ((!onButtonSubmit && !onButtonMove)
       || !mediaButtonContainerRef
@@ -122,10 +110,12 @@ export function Button(props: ButtonProps) {
         ref={mediaButtonContainerRef}
         role="button"
         tabIndex={0}
+        // for some reason, in our custom implementation setting delay directly to tooltip is not working
+        // we use timeout then to open up the tooltip
         onMouseEnter={() => setTooltipOpen(true)}
         onMouseLeave={() => setTooltipOpen(false)}
         data-dndkit-no-drag // do not allow drag events on our custom button
-        {...mediaButtonContainerProps}
+        {...rest}
       >
         {icon && (
           <Icon
@@ -135,7 +125,7 @@ export function Button(props: ButtonProps) {
         )}
         {children}
       </div>
-      {hasTooltip && (
+      {hasTooltip && !disabled && (
         <ButtonTooltip
           title={tooltip}
           open={tooltipOpen}

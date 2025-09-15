@@ -1,11 +1,10 @@
 import _ from 'lodash';
-
 import { Semaphore } from 'async-mutex';
 
-import { AppEnums, MediaEnums } from '../enums';
-import { DatastoreUtils, MediaUtils } from '../utils';
+import { AppEnums, MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
 import store from '../store';
 import { AppError, DataStoreInputData, DataStoreUpdateData } from '../types';
+import { DatastoreUtils, MediaUtils } from '../utils';
 
 import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
@@ -25,7 +24,6 @@ import {
   IMediaAlbumData,
   IMediaArtist,
   IMediaArtistData,
-  IMediaCollectionItem,
   IMediaPicture,
   IMediaPlaylist,
   IMediaPlaylistData,
@@ -318,22 +316,6 @@ class MediaLibraryService {
     return MediaUtils.sortMediaAlbums(mediaAlbums);
   }
 
-  async getMediaCollectionTracks(mediaCollectionItem: IMediaCollectionItem): Promise<IMediaTrack[]> {
-    switch (mediaCollectionItem.type) {
-      case 'album': {
-        return this.getMediaAlbumTracks(mediaCollectionItem.id);
-      }
-      case 'artist': {
-        return this.getMediaArtistTracks(mediaCollectionItem.id);
-      }
-      case 'playlist': {
-        return this.getMediaPlaylistTracks(mediaCollectionItem.id);
-      }
-      default:
-        throw new Error(`Unsupported media collection type - ${mediaCollectionItem.type}`);
-    }
-  }
-
   async getMediaPlaylists(): Promise<IMediaPlaylist[]> {
     const mediaPlaylistsDataList = await MediaPlaylistDatastore.findMediaPlaylists();
 
@@ -358,7 +340,7 @@ class MediaLibraryService {
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      type: MediaLibraryActions.AddPlaylist,
       data: {
         mediaPlaylist,
       },
@@ -371,7 +353,6 @@ class MediaLibraryService {
    * @throws MediaLibraryPlaylistDuplicateTracksError
    */
   async addMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[], options?: {
-    // allowDuplicates: boolean;
     ignoreExisting?: boolean; // only add new ones
   }): Promise<IMediaPlaylist> {
     const {
@@ -396,7 +377,7 @@ class MediaLibraryService {
     const mediaPlaylistUpdated = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      type: MediaLibraryActions.AddPlaylist,
       data: {
         mediaPlaylist: mediaPlaylistUpdated,
       },
@@ -416,7 +397,7 @@ class MediaLibraryService {
       .getMediaAlbums()
       .then((mediaAlbums) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.SetAlbums,
+          type: MediaLibraryActions.SetAlbums,
           data: {
             mediaAlbums,
           },
@@ -429,7 +410,7 @@ class MediaLibraryService {
       .getMediaAlbumTracks(mediaAlbumId)
       .then(async (mediaAlbumTracks) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.SetAlbum,
+          type: MediaLibraryActions.SetAlbum,
           data: {
             mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
             mediaAlbumTracks,
@@ -443,7 +424,7 @@ class MediaLibraryService {
       .getMediaArtists()
       .then((mediaArtists) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.SetArtists,
+          type: MediaLibraryActions.SetArtists,
           data: {
             mediaArtists,
           },
@@ -456,7 +437,7 @@ class MediaLibraryService {
       .getMediaArtistAlbums(mediaArtistId)
       .then(async (mediaArtistAlbums) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.SetArtist,
+          type: MediaLibraryActions.SetArtist,
           data: {
             mediaArtist: await this.buildMediaArtist(mediaArtistId),
             mediaArtistAlbums,
@@ -470,7 +451,7 @@ class MediaLibraryService {
       .getMediaPlaylists()
       .then((mediaPlaylists) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.SetPlaylists,
+          type: MediaLibraryActions.SetPlaylists,
           data: {
             mediaPlaylists,
           },
@@ -483,7 +464,7 @@ class MediaLibraryService {
       .getMediaPlaylist(mediaPlaylistId)
       .then((mediaPlaylist) => {
         store.dispatch({
-          type: MediaEnums.MediaLibraryActions.SetPlaylist,
+          type: MediaLibraryActions.SetPlaylist,
           data: {
             mediaPlaylist,
           },
@@ -498,7 +479,7 @@ class MediaLibraryService {
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      type: MediaLibraryActions.AddPlaylist,
       data: {
         mediaPlaylist,
       },
@@ -515,7 +496,7 @@ class MediaLibraryService {
     });
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.RemovePlaylist,
+      type: MediaLibraryActions.RemovePlaylist,
       data: {
         mediaPlaylistId,
       },
@@ -529,7 +510,7 @@ class MediaLibraryService {
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.AddPlaylist,
+      type: MediaLibraryActions.AddPlaylist,
       data: {
         mediaPlaylist,
       },
@@ -554,7 +535,7 @@ class MediaLibraryService {
     debug('started sync for provider %s at %d', mediaProviderIdentifier, mediaSyncStartTimestamp);
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.StartSync,
+      type: MediaLibraryActions.StartSync,
       data: {
         mediaProviderIdentifier,
       },
@@ -584,7 +565,7 @@ class MediaLibraryService {
     debug('finished sync for provider %s at %d', mediaProviderIdentifier, mediaSyncEndTimestamp);
 
     store.dispatch({
-      type: MediaEnums.MediaLibraryActions.FinishSync,
+      type: MediaLibraryActions.FinishSync,
       data: {
         mediaProviderIdentifier,
         mediaSyncStartTimestamp,
@@ -600,7 +581,7 @@ class MediaLibraryService {
 
     if (loadMediaTrack) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddTrack,
+        type: MediaLibraryActions.AddTrack,
         data: {
           mediaTrack,
         },
@@ -632,7 +613,7 @@ class MediaLibraryService {
 
     if (loadMediaAlbum) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddAlbum,
+        type: MediaLibraryActions.AddAlbum,
         data: {
           mediaAlbum: mediaAlbumBuilt,
         },
@@ -661,7 +642,7 @@ class MediaLibraryService {
 
     if (loadMediaArtist) {
       store.dispatch({
-        type: MediaEnums.MediaLibraryActions.AddArtist,
+        type: MediaLibraryActions.AddArtist,
         data: {
           mediaArtist: mediaArtistData,
         },
@@ -682,7 +663,7 @@ class MediaLibraryService {
       return undefined;
     }
 
-    if (mediaPicture.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Buffer) {
+    if (mediaPicture.image_data_type === MediaTrackCoverPictureImageDataType.Buffer) {
       let imageCachePath;
 
       try {
@@ -700,7 +681,7 @@ class MediaLibraryService {
 
       return {
         image_data: imageCachePath,
-        image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Path,
+        image_data_type: MediaTrackCoverPictureImageDataType.Path,
       };
     }
 

@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames/bind';
 
+import { useContextMenu } from '../../contexts';
 import { useMediaCollectionPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
-import { useContextMenu } from '../../contexts';
+import { MediaCollectionService } from '../../services';
 
 import { RouterLink } from '../router-link/router-link.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
@@ -81,6 +82,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
             <MediaCoverPicture
               mediaPicture={mediaItem.picture}
               mediaPictureAltText={mediaItem.name}
+              mediaCoverPlaceholderIcon={MediaCollectionService.getCoverPlaceholderIcon(mediaItem)}
               className={cx('collection-item-cover')}
             />
           </div>

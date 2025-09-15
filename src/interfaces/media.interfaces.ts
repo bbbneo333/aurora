@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { MediaEnums } from '../enums';
+import {
+  MediaCollectionItemType,
+  MediaTrackCoverPictureImageDataType,
+} from '../enums';
 
 export interface IMediaTrackData {
   id: string;
@@ -61,7 +64,7 @@ export interface IMediaArtist extends IMediaArtistData {
 
 export interface IMediaPicture {
   image_data: any;
-  image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType;
+  image_data_type: MediaTrackCoverPictureImageDataType;
 }
 
 export interface IMediaPlayback {
@@ -135,9 +138,14 @@ export interface IMediaProvider {
   onMediaProviderSettingsUpdated?(existingSettings: object, updatedSettings: object): void;
 }
 
+export interface IMediaProviderTrackData {
+  provider: string;
+  provider_id: string;
+}
+
 export interface IMediaCollectionItem {
   id: string;
-  type: 'artist' | 'album' | 'playlist';
+  type: MediaCollectionItemType;
   name: string;
   picture?: IMediaPicture;
 }
@@ -150,10 +158,8 @@ export interface IMediaPlaylistData {
   created_at: number;
 }
 
-export interface IMediaPlaylistTrackData {
+export interface IMediaPlaylistTrackData extends IMediaProviderTrackData {
   playlist_track_id: string;
-  provider: string;
-  provider_id: string;
   added_at: number;
 }
 
@@ -169,9 +175,7 @@ export interface IMediaPlaylistInputData {
   cover_picture?: IMediaPicture;
 }
 
-export interface IMediaPlaylistTrackInputData {
-  provider: string;
-  provider_id: string;
+export interface IMediaPlaylistTrackInputData extends IMediaProviderTrackData {
 }
 
 export interface IMediaPlaylistUpdateData {
@@ -182,4 +186,12 @@ export interface IMediaPlaylistUpdateData {
 
 export interface IMediaPlaylistTrackUpdateData {
   playlist_track_id: string;
+}
+
+export interface IMediaLikedTrackData {
+  track_id: string;
+  added_at: number;
+}
+
+export interface IMediaLikedTrack extends IMediaLikedTrackData, IMediaTrack {
 }

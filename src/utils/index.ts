@@ -1,7 +1,7 @@
 import * as ArrayUtils from './array.utils';
 import * as DatastoreUtils from './datastore.utils';
 import * as DateTimeUtils from './date-time.utils';
-import * as DOMUtils from './dom.utils';
+import * as DOM from './dom.utils';
 import * as Events from './event.utils';
 import * as MediaUtils from './media.utils';
 import * as PromiseUtils from './promise.utils';
@@ -13,7 +13,7 @@ export {
   ArrayUtils,
   DatastoreUtils,
   DateTimeUtils,
-  DOMUtils,
+  DOM,
   Events,
   MediaUtils,
   PromiseUtils,

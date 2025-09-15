@@ -4,14 +4,15 @@ import { useHistory, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 
-import { I18nService, MediaLibraryService } from '../../services';
-import { Layout, Routes } from '../../constants';
 import { useModal } from '../../contexts';
-import { RootState } from '../../reducers';
-import { IMediaPicture, IMediaPlaylistTrack } from '../../interfaces';
+import { Layout, Routes } from '../../constants';
 import { useEntityMissing } from '../../hooks';
+import { IMediaPicture, IMediaPlaylistTrack } from '../../interfaces';
+import { RootState } from '../../reducers';
+import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 
 import {
+  MediaCollectionActions,
   MediaCoverPictureUploadable,
   MediaPlaylistDeleteTracksModal,
   MediaTrackContextMenuItem,
@@ -19,14 +20,13 @@ import {
 } from '../../components';
 
 import styles from './playlist.component.css';
-import { PlaylistActions } from './playlist-actions.component';
 
 const cx = classNames.bind(styles);
 
 export function PlaylistPage() {
   const { playlistId } = useParams() as { playlistId: string };
   const history = useHistory();
-  const { mediaSelectedPlaylist } = useSelector((state: RootState) => state.mediaLibrary);
+  const mediaSelectedPlaylist = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedPlaylist);
   const [mediaPlaylistTracks, setMediaPlaylistTracks] = useState<IMediaPlaylistTrack[]>([]);
   const isPlaylistRemoved = useEntityMissing(mediaSelectedPlaylist);
   const { showModal } = useModal();
@@ -51,6 +51,12 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
+  useEffect(() => {
+    if (isPlaylistRemoved) {
+      history.replace(Routes.LibraryPlaylists);
+    }
+  }, [isPlaylistRemoved, history]);
+
   const handleMediaTracksSorted = useCallback(async (mediaTracks: IMediaPlaylistTrack[]) => {
     if (!mediaSelectedPlaylist) {
       return;
@@ -65,7 +71,7 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
-  const handleSelectionDelete = useCallback((mediaPlaylistId, mediaPlaylistTrackIds) => new Promise<boolean>((resolve) => {
+  const handleSelectionDelete = useCallback((mediaPlaylistId: string, mediaPlaylistTrackIds: string[]) => new Promise<boolean>((resolve) => {
     showModal(MediaPlaylistDeleteTracksModal, {
       mediaPlaylistId,
       mediaPlaylistTrackIds,
@@ -91,12 +97,8 @@ export function PlaylistPage() {
     mediaSelectedPlaylist,
   ]);
 
-  if (isPlaylistRemoved) {
-    return history.replace(Routes.LibraryPlaylists);
-  }
-
-  if (!mediaSelectedPlaylist) {
-    return (<></>);
+  if (!mediaSelectedPlaylist || isPlaylistRemoved) {
+    return null;
   }
 
   return (
@@ -122,7 +124,10 @@ export function PlaylistPage() {
         </div>
       </div>
       <div className={cx('playlist-actions')}>
-        <PlaylistActions mediaPlaylist={mediaSelectedPlaylist}/>
+        <MediaCollectionActions
+          mediaItem={MediaCollectionService.getMediaItemFromPlaylist(mediaSelectedPlaylist)}
+          hasTracks={!isEmpty(mediaPlaylistTracks)}
+        />
       </div>
       {isEmpty(mediaPlaylistTracks) && (
         <div className="row">
@@ -145,6 +150,7 @@ export function PlaylistPage() {
             }}
             getMediaTrackId={mediaPlaylistTrack => mediaPlaylistTrack.playlist_track_id}
             contextMenuItems={[
+              MediaTrackContextMenuItem.Like,
               MediaTrackContextMenuItem.AddToQueue,
               MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,

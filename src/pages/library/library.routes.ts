@@ -6,6 +6,7 @@ import { AlbumPage } from '../album/album.component';
 import { AlbumsPage } from '../albums/albums.component';
 import { PlaylistsPage } from '../playlists/playlists.component';
 import { PlaylistPage } from '../playlist/playlist.component';
+import { LikedTracksPage } from '../liked-tracks/liked-tracks.component';
 
 export default [
   {
@@ -44,5 +45,9 @@ export default [
   {
     path: Routes.Library,
     redirect: Routes.LibraryAlbums,
+  },
+  {
+    path: Routes.LibraryLikedTracks,
+    component: LikedTracksPage,
   },
 ];

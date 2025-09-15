@@ -10,7 +10,7 @@ import {
 
 import { useContextMenu } from '../../contexts';
 import { IMediaCollectionItem } from '../../interfaces';
-import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+import { I18nService, MediaCollectionService, MediaPlayerService } from '../../services';
 
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
@@ -45,7 +45,8 @@ export function MediaCollectionContextMenu(props: {
         if (!mediaItem) {
           throw new Error('MediaCollectionContextMenu encountered error while performing action AddToQueue - No media item was provided');
         }
-        MediaLibraryService
+
+        MediaCollectionService
           .getMediaCollectionTracks(mediaItem)
           .then((mediaTracks) => {
             MediaPlayerService.addMediaTracksToQueue(mediaTracks);

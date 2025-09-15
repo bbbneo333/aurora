@@ -12,6 +12,7 @@ import { StringUtils } from '../../utils';
 import {
   Button,
   MediaPlaylists,
+  MediaLikedTracksCollectionItem,
 } from '../../components';
 
 import styles from './playlists.component.css';
@@ -19,7 +20,7 @@ import styles from './playlists.component.css';
 const cx = classNames.bind(styles);
 
 export function PlaylistsPage() {
-  const { mediaPlaylists } = useSelector((state: RootState) => state.mediaLibrary);
+  const mediaPlaylists = useSelector((state: RootState) => state.mediaLibrary.mediaPlaylists);
   const history = useHistory();
 
   useEffect(() => {
@@ -55,6 +56,9 @@ export function PlaylistsPage() {
           </div>
         </div>
       )}
+      <div className={cx('playlist-liked-tracks')}>
+        <MediaLikedTracksCollectionItem/>
+      </div>
       <MediaPlaylists mediaPlaylists={mediaPlaylists}/>
     </div>
   );

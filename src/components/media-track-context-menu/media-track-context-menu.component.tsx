@@ -10,6 +10,7 @@ import {
 } from 'react-contexify';
 
 import { useContextMenu } from '../../contexts';
+import { useMediaTrackLike } from '../../hooks';
 import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
 
 import {
@@ -26,6 +27,7 @@ export enum MediaTrackContextMenuItem {
   AddToPlaylist,
   RemoveFromQueue,
   RemoveFromPlaylist,
+  Like,
   Separator,
 }
 
@@ -33,6 +35,7 @@ export enum MediaTrackContextMenuItemAction {
   AddToQueue = 'media/track/action/addToQueue',
   RemoveFromQueue = 'media/track/action/removeFromQueue',
   RemoveFromPlaylist = 'media/track/action/removeFromPlaylist',
+  Like = 'media/track/action/likeTrack', // handles both - remove and add
 }
 
 export interface MediaTrackContextMenuItemProps {
@@ -46,11 +49,22 @@ export function MediaTrackContextMenu(props: {
   menuItems: MediaTrackContextMenuItem[],
 }) {
   const { id, menuItems } = props;
-  const { menuProps } = useContextMenu<MediaTrackContextMenuItemProps>();
+  const { menuProps, hideAll } = useContextMenu<MediaTrackContextMenuItemProps>();
+  const { mediaTrack, mediaTracks, mediaTrackList } = menuProps || {};
+
+  const {
+    isTrackLiked,
+    isLikeStatusLoading,
+    areAllTracksLiked,
+    toggleLike,
+  } = useMediaTrackLike({
+    mediaTrack,
+    mediaTracks,
+  });
 
   const handleMenuItemClick = useCallback(async (itemParams: ItemParams<MediaTrackContextMenuItemProps>) => {
     const itemAction: MediaTrackContextMenuItemAction = itemParams.id as MediaTrackContextMenuItemAction;
-    const { mediaTrack, mediaTracks, mediaTrackList } = menuProps;
+    hideAll();
 
     switch (itemAction) {
       case MediaTrackContextMenuItemAction.AddToQueue: {
@@ -103,11 +117,19 @@ export function MediaTrackContextMenu(props: {
         }
         break;
       }
+      case MediaTrackContextMenuItemAction.Like: {
+        await toggleLike();
+        break;
+      }
       default:
       // unsupported action, do nothing
     }
   }, [
-    menuProps,
+    hideAll,
+    mediaTrack,
+    mediaTrackList,
+    mediaTracks,
+    toggleLike,
   ]);
 
   return (
@@ -157,6 +179,26 @@ export function MediaTrackContextMenu(props: {
             return (
               // eslint-disable-next-line react/no-array-index-key
               <MenuSeparator key={`${MediaTrackContextMenuItem.Separator}-${menuItemPointer}`}/>
+            );
+          }
+          case MediaTrackContextMenuItem.Like: {
+            return (
+              <Item
+                disabled={isLikeStatusLoading}
+                key={MediaTrackContextMenuItem.Like}
+                id={MediaTrackContextMenuItemAction.Like}
+                onClick={handleMenuItemClick}
+              >
+                {!isEmpty(mediaTracks) ? (
+                  I18nService.getString(areAllTracksLiked
+                    ? 'label_submenu_media_track_remove_from_liked_songs'
+                    : 'label_submenu_media_track_add_to_liked_songs')
+                ) : (
+                  I18nService.getString(isTrackLiked
+                    ? 'label_submenu_media_track_remove_from_liked_songs'
+                    : 'label_submenu_media_track_add_to_liked_songs')
+                )}
+              </Item>
             );
           }
           default:

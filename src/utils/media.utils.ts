@@ -1,7 +1,7 @@
 import {
   IMediaAlbum,
   IMediaArtist,
-  IMediaCollectionItem,
+  IMediaLikedTrack,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
@@ -46,6 +46,13 @@ export function mediaPlaylistComparator(
   return mediaPlaylistA.created_at > mediaPlaylistB.created_at ? -1 : 1;
 }
 
+export function mediaLikedTracksComparator(
+  mediaLikedTrackA: IMediaLikedTrack,
+  mediaLikedTrackB: IMediaLikedTrack,
+) {
+  return mediaLikedTrackA.added_at > mediaLikedTrackB.added_at ? -1 : 1;
+}
+
 export function sortMediaAlbumTracks(
   mediaAlbumTracks: IMediaTrack[],
 ): IMediaTrack[] {
@@ -72,29 +79,8 @@ export function sortMediaPlaylists(
   return mediaPlaylists.sort(mediaPlaylistComparator);
 }
 
-export function getMediaItemFromAlbum(mediaAlbum: IMediaAlbum): IMediaCollectionItem {
-  return {
-    id: mediaAlbum.id,
-    type: 'album',
-    name: mediaAlbum.album_name,
-    picture: mediaAlbum.album_cover_picture,
-  };
-}
-
-export function getMediaItemFromArtist(mediaArtist: IMediaArtist): IMediaCollectionItem {
-  return {
-    id: mediaArtist.id,
-    name: mediaArtist.artist_name,
-    type: 'artist',
-    picture: mediaArtist.artist_feature_picture,
-  };
-}
-
-export function getMediaItemFromPlaylist(mediaPlaylist: IMediaPlaylist): IMediaCollectionItem {
-  return {
-    id: mediaPlaylist.id,
-    name: mediaPlaylist.name,
-    type: 'playlist',
-    picture: mediaPlaylist.cover_picture,
-  };
+export function sortMediaLikedTracks(
+  mediaLikedTracks: IMediaLikedTrack[],
+) {
+  return mediaLikedTracks.sort(mediaLikedTracksComparator);
 }
