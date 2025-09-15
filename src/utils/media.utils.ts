@@ -6,6 +6,8 @@ import {
   IMediaTrack,
 } from '../interfaces';
 
+import { MediaCollectionItemType } from '../enums';
+
 export function mediaNameSanitizerForComparator(mediaName: string): string {
   return mediaName.replace(/[^A-Z0-9]/ig, '');
 }
@@ -75,7 +77,7 @@ export function sortMediaPlaylists(
 export function getMediaItemFromAlbum(mediaAlbum: IMediaAlbum): IMediaCollectionItem {
   return {
     id: mediaAlbum.id,
-    type: 'album',
+    type: MediaCollectionItemType.Album,
     name: mediaAlbum.album_name,
     picture: mediaAlbum.album_cover_picture,
   };
@@ -85,7 +87,7 @@ export function getMediaItemFromArtist(mediaArtist: IMediaArtist): IMediaCollect
   return {
     id: mediaArtist.id,
     name: mediaArtist.artist_name,
-    type: 'artist',
+    type: MediaCollectionItemType.Artist,
     picture: mediaArtist.artist_feature_picture,
   };
 }
@@ -94,7 +96,16 @@ export function getMediaItemFromPlaylist(mediaPlaylist: IMediaPlaylist): IMediaC
   return {
     id: mediaPlaylist.id,
     name: mediaPlaylist.name,
-    type: 'playlist',
+    type: MediaCollectionItemType.Playlist,
     picture: mediaPlaylist.cover_picture,
+  };
+}
+
+export function getMediaItemForLikedTracks(): IMediaCollectionItem {
+  return {
+    id: 'liked-tracks',
+    name: 'Liked Songs',
+    type: MediaCollectionItemType.LikedTracks,
+    picture: undefined,
   };
 }

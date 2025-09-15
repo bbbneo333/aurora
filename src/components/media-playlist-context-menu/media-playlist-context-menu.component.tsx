@@ -8,7 +8,7 @@ import { Icons, Routes } from '../../constants';
 import { useContextMenu, useModal } from '../../contexts';
 import { IMediaCollectionItem, IMediaTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
-import { I18nService, MediaLibraryService } from '../../services';
+import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 import { Events, StringUtils, useSearch } from '../../utils';
 
 import { Icon } from '../icon/icon.component';
@@ -42,7 +42,7 @@ export type MediaPlaylistContextMenuProps = {
 
 export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
   const { type: mediaPlaylistContextMenuType } = props;
-  const { mediaPlaylists } = useSelector((state: RootState) => state.mediaLibrary);
+  const mediaPlaylists = useSelector((state: RootState) => state.mediaLibrary.mediaPlaylists);
   const [mediaPlaylistsSearchStr, setMediaPlaylistsSearchStr] = useState<string>('');
   const history = useHistory();
   const [searchInputFocus, setSearchInputFocus] = useState(false);
@@ -67,7 +67,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
         return mediaTracks;
       }
       if (mediaItem) {
-        return MediaLibraryService.getMediaCollectionTracks(mediaItem);
+        return MediaCollectionService.getMediaCollectionTracks(mediaItem);
       }
 
       throw new Error('MediaPlaylistContextMenu encountered error at getMediaTracks - Either mediaTrack or mediaItem is required for handling action');

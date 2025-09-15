@@ -1,10 +1,10 @@
 import { useSelector } from 'react-redux';
 import { useCallback } from 'react';
 
-import { MediaEnums } from '../enums';
+import { MediaPlaybackState } from '../enums';
 import { IMediaCollectionItem } from '../interfaces';
-import { MediaLibraryService, MediaPlayerService } from '../services';
 import { RootState } from '../reducers';
+import { MediaCollectionService, MediaPlayerService } from '../services';
 
 export type UseMediaCollectionPlaybackProps = {
   mediaItem: IMediaCollectionItem,
@@ -20,12 +20,12 @@ export function useMediaCollectionPlayback(props: UseMediaCollectionPlaybackProp
     mediaPlaybackCurrentTrackList,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
-  const isMediaPlaying = mediaPlaybackState === MediaEnums.MediaPlaybackState.Playing
+  const isMediaPlaying = mediaPlaybackState === MediaPlaybackState.Playing
     && mediaPlaybackCurrentTrackList
     && mediaPlaybackCurrentTrackList.id === mediaItem.id;
 
   const play = useCallback((e: Event) => {
-    MediaLibraryService
+    MediaCollectionService
       .getMediaCollectionTracks(mediaItem)
       .then((mediaTracks) => {
         MediaPlayerService.playMediaTracks(mediaTracks, {

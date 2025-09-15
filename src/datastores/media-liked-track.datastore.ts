@@ -13,13 +13,23 @@ class MediaLikedTracksDatastore {
         field: 'id',
         unique: true,
       }, {
-        field: 'provider_id',
+        field: 'track_id',
       }],
     });
   }
 
+  countLikedTracks(): Promise<number> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSCount, this.datastoreName);
+  }
+
   findLikedTrack(filterData: DataStoreFilterData<IMediaLikedTrackData>): Promise<IMediaLikedTrackData | undefined> {
     return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.datastoreName, filterData);
+  }
+
+  findLikedTracks(filterData?: DataStoreFilterData<IMediaLikedTrackData>): Promise<IMediaLikedTrackData[]> {
+    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFind, this.datastoreName, {
+      filter: filterData,
+    });
   }
 
   insertLikedTrack(inputData: DataStoreInputData<IMediaLikedTrackData>): Promise<IMediaLikedTrackData> {

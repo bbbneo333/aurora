@@ -16,6 +16,7 @@ export enum MediaLibraryActions {
   AddPlaylist = 'media/library/addPlaylist',
   RemovePlaylist = 'media/library/removePlaylist',
   SetPlaylist = 'media/library/setPlaylist',
+  SetLikedTracks = 'media/library/setLikedTracks',
   AddMediaTrackToLiked = 'media/library/addMediaTrackToLiked',
   RemoveMediaTrackFromLiked = 'media/library/removeMediaTrackFromLiked',
 }
@@ -57,4 +58,11 @@ export enum MediaTrackCoverPictureImageDataType {
 export enum MediaProviderRegistryActions {
   AddProvider = 'media/providerRegistry/addProvider',
   AddProviderSafe = 'media/providerRegistry/addProviderSafe',
+}
+
+export enum MediaCollectionItemType {
+  Artist = 'artist',
+  Album = 'album',
+  Playlist = 'playlist',
+  LikedTracks = 'liked-tracks',
 }

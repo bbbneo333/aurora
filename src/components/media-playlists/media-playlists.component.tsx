@@ -25,7 +25,7 @@ export function MediaPlaylists(props: {
   const mediaContextMenuId = 'media_playlists_context_menu';
 
   return (
-    <div>
+    <>
       <div className={cx('media-playlists')}>
         {mediaPlaylists.map((mediaPlaylist) => {
           const mediaItem = MediaUtils.getMediaItemFromPlaylist(mediaPlaylist);
@@ -54,6 +54,6 @@ export function MediaPlaylists(props: {
           MediaCollectionContextMenuItem.ManagePlaylist,
         ]}
       />
-    </div>
+    </>
   );
 }

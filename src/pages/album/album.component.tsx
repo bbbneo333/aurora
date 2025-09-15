@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import classNames from 'classnames/bind';
 import { useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { isEmpty } from 'lodash';
 
 import {
   MediaCoverPicture,
@@ -21,14 +22,9 @@ import styles from './album.component.css';
 const cx = classNames.bind(styles);
 
 export function AlbumPage() {
-  const {
-    albumId,
-  } = useParams() as { albumId: string };
-
-  const {
-    mediaSelectedAlbum,
-    mediaSelectedAlbumTracks,
-  } = useSelector((state: RootState) => state.mediaLibrary);
+  const { albumId } = useParams() as { albumId: string };
+  const mediaSelectedAlbum = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedAlbum);
+  const mediaSelectedAlbumTracks = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedAlbumTracks);
 
   useEffect(() => {
     MediaLibraryService.loadMediaAlbum(albumId);
@@ -65,7 +61,10 @@ export function AlbumPage() {
         </div>
       </div>
       <div className={cx('album-actions')}>
-        <MediaCollectionActions mediaItem={MediaUtils.getMediaItemFromAlbum(mediaSelectedAlbum)}/>
+        <MediaCollectionActions
+          mediaItem={MediaUtils.getMediaItemFromAlbum(mediaSelectedAlbum)}
+          hasTracks={!isEmpty(mediaSelectedAlbumTracks)}
+        />
       </div>
       <div className={cx('album-tracklist')}>
         <MediaTrackList

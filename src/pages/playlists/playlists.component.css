@@ -11,3 +11,7 @@
   color: var(--text-dark-color);
   font-weight: bold;
 }
+
+.playlist-liked-tracks {
+  margin-bottom: 15px;
+}

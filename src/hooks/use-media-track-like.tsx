@@ -13,16 +13,16 @@ export function useMediaTrackLike(props: {
   const { mediaTrack, mediaTracks } = props;
   const [isLikeStatusLoading, setIsLikeStatusLoading] = useState(false);
 
-  const { mediaTracksLiked } = useSelector((state: RootState) => state.mediaLibrary);
-  const isTrackLiked = mediaTrack && !isNil(mediaTracksLiked[mediaTrack.id]);
-  const areAllTracksLiked = mediaTracks && every(mediaTracks, track => !isNil(mediaTracksLiked[track.id]));
+  const mediaLikedTracks = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracks);
+  const isTrackLiked = mediaTrack && !isNil(mediaLikedTracks[mediaTrack.id]);
+  const areAllTracksLiked = mediaTracks && every(mediaTracks, track => !isNil(mediaLikedTracks[track.id]));
 
   useEffect(() => {
     if (!mediaTrack) {
       return;
     }
 
-    MediaLibraryLikedTrackService.loadTrackLikedStatus(mediaTrack.id, mediaTrack);
+    MediaLibraryLikedTrackService.loadTrackLikedStatus(mediaTrack.id);
   }, [
     mediaTrack,
   ]);
@@ -33,7 +33,7 @@ export function useMediaTrackLike(props: {
     }
 
     mediaTracks.forEach((track: IMediaTrack) => {
-      MediaLibraryLikedTrackService.loadTrackLikedStatus(track.id, track);
+      MediaLibraryLikedTrackService.loadTrackLikedStatus(track.id);
     });
   }, [
     mediaTracks,
@@ -46,24 +46,18 @@ export function useMediaTrackLike(props: {
       if (mediaTrack) {
         if (isTrackLiked) {
           // remove
-          await MediaLibraryLikedTrackService.removeTrackFromLiked(mediaTrack.id, mediaTrack);
+          await MediaLibraryLikedTrackService.removeTrackFromLiked(mediaTrack.id);
         } else {
           // add
-          await MediaLibraryLikedTrackService.addTrackToLiked(mediaTrack.id, mediaTrack);
+          await MediaLibraryLikedTrackService.addTrackToLiked(mediaTrack.id);
         }
       } else if (mediaTracks && !isEmpty(mediaTracks)) {
         if (areAllTracksLiked) {
           // remove
-          await MediaLibraryLikedTrackService.removeTracksFromLiked(mediaTracks.map(track => ({
-            mediaTrackId: track.id,
-            mediaLikedTrackData: track,
-          })));
+          await MediaLibraryLikedTrackService.removeTracksFromLiked(mediaTracks.map(track => track.id));
         } else {
           // add
-          await MediaLibraryLikedTrackService.addTracksToLiked(mediaTracks.map(track => ({
-            mediaTrackId: track.id,
-            mediaLikedTrackData: track,
-          })));
+          await MediaLibraryLikedTrackService.addTracksToLiked(mediaTracks.map(track => track.id));
         }
       }
     } catch (error) {

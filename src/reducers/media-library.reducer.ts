@@ -1,6 +1,6 @@
-import { omit } from 'lodash';
+import { omit, keyBy } from 'lodash';
 
-import { MediaEnums } from '../enums';
+import { MediaLibraryActions } from '../enums';
 import { ArrayUtils, MediaUtils } from '../utils';
 
 import {
@@ -21,11 +21,11 @@ export type MediaLibraryState = {
   mediaIsSyncing: boolean;
   mediaPlaylists: IMediaPlaylist[];
   mediaSelectedPlaylist?: IMediaPlaylist;
-  mediaTracksLiked: Record<string, IMediaLikedTrack>;
+  mediaLikedTracks: Record<string, IMediaLikedTrack>;
 };
 
 export type MediaLibraryStateAction = {
-  type: MediaEnums.MediaLibraryActions,
+  type: MediaLibraryActions,
   data?: any,
 };
 
@@ -34,18 +34,18 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaArtists: [],
   mediaIsSyncing: false,
   mediaPlaylists: [],
-  mediaTracksLiked: {},
+  mediaLikedTracks: {},
 };
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
   switch (action.type) {
-    case MediaEnums.MediaLibraryActions.Initialize: {
+    case MediaLibraryActions.Initialize: {
       // data.mediaProviderIdentifier
       // TODO: To be implemented
 
       return state;
     }
-    case MediaEnums.MediaLibraryActions.StartSync: {
+    case MediaLibraryActions.StartSync: {
       // data.mediaProviderIdentifier
 
       return {
@@ -53,7 +53,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaIsSyncing: true,
       };
     }
-    case MediaEnums.MediaLibraryActions.FinishSync: {
+    case MediaLibraryActions.FinishSync: {
       // data.mediaProviderIdentifier
       // data.mediaSyncStartTimestamp
       const { mediaSyncStartTimestamp } = action.data;
@@ -91,7 +91,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbum,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddTrack: {
+    case MediaLibraryActions.AddTrack: {
       // data.mediaTrack: MediaTrack - track which needs to be added
       const { mediaTrack } = action.data;
       const { mediaSelectedAlbum } = state;
@@ -113,7 +113,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbumTracks,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddAlbum: {
+    case MediaLibraryActions.AddAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be added
       const { mediaAlbum } = action.data;
       const { mediaAlbums, mediaSelectedArtist, mediaSelectedArtistAlbums = [] } = state;
@@ -146,7 +146,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbum,
       };
     }
-    case MediaEnums.MediaLibraryActions.SetAlbums: {
+    case MediaLibraryActions.SetAlbums: {
       // data.mediaAlbums: MediaAlbum[] - albums which are needed to be added
       const { mediaAlbums } = action.data;
 
@@ -155,7 +155,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaAlbums: MediaUtils.sortMediaAlbums(mediaAlbums),
       };
     }
-    case MediaEnums.MediaLibraryActions.SetAlbum: {
+    case MediaLibraryActions.SetAlbum: {
       // data.mediaAlbum: MediaAlbum - album which needs to be loaded
       // data.mediaAlbumTracks: MediaTrack[] - album tracks which can be loaded
       const {
@@ -169,7 +169,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedAlbumTracks: mediaAlbumTracks,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddArtist: {
+    case MediaLibraryActions.AddArtist: {
       // data.mediaArtist: MediaArtist - artist which needs to be added
       const { mediaArtist } = action.data;
       const { mediaArtists } = state;
@@ -192,7 +192,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedArtist,
       };
     }
-    case MediaEnums.MediaLibraryActions.SetArtist: {
+    case MediaLibraryActions.SetArtist: {
       // data.mediaArtist: MediaArtist - artist which needs to be loaded
       // data.mediaArtistAlbums: MediaAlbum[] - artist albums which can be loaded
       const {
@@ -206,7 +206,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedArtistAlbums: mediaArtistAlbums,
       };
     }
-    case MediaEnums.MediaLibraryActions.SetArtists: {
+    case MediaLibraryActions.SetArtists: {
       // data.mediaArtists: MediaArtist[] - artists which are needed to be added
       const { mediaArtists } = action.data;
 
@@ -215,7 +215,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaArtists: MediaUtils.sortMediaArtists(mediaArtists),
       };
     }
-    case MediaEnums.MediaLibraryActions.SetPlaylists: {
+    case MediaLibraryActions.SetPlaylists: {
       // data.mediaPlaylists: MediaPlaylist - playlists which need to be loaded
       const {
         mediaPlaylists,
@@ -226,7 +226,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaPlaylists,
       };
     }
-    case MediaEnums.MediaLibraryActions.RemovePlaylist: {
+    case MediaLibraryActions.RemovePlaylist: {
       // data.mediaPlaylistId: string - playlist id which need to be removed
       const {
         mediaPlaylistId,
@@ -244,7 +244,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaPlaylists: mediaPlaylistsUpdated,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddPlaylist: {
+    case MediaLibraryActions.AddPlaylist: {
       // data.mediaPlaylist: IMediaPlaylist - playlist need to be added
       const { mediaPlaylist } = action.data;
       const { mediaPlaylists } = state;
@@ -267,7 +267,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedPlaylist,
       };
     }
-    case MediaEnums.MediaLibraryActions.SetPlaylist: {
+    case MediaLibraryActions.SetPlaylist: {
       // data.mediaPlaylist: IMediaPlaylist - playlist need to be loaded
       const { mediaPlaylist } = action.data;
 
@@ -276,27 +276,35 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         mediaSelectedPlaylist: mediaPlaylist,
       };
     }
-    case MediaEnums.MediaLibraryActions.AddMediaTrackToLiked: {
-      // data.mediaTrackId: string - media track id
-      // data.mediaLikedTrack: IMediaPlaylist - liked track to be added
-      const { mediaTrackId, mediaLikedTrack } = action.data;
+    case MediaLibraryActions.SetLikedTracks: {
+      // data.mediaLikedTracks: IMediaLikedTrack[]
+      const { mediaLikedTracks } = action.data;
 
       return {
         ...state,
-        mediaTracksLiked: {
-          ...state.mediaTracksLiked,
-          [mediaTrackId]: mediaLikedTrack,
+        mediaLikedTracks: keyBy(mediaLikedTracks, 'track_id'),
+      };
+    }
+    case MediaLibraryActions.AddMediaTrackToLiked: {
+      // data.mediaLikedTrack: IMediaLikedTrack - liked track to be added
+      const { mediaLikedTrack } = action.data;
+
+      return {
+        ...state,
+        mediaLikedTracks: {
+          ...state.mediaLikedTracks,
+          [mediaLikedTrack.track_id]: mediaLikedTrack,
         },
       };
     }
-    case MediaEnums.MediaLibraryActions.RemoveMediaTrackFromLiked: {
+    case MediaLibraryActions.RemoveMediaTrackFromLiked: {
       // data.mediaTrackId: string - media track id
       const { mediaTrackId } = action.data;
-      const { mediaTracksLiked } = state;
+      const { mediaLikedTracks } = state;
 
       return {
         ...state,
-        mediaTracksLiked: omit(mediaTracksLiked, mediaTrackId),
+        mediaLikedTracks: omit(mediaLikedTracks, mediaTrackId),
       };
     }
     default:

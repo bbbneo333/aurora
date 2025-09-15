@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { MediaEnums } from '../enums';
+import {
+  MediaCollectionItemType,
+  MediaTrackCoverPictureImageDataType,
+} from '../enums';
 
 export interface IMediaTrackData {
   id: string;
@@ -61,7 +64,7 @@ export interface IMediaArtist extends IMediaArtistData {
 
 export interface IMediaPicture {
   image_data: any;
-  image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType;
+  image_data_type: MediaTrackCoverPictureImageDataType;
 }
 
 export interface IMediaPlayback {
@@ -142,7 +145,7 @@ export interface IMediaProviderTrackData {
 
 export interface IMediaCollectionItem {
   id: string;
-  type: 'artist' | 'album' | 'playlist';
+  type: MediaCollectionItemType;
   name: string;
   picture?: IMediaPicture;
 }
@@ -185,13 +188,10 @@ export interface IMediaPlaylistTrackUpdateData {
   playlist_track_id: string;
 }
 
-export interface IMediaLikedTrackData extends IMediaProviderTrackData {
-  id: string;
+export interface IMediaLikedTrackData {
+  track_id: string;
   created_at: number;
 }
 
-export interface IMediaLikedTrack extends IMediaLikedTrackData {
-}
-
-export interface IMediaLikedTrackInputData extends IMediaProviderTrackData {
+export interface IMediaLikedTrack extends IMediaLikedTrackData, IMediaTrack {
 }
