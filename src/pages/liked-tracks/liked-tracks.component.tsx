@@ -92,8 +92,6 @@ export function LikedTracksPage() {
             contextMenuItems={[
               MediaTrackContextMenuItem.Like,
               MediaTrackContextMenuItem.AddToQueue,
-              MediaTrackContextMenuItem.Separator,
-              MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
             onSelectionDelete={handleSelectionDelete}
           />
