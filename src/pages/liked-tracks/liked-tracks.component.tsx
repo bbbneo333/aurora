@@ -51,6 +51,7 @@ export function LikedTracksPage() {
             <MediaCoverPicture
               mediaPicture={likesCollectionItem.picture}
               mediaPictureAltText={likesCollectionItem.name}
+              mediaCoverPlaceholderIcon={MediaCollectionService.getCoverPlaceholderIcon(likesCollectionItem)}
               className={cx('playlist-cover-picture')}
             />
           </div>

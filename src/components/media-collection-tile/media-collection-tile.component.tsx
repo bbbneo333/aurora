@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
 import classNames from 'classnames/bind';
-import { capitalize } from 'lodash';
 
-import { Icons } from '../../constants';
 import { useContextMenu } from '../../contexts';
 import { useMediaCollectionPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
+import { MediaCollectionService } from '../../services';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
@@ -68,8 +67,7 @@ export function MediaCollectionTile(props: {
           <MediaCoverPicture
             mediaPicture={mediaItem.picture}
             mediaPictureAltText={mediaItem.name}
-            // @ts-ignore
-            mediaCoverPlaceholderIcon={Icons[`${capitalize(mediaItem.type)}TilePlaceholder`]}
+            mediaCoverPlaceholderIcon={MediaCollectionService.getCoverPlaceholderIcon(mediaItem)}
             className={cx('collection-tile-cover-picture')}
           />
           <div className={cx('collection-tile-cover-overlay')}>

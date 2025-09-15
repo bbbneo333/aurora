@@ -6,6 +6,7 @@ import {
   IMediaTrack,
 } from '../interfaces';
 
+import { Icons } from '../constants';
 import { MediaCollectionItemType } from '../enums';
 
 import MediaLibraryService from './media-library.service';
@@ -66,6 +67,15 @@ class MediaCollectionService {
       type: MediaCollectionItemType.LikedTracks,
       picture: undefined,
     };
+  }
+
+  getCoverPlaceholderIcon(mediaCollectionItem: IMediaCollectionItem): string {
+    switch (mediaCollectionItem.type) {
+      case MediaCollectionItemType.LikedTracks:
+        return Icons.MediaLike;
+      default:
+        return Icons.AlbumPlaceholder;
+    }
   }
 }
 
