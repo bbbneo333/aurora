@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Snackbar from '@mui/material/Snackbar';
+import { SxProps, Theme } from '@mui/material';
 
 import { NotificationService } from '../services';
 
 export function NotificationProvider(props: {
   children: React.ReactNode,
+  snackbarSx?: SxProps<Theme>,
 }) {
-  const { children } = props;
+  const { children, snackbarSx = {} } = props;
   const [queue, setQueue] = useState<string[]>([]);
   const [current, setCurrent] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -55,7 +57,7 @@ export function NotificationProvider(props: {
         }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         sx={{
-          bottom: '110px !important', // TODO: Hack to keep it floating above player ribbon
+          ...snackbarSx,
           '& .MuiSnackbarContent-root': {
             padding: '8px 28px',
             minWidth: 'unset',
