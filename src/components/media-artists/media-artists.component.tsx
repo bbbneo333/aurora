@@ -1,9 +1,9 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { IMediaArtist } from '../../interfaces';
-import { MediaUtils, StringUtils } from '../../utils';
 import { Layout, Routes } from '../../constants';
+import { IMediaArtist } from '../../interfaces';
+import { StringUtils } from '../../utils';
 
 import {
   MediaCollectionContextMenu,
@@ -13,6 +13,7 @@ import {
 import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
 
 import styles from './media-artists.component.css';
+import { MediaCollectionService } from '../../services';
 
 const cx = classNames.bind(styles);
 
@@ -26,7 +27,7 @@ export function MediaArtists(props: {
     <div>
       <div className={cx('row', 'media-artists')}>
         {mediaArtists.map((mediaArtist) => {
-          const mediaItem = MediaUtils.getMediaItemFromArtist(mediaArtist);
+          const mediaItem = MediaCollectionService.getMediaItemFromArtist(mediaArtist);
 
           return (
             <div className={Layout.Grid.CollectionTile} key={mediaArtist.id}>

@@ -3,11 +3,10 @@ import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
 import { isEmpty, values } from 'lodash';
 
-import { I18nService, MediaLibraryLikedTrackService } from '../../services';
+import { I18nService, MediaCollectionService, MediaLibraryLikedTrackService } from '../../services';
 import { Layout } from '../../constants';
 import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
-import { MediaUtils } from '../../utils';
 
 import {
   MediaCollectionActions,
@@ -21,7 +20,7 @@ import styles from '../playlist/playlist.component.css';
 
 const cx = classNames.bind(styles);
 
-const likesCollectionItem = MediaUtils.getMediaItemForLikedTracks();
+const likesCollectionItem = MediaCollectionService.getMediaItemForLikedTracks();
 
 export function LikedTracksPage() {
   const mediaLikedTracks = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracks);

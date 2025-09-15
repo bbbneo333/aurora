@@ -1,12 +1,9 @@
 import {
   IMediaAlbum,
   IMediaArtist,
-  IMediaCollectionItem,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
-
-import { MediaCollectionItemType } from '../enums';
 
 export function mediaNameSanitizerForComparator(mediaName: string): string {
   return mediaName.replace(/[^A-Z0-9]/ig, '');
@@ -72,40 +69,4 @@ export function sortMediaPlaylists(
   mediaPlaylists: IMediaPlaylist[],
 ): IMediaPlaylist[] {
   return mediaPlaylists.sort(mediaPlaylistComparator);
-}
-
-export function getMediaItemFromAlbum(mediaAlbum: IMediaAlbum): IMediaCollectionItem {
-  return {
-    id: mediaAlbum.id,
-    type: MediaCollectionItemType.Album,
-    name: mediaAlbum.album_name,
-    picture: mediaAlbum.album_cover_picture,
-  };
-}
-
-export function getMediaItemFromArtist(mediaArtist: IMediaArtist): IMediaCollectionItem {
-  return {
-    id: mediaArtist.id,
-    name: mediaArtist.artist_name,
-    type: MediaCollectionItemType.Artist,
-    picture: mediaArtist.artist_feature_picture,
-  };
-}
-
-export function getMediaItemFromPlaylist(mediaPlaylist: IMediaPlaylist): IMediaCollectionItem {
-  return {
-    id: mediaPlaylist.id,
-    name: mediaPlaylist.name,
-    type: MediaCollectionItemType.Playlist,
-    picture: mediaPlaylist.cover_picture,
-  };
-}
-
-export function getMediaItemForLikedTracks(): IMediaCollectionItem {
-  return {
-    id: 'liked-tracks',
-    name: 'Liked Songs',
-    type: MediaCollectionItemType.LikedTracks,
-    picture: undefined,
-  };
 }

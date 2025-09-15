@@ -7,22 +7,17 @@ import classNames from 'classnames/bind';
 import { Icons, Layout } from '../../constants';
 import { MediaAlbums, MediaCollectionActions, MediaCoverPicture } from '../../components';
 import { RootState } from '../../reducers';
-import { I18nService, MediaLibraryService } from '../../services';
-import { MediaUtils } from '../../utils';
+import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 
 import styles from './artist.component.css';
 
 const cx = classNames.bind(styles);
 
 export function ArtistPage() {
-  const {
-    artistId,
-  } = useParams() as { artistId: string };
+  const { artistId } = useParams() as { artistId: string };
 
-  const {
-    mediaSelectedArtist,
-    mediaSelectedArtistAlbums,
-  } = useSelector((state: RootState) => state.mediaLibrary);
+  const mediaSelectedArtist = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedArtist);
+  const mediaSelectedArtistAlbums = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedArtistAlbums);
 
   useEffect(() => {
     MediaLibraryService.loadMediaArtist(artistId);
@@ -58,7 +53,9 @@ export function ArtistPage() {
         </div>
       </div>
       <div className={cx('artist-actions')}>
-        <MediaCollectionActions mediaItem={MediaUtils.getMediaItemFromArtist(mediaSelectedArtist)}/>
+        <MediaCollectionActions
+          mediaItem={MediaCollectionService.getMediaItemFromArtist(mediaSelectedArtist)}
+        />
       </div>
       <div className={cx('artist-albums')}>
         <MediaAlbums mediaAlbums={mediaSelectedArtistAlbums}/>

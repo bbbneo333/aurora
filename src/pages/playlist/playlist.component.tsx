@@ -9,8 +9,7 @@ import { Layout, Routes } from '../../constants';
 import { useEntityMissing } from '../../hooks';
 import { IMediaPicture, IMediaPlaylistTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
-import { I18nService, MediaLibraryService } from '../../services';
-import { MediaUtils } from '../../utils';
+import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 
 import {
   MediaCollectionActions,
@@ -126,7 +125,7 @@ export function PlaylistPage() {
       </div>
       <div className={cx('playlist-actions')}>
         <MediaCollectionActions
-          mediaItem={MediaUtils.getMediaItemFromPlaylist(mediaSelectedPlaylist)}
+          mediaItem={MediaCollectionService.getMediaItemFromPlaylist(mediaSelectedPlaylist)}
           hasTracks={!isEmpty(mediaPlaylistTracks)}
         />
       </div>

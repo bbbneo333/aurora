@@ -2,10 +2,10 @@ import { isEmpty } from 'lodash';
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { IMediaPlaylist } from '../../interfaces';
-import { MediaUtils, StringUtils } from '../../utils';
 import { Routes } from '../../constants';
-import { I18nService } from '../../services';
+import { IMediaPlaylist } from '../../interfaces';
+import { I18nService, MediaCollectionService } from '../../services';
+import { StringUtils } from '../../utils';
 
 import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
 
@@ -28,7 +28,7 @@ export function MediaPlaylists(props: {
     <>
       <div className={cx('media-playlists')}>
         {mediaPlaylists.map((mediaPlaylist) => {
-          const mediaItem = MediaUtils.getMediaItemFromPlaylist(mediaPlaylist);
+          const mediaItem = MediaCollectionService.getMediaItemFromPlaylist(mediaPlaylist);
 
           return (
             <MediaCollectionItem

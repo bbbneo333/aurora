@@ -14,8 +14,7 @@ import {
 
 import { Layout } from '../../constants';
 import { RootState } from '../../reducers';
-import { I18nService, MediaLibraryService } from '../../services';
-import { MediaUtils } from '../../utils';
+import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 
 import styles from './album.component.css';
 
@@ -62,7 +61,7 @@ export function AlbumPage() {
       </div>
       <div className={cx('album-actions')}>
         <MediaCollectionActions
-          mediaItem={MediaUtils.getMediaItemFromAlbum(mediaSelectedAlbum)}
+          mediaItem={MediaCollectionService.getMediaItemFromAlbum(mediaSelectedAlbum)}
           hasTracks={!isEmpty(mediaSelectedAlbumTracks)}
         />
       </div>

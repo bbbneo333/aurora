@@ -45,6 +45,7 @@
   "label_file_upload": "Upload",
   "label_liked_tracks_delete": "Remove from your Liked Songs",
   "label_liked_tracks_delete_details": "This will remove selected tracks from your Liked Songs.",
+  "label_liked_tracks_collection_name": "Liked Songs",
   "message_value_invalid": "Please provide a valid input",
   "message_added_to_queue": "Added to queue",
   "message_added_to_playlist": "Added to {playlistName}",
