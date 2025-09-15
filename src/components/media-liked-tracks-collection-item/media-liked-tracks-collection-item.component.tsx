@@ -12,7 +12,7 @@ import { MediaCollectionContextMenu, MediaCollectionContextMenuItem } from '../m
 const likesCollectionItem = MediaCollectionService.getMediaItemForLikedTracks();
 
 export function MediaLikedTracksCollectionItem() {
-  const mediaLikedTracks = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracks);
+  const mediaLikedTracksRecord = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracksRecord);
   const [likedTracksCount, setLikedTracksCount] = useState(0);
 
   const contextMenuId = 'media-liked-tracks-context-menu';
@@ -26,7 +26,7 @@ export function MediaLikedTracksCollectionItem() {
         console.error(error);
       });
   }, [
-    mediaLikedTracks,
+    mediaLikedTracksRecord,
   ]);
 
   return (

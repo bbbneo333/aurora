@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
-import { isEmpty, values } from 'lodash';
+import { isEmpty } from 'lodash';
 
+import { selectSortedLikedTracks } from '../../selectors';
 import { I18nService, MediaCollectionService, MediaLibraryLikedTrackService } from '../../services';
 import { Layout } from '../../constants';
 import { useModal } from '../../contexts';
-import { RootState } from '../../reducers';
-import { MediaUtils } from '../../utils';
 
 import {
   MediaCollectionActions,
@@ -24,8 +23,8 @@ const cx = classNames.bind(styles);
 const likesCollectionItem = MediaCollectionService.getMediaItemForLikedTracks();
 
 export function LikedTracksPage() {
-  const mediaLikedTracks = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracks);
   const { showModal } = useModal();
+  const sortedMediaLikedTracks = useSelector(selectSortedLikedTracks);
 
   const handleSelectionDelete = useCallback((likedTracksIds: string[]) => new Promise<boolean>((resolve) => {
     showModal(MediaLikedTracksDeleteModal, {
@@ -69,10 +68,10 @@ export function LikedTracksPage() {
       <div className={cx('playlist-actions')}>
         <MediaCollectionActions
           mediaItem={likesCollectionItem}
-          hasTracks={!isEmpty(mediaLikedTracks)}
+          hasTracks={!isEmpty(sortedMediaLikedTracks)}
         />
       </div>
-      {isEmpty(mediaLikedTracks) && (
+      {isEmpty(sortedMediaLikedTracks) && (
         <div className="row">
           <div className="col-12">
             <div className={cx('playlist-empty-section')}>
@@ -83,10 +82,10 @@ export function LikedTracksPage() {
           </div>
         </div>
       )}
-      {!isEmpty(mediaLikedTracks) && (
+      {!isEmpty(sortedMediaLikedTracks) && (
         <div className={cx('playlist-tracklist')}>
           <MediaTrackList
-            mediaTracks={MediaUtils.sortMediaLikedTracks(values(mediaLikedTracks))}
+            mediaTracks={sortedMediaLikedTracks}
             mediaTrackList={{
               id: likesCollectionItem.id,
             }}

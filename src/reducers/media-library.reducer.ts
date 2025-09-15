@@ -21,7 +21,7 @@ export type MediaLibraryState = {
   mediaIsSyncing: boolean;
   mediaPlaylists: IMediaPlaylist[];
   mediaSelectedPlaylist?: IMediaPlaylist;
-  mediaLikedTracks: Record<string, IMediaLikedTrack>;
+  mediaLikedTracksRecord: Record<string, IMediaLikedTrack>;
 };
 
 export type MediaLibraryStateAction = {
@@ -34,7 +34,7 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaArtists: [],
   mediaIsSyncing: false,
   mediaPlaylists: [],
-  mediaLikedTracks: {},
+  mediaLikedTracksRecord: {},
 };
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
@@ -282,17 +282,22 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
 
       return {
         ...state,
-        mediaLikedTracks: keyBy(mediaLikedTracks, 'track_id'),
+        mediaLikedTracksRecord: keyBy(mediaLikedTracks, 'track_id'),
       };
     }
     case MediaLibraryActions.AddMediaTrackToLiked: {
       // data.mediaLikedTrack: IMediaLikedTrack - liked track to be added
       const { mediaLikedTrack } = action.data;
 
+      if (state.mediaLikedTracksRecord[mediaLikedTrack.track_id]) {
+        // already there, skip update
+        return state;
+      }
+
       return {
         ...state,
-        mediaLikedTracks: {
-          ...state.mediaLikedTracks,
+        mediaLikedTracksRecord: {
+          ...state.mediaLikedTracksRecord,
           [mediaLikedTrack.track_id]: mediaLikedTrack,
         },
       };
@@ -300,11 +305,15 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     case MediaLibraryActions.RemoveMediaTrackFromLiked: {
       // data.mediaTrackId: string - media track id
       const { mediaTrackId } = action.data;
-      const { mediaLikedTracks } = state;
+
+      if (!state.mediaLikedTracksRecord[mediaTrackId]) {
+        // already removed, skip update
+        return state;
+      }
 
       return {
         ...state,
-        mediaLikedTracks: omit(mediaLikedTracks, mediaTrackId),
+        mediaLikedTracksRecord: omit(state.mediaLikedTracksRecord, mediaTrackId),
       };
     }
     default:

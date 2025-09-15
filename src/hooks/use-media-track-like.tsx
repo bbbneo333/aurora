@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { every, isEmpty, isNil } from 'lodash';
+import { isEmpty } from 'lodash';
 import { useSelector } from 'react-redux';
 
 import { IMediaTrack } from '../interfaces';
-import { RootState } from '../reducers';
+import { makeSelectIsTrackLiked, makeSelectAreAllTracksLiked } from '../selectors';
 import { MediaLibraryLikedTrackService } from '../services';
 
 export function useMediaTrackLike(props: {
@@ -13,9 +13,8 @@ export function useMediaTrackLike(props: {
   const { mediaTrack, mediaTracks } = props;
   const [isLikeStatusLoading, setIsLikeStatusLoading] = useState(false);
 
-  const mediaLikedTracks = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracks);
-  const isTrackLiked = mediaTrack && !isNil(mediaLikedTracks[mediaTrack.id]);
-  const areAllTracksLiked = mediaTracks && every(mediaTracks, track => !isNil(mediaLikedTracks[track.id]));
+  const isTrackLiked = useSelector(makeSelectIsTrackLiked(mediaTrack?.id));
+  const areAllTracksLiked = useSelector(makeSelectAreAllTracksLiked(mediaTracks?.map(t => t.id)));
 
   useEffect(() => {
     if (!mediaTrack) {
