@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 
 import { selectSortedLikedTracks } from '../../selectors';
-import { I18nService, MediaCollectionService, MediaLibraryLikedTrackService } from '../../services';
+import { I18nService, MediaCollectionService, MediaLikedTrackService } from '../../services';
 import { Layout } from '../../constants';
 import { useModal } from '../../contexts';
 
@@ -40,7 +40,7 @@ export function LikedTracksPage() {
   ]);
 
   useEffect(() => {
-    MediaLibraryLikedTrackService.loadLikedTracks();
+    MediaLikedTrackService.loadLikedTracks();
   }, []);
 
   return (

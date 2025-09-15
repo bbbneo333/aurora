@@ -3,7 +3,7 @@ import { Modal } from 'react-bootstrap';
 
 import { ModalComponent } from '../../contexts';
 import { useDataAction } from '../../hooks';
-import { I18nService, MediaLibraryLikedTrackService } from '../../services';
+import { I18nService, MediaLikedTrackService } from '../../services';
 
 import { Button } from '../button/button.component';
 
@@ -18,7 +18,7 @@ export const MediaLikedTracksDeleteModal: ModalComponent<{
   } = props;
 
   const deleteLikedTracks = useDataAction(async () => {
-    await MediaLibraryLikedTrackService.removeTracksFromLiked(likedTracksIds);
+    await MediaLikedTrackService.removeTracksFromLiked(likedTracksIds);
 
     onComplete({
       deletedLikedTrackIds: likedTracksIds,

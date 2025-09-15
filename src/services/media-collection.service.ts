@@ -10,7 +10,7 @@ import { Icons } from '../constants';
 import { MediaCollectionItemType } from '../enums';
 
 import MediaLibraryService from './media-library.service';
-import MediaLibraryLikedTrackService from './media-library-liked-track.service';
+import MediaLikedTrackService from './media-liked-track.service';
 import I18nService from './i18n.service';
 
 class MediaCollectionService {
@@ -26,7 +26,7 @@ class MediaCollectionService {
         return MediaLibraryService.getMediaPlaylistTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.LikedTracks: {
-        return MediaLibraryLikedTrackService.getLikedTracks();
+        return MediaLikedTrackService.getLikedTracks();
       }
       default:
         throw new Error(`Unsupported media collection type - ${mediaCollectionItem.type}`);

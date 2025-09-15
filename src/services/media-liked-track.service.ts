@@ -9,7 +9,7 @@ import MediaLibraryService from './media-library.service';
 import NotificationService from './notification.service';
 import I18nService from './i18n.service';
 
-class MediaLibraryLikedTrackService {
+class MediaLikedTrackService {
   loadLikedTracks() {
     this.getLikedTracks()
       .then((tracks: IMediaLikedTrack[]) => {
@@ -147,4 +147,4 @@ class MediaLibraryLikedTrackService {
   }
 }
 
-export default new MediaLibraryLikedTrackService();
+export default new MediaLikedTrackService();
