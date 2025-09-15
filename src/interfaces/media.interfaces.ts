@@ -190,7 +190,7 @@ export interface IMediaPlaylistTrackUpdateData {
 
 export interface IMediaLikedTrackData {
   track_id: string;
-  created_at: number;
+  added_at: number;
 }
 
 export interface IMediaLikedTrack extends IMediaLikedTrackData, IMediaTrack {

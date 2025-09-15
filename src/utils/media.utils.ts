@@ -1,6 +1,7 @@
 import {
   IMediaAlbum,
   IMediaArtist,
+  IMediaLikedTrack,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
@@ -45,6 +46,13 @@ export function mediaPlaylistComparator(
   return mediaPlaylistA.created_at > mediaPlaylistB.created_at ? -1 : 1;
 }
 
+export function mediaLikedTracksComparator(
+  mediaLikedTrackA: IMediaLikedTrack,
+  mediaLikedTrackB: IMediaLikedTrack,
+) {
+  return mediaLikedTrackA.added_at > mediaLikedTrackB.added_at ? -1 : 1;
+}
+
 export function sortMediaAlbumTracks(
   mediaAlbumTracks: IMediaTrack[],
 ): IMediaTrack[] {
@@ -69,4 +77,10 @@ export function sortMediaPlaylists(
   mediaPlaylists: IMediaPlaylist[],
 ): IMediaPlaylist[] {
   return mediaPlaylists.sort(mediaPlaylistComparator);
+}
+
+export function sortMediaLikedTracks(
+  mediaLikedTracks: IMediaLikedTrack[],
+) {
+  return mediaLikedTracks.sort(mediaLikedTracksComparator);
 }

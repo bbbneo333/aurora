@@ -7,6 +7,7 @@ import { I18nService, MediaCollectionService, MediaLibraryLikedTrackService } fr
 import { Layout } from '../../constants';
 import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
+import { MediaUtils } from '../../utils';
 
 import {
   MediaCollectionActions,
@@ -85,7 +86,7 @@ export function LikedTracksPage() {
       {!isEmpty(mediaLikedTracks) && (
         <div className={cx('playlist-tracklist')}>
           <MediaTrackList
-            mediaTracks={values(mediaLikedTracks)}
+            mediaTracks={MediaUtils.sortMediaLikedTracks(values(mediaLikedTracks))}
             mediaTrackList={{
               id: likesCollectionItem.id,
             }}

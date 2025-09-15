@@ -72,7 +72,7 @@ class MediaLibraryLikedTrackService {
     // now add
     const likedTrackData = await MediaLikedTrackDatastore.insertLikedTrack({
       track_id: trackId,
-      created_at: Date.now(),
+      added_at: Date.now(),
     });
 
     const likedTrack = await this.buildLikedTrack(likedTrackData);
