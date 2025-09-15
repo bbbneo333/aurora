@@ -8,14 +8,14 @@ import { Icons, Routes } from '../../constants';
 import { useContextMenu, useModal } from '../../contexts';
 import { IMediaCollectionItem, IMediaTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
-import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 import { Events, StringUtils, useSearch } from '../../utils';
+import { I18nService, MediaCollectionService, MediaPlaylistService } from '../../services';
+import { MediaLibraryPlaylistDuplicateTracksError } from '../../services/media-playlist.service';
 
 import { Icon } from '../icon/icon.component';
 import { TextInput } from '../text-input/text-input.component';
 import { MediaPlaylistDeleteModal } from '../media-playlist-delete-modal/media-playlist-delete-modal.component';
 import { MediaPlaylistEditModal } from '../media-playlist-edit-modal/media-playlist-edit-modal.component';
-import { MediaLibraryPlaylistDuplicateTracksError } from '../../services/media-library.service';
 import { MediaPlaylistDuplicateTrackModal } from '../media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 
 export enum MediaPlaylistContextMenuItemAction {
@@ -51,7 +51,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
   const { showModal } = useModal();
 
   useEffect(() => {
-    MediaLibraryService.loadMediaPlaylists();
+    MediaPlaylistService.loadMediaPlaylists();
   }, []);
 
   const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaPlaylistContextMenuItemProps, MediaPlaylistContextMenuItemData>) => {
@@ -76,7 +76,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
     switch (itemAction) {
       case MediaPlaylistContextMenuItemAction.CreatePlaylist:
         getMediaTracks().then(async (mediaTracksToAdd) => {
-          const mediaPlaylist = await MediaLibraryService.createMediaPlaylist({
+          const mediaPlaylist = await MediaPlaylistService.createMediaPlaylist({
             tracks: mediaTracksToAdd,
           });
           const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
@@ -93,7 +93,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
 
         getMediaTracks().then(async (mediaTracksToAdd) => {
           try {
-            await MediaLibraryService.addMediaPlaylistTracks(mediaPlaylistId, mediaTracksToAdd);
+            await MediaPlaylistService.addMediaPlaylistTracks(mediaPlaylistId, mediaTracksToAdd);
           } catch (error) {
             if (error instanceof MediaLibraryPlaylistDuplicateTracksError) {
               // in case of duplicate track, explicitly ask user what to do

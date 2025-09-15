@@ -2,6 +2,7 @@ import {
   IMediaAlbum,
   IMediaArtist,
   IMediaCollectionItem,
+  IMediaCollectionSearchResults,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
@@ -11,9 +12,19 @@ import { MediaCollectionItemType } from '../enums';
 
 import MediaLibraryService from './media-library.service';
 import MediaLikedTrackService from './media-liked-track.service';
+import MediaPlaylistService from './media-playlist.service';
 import I18nService from './i18n.service';
 
 class MediaCollectionService {
+  async searchCollection(query: string): Promise<IMediaCollectionSearchResults> {
+    return {
+      tracks: await MediaLibraryService.searchTracksByName(query),
+      albums: await MediaLibraryService.searchAlbumsByName(query),
+      artists: await MediaLibraryService.searchArtistsByName(query),
+      playlists: await MediaPlaylistService.searchPlaylistsByName(query),
+    };
+  }
+
   async getMediaCollectionTracks(mediaCollectionItem: IMediaCollectionItem): Promise<IMediaTrack[]> {
     switch (mediaCollectionItem.type) {
       case MediaCollectionItemType.Album: {
@@ -23,7 +34,7 @@ class MediaCollectionService {
         return MediaLibraryService.getMediaArtistTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.Playlist: {
-        return MediaLibraryService.getMediaPlaylistTracks(mediaCollectionItem.id);
+        return MediaPlaylistService.getMediaPlaylistTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.LikedTracks: {
         return MediaLikedTrackService.getLikedTracks();

@@ -11,7 +11,7 @@ import {
 
 import { useContextMenu } from '../../contexts';
 import { useMediaTrackLike } from '../../hooks';
-import { I18nService, MediaLibraryService, MediaPlayerService } from '../../services';
+import { I18nService, MediaPlayerService, MediaPlaylistService } from '../../services';
 
 import {
   IMediaPlaylistTrack,
@@ -101,11 +101,11 @@ export function MediaTrackContextMenu(props: {
         }
 
         if (mediaPlaylistTrack?.playlist_track_id) {
-          await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, [
+          await MediaPlaylistService.deleteMediaPlaylistTracks(mediaTrackList.id, [
             mediaPlaylistTrack.playlist_track_id,
           ]);
         } else if (!isEmpty(mediaPlaylistTracks)) {
-          await MediaLibraryService.deleteMediaPlaylistTracks(mediaTrackList.id, mediaPlaylistTracks.map((track) => {
+          await MediaPlaylistService.deleteMediaPlaylistTracks(mediaTrackList.id, mediaPlaylistTracks.map((track) => {
             if (!track.playlist_track_id) {
               throw new Error('MediaTrackContextMenu encountered error while performing action RemoveFromPlaylist - Invalid playlist track provided');
             }

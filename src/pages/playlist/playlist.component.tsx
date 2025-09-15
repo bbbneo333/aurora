@@ -9,7 +9,7 @@ import { Layout, Routes } from '../../constants';
 import { useEntityMissing } from '../../hooks';
 import { IMediaPicture, IMediaPlaylistTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
-import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
+import { I18nService, MediaCollectionService, MediaPlaylistService } from '../../services';
 
 import {
   MediaCollectionActions,
@@ -32,7 +32,7 @@ export function PlaylistPage() {
   const { showModal } = useModal();
 
   useEffect(() => {
-    MediaLibraryService.loadMediaPlaylist(playlistId);
+    MediaPlaylistService.loadMediaPlaylist(playlistId);
   }, [
     playlistId,
   ]);
@@ -42,7 +42,7 @@ export function PlaylistPage() {
       return;
     }
 
-    MediaLibraryService.getMediaPlaylistTracks(mediaSelectedPlaylist.id)
+    MediaPlaylistService.getMediaPlaylistTracks(mediaSelectedPlaylist.id)
       .then((tracks) => {
         setMediaPlaylistTracks(tracks);
       });
@@ -62,7 +62,7 @@ export function PlaylistPage() {
       return;
     }
 
-    await MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
+    await MediaPlaylistService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
       tracks: mediaTracks,
     });
 
@@ -90,7 +90,7 @@ export function PlaylistPage() {
       return;
     }
 
-    await MediaLibraryService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
+    await MediaPlaylistService.updateMediaPlaylist(mediaSelectedPlaylist.id, {
       cover_picture: picture,
     });
   }, [

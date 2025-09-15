@@ -5,9 +5,9 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import { TextInput, NavigationPills } from '../../components';
 import { Icons, Routes } from '../../constants';
-import { I18nService, MediaLibraryService } from '../../services';
+import { IMediaCollectionSearchResults } from '../../interfaces';
+import { I18nService, MediaCollectionService } from '../../services';
 import { StringUtils } from '../../utils';
-import { MediaSearchResults } from '../../services/media-library.service';
 
 import styles from './search.component.css';
 
@@ -35,7 +35,7 @@ export function SearchPage() {
 
   const [searchInput, setSearchInput] = React.useState(query);
   const [searchLoading, setSearchLoading] = React.useState(false);
-  const [searchResults, setSearchResults] = React.useState<Partial<MediaSearchResults>>({});
+  const [searchResults, setSearchResults] = React.useState<Partial<IMediaCollectionSearchResults>>({});
   const [searchCategory, setSearchCategory] = useState('all');
   const isSearchingAll = searchCategory === 'all';
 
@@ -46,7 +46,7 @@ export function SearchPage() {
     searchResults,
   ]);
 
-  const search = useCallback((searchTerm) => {
+  const search = useCallback((searchTerm: string) => {
     setSearchCategory('all');
 
     if (isEmpty(searchTerm)) {
@@ -57,7 +57,7 @@ export function SearchPage() {
 
     setSearchLoading(true);
 
-    MediaLibraryService.search(searchTerm)
+    MediaCollectionService.searchCollection(searchTerm)
       .then((results) => {
         setSearchResults(results);
         history.replace(buildQueryPath(searchTerm));

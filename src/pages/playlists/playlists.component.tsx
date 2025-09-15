@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 import { Icons, Routes } from '../../constants';
 import { RootState } from '../../reducers';
-import { I18nService, MediaLibraryService } from '../../services';
+import { I18nService, MediaPlaylistService } from '../../services';
 import { StringUtils } from '../../utils';
 
 import {
@@ -24,7 +24,7 @@ export function PlaylistsPage() {
   const history = useHistory();
 
   useEffect(() => {
-    MediaLibraryService.loadMediaPlaylists();
+    MediaPlaylistService.loadMediaPlaylists();
   }, []);
 
   return (
@@ -40,7 +40,7 @@ export function PlaylistsPage() {
                 <Button
                   icon={Icons.AddCircle}
                   onButtonSubmit={() => {
-                    MediaLibraryService.createMediaPlaylist().then((mediaPlaylist) => {
+                    MediaPlaylistService.createMediaPlaylist().then((mediaPlaylist) => {
                       const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
                         playlistId: mediaPlaylist.id,
                       });
