@@ -35,7 +35,7 @@
   --stage-content-bg-color: #1d1d1d;
   --stage-overlay-bg-color: #181818;
   --stage-overlay-outline-color: #282828;
-  --stage-scroll-bg-color: #6d6d6d;
+  --stage-scroll-bg-color: rgba(255, 255, 255, 0.3);
   --stage-toast-bg-color: #f8f8f8;
   --stage-toast-color: #1d1d1d;
   /*text*/
@@ -47,7 +47,7 @@
   --loader-color: #b3b3b3;
   /*misc*/
   --titlebar-overlay-height: 60px;
-  --scrollable-scrollbar-width: 15px;
+  --scrollable-scrollbar-width: 6px;
   --slide-in-item-transition: opacity 200ms ease, bottom 200ms, right 200ms ease, transform 200ms ease, margin-bottom 200ms;
   --radius-pill: 9999px; /* fully rounded element */
   /*input*/
@@ -89,12 +89,9 @@ body {
 }
 
 .app-scrollable::-webkit-scrollbar-thumb {
-  border-radius: 10px;
+  border-radius: 3px;
   background-color: transparent;
-  /* Transparent border together with `background-clip: padding-box` does the trick */
-  /* See - https://gist.github.com/flekschas/a817fd1a67aaca511964 */
-  border: 4px solid rgba(0, 0, 0, 0);
-  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0);
 }
 
 .app-scrollable:hover::-webkit-scrollbar-thumb {

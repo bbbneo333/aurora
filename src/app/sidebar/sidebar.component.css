@@ -26,6 +26,8 @@
   display: flex;
   flex-direction: column;
   flex: 0 0 auto; /* only take needed space */
+  /* this is to keep vertically inline with the scrollable list below it */
+  padding-right: var(--scrollable-scrollbar-width);
 }
 
 .sidebar-navigation-item {
