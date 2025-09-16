@@ -5,7 +5,7 @@ import { Form, Modal } from 'react-bootstrap';
 
 import { ModalComponent } from '../../contexts';
 import { IMediaPlaylist, IMediaPlaylistUpdateData } from '../../interfaces';
-import { I18nService, MediaLibraryService } from '../../services';
+import { I18nService, MediaPlaylistService } from '../../services';
 
 import { Button } from '../button/button.component';
 
@@ -25,12 +25,12 @@ export const MediaPlaylistEditModal: ModalComponent<{
     name: '',
   });
 
-  const handleSubmit = useCallback(async (event) => {
+  const handleSubmit = useCallback(async (event: any) => {
     event.preventDefault();
     setValidated(true);
 
     if (formRef.current?.checkValidity()) {
-      const updatedPlaylist = await MediaLibraryService.updateMediaPlaylist(mediaPlaylistId, {
+      const updatedPlaylist = await MediaPlaylistService.updateMediaPlaylist(mediaPlaylistId, {
         name: inputData.name,
       });
       onComplete({ updatedPlaylist });
@@ -42,7 +42,7 @@ export const MediaPlaylistEditModal: ModalComponent<{
   ]);
 
   useEffect(() => {
-    MediaLibraryService.getMediaPlaylist(mediaPlaylistId)
+    MediaPlaylistService.getMediaPlaylist(mediaPlaylistId)
       .then((mediaPlaylist) => {
         setInputData({
           ...mediaPlaylist,

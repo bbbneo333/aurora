@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { Routes } from '../../constants';
 import { RootState } from '../../reducers';
-import { I18nService, MediaCollectionService, MediaLibraryLikedTrackService } from '../../services';
+import { I18nService, MediaCollectionService, MediaLikedTrackService } from '../../services';
 import { StringUtils } from '../../utils';
 
 import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
@@ -11,14 +11,17 @@ import { MediaCollectionContextMenu, MediaCollectionContextMenuItem } from '../m
 
 const likesCollectionItem = MediaCollectionService.getMediaItemForLikedTracks();
 
-export function MediaLikedTracksCollectionItem() {
+export function MediaLikedTracksCollectionItem(props: {
+  className?: string;
+}) {
+  const { className } = props;
   const mediaLikedTracksRecord = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracksRecord);
   const [likedTracksCount, setLikedTracksCount] = useState(0);
 
   const contextMenuId = 'media-liked-tracks-context-menu';
 
   useEffect(() => {
-    MediaLibraryLikedTrackService.getLikedTracksCount()
+    MediaLikedTrackService.getLikedTracksCount()
       .then((count) => {
         setLikedTracksCount(count);
       })
@@ -40,6 +43,7 @@ export function MediaLikedTracksCollectionItem() {
           trackCount: likedTracksCount,
         })}
         disablePlayback={likedTracksCount === 0}
+        className={className}
       />
       <MediaCollectionContextMenu
         id={contextMenuId}

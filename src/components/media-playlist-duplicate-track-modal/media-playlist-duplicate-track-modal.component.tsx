@@ -4,7 +4,7 @@ import { isEmpty } from 'lodash';
 
 import { ModalComponent } from '../../contexts';
 import { IMediaPlaylist, IMediaPlaylistTrackInputData } from '../../interfaces';
-import { I18nService, MediaLibraryService } from '../../services';
+import { I18nService, MediaPlaylistService } from '../../services';
 import { useDataAction, useDataLoad } from '../../hooks';
 
 import { Button } from '../button/button.component';
@@ -29,14 +29,14 @@ export const MediaPlaylistDuplicateTrackModal: ModalComponent<{
   const hasNewTracks = !isEmpty(newTrackDataList);
   const hasSingleDuplicateTrack = existingTrackDataList.length === 1;
 
-  const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
+  const loadedPlaylist = useDataLoad(() => MediaPlaylistService.getMediaPlaylist(mediaPlaylistId));
 
   const addPlaylistTracks = useDataAction(async (
     playlistId: string,
     playlistTracks: IMediaPlaylistTrackInputData[],
     ignoreExisting: boolean = false,
   ) => {
-    const updatedPlaylist = await MediaLibraryService.addMediaPlaylistTracks(playlistId, playlistTracks, {
+    const updatedPlaylist = await MediaPlaylistService.addMediaPlaylistTracks(playlistId, playlistTracks, {
       ignoreExisting,
     });
 

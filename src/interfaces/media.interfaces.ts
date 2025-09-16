@@ -150,6 +150,13 @@ export interface IMediaCollectionItem {
   picture?: IMediaPicture;
 }
 
+export interface IMediaCollectionSearchResults {
+  tracks: IMediaTrack[],
+  artists: IMediaArtist[],
+  albums: IMediaAlbum[],
+  playlists: IMediaPlaylist[],
+}
+
 export interface IMediaPlaylistData {
   id: string;
   name: string;

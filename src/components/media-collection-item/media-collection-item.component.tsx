@@ -21,6 +21,7 @@ export type MediaCollectionItemProps = {
   subtitle?: string;
   disablePlayback?: boolean;
   disableCover?: boolean;
+  className?: string;
 };
 
 export function MediaCollectionItem(props: MediaCollectionItemProps) {
@@ -31,6 +32,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
     contextMenuId,
     disablePlayback = false,
     disableCover = false,
+    className,
   } = props;
 
   const { showMenu } = useContextMenu();
@@ -63,7 +65,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       tabIndex={0}
       exact
       to={routerLink}
-      className={cx('collection-item', 'app-nav-link')}
+      className={cx('collection-item', 'app-nav-link', className)}
       onContextMenu={handleOnContextMenu}
     >
       <div className={cx('collection-item-content')}>

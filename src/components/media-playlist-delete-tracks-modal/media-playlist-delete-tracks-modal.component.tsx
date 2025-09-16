@@ -3,7 +3,7 @@ import { Modal } from 'react-bootstrap';
 
 import { ModalComponent } from '../../contexts';
 import { useDataAction, useDataLoad } from '../../hooks';
-import { I18nService, MediaLibraryService } from '../../services';
+import { I18nService, MediaPlaylistService } from '../../services';
 
 import { Button } from '../button/button.component';
 import { IMediaPlaylist } from '../../interfaces';
@@ -21,9 +21,9 @@ export const MediaPlaylistDeleteTracksModal: ModalComponent<{
     onComplete,
   } = props;
 
-  const loadedPlaylist = useDataLoad(() => MediaLibraryService.getMediaPlaylist(mediaPlaylistId));
+  const loadedPlaylist = useDataLoad(() => MediaPlaylistService.getMediaPlaylist(mediaPlaylistId));
   const deletePlaylistTracks = useDataAction(async () => {
-    const updatedPlaylist = await MediaLibraryService.deleteMediaPlaylistTracks(
+    const updatedPlaylist = await MediaPlaylistService.deleteMediaPlaylistTracks(
       mediaPlaylistId,
       mediaPlaylistTrackIds,
     );

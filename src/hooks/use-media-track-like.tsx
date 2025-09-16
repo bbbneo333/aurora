@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { IMediaTrack } from '../interfaces';
 import { makeSelectIsTrackLiked, makeSelectAreAllTracksLiked } from '../selectors';
-import { MediaLibraryLikedTrackService } from '../services';
+import { MediaLikedTrackService } from '../services';
 
 export function useMediaTrackLike(props: {
   mediaTrack?: IMediaTrack;
@@ -21,7 +21,7 @@ export function useMediaTrackLike(props: {
       return;
     }
 
-    MediaLibraryLikedTrackService.loadTrackLikedStatus(mediaTrack.id);
+    MediaLikedTrackService.loadTrackLikedStatus(mediaTrack.id);
   }, [
     mediaTrack,
   ]);
@@ -32,7 +32,7 @@ export function useMediaTrackLike(props: {
     }
 
     mediaTracks.forEach((track: IMediaTrack) => {
-      MediaLibraryLikedTrackService.loadTrackLikedStatus(track.id);
+      MediaLikedTrackService.loadTrackLikedStatus(track.id);
     });
   }, [
     mediaTracks,
@@ -45,18 +45,18 @@ export function useMediaTrackLike(props: {
       if (mediaTrack) {
         if (isTrackLiked) {
           // remove
-          await MediaLibraryLikedTrackService.removeTrackFromLiked(mediaTrack.id);
+          await MediaLikedTrackService.removeTrackFromLiked(mediaTrack.id);
         } else {
           // add
-          await MediaLibraryLikedTrackService.addTrackToLiked(mediaTrack.id);
+          await MediaLikedTrackService.addTrackToLiked(mediaTrack.id);
         }
       } else if (mediaTracks && !isEmpty(mediaTracks)) {
         if (areAllTracksLiked) {
           // remove
-          await MediaLibraryLikedTrackService.removeTracksFromLiked(mediaTracks.map(track => track.id));
+          await MediaLikedTrackService.removeTracksFromLiked(mediaTracks.map(track => track.id));
         } else {
           // add
-          await MediaLibraryLikedTrackService.addTracksToLiked(mediaTracks.map(track => track.id));
+          await MediaLikedTrackService.addTracksToLiked(mediaTracks.map(track => track.id));
         }
       }
     } catch (error) {
