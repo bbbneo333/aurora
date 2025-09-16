@@ -11,7 +11,10 @@ import { MediaCollectionContextMenu, MediaCollectionContextMenuItem } from '../m
 
 const likesCollectionItem = MediaCollectionService.getMediaItemForLikedTracks();
 
-export function MediaLikedTracksCollectionItem() {
+export function MediaLikedTracksCollectionItem(props: {
+  className?: string;
+}) {
+  const { className } = props;
   const mediaLikedTracksRecord = useSelector((state: RootState) => state.mediaLibrary.mediaLikedTracksRecord);
   const [likedTracksCount, setLikedTracksCount] = useState(0);
 
@@ -40,6 +43,7 @@ export function MediaLikedTracksCollectionItem() {
           trackCount: likedTracksCount,
         })}
         disablePlayback={likedTracksCount === 0}
+        className={className}
       />
       <MediaCollectionContextMenu
         id={contextMenuId}

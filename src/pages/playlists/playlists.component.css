@@ -15,3 +15,8 @@
 .playlist-liked-tracks {
   margin-bottom: 15px;
 }
+
+.playlist-liked-tracks-collection-item {
+  border: 1px solid var(--selectable-outline-color);
+  padding: 10px;
+}

@@ -20,7 +20,7 @@
   "label_player_queue_current_track": "Now playing",
   "label_player_queue_upcoming_tracks": "Up next",
   "label_player_queue_empty": "You got nothing playing right now",
-  "label_playlists_empty": "No playlists Found",
+  "label_playlists_empty": "No playlists found",
   "label_playlist_empty": "Playlist has no tracks",
   "label_playlist_name": "Name",
   "label_playlist_subtitle": "{trackCount} tracks",
