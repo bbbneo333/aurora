@@ -20,7 +20,7 @@ export function MediaHeaderNavigationLinkComponent(props: {
   return (
     <RouterLink
       to={path}
-      activeClassName={cx('selected')}
+      activeClassName={cx('active')}
       className={cx('media-header-navigation-link', 'app-nav-link')}
     >
       <span className={cx('media-header-navigation-link-label')}>

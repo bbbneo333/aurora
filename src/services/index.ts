@@ -3,6 +3,7 @@ import I18nService from './i18n.service';
 import MediaCollectionService from './media-collection.service';
 import MediaLibraryService from './media-library.service';
 import MediaLikedTrackService from './media-liked-track.service';
+import MediaPinnedItemService from './media-pinned-item.service';
 import MediaPlayerService from './media-player.service';
 import MediaPlaylistService from './media-playlist.service';
 import MediaProviderService from './media-provider.service';
@@ -14,6 +15,7 @@ export {
   MediaCollectionService,
   MediaLibraryService,
   MediaLikedTrackService,
+  MediaPinnedItemService,
   MediaPlayerService,
   MediaPlaylistService,
   MediaProviderService,

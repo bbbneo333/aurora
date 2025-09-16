@@ -3,3 +3,7 @@
   align-items: center;
   gap: 5px;
 }
+
+.media-collection-pin-button.active {
+  color: var(--button-primary-bg-color) !important;
+}

@@ -7,8 +7,9 @@ import {
   IMediaTrack,
 } from '../interfaces';
 
-import { Icons } from '../constants';
+import { Icons, Routes } from '../constants';
 import { MediaCollectionItemType } from '../enums';
+import { StringUtils } from '../utils';
 
 import MediaLibraryService from './media-library.service';
 import MediaLikedTrackService from './media-liked-track.service';
@@ -80,12 +81,75 @@ class MediaCollectionService {
     };
   }
 
-  getCoverPlaceholderIcon(mediaCollectionItem: IMediaCollectionItem): string {
+  getItemCoverPlaceholderIcon(mediaCollectionItem: IMediaCollectionItem): string {
     switch (mediaCollectionItem.type) {
+      case MediaCollectionItemType.Artist:
+        return Icons.ArtistPlaceholder;
+      case MediaCollectionItemType.Album:
+        return Icons.AlbumPlaceholder;
+      case MediaCollectionItemType.Playlist:
+        return Icons.PlaylistPlaceholder;
       case MediaCollectionItemType.LikedTracks:
         return Icons.MediaLike;
       default:
         return Icons.AlbumPlaceholder;
+    }
+  }
+
+  getItemRouterLink(mediaCollectionItem: IMediaCollectionItem): string {
+    switch (mediaCollectionItem.type) {
+      case MediaCollectionItemType.Album:
+        return StringUtils.buildRoute(Routes.LibraryAlbum, {
+          albumId: mediaCollectionItem.id,
+        });
+      case MediaCollectionItemType.Artist:
+        return StringUtils.buildRoute(Routes.LibraryArtist, {
+          artistId: mediaCollectionItem.id,
+        });
+      case MediaCollectionItemType.Playlist:
+        return StringUtils.buildRoute(Routes.LibraryPlaylist, {
+          playlistId: mediaCollectionItem.id,
+        });
+      case MediaCollectionItemType.LikedTracks:
+        return Routes.LibraryLikedTracks;
+      default:
+        throw new Error(`Unsupported media collection type - ${mediaCollectionItem.type}`);
+    }
+  }
+
+  getItemSubtitle(mediaCollectionItem: IMediaCollectionItem): string {
+    switch (mediaCollectionItem.type) {
+      case MediaCollectionItemType.Artist:
+        return I18nService.getString('label_artist_header');
+      case MediaCollectionItemType.Album:
+        return I18nService.getString('label_album_header');
+      case MediaCollectionItemType.Playlist:
+      case MediaCollectionItemType.LikedTracks:
+        return I18nService.getString('label_playlist_header');
+      default:
+        throw new Error(`Unsupported media collection type - ${mediaCollectionItem.type}`);
+    }
+  }
+
+  async getMediaItem(id: string, type: MediaCollectionItemType): Promise<IMediaCollectionItem | undefined> {
+    switch (type) {
+      case MediaCollectionItemType.Album: {
+        const album = await MediaLibraryService.getMediaAlbum(id);
+        return album ? this.getMediaItemFromAlbum(album) : undefined;
+      }
+      case MediaCollectionItemType.Artist: {
+        const artist = await MediaLibraryService.getMediaArtist(id);
+        return artist ? this.getMediaItemFromArtist(artist) : undefined;
+      }
+      case MediaCollectionItemType.Playlist: {
+        const playlist = await MediaPlaylistService.getMediaPlaylist(id);
+        return playlist ? this.getMediaItemFromPlaylist(playlist) : undefined;
+      }
+      case MediaCollectionItemType.LikedTracks: {
+        return this.getMediaItemForLikedTracks();
+      }
+      default:
+        throw new Error(`Unsupported media collection type - ${type}`);
     }
   }
 }

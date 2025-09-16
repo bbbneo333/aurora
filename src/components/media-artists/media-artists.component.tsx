@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { Layout, Routes } from '../../constants';
+import { Icons, Layout, Routes } from '../../constants';
 import { IMediaArtist } from '../../interfaces';
 import { StringUtils } from '../../utils';
 
@@ -33,10 +33,11 @@ export function MediaArtists(props: {
             <div className={Layout.Grid.CollectionTile} key={mediaArtist.id}>
               <MediaCollectionTile
                 mediaItem={mediaItem}
-                mediaLink={StringUtils.buildRoute(Routes.LibraryArtist, {
+                routerLink={StringUtils.buildRoute(Routes.LibraryArtist, {
                   artistId: mediaArtist.id,
                 })}
-                mediaContextMenuId={mediaContextMenuId}
+                contextMenuId={mediaContextMenuId}
+                coverPlaceholderIcon={Icons.ArtistPlaceholder}
               />
             </div>
           );

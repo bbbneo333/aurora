@@ -19,6 +19,9 @@ export enum MediaLibraryActions {
   SetLikedTracks = 'media/library/setLikedTracks',
   AddMediaTrackToLiked = 'media/library/addMediaTrackToLiked',
   RemoveMediaTrackFromLiked = 'media/library/removeMediaTrackFromLiked',
+  SetPinnedItems = 'media/library/setPinnedItems',
+  AddPinnedItem = 'media/library/addPinnedItem',
+  RemovePinnedCollectionItem = 'media/library/removePinnedCollectionItem',
 }
 
 export enum MediaPlayerActions {

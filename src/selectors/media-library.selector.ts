@@ -1,6 +1,7 @@
 import { every, isNil, values } from 'lodash';
 import { createSelector } from 'reselect';
 
+import { IMediaCollectionItem } from '../interfaces';
 import { RootState } from '../reducers';
 import { MediaUtils } from '../utils';
 
@@ -23,4 +24,16 @@ export const makeSelectAreAllTracksLiked = (trackIds?: string[]) => createSelect
 
     return every(trackIds, (id: string) => !isNil(mediaLikedTracksRecord[id]));
   },
+);
+
+export const selectMediaPinnedItemsRecord = (state: RootState) => state.mediaLibrary.mediaPinnedItemsRecord;
+
+export const selectSortedPinnedItems = createSelector(
+  [selectMediaPinnedItemsRecord],
+  mediaPinnedItemsRecord => MediaUtils.sortMediaPinnedItems(values(mediaPinnedItemsRecord)),
+);
+
+export const makeSelectIsCollectionPinned = (item: IMediaCollectionItem) => createSelector(
+  [selectMediaPinnedItemsRecord],
+  mediaPinnedItemsRecord => !!mediaPinnedItemsRecord[MediaUtils.getPinnedItemKeyFromCollection(item)],
 );

@@ -5,12 +5,17 @@
 }
 
 .collection-item:focus,
-.collection-item:hover {
+.collection-item:hover,
+.collection-item.active {
   background-color: var(--selectable-hovered-bg-color);
 }
 
 .collection-item:hover .collection-item-playback-button {
   color: var(--selectable-hovered-color);
+}
+
+.collection-item.compact:hover .collection-item-cover-content {
+  opacity: 1 !important;
 }
 
 .collection-item-content {

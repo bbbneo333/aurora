@@ -8,6 +8,14 @@
   flex-direction: column;
 }
 
+.sidebar-content {
+  margin: 10px;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 15px;
+}
+
 .sidebar-header {
   height: var(--titlebar-overlay-height);
   /* according to electron docs, following property makes the frameless window draggable */
@@ -17,7 +25,7 @@
 .sidebar-navigation-list {
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  flex: 0 0 auto; /* only take needed space */
 }
 
 .sidebar-navigation-item {
@@ -34,7 +42,7 @@
   color: var(--selectable-hovered-color);
 }
 
-.sidebar-navigation-item.selected {
+.sidebar-navigation-item.active {
   background-color: var(--selectable-active-bg-color);
   color: var(--selectable-active-color);
 }
@@ -44,8 +52,7 @@
 }
 
 .sidebar-quick-access {
-  flex: 1 0 0;
-  padding: 0 4px 0 calc(var(--scrollable-scrollbar-width) + 4px);
+  flex: 1 0 0; /* stretch to fill remaining space */
 }
 
 .sidebar-logo {

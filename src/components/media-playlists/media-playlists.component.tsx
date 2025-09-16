@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash';
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { Routes } from '../../constants';
+import { Icons, Routes } from '../../constants';
 import { IMediaPlaylist } from '../../interfaces';
 import { I18nService, MediaCollectionService } from '../../services';
 import { StringUtils } from '../../utils';
@@ -42,6 +42,7 @@ export function MediaPlaylists(props: {
                 trackCount: mediaPlaylist.tracks.length.toString(),
               })}
               disablePlayback={isEmpty(mediaPlaylist.tracks)}
+              coverPlaceholderIcon={Icons.PlaylistPlaceholder}
             />
           );
         })}

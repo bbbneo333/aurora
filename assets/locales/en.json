@@ -68,5 +68,7 @@
   "tooltip_rename_playlist": "Rename",
   "tooltip_delete_playlist": "Delete",
   "tooltip_track_like": "Add to Liked Songs",
-  "tooltip_track_dislike": "Remove from Liked Songs"
+  "tooltip_track_dislike": "Remove from Liked Songs",
+  "tooltip_pin_collection": "Pin {collectionType}",
+  "tooltip_unpin_collection": "Unpin {collectionType}"
 }

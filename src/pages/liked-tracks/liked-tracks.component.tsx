@@ -5,7 +5,7 @@ import { isEmpty } from 'lodash';
 
 import { selectSortedLikedTracks } from '../../selectors';
 import { I18nService, MediaCollectionService, MediaLikedTrackService } from '../../services';
-import { Layout } from '../../constants';
+import { Icons, Layout } from '../../constants';
 import { useModal } from '../../contexts';
 
 import {
@@ -51,7 +51,7 @@ export function LikedTracksPage() {
             <MediaCoverPicture
               mediaPicture={likesCollectionItem.picture}
               mediaPictureAltText={likesCollectionItem.name}
-              mediaCoverPlaceholderIcon={MediaCollectionService.getCoverPlaceholderIcon(likesCollectionItem)}
+              mediaCoverPlaceholderIcon={Icons.MediaLike}
               className={cx('playlist-cover-picture')}
             />
           </div>
