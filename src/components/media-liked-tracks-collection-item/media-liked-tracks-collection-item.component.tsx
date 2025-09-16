@@ -49,6 +49,7 @@ export function MediaLikedTracksCollectionItem(props: {
         id={contextMenuId}
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
+          MediaCollectionContextMenuItem.AddToPlaylist,
         ]}
       />
     </>

@@ -47,7 +47,6 @@ export function MediaArtists(props: {
         id={mediaContextMenuId}
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
-          MediaCollectionContextMenuItem.Separator,
           MediaCollectionContextMenuItem.AddToPlaylist,
         ]}
       />

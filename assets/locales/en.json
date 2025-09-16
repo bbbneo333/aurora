@@ -42,6 +42,8 @@
   "label_submenu_media_track_add_to_playlist": "Add to playlist",
   "label_submenu_media_collection_add_to_queue": "Add to queue",
   "label_submenu_media_collection_add_to_playlist": "Add to playlist",
+  "label_submenu_media_collection_pin": "Pin {collectionType}",
+  "label_submenu_media_collection_unpin": "Unpin {collectionType}",
   "label_file_upload": "Upload",
   "label_liked_tracks_delete": "Remove from your Liked Songs",
   "label_liked_tracks_delete_details": "This will remove selected tracks from your Liked Songs.",

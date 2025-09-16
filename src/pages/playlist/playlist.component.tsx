@@ -153,7 +153,6 @@ export function PlaylistPage() {
             contextMenuItems={[
               MediaTrackContextMenuItem.Like,
               MediaTrackContextMenuItem.AddToQueue,
-              MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
             onMediaTracksSorted={handleMediaTracksSorted}

@@ -6,7 +6,7 @@ import { makeSelectIsCollectionPinned } from '../selectors';
 import { MediaPinnedItemService } from '../services';
 
 export function useMediaCollectionPin(props: {
-  mediaItem: IMediaCollectionItem;
+  mediaItem?: IMediaCollectionItem;
 }) {
   const { mediaItem } = props;
 
@@ -14,12 +14,20 @@ export function useMediaCollectionPin(props: {
   const [isPinnedStatusLoading, setIsPinnedStatusLoading] = useState(false);
 
   useEffect(() => {
+    if (!mediaItem) {
+      return;
+    }
+
     MediaPinnedItemService.loadPinnedItemStatus(mediaItem);
   }, [
     mediaItem,
   ]);
 
   const togglePinned = useCallback(async () => {
+    if (!mediaItem) {
+      return;
+    }
+
     setIsPinnedStatusLoading(true);
 
     try {

@@ -9,6 +9,7 @@ import {
 } from 'react-contexify';
 
 import { useContextMenu } from '../../contexts';
+import { useMediaCollectionPin } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
 import { I18nService, MediaCollectionService, MediaPlayerService } from '../../services';
 
@@ -19,14 +20,16 @@ export enum MediaCollectionContextMenuItem {
   AddToPlaylist,
   Separator,
   ManagePlaylist,
+  Pin,
 }
 
 export enum MediaCollectionContextMenuItemAction {
   AddToQueue = 'media/collection/action/addToQueue',
+  Pin = 'media/collection/action/pin',
 }
 
 export interface MediaCollectionContextMenuItemProps {
-  mediaItem: IMediaCollectionItem;
+  mediaItem?: IMediaCollectionItem;
 }
 
 export function MediaCollectionContextMenu(props: {
@@ -34,11 +37,20 @@ export function MediaCollectionContextMenu(props: {
   menuItems: MediaCollectionContextMenuItem[],
 }) {
   const { id, menuItems } = props;
-  const { menuProps } = useContextMenu<MediaCollectionContextMenuItemProps>();
+  const { menuProps, hideAll } = useContextMenu<MediaCollectionContextMenuItemProps>();
+  const { mediaItem } = menuProps || {};
 
-  const handleMenuItemClick = useCallback((itemParams: ItemParams<MediaCollectionContextMenuItemProps>) => {
+  const {
+    isPinned,
+    isPinnedStatusLoading,
+    togglePinned,
+  } = useMediaCollectionPin({
+    mediaItem,
+  });
+
+  const handleMenuItemClick = useCallback(async (itemParams: ItemParams<MediaCollectionContextMenuItemProps>) => {
     const itemAction: MediaCollectionContextMenuItemAction = itemParams.id as MediaCollectionContextMenuItemAction;
-    const { mediaItem } = menuProps;
+    hideAll();
 
     switch (itemAction) {
       case MediaCollectionContextMenuItemAction.AddToQueue: {
@@ -53,17 +65,40 @@ export function MediaCollectionContextMenu(props: {
           });
         break;
       }
+      case MediaCollectionContextMenuItemAction.Pin: {
+        if (!mediaItem) {
+          throw new Error('MediaCollectionContextMenu encountered error while performing action Pin - No media item was provided');
+        }
+
+        await togglePinned();
+        break;
+      }
       default:
       // unsupported action, do nothing
     }
   }, [
-    menuProps,
+    hideAll,
+    mediaItem,
+    togglePinned,
   ]);
 
   return (
     <Menu id={id}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
+          case MediaCollectionContextMenuItem.Pin:
+            return (
+              <Item
+                key={MediaCollectionContextMenuItem.Pin}
+                id={MediaCollectionContextMenuItemAction.Pin}
+                onClick={handleMenuItemClick}
+                disabled={isPinnedStatusLoading}
+              >
+                {I18nService.getString(isPinned ? 'label_submenu_media_collection_unpin' : 'label_submenu_media_collection_pin', {
+                  collectionType: mediaItem ? MediaCollectionService.getItemSubtitle(mediaItem) : '',
+                })}
+              </Item>
+            );
           case MediaCollectionContextMenuItem.AddToQueue:
             return (
               <Item

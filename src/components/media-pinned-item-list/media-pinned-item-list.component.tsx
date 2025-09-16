@@ -34,7 +34,9 @@ export function MediaPinnedItemList() {
       <MediaCollectionContextMenu
         id={contextMenuId}
         menuItems={[
+          MediaCollectionContextMenuItem.Pin,
           MediaCollectionContextMenuItem.AddToQueue,
+          MediaCollectionContextMenuItem.AddToPlaylist,
         ]}
       />
     </>
