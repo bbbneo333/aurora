@@ -31,6 +31,7 @@
   --selectable-focused-bg-color: #3c3c3c;
   --selectable-item-transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, opacity 200ms ease, transform 100ms ease;
   --selectable-focus-ring-size: 3px;
+  --selectable-focus-ring-color: #dee2e6;
   /*stage*/
   --stage-bg-color: #121212;
   --stage-content-bg-color: #1d1d1d;
@@ -65,6 +66,10 @@
   /*--selected-text-color: #fff;*/
   /*--dark-button-color: #b3b3b3;*/
   /*--light-bg-color: #1d1d1d;*/
+}
+
+:focus {
+  outline: 2px solid var(--selectable-focus-ring-color);
 }
 
 body {
