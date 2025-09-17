@@ -202,6 +202,7 @@ export interface IMediaLikedTrackData {
 }
 
 export interface IMediaLikedTrack extends IMediaLikedTrackData, IMediaTrack {
+  liked_track_id: string;
 }
 
 export interface IMediaPinnedItemData {
@@ -213,4 +214,5 @@ export interface IMediaPinnedItemData {
 }
 
 export interface IMediaPinnedItem extends IMediaPinnedItemData, IMediaCollectionItem {
+  pinned_item_id: string;
 }

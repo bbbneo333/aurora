@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 
 import { MediaCollectionService, MediaPinnedItemService } from '../../services';
 import { selectSortedPinnedItems } from '../../selectors';
+import { IMediaPinnedItem } from '../../interfaces';
 
 import { InteractiveList } from '../interactive-list/interactive-list.component';
 import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
@@ -21,12 +22,19 @@ export function MediaPinnedItemList() {
     MediaPinnedItemService.loadPinnedItems();
   }, []);
 
+  const handleItemsSorted = useCallback(async (items: IMediaPinnedItem[]) => {
+    await MediaPinnedItemService.updatePinnedItemsOrder(items.map(item => item.pinned_item_id));
+    MediaPinnedItemService.loadPinnedItems();
+  }, []);
+
   return (
     <>
       <InteractiveList
         disableMultiSelect
+        sortable
         className={cx('media-pinned-item-list')}
         items={sortedMediaPinnedItems}
+        onItemsSorted={handleItemsSorted}
       >
         {pinnedItem => (
           <MediaCollectionItem

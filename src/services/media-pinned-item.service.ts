@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash';
+import { isEmpty, omit } from 'lodash';
 
 import { MediaPinnedItemDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
@@ -92,6 +92,13 @@ class MediaPinnedItemService {
     });
   }
 
+  async updatePinnedItemsOrder(itemIds: string[]): Promise<void> {
+    // update order - itemIds need to be in the required order
+    await Promise.map(itemIds, async (itemId, index) => MediaPinnedItemDatastore.updateOne(itemId, {
+      order: index,
+    }));
+  }
+
   private async getOrderForNewItem(): Promise<number> {
     // get the last pinned item for obtaining order
     // we start with 0 if not found (index based)
@@ -107,18 +114,19 @@ class MediaPinnedItemService {
     return itemData.order + 1;
   }
 
-  private async buildPinnedItem(data: IMediaPinnedItemData): Promise<IMediaPinnedItem> {
+  private async buildPinnedItem(pinnedItemData: IMediaPinnedItemData): Promise<IMediaPinnedItem> {
     const collectionItem = await MediaCollectionService.getMediaItem(
-      data.collection_item_id,
-      data.collection_item_type,
+      pinnedItemData.collection_item_id,
+      pinnedItemData.collection_item_type,
     );
     if (!collectionItem) {
-      throw new Error(`Encountered error at buildPinnedItem - Could not find collection item, id - ${data.collection_item_id}, type - ${data.collection_item_type}`);
+      throw new Error(`Encountered error at buildPinnedItem - Could not find collection item, id - ${pinnedItemData.collection_item_id}, type - ${pinnedItemData.collection_item_type}`);
     }
 
     return {
-      ...data,
       ...collectionItem,
+      ...omit(pinnedItemData, 'id'),
+      pinned_item_id: pinnedItemData.id,
     };
   }
 }

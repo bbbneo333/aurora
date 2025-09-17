@@ -143,6 +143,7 @@ class MediaLikedTrackService {
     return {
       ...track,
       ...omit(likedTrackData, 'id'),
+      liked_track_id: likedTrackData.id,
     };
   }
 }
