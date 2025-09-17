@@ -1,9 +1,9 @@
 import {
   IMediaAlbum,
   IMediaArtist,
-  IMediaCollectionItem,
   IMediaLikedTrack,
   IMediaPinnedItem,
+  IMediaPinnedItemInputData,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
@@ -104,6 +104,6 @@ export function getPinnedItemKey(item: IMediaPinnedItem) {
   return `${item.collection_item_type}_${item.collection_item_id}`;
 }
 
-export function getPinnedItemKeyFromCollection(item: IMediaCollectionItem) {
-  return `${item.type}_${item.id}`;
+export function getPinnedItemKeyFromInput(input: IMediaPinnedItemInputData) {
+  return `${input.type}_${input.id}`;
 }

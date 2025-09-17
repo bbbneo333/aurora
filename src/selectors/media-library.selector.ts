@@ -35,5 +35,5 @@ export const selectSortedPinnedItems = createSelector(
 
 export const makeSelectIsCollectionPinned = (item?: IMediaCollectionItem) => createSelector(
   [selectMediaPinnedItemsRecord],
-  mediaPinnedItemsRecord => !!item && !!mediaPinnedItemsRecord[MediaUtils.getPinnedItemKeyFromCollection(item)],
+  mediaPinnedItemsRecord => !!item && !!mediaPinnedItemsRecord[MediaUtils.getPinnedItemKeyFromInput(item)],
 );

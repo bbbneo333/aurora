@@ -351,8 +351,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
     }
     case MediaLibraryActions.RemovePinnedCollectionItem: {
       // data.mediaCollectionItem: IMediaCollectionItem
-      const { mediaCollectionItem } = action.data;
-      const mediaPinnedItemKey = MediaUtils.getPinnedItemKeyFromCollection(mediaCollectionItem);
+      const { mediaPinnedItemInput } = action.data;
+      const mediaPinnedItemKey = MediaUtils.getPinnedItemKeyFromInput(mediaPinnedItemInput);
 
       if (!state.mediaPinnedItemsRecord[mediaPinnedItemKey]) {
         // already removed, skip update

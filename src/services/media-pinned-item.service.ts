@@ -2,14 +2,17 @@ import { isEmpty, omit } from 'lodash';
 
 import { MediaPinnedItemDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
-import { IMediaCollectionItem, IMediaPinnedItem, IMediaPinnedItemData } from '../interfaces';
+import { IMediaPinnedItem, IMediaPinnedItemData, IMediaPinnedItemInputData } from '../interfaces';
+import { EntityNotFoundError } from '../types';
 import store from '../store';
 
 import MediaCollectionService from './media-collection.service';
 
+const debug = require('debug')('app:service:media_pinned_item_service');
+
 class MediaPinnedItemService {
   loadPinnedItems() {
-    this.getPinnedItems()
+    this.resolvePinnedItems()
       .then((mediaPinnedItems) => {
         store.dispatch({
           type: MediaLibraryActions.SetPinnedItems,
@@ -20,8 +23,8 @@ class MediaPinnedItemService {
       });
   }
 
-  loadPinnedItemStatus(collectionItem: IMediaCollectionItem) {
-    this.getPinnedItem(collectionItem)
+  loadPinnedItemStatus(input: IMediaPinnedItemInputData) {
+    this.getPinnedItem(input)
       .then((pinnedItem) => {
         if (pinnedItem) {
           store.dispatch({
@@ -34,34 +37,54 @@ class MediaPinnedItemService {
           store.dispatch({
             type: MediaLibraryActions.RemovePinnedCollectionItem,
             data: {
-              mediaCollectionItem: collectionItem,
+              mediaPinnedItemInput: input,
             },
           });
         }
       });
   }
 
-  async getPinnedItems(): Promise<IMediaPinnedItem[]> {
+  async resolvePinnedItems(): Promise<IMediaPinnedItem[]> {
+    // this function fetches pinned items along with their collection item
+    // in case collection item entry is not found, it removes the pinned item
     const dataList = await MediaPinnedItemDatastore.find();
+    const items: IMediaPinnedItem[] = [];
 
-    return Promise.map(dataList, data => this.buildPinnedItem(data));
+    await Promise.map(dataList, async (data: IMediaPinnedItemData) => {
+      try {
+        const item = await this.buildPinnedItem(data);
+        items.push(item);
+      } catch (error) {
+        if (error instanceof EntityNotFoundError) {
+          // remove associated pinned item and skip it from list
+          debug('resolvePinnedItems: removing pinned item - %o', data);
+
+          await this.unpinCollectionItem({
+            id: data.collection_item_id,
+            type: data.collection_item_type,
+          });
+        }
+      }
+    });
+
+    return items;
   }
 
-  async getPinnedItem(collectionItem: IMediaCollectionItem): Promise<IMediaPinnedItem | undefined> {
+  async getPinnedItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem | undefined> {
     const data = await MediaPinnedItemDatastore.findOne({
-      collection_item_id: collectionItem.id,
-      collection_item_type: collectionItem.type,
+      collection_item_id: input.id,
+      collection_item_type: input.type,
     });
 
     return data ? this.buildPinnedItem(data) : undefined;
   }
 
-  async pinCollectionItem(collectionItem: IMediaCollectionItem): Promise<IMediaPinnedItem> {
+  async pinCollectionItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem> {
     const newOrder = await this.getOrderForNewItem();
 
     const data = await MediaPinnedItemDatastore.insertOne({
-      collection_item_id: collectionItem.id,
-      collection_item_type: collectionItem.type,
+      collection_item_id: input.id,
+      collection_item_type: input.type,
       order: newOrder,
       pinned_at: Date.now(),
     });
@@ -78,16 +101,16 @@ class MediaPinnedItemService {
     return pinnedItem;
   }
 
-  async unpinCollectionItem(collectionItem: IMediaCollectionItem): Promise<void> {
+  async unpinCollectionItem(input: IMediaPinnedItemInputData): Promise<void> {
     await MediaPinnedItemDatastore.remove({
-      collection_item_id: collectionItem.id,
-      collection_item_type: collectionItem.type,
+      collection_item_id: input.id,
+      collection_item_type: input.type,
     });
 
     store.dispatch({
       type: MediaLibraryActions.RemovePinnedCollectionItem,
       data: {
-        mediaCollectionItem: collectionItem,
+        mediaPinnedItemInput: input,
       },
     });
   }
@@ -120,7 +143,7 @@ class MediaPinnedItemService {
       pinnedItemData.collection_item_type,
     );
     if (!collectionItem) {
-      throw new Error(`Encountered error at buildPinnedItem - Could not find collection item, id - ${pinnedItemData.collection_item_id}, type - ${pinnedItemData.collection_item_type}`);
+      throw new EntityNotFoundError(pinnedItemData.collection_item_id, pinnedItemData.collection_item_type);
     }
 
     return {

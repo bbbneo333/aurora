@@ -213,6 +213,9 @@ export interface IMediaPinnedItemData {
   pinned_at: number;
 }
 
+export interface IMediaPinnedItemInputData extends Pick<IMediaCollectionItem, 'id' | 'type'> {
+}
+
 export interface IMediaPinnedItem extends IMediaPinnedItemData, IMediaCollectionItem {
   pinned_item_id: string;
 }
