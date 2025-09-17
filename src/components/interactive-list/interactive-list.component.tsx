@@ -63,7 +63,13 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   const [selectionDeleteInProgress, setSelectionDeleteInProgress] = React.useState<boolean>(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const sensors = useSensors(useSensor(SafePointerSensor));
+  const sensors = useSensors(useSensor(SafePointerSensor, {
+    activationConstraint: {
+      // by default, every click is considered drag by dnd
+      // this ensures pixels to move before it's considered a drag
+      distance: 5,
+    },
+  }));
 
   // make sure either item.id or getItemId returns unique ids
   const getItemId = React.useCallback((item: T) => ((getItemIdFn ? getItemIdFn(item) : item.id) as string), [

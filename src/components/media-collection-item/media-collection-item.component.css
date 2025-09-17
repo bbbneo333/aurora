@@ -6,7 +6,8 @@
 
 .collection-item:focus,
 .collection-item:hover,
-.collection-item.active {
+.collection-item.active,
+.collection-item[aria-selected="true"] {
   background-color: var(--selectable-hovered-bg-color);
 }
 

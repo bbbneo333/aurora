@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { HTMLAttributes, useCallback, useMemo } from 'react';
 import classNames from 'classnames/bind';
 
 import { useContextMenu } from '../../contexts';
@@ -23,7 +23,7 @@ export type MediaCollectionItemProps = {
   disableCover?: boolean;
   className?: string;
   variant?: 'default' | 'compact';
-};
+} & HTMLAttributes<HTMLAnchorElement>;
 
 export function MediaCollectionItem(props: MediaCollectionItemProps) {
   const {
@@ -36,6 +36,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
     disableCover = false,
     className,
     variant = 'default',
+    ...rest
   } = props;
 
   const { showMenu } = useContextMenu();
@@ -87,6 +88,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       activeClassName={cx('active')}
       className={cx('collection-item', 'app-nav-link', variant, className)}
       onContextMenu={handleOnContextMenu}
+      {...rest}
     >
       <div className={cx('collection-item-content')}>
         {variant !== 'compact' && (

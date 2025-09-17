@@ -6,3 +6,9 @@
 
 .interactive-list-item {
 }
+
+.interactive-list-item-child.dragging {
+  /* this was added for preventing clicks on elements like <a> when item is being dragged */
+  /* this would then prevents say opening the link while item is being dragged */
+  pointer-events: none;
+}

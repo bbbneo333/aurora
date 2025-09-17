@@ -49,7 +49,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps
     ],
   );
 
-  const handleContextMenu = useCallback((e, mediaTrackIds: string[]) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, mediaTrackIds: string[]) => {
     if (!contextMenuId) {
       return;
     }
@@ -97,8 +97,6 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps
             mediaTrackPointer={index}
             disableCover={disableCovers}
             disableAlbumLink={disableAlbumLinks}
-            // TODO: Fix generic typing issue with MediaTrack
-            // @ts-ignore
             onMediaTrackPlay={onMediaTrackPlay}
             onPointerDown={handlePointerDown}
           />

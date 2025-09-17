@@ -18,7 +18,9 @@ export function MediaPinnedItemList() {
 
   return (
     <>
-      <InteractiveList sortable items={sortedMediaPinnedItems}>
+      <InteractiveList
+        items={sortedMediaPinnedItems}
+      >
         {pinnedItem => (
           <MediaCollectionItem
             key={pinnedItem.id}
