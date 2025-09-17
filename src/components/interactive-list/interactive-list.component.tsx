@@ -37,6 +37,7 @@ export type InteractiveListItemType = {
 export type InteractiveListProps<T> = {
   items: T[];
   children: (item: T, index: number) => React.ReactElement;
+  className?: string;
   sortable?: boolean;
   getItemId?: (item: T) => string;
   onContextMenu?: (event: React.MouseEvent, itemIds: string[]) => void;
@@ -49,6 +50,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   const {
     items,
     children,
+    className,
     sortable = false,
     getItemId: getItemIdFn,
     onContextMenu,
@@ -268,7 +270,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   ]);
 
   return (
-    <div ref={containerRef} className={cx('interactive-list')}>
+    <div ref={containerRef} className={cx('interactive-list', className)}>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

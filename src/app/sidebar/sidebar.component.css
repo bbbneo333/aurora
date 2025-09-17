@@ -1,5 +1,5 @@
 .sidebar {
-  width: 30%;
+  width: 35%;
   min-width: 250px;
   max-width: 350px;
   background-color: var(--stage-bg-color);
@@ -13,7 +13,7 @@
   display: flex;
   height: 100%;
   flex-direction: column;
-  gap: 15px;
+  gap: 20px;
 }
 
 .sidebar-header {
@@ -27,12 +27,14 @@
   flex-direction: column;
   flex: 0 0 auto; /* only take needed space */
   /* this is to keep vertically inline with the scrollable list below it */
+  padding-left: var(--scrollable-scrollbar-width);
   padding-right: var(--scrollable-scrollbar-width);
+  gap: 5px;
 }
 
 .sidebar-navigation-item {
   font-size: 15px;
-  padding: 10px 15px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: row;
   border-radius: 5px;
@@ -55,6 +57,7 @@
 
 .sidebar-quick-access {
   flex: 1 0 0; /* stretch to fill remaining space */
+  padding: var(--selectable-focus-ring-size); /* this is to not clip focus ring */
 }
 
 .sidebar-logo {

@@ -4,6 +4,7 @@
   align-items: flex-start;
   white-space: nowrap;
   overflow: hidden;
+  padding: var(--selectable-focus-ring-size); /* this is to not clip focus ring */
   gap: 5px;
 }
 

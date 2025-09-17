@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import classNames from 'classnames/bind';
 
 import { MediaCollectionService, MediaPinnedItemService } from '../../services';
 import { selectSortedPinnedItems } from '../../selectors';
@@ -7,6 +8,10 @@ import { selectSortedPinnedItems } from '../../selectors';
 import { InteractiveList } from '../interactive-list/interactive-list.component';
 import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
 import { MediaCollectionContextMenu, MediaCollectionContextMenuItem } from '../media-collection-context-menu/media-collection-context-menu.component';
+
+import styles from './media-pinned-item-list.component.css';
+
+const cx = classNames.bind(styles);
 
 export function MediaPinnedItemList() {
   const sortedMediaPinnedItems = useSelector(selectSortedPinnedItems);
@@ -20,6 +25,7 @@ export function MediaPinnedItemList() {
     <>
       <InteractiveList
         disableMultiSelect
+        className={cx('media-pinned-item-list')}
         items={sortedMediaPinnedItems}
       >
         {pinnedItem => (
