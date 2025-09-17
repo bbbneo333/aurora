@@ -19,6 +19,7 @@ export function MediaPinnedItemList() {
   return (
     <>
       <InteractiveList
+        disableMultiSelect
         items={sortedMediaPinnedItems}
       >
         {pinnedItem => (

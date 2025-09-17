@@ -340,19 +340,18 @@ class App implements IAppMain {
       }
     });
 
-    // TODO: For now we don't support opening up external links,
-    //  we are ignoring every external link for now
-    // open urls in the user's browser
-    // @ts-ignore
-    // mainWindow.webContents.on('new-window', (event, url) => {
-    //   event.preventDefault();
-    //   shell.openExternal(url);
-    // });
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+      // if it's an external URL → open in default browser
+      if (/^https?:\/\//.test(url)) {
+        debug('web window openExternal - %s', url);
+        shell.openExternal(url);
 
-    // prevent new window on Ctrl+Click or target="_blank"
-    mainWindow.webContents.setWindowOpenHandler(() => ({
-      action: 'deny',
-    }));
+        return { action: 'deny' };
+      }
+
+      // if it's internal → allow React Router to handle it
+      return { action: 'allow' };
+    });
 
     // run builders
     this.runBuilders(mainWindow);

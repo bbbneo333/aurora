@@ -81,6 +81,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
 
   return (
     <RouterLink
+      {...rest}
       role="row"
       tabIndex={0}
       exact
@@ -88,7 +89,6 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       activeClassName={cx('active')}
       className={cx('collection-item', 'app-nav-link', variant, className)}
       onContextMenu={handleOnContextMenu}
-      {...rest}
     >
       <div className={cx('collection-item-content')}>
         {variant !== 'compact' && (

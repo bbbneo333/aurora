@@ -42,6 +42,7 @@ export type InteractiveListProps<T> = {
   onContextMenu?: (event: React.MouseEvent, itemIds: string[]) => void;
   onItemsSorted?: (items: T[]) => Promise<void> | void;
   onItemsDelete?: (itemIds: string[]) => Promise<boolean> | boolean;
+  disableMultiSelect?: boolean;
 };
 
 export function InteractiveList<T extends InteractiveListItemType>(props: InteractiveListProps<T>) {
@@ -53,6 +54,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     onContextMenu,
     onItemsSorted,
     onItemsDelete,
+    disableMultiSelect = false,
   } = props;
 
   const [dragItems, setDragItems] = React.useState<T[] | null>(null);
@@ -102,6 +104,13 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   }, []);
 
   const handleSelect = React.useCallback((e: React.MouseEvent, itemId: string, index: number) => {
+    if (disableMultiSelect) {
+      // single item selection
+      setSelectedItemIds([itemId]);
+      setLastSelectedIndex(index);
+      return;
+    }
+
     if (Events.isShiftKey(e)) {
       // select range between last clicked index and this one
       if (lastSelectedIndex !== null) {
@@ -122,6 +131,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
 
     setLastSelectedIndex(index);
   }, [
+    disableMultiSelect,
     getItemId,
     items,
     lastSelectedIndex,
