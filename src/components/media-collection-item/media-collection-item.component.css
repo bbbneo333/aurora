@@ -5,12 +5,18 @@
 }
 
 .collection-item:focus,
-.collection-item:hover {
+.collection-item:hover,
+.collection-item.active,
+.collection-item[aria-selected="true"] {
   background-color: var(--selectable-hovered-bg-color);
 }
 
 .collection-item:hover .collection-item-playback-button {
   color: var(--selectable-hovered-color);
+}
+
+.collection-item.compact:hover .collection-item-cover-content {
+  opacity: 1 !important;
 }
 
 .collection-item-content {
@@ -19,6 +25,10 @@
   align-items: center;
   gap: 20px;
   padding: 10px;
+}
+
+.collection-item.compact .collection-item-content {
+  gap: 10px;
 }
 
 .collection-item-cover {

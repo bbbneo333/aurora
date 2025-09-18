@@ -37,22 +37,26 @@ export type InteractiveListItemType = {
 export type InteractiveListProps<T> = {
   items: T[];
   children: (item: T, index: number) => React.ReactElement;
+  className?: string;
   sortable?: boolean;
   getItemId?: (item: T) => string;
   onContextMenu?: (event: React.MouseEvent, itemIds: string[]) => void;
   onItemsSorted?: (items: T[]) => Promise<void> | void;
   onItemsDelete?: (itemIds: string[]) => Promise<boolean> | boolean;
+  disableMultiSelect?: boolean;
 };
 
 export function InteractiveList<T extends InteractiveListItemType>(props: InteractiveListProps<T>) {
   const {
     items,
     children,
+    className,
     sortable = false,
     getItemId: getItemIdFn,
     onContextMenu,
     onItemsSorted,
     onItemsDelete,
+    disableMultiSelect = false,
   } = props;
 
   const [dragItems, setDragItems] = React.useState<T[] | null>(null);
@@ -63,7 +67,13 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   const [selectionDeleteInProgress, setSelectionDeleteInProgress] = React.useState<boolean>(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const sensors = useSensors(useSensor(SafePointerSensor));
+  const sensors = useSensors(useSensor(SafePointerSensor, {
+    activationConstraint: {
+      // by default, every click is considered drag by dnd
+      // this ensures pixels to move before it's considered a drag
+      distance: 5,
+    },
+  }));
 
   // make sure either item.id or getItemId returns unique ids
   const getItemId = React.useCallback((item: T) => ((getItemIdFn ? getItemIdFn(item) : item.id) as string), [
@@ -74,9 +84,13 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   const listIds = list.map(getItemId);
 
   const selectAll = React.useCallback(() => {
-    setSelectedItemIds(listIds);
+    // allowed only if multi selection is allowed
+    if (!disableMultiSelect) {
+      setSelectedItemIds(listIds);
+    }
   }, [
     listIds,
+    disableMultiSelect,
   ]);
 
   const clearSelection = React.useCallback(() => {
@@ -96,6 +110,13 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   }, []);
 
   const handleSelect = React.useCallback((e: React.MouseEvent, itemId: string, index: number) => {
+    if (disableMultiSelect) {
+      // single item selection
+      setSelectedItemIds([itemId]);
+      setLastSelectedIndex(index);
+      return;
+    }
+
     if (Events.isShiftKey(e)) {
       // select range between last clicked index and this one
       if (lastSelectedIndex !== null) {
@@ -116,6 +137,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
 
     setLastSelectedIndex(index);
   }, [
+    disableMultiSelect,
     getItemId,
     items,
     lastSelectedIndex,
@@ -252,7 +274,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   ]);
 
   return (
-    <div ref={containerRef} className={cx('interactive-list')}>
+    <div ref={containerRef} className={cx('interactive-list', className)}>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}

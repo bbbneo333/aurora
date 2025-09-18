@@ -13,7 +13,7 @@ import {
 
 import { MediaPlaylistDatastore } from '../datastores';
 import { DatastoreUtils, MediaUtils } from '../utils';
-import { AppError, DataStoreInputData, DataStoreUpdateData } from '../types';
+import { BaseError, DataStoreInputData, DataStoreUpdateData } from '../types';
 import store from '../store';
 import { MediaLibraryActions } from '../enums';
 
@@ -21,7 +21,7 @@ import NotificationService from './notification.service';
 import I18nService from './i18n.service';
 import MediaLibraryService from './media-library.service';
 
-export class MediaLibraryPlaylistDuplicateTracksError extends AppError {
+export class MediaLibraryPlaylistDuplicateTracksError extends BaseError {
   existingTrackDataList: IMediaPlaylistTrackInputData[] = [];
   newTrackDataList: IMediaPlaylistTrackInputData[] = [];
 

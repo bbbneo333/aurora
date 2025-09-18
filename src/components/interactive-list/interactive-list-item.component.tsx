@@ -32,6 +32,7 @@ export function InteractiveListItem(props: {
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({
     id: itemId,
     disabled: !sortable,
@@ -62,15 +63,25 @@ export function InteractiveListItem(props: {
     child.props.onContextMenu?.(e);
   };
 
-  return React.cloneElement(child, {
-    ref: setNodeRef,
-    'data-interactive-item-id': itemId,
-    style,
-    className: cx('interactive-list-item', child.props.className),
-    ...(sortable ? { ...attributes, ...listeners } : {}),
-    isSelected,
-    onPointerDown: handlePointerDown,
-    onPointerUp: handlePointerUp,
-    onContextMenu: handleContextMenu,
-  });
+  // we wrap the child in our own wrapper which is required for functionality
+  // - all handling via wrapper
+  // - all state mgmt on the child
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...(sortable ? { ...attributes, ...listeners } : {})}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onContextMenu={handleContextMenu}
+      tabIndex={-1}
+      className={cx('interactive-list-item')}
+    >
+      {React.cloneElement(child, {
+        'data-interactive-item-id': itemId,
+        'aria-selected': isSelected,
+        className: cx('interactive-list-item-child', { dragging: isDragging }),
+      })}
+    </div>
+  );
 }

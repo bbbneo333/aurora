@@ -88,7 +88,6 @@ export function PlayerQueueComponent() {
                   menuItems={[
                     MediaTrackContextMenuItem.Like,
                     MediaTrackContextMenuItem.AddToQueue,
-                    MediaTrackContextMenuItem.Separator,
                     MediaTrackContextMenuItem.AddToPlaylist,
                   ]}
                 />
@@ -121,7 +120,6 @@ export function PlayerQueueComponent() {
                     MediaTrackContextMenuItem.Like,
                     MediaTrackContextMenuItem.AddToQueue,
                     MediaTrackContextMenuItem.RemoveFromQueue,
-                    MediaTrackContextMenuItem.Separator,
                     MediaTrackContextMenuItem.AddToPlaylist,
                   ]}
                   onMediaTrackPlay={(mediaTrack) => {

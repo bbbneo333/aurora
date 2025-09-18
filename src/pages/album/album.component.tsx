@@ -74,7 +74,6 @@ export function AlbumPage() {
           contextMenuItems={[
             MediaTrackContextMenuItem.Like,
             MediaTrackContextMenuItem.AddToQueue,
-            MediaTrackContextMenuItem.Separator,
             MediaTrackContextMenuItem.AddToPlaylist,
           ]}
           disableCovers

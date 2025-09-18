@@ -196,9 +196,26 @@ export interface IMediaPlaylistTrackUpdateData {
 }
 
 export interface IMediaLikedTrackData {
+  id: string;
   track_id: string;
   added_at: number;
 }
 
 export interface IMediaLikedTrack extends IMediaLikedTrackData, IMediaTrack {
+  liked_track_id: string;
+}
+
+export interface IMediaPinnedItemData {
+  id: string;
+  collection_item_id: string;
+  collection_item_type: MediaCollectionItemType;
+  order: number;
+  pinned_at: number;
+}
+
+export interface IMediaPinnedItemInputData extends Pick<IMediaCollectionItem, 'id' | 'type'> {
+}
+
+export interface IMediaPinnedItem extends IMediaPinnedItemData, IMediaCollectionItem {
+  pinned_item_id: string;
 }

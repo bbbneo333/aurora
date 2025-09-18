@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Routes } from '../../constants';
+import { Icons, Routes } from '../../constants';
 import { RootState } from '../../reducers';
 import { I18nService, MediaCollectionService, MediaLikedTrackService } from '../../services';
-import { StringUtils } from '../../utils';
 
 import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
 import { MediaCollectionContextMenu, MediaCollectionContextMenuItem } from '../media-collection-context-menu/media-collection-context-menu.component';
@@ -38,17 +37,19 @@ export function MediaLikedTracksCollectionItem(props: {
         key={likesCollectionItem.id}
         mediaItem={likesCollectionItem}
         contextMenuId={contextMenuId}
-        routerLink={StringUtils.buildRoute(Routes.LibraryLikedTracks)}
+        routerLink={Routes.LibraryLikedTracks}
         subtitle={I18nService.getString('label_playlist_subtitle', {
           trackCount: likedTracksCount,
         })}
         disablePlayback={likedTracksCount === 0}
         className={className}
+        coverPlaceholderIcon={Icons.MediaLike}
       />
       <MediaCollectionContextMenu
         id={contextMenuId}
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
+          MediaCollectionContextMenuItem.AddToPlaylist,
         ]}
       />
     </>

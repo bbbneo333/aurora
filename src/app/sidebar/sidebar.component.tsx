@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { Icon, RouterLink } from '../../components';
+import { Icon, MediaPinnedItemList, RouterLink } from '../../components';
 import { AppEnums } from '../../enums';
 import { I18nService } from '../../services';
 import routes from '../app.routes';
@@ -13,7 +13,9 @@ const cx = classNames.bind(styles);
 
 function SidebarQuickAccess() {
   return (
-    <div className={cx('sidebar-quick-access', 'app-scrollable')}/>
+    <div className={cx('sidebar-quick-access', 'app-scrollable')}>
+      <MediaPinnedItemList/>
+    </div>
   );
 }
 
@@ -41,7 +43,7 @@ function SidebarNavigationLink(props: {
   return (
     <RouterLink
       to={path}
-      activeClassName={cx('selected')}
+      activeClassName={cx('active')}
       className={cx('sidebar-navigation-item', 'app-nav-link')}
     >
       <span className={cx('sidebar-navigation-item-icon')}>
@@ -75,14 +77,22 @@ function SidebarHeader() {
   );
 }
 
+function SidebarContent() {
+  return (
+    <div className={cx('sidebar-content')}>
+      <SidebarNavigationList/>
+      <SidebarQuickAccess/>
+    </div>
+  );
+}
+
 export function Sidebar() {
   return (
     <div className={cx('sidebar')}>
       {/* TODO: Add back SidebarBrandingLogo when required */}
       {/* <SidebarBrandingLogo/> */}
       <SidebarHeader/>
-      <SidebarNavigationList/>
-      <SidebarQuickAccess/>
+      <SidebarContent/>
     </div>
   );
 }

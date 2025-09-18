@@ -11,7 +11,7 @@
   color: var(--selectable-hovered-color);
 }
 
-.media-header-navigation-link.selected {
+.media-header-navigation-link.active {
   background-color: var(--selectable-active-bg-color);
   color: var(--selectable-active-color);
 }

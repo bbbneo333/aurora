@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useCallback } from 'react';
+import { isEmpty } from 'lodash';
 
 import { MediaPlaybackState } from '../enums';
 import { IMediaCollectionItem } from '../interfaces';
@@ -28,6 +29,11 @@ export function useMediaCollectionPlayback(props: UseMediaCollectionPlaybackProp
     MediaCollectionService
       .getMediaCollectionTracks(mediaItem)
       .then((mediaTracks) => {
+        if (isEmpty(mediaTracks)) {
+          console.warn(`useMediaCollectionPlayback got empty track list for ${mediaItem.type} - ${mediaItem.id}, skipping playback...`);
+          return;
+        }
+
         MediaPlayerService.playMediaTracks(mediaTracks, {
           id: mediaItem.id,
         });

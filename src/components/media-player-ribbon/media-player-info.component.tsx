@@ -69,7 +69,6 @@ export function MediaPlayerInfo() {
           menuItems={[
             MediaTrackContextMenuItem.Like,
             MediaTrackContextMenuItem.AddToQueue,
-            MediaTrackContextMenuItem.Separator,
             MediaTrackContextMenuItem.AddToPlaylist,
           ]}
         />

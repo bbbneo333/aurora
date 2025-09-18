@@ -2,6 +2,8 @@ import {
   IMediaAlbum,
   IMediaArtist,
   IMediaLikedTrack,
+  IMediaPinnedItem,
+  IMediaPinnedItemInputData,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
@@ -53,6 +55,13 @@ export function mediaLikedTracksComparator(
   return mediaLikedTrackA.added_at > mediaLikedTrackB.added_at ? -1 : 1;
 }
 
+export function mediaPinnedItemsComparator(
+  itemA: IMediaPinnedItem,
+  itemB: IMediaPinnedItem,
+) {
+  return itemA.order < itemB.order ? -1 : 1;
+}
+
 export function sortMediaAlbumTracks(
   mediaAlbumTracks: IMediaTrack[],
 ): IMediaTrack[] {
@@ -83,4 +92,18 @@ export function sortMediaLikedTracks(
   mediaLikedTracks: IMediaLikedTrack[],
 ) {
   return mediaLikedTracks.sort(mediaLikedTracksComparator);
+}
+
+export function sortMediaPinnedItems(
+  mediaPinnedItems: IMediaPinnedItem[],
+) {
+  return mediaPinnedItems.sort(mediaPinnedItemsComparator);
+}
+
+export function getPinnedItemKey(item: IMediaPinnedItem) {
+  return `${item.collection_item_type}_${item.collection_item_id}`;
+}
+
+export function getPinnedItemKeyFromInput(input: IMediaPinnedItemInputData) {
+  return `${input.type}_${input.id}`;
 }

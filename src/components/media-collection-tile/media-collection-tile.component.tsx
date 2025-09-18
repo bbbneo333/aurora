@@ -4,7 +4,6 @@ import classNames from 'classnames/bind';
 import { useContextMenu } from '../../contexts';
 import { useMediaCollectionPlayback } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
-import { MediaCollectionService } from '../../services';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
@@ -14,17 +13,21 @@ import styles from './media-collection-tile.component.css';
 
 const cx = classNames.bind(styles);
 
-export function MediaCollectionTile(props: {
-  mediaItem: IMediaCollectionItem,
-  mediaLink: string,
-  mediaSubtitle?: string,
-  mediaContextMenuId?: string,
-}) {
+export type MediaCollectionTileProps = {
+  mediaItem: IMediaCollectionItem;
+  routerLink: string;
+  subtitle?: string;
+  contextMenuId?: string;
+  coverPlaceholderIcon?: string;
+};
+
+export function MediaCollectionTile(props: MediaCollectionTileProps) {
   const {
     mediaItem,
-    mediaLink,
-    mediaSubtitle,
-    mediaContextMenuId,
+    routerLink,
+    subtitle,
+    contextMenuId,
+    coverPlaceholderIcon,
   } = props;
 
   const { showMenu } = useContextMenu();
@@ -38,9 +41,9 @@ export function MediaCollectionTile(props: {
   });
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
-    if (mediaContextMenuId) {
+    if (contextMenuId) {
       showMenu({
-        id: mediaContextMenuId,
+        id: contextMenuId,
         event: e,
         props: { mediaItem },
       });
@@ -48,7 +51,7 @@ export function MediaCollectionTile(props: {
   }, [
     showMenu,
     mediaItem,
-    mediaContextMenuId,
+    contextMenuId,
   ]);
 
   return (
@@ -56,7 +59,7 @@ export function MediaCollectionTile(props: {
       role="row"
       tabIndex={0}
       exact
-      to={mediaLink}
+      to={routerLink}
       className={cx('collection-tile', 'app-nav-link', {
         playing: isMediaPlaying,
       })}
@@ -67,7 +70,7 @@ export function MediaCollectionTile(props: {
           <MediaCoverPicture
             mediaPicture={mediaItem.picture}
             mediaPictureAltText={mediaItem.name}
-            mediaCoverPlaceholderIcon={MediaCollectionService.getCoverPlaceholderIcon(mediaItem)}
+            mediaCoverPlaceholderIcon={coverPlaceholderIcon}
             className={cx('collection-tile-cover-picture')}
           />
           <div className={cx('collection-tile-cover-overlay')}>
@@ -86,9 +89,9 @@ export function MediaCollectionTile(props: {
           <div className={cx('collection-tile-title')}>
             {mediaItem.name}
           </div>
-          {mediaSubtitle && (
+          {subtitle && (
             <div className={cx('collection-tile-subtitle')}>
-              {mediaSubtitle}
+              {subtitle}
             </div>
           )}
         </div>

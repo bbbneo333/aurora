@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { Icons } from '../../constants';
 import { MediaEnums } from '../../enums';
 import { IMediaPicture } from '../../interfaces';
 
@@ -12,19 +11,23 @@ import styles from './media-cover-picture.component.css';
 const cx = classNames.bind(styles);
 
 export type MediaCoverPictureProps = {
-  mediaPicture?: IMediaPicture,
-  mediaPictureAltText?: string,
-  mediaCoverPlaceholderIcon?: string,
-  className?: string,
-  onContextMenu?: (e: React.MouseEvent) => void,
+  children?: React.ReactNode;
+  mediaPicture?: IMediaPicture;
+  mediaPictureAltText?: string;
+  mediaCoverPlaceholderIcon?: string;
+  className?: string;
+  contentClassName?: string;
+  onContextMenu?: (e: React.MouseEvent) => void;
 };
 
 export function MediaCoverPicture(props: MediaCoverPictureProps) {
   const {
+    children,
     mediaPicture,
     mediaPictureAltText,
     mediaCoverPlaceholderIcon,
     className,
+    contentClassName,
     onContextMenu,
   } = props;
 
@@ -44,7 +47,7 @@ export function MediaCoverPicture(props: MediaCoverPictureProps) {
 
   return (
     <div
-      className={cx('media-cover-picture', className)}
+      className={cx('media-cover-picture', { has_content: !!children }, className)}
       onContextMenu={onContextMenu}
     >
       {mediaCoverPictureImageSrc ? (
@@ -53,13 +56,18 @@ export function MediaCoverPicture(props: MediaCoverPictureProps) {
           src={mediaCoverPictureImageSrc}
         />
       ) : (
-        <div className={cx('media-cover-placeholder')}>
-          <Icon
-            className={cx('media-cover-placeholder-icon')}
-            name={mediaCoverPlaceholderIcon || Icons.AlbumPlaceholder}
-          />
-        </div>
+        mediaCoverPlaceholderIcon && (
+          <div className={cx('media-cover-placeholder')}>
+            <Icon
+              className={cx('media-cover-placeholder-icon')}
+              name={mediaCoverPlaceholderIcon}
+            />
+          </div>
+        )
       )}
+      <div className={cx('media-cover-picture-content', contentClassName)}>
+        {children}
+      </div>
     </div>
   );
 }

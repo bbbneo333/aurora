@@ -51,7 +51,6 @@ export function TracksSearchResults({ tracks, trim }: {
               contextMenuItems={[
                 MediaTrackContextMenuItem.Like,
                 MediaTrackContextMenuItem.AddToQueue,
-                MediaTrackContextMenuItem.Separator,
                 MediaTrackContextMenuItem.AddToPlaylist,
               ]}
             />

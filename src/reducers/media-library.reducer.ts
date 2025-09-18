@@ -7,6 +7,7 @@ import {
   IMediaAlbum,
   IMediaArtist,
   IMediaLikedTrack,
+  IMediaPinnedItem,
   IMediaPlaylist,
   IMediaTrack,
 } from '../interfaces';
@@ -22,6 +23,7 @@ export type MediaLibraryState = {
   mediaPlaylists: IMediaPlaylist[];
   mediaSelectedPlaylist?: IMediaPlaylist;
   mediaLikedTracksRecord: Record<string, IMediaLikedTrack>;
+  mediaPinnedItemsRecord: Record<string, IMediaPinnedItem>;
 };
 
 export type MediaLibraryStateAction = {
@@ -35,6 +37,7 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaIsSyncing: false,
   mediaPlaylists: [],
   mediaLikedTracksRecord: {},
+  mediaPinnedItemsRecord: {},
 };
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
@@ -314,6 +317,51 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       return {
         ...state,
         mediaLikedTracksRecord: omit(state.mediaLikedTracksRecord, mediaTrackId),
+      };
+    }
+    case MediaLibraryActions.SetPinnedItems: {
+      // data.mediaPinnedItems: IMediaPinnedItem[]
+      const { mediaPinnedItems } = action.data;
+
+      return {
+        ...state,
+        mediaPinnedItemsRecord: keyBy(
+          mediaPinnedItems,
+          (item: IMediaPinnedItem) => MediaUtils.getPinnedItemKey(item),
+        ),
+      };
+    }
+    case MediaLibraryActions.AddPinnedItem: {
+      // data.mediaPinnedItem: IMediaPinnedItem
+      const { mediaPinnedItem } = action.data;
+      const mediaPinnedItemKey = MediaUtils.getPinnedItemKey(mediaPinnedItem);
+
+      if (state.mediaPinnedItemsRecord[mediaPinnedItemKey]) {
+        // already there, skip update
+        return state;
+      }
+
+      return {
+        ...state,
+        mediaPinnedItemsRecord: {
+          ...state.mediaPinnedItemsRecord,
+          [mediaPinnedItemKey]: mediaPinnedItem,
+        },
+      };
+    }
+    case MediaLibraryActions.RemovePinnedCollectionItem: {
+      // data.mediaCollectionItem: IMediaCollectionItem
+      const { mediaPinnedItemInput } = action.data;
+      const mediaPinnedItemKey = MediaUtils.getPinnedItemKeyFromInput(mediaPinnedItemInput);
+
+      if (!state.mediaPinnedItemsRecord[mediaPinnedItemKey]) {
+        // already removed, skip update
+        return state;
+      }
+
+      return {
+        ...state,
+        mediaPinnedItemsRecord: omit(state.mediaPinnedItemsRecord, mediaPinnedItemKey),
       };
     }
     default:

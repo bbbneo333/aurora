@@ -1,11 +1,19 @@
 .sidebar {
-  width: 30%;
+  width: 35%;
   min-width: 250px;
   max-width: 350px;
   background-color: var(--stage-bg-color);
   color: var(--text-dark-color);
   display: flex;
   flex-direction: column;
+}
+
+.sidebar-content {
+  margin: 10px;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .sidebar-header {
@@ -17,12 +25,16 @@
 .sidebar-navigation-list {
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  flex: 0 0 auto; /* only take needed space */
+  /* this is to keep vertically inline with the scrollable list below it */
+  padding-left: var(--scrollable-scrollbar-width);
+  padding-right: var(--scrollable-scrollbar-width);
+  gap: 5px;
 }
 
 .sidebar-navigation-item {
   font-size: 15px;
-  padding: 10px 15px;
+  padding: 10px 12px;
   display: flex;
   flex-direction: row;
   border-radius: 5px;
@@ -34,7 +46,7 @@
   color: var(--selectable-hovered-color);
 }
 
-.sidebar-navigation-item.selected {
+.sidebar-navigation-item.active {
   background-color: var(--selectable-active-bg-color);
   color: var(--selectable-active-color);
 }
@@ -44,8 +56,8 @@
 }
 
 .sidebar-quick-access {
-  flex: 1 0 0;
-  padding: 0 4px 0 calc(var(--scrollable-scrollbar-width) + 4px);
+  flex: 1 0 0; /* stretch to fill remaining space */
+  padding: var(--selectable-focus-ring-size); /* this is to not clip focus ring */
 }
 
 .sidebar-logo {

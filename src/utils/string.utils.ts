@@ -17,7 +17,7 @@ export function buildRoute(
   const path = base.replace(/:(\w*)/g, (...args) => {
     const mapping = get(mappings, args[1]);
     if (!mapping) {
-      throw new Error(`Could not build route - Unknown mapping for key ${mapping}`);
+      throw new Error(`Could not build route - Unknown mapping for key ${args[1]}`);
     }
 
     return mapping;

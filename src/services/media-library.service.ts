@@ -218,11 +218,21 @@ class MediaLibraryService {
     return MediaUtils.sortMediaArtistTracks(mediaTracks);
   }
 
+  async getMediaAlbum(albumId: string): Promise<IMediaAlbum | undefined> {
+    const albumData = await MediaAlbumDatastore.findMediaAlbumById(albumId);
+    return albumData ? this.buildMediaAlbum(albumData) : undefined;
+  }
+
   async getMediaAlbums(): Promise<IMediaAlbum[]> {
     const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums();
 
     const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
     return MediaUtils.sortMediaAlbums(mediaAlbums);
+  }
+
+  async getMediaArtist(artistId: string): Promise<IMediaArtist | undefined> {
+    const artistData = await MediaArtistDatastore.findMediaArtistById(artistId);
+    return artistData ? this.buildMediaArtist(artistData) : undefined;
   }
 
   async getMediaArtists(): Promise<IMediaArtist[]> {
@@ -261,7 +271,7 @@ class MediaLibraryService {
         store.dispatch({
           type: MediaLibraryActions.SetAlbum,
           data: {
-            mediaAlbum: await this.buildMediaAlbum(mediaAlbumId),
+            mediaAlbum: await this.getMediaAlbum(mediaAlbumId),
             mediaAlbumTracks,
           },
         });
@@ -288,7 +298,7 @@ class MediaLibraryService {
         store.dispatch({
           type: MediaLibraryActions.SetArtist,
           data: {
-            mediaArtist: await this.buildMediaArtist(mediaArtistId),
+            mediaArtist: await this.getMediaArtist(mediaArtistId),
             mediaArtistAlbums,
           },
         });
@@ -381,8 +391,13 @@ class MediaLibraryService {
       mediaAlbumData = mediaAlbum;
     }
 
+    const mediaAlbumArtist = await this.getMediaArtist(mediaAlbumData.album_artist_id);
+    if (!mediaAlbumArtist) {
+      throw new Error(`Encountered error while build media album - ${mediaAlbumData.id} - Could not find artist with id - ${mediaAlbumData.album_artist_id}`);
+    }
+
     const mediaAlbumBuilt = _.assign({}, mediaAlbumData, {
-      album_artist: await this.buildMediaArtist(mediaAlbumData.album_artist_id),
+      album_artist: mediaAlbumArtist,
     });
 
     if (loadMediaAlbum) {

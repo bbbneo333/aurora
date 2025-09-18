@@ -34,3 +34,25 @@
   font-size: inherit;
   color: var(--text-dark-color);
 }
+
+.media-cover-picture:not(.has_content) .media-cover-picture-content {
+  display: none;
+}
+
+.media-cover-picture.has_content .media-cover-picture-content {
+  position: absolute;
+  background-color: rgba(0, 0, 0, .7);
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: var(--selectable-item-transition);
+}
+
+.media-cover-picture.has_content:hover .media-cover-picture-content {
+  opacity: 1;
+}

@@ -46,7 +46,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
   const [mediaPlaylistsSearchStr, setMediaPlaylistsSearchStr] = useState<string>('');
   const history = useHistory();
   const [searchInputFocus, setSearchInputFocus] = useState(false);
-  const { menuProps } = useContextMenu<MediaPlaylistContextMenuItemProps>();
+  const { menuProps, hideAll } = useContextMenu<MediaPlaylistContextMenuItemProps>();
   const mediaPlaylistsToShow = useSearch(mediaPlaylists, mediaPlaylistsSearchStr);
   const { showModal } = useModal();
 
@@ -58,6 +58,7 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
     const itemAction: MediaPlaylistContextMenuItemAction = itemParams.id as MediaPlaylistContextMenuItemAction;
     const mediaPlaylistId = itemParams.data?.mediaPlaylistId;
     const { mediaTrack, mediaTracks, mediaItem } = menuProps;
+    hideAll();
 
     async function getMediaTracks(): Promise<IMediaTrack[]> {
       if (mediaTrack) {
@@ -129,7 +130,10 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
       // unsupported action, do nothing
     }
   }, [
+    hideAll,
+    history,
     menuProps,
+    showModal,
   ]);
 
   if (mediaPlaylistContextMenuType === 'add') {

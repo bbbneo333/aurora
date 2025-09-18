@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 
 import { useModal } from '../../contexts';
-import { Layout, Routes } from '../../constants';
+import { Icons, Layout, Routes } from '../../constants';
 import { useEntityMissing } from '../../hooks';
 import { IMediaPicture, IMediaPlaylistTrack } from '../../interfaces';
 import { RootState } from '../../reducers';
@@ -111,6 +111,7 @@ export function PlaylistPage() {
               mediaPictureAltText={mediaSelectedPlaylist.name}
               className={cx('playlist-cover-picture')}
               onPictureUpdate={handleOnPictureUpdate}
+              mediaCoverPlaceholderIcon={Icons.PlaylistPlaceholder}
             />
           </div>
           <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'playlist-header-info-column')}>
@@ -152,7 +153,6 @@ export function PlaylistPage() {
             contextMenuItems={[
               MediaTrackContextMenuItem.Like,
               MediaTrackContextMenuItem.AddToQueue,
-              MediaTrackContextMenuItem.Separator,
               MediaTrackContextMenuItem.RemoveFromPlaylist,
             ]}
             onMediaTracksSorted={handleMediaTracksSorted}

@@ -10,10 +10,3 @@ export type AppBrowserHistory = H.History & {
   index: number,
   entries: [H.Location],
 };
-
-export abstract class AppError extends Error {
-  protected constructor(message: string) {
-    super(message);
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}

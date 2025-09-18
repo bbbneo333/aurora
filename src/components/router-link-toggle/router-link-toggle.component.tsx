@@ -1,22 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import classNames from 'classnames/bind';
+import { NavLinkProps, useHistory, useLocation } from 'react-router-dom';
 
-import {
-  NavLink,
-  NavLinkProps,
-  useHistory,
-  useLocation,
-} from 'react-router-dom';
-
-import { AppBrowserHistory } from '../../types';
+import { RouterLink } from '../router-link/router-link.component';
 
 import styles from './router-link-toggle.component.css';
 
 const cx = classNames.bind(styles);
 
-type RouterLinkToggleProps = NavLinkProps & {
-  fallbackPath?: string,
-};
+type RouterLinkToggleProps = {} & NavLinkProps;
 
 export function RouterLinkToggle(props: RouterLinkToggleProps) {
   const {
@@ -24,37 +16,28 @@ export function RouterLinkToggle(props: RouterLinkToggleProps) {
     activeClassName,
     children,
     to,
-    fallbackPath = '/',
+    ...rest
   } = props;
 
   const { pathname } = useLocation();
-  const { entries } = useHistory() as AppBrowserHistory;
-  const [togglePath, setTogglePath] = useState<string>(to);
-
-  useEffect(() => {
-    if (pathname === to) {
-      const toLocation = entries[entries.length - 2];
-      setTogglePath(toLocation ? toLocation.pathname : fallbackPath);
-    } else {
-      setTogglePath(to);
-    }
-  }, [
-    to,
-    fallbackPath,
-    pathname,
-    entries,
-  ]);
+  const history = useHistory();
 
   return (
-    <NavLink
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      {...props}
-      to={togglePath}
+    <RouterLink
+      {...rest}
+      to={to}
       className={cx('router-link-toggle', className, activeClassName && {
         [activeClassName]: pathname === to,
       })}
+      onClick={(e) => {
+        if (pathname === to) {
+          // if user is on same path, go back to previous
+          e.preventDefault();
+          history.goBack();
+        }
+      }}
     >
       {children}
-    </NavLink>
+    </RouterLink>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { Layout, Routes } from '../../constants';
+import { Icons, Layout, Routes } from '../../constants';
 import { IMediaAlbum } from '../../interfaces';
 import { MediaCollectionService } from '../../services';
 import { StringUtils } from '../../utils';
@@ -33,11 +33,12 @@ export function MediaAlbums(props: {
             <div className={Layout.Grid.CollectionTile} key={mediaAlbum.id}>
               <MediaCollectionTile
                 mediaItem={mediaItem}
-                mediaLink={StringUtils.buildRoute(Routes.LibraryAlbum, {
+                routerLink={StringUtils.buildRoute(Routes.LibraryAlbum, {
                   albumId: mediaAlbum.id,
                 })}
-                mediaSubtitle={mediaAlbum.album_artist.artist_name}
-                mediaContextMenuId={mediaContextMenuId}
+                subtitle={mediaAlbum.album_artist.artist_name}
+                contextMenuId={mediaContextMenuId}
+                coverPlaceholderIcon={Icons.AlbumPlaceholder}
               />
             </div>
           );
@@ -47,7 +48,6 @@ export function MediaAlbums(props: {
         id={mediaContextMenuId}
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
-          MediaCollectionContextMenuItem.Separator,
           MediaCollectionContextMenuItem.AddToPlaylist,
         ]}
       />

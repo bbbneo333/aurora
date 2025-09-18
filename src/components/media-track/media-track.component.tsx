@@ -25,7 +25,7 @@ export type MediaTrackProps<T> = {
   isActive?: boolean;
 } & HTMLAttributes<HTMLDivElement>;
 
-export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMediaTrack>>((props, ref) => {
+export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
   const {
     mediaTrack,
     mediaTrackPointer,
@@ -59,10 +59,8 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
       role="row"
       tabIndex={0}
       {...rest}
-      ref={ref}
-      aria-selected={isSelected}
       className={cx('media-track', className, {
-        selected: isSelected,
+        selected: isSelected || rest['aria-selected'],
         active: isActive || isTrackActive,
       })}
       onDoubleClick={(e) => {
@@ -114,4 +112,4 @@ export const MediaTrack = React.forwardRef<HTMLDivElement, MediaTrackProps<IMedi
       </div>
     </div>
   );
-});
+}

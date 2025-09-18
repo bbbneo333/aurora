@@ -3,11 +3,16 @@ import { Menu } from 'react-contexify';
 import classNames from 'classnames/bind';
 
 import { useContextMenu, useModal } from '../../contexts';
-import { useMediaCollectionPlayback } from '../../hooks';
-import { I18nService, MediaCollectionService, MediaPlayerService } from '../../services';
+import { useMediaCollectionPin, useMediaCollectionPlayback } from '../../hooks';
 import { Icons } from '../../constants';
 import { IMediaCollectionItem } from '../../interfaces';
 import { MediaCollectionItemType } from '../../enums';
+
+import {
+  I18nService,
+  MediaCollectionService,
+  MediaPlayerService,
+} from '../../services';
 
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
@@ -37,6 +42,14 @@ export function MediaCollectionActions(props: {
     play,
     pause,
   } = useMediaCollectionPlayback({
+    mediaItem,
+  });
+
+  const {
+    isPinned,
+    togglePinned,
+    isPinnedStatusLoading,
+  } = useMediaCollectionPin({
     mediaItem,
   });
 
@@ -111,6 +124,17 @@ export function MediaCollectionActions(props: {
           </Button>
         </>
       )}
+      <Button
+        className={cx('media-collection-pin-button', { active: isPinned })}
+        variant={['rounded', 'outline']}
+        tooltip={I18nService.getString(isPinned ? 'tooltip_unpin_collection' : 'tooltip_pin_collection', {
+          collectionType: MediaCollectionService.getItemSubtitle(mediaItem),
+        })}
+        onButtonSubmit={togglePinned}
+        disabled={isPinnedStatusLoading}
+      >
+        <Icon name={Icons.MediaPin}/>
+      </Button>
     </div>
   );
 }
