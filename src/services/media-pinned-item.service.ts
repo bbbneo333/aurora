@@ -120,6 +120,8 @@ class MediaPinnedItemService {
     await Promise.map(itemIds, async (itemId, index) => MediaPinnedItemDatastore.updateOne(itemId, {
       order: index,
     }));
+
+    this.loadPinnedItems();
   }
 
   private async getOrderForNewItem(): Promise<number> {

@@ -20,8 +20,8 @@ const cx = classNames.bind(styles);
 
 export function MediaPinnedItemList() {
   const sortedMediaPinnedItems = useSelector(selectSortedPinnedItems);
-  const contextMenuId = 'media-pinned-item-list-context-menu';
   const { showModal } = useModal();
+  const contextMenuId = 'media-pinned-item-list-context-menu';
 
   useEffect(() => {
     MediaPinnedItemService.loadPinnedItems();
@@ -29,7 +29,6 @@ export function MediaPinnedItemList() {
 
   const handleItemsSorted = useCallback(async (items: IMediaPinnedItem[]) => {
     await MediaPinnedItemService.updatePinnedItemsOrder(items.map(item => item.pinned_item_id));
-    MediaPinnedItemService.loadPinnedItems();
   }, []);
 
   const handleItemsDelete = useCallback((ids: string[]) => new Promise<boolean>((resolve) => {
