@@ -84,9 +84,13 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   const listIds = list.map(getItemId);
 
   const selectAll = React.useCallback(() => {
-    setSelectedItemIds(listIds);
+    // allowed only if multi selection is allowed
+    if (!disableMultiSelect) {
+      setSelectedItemIds(listIds);
+    }
   }, [
     listIds,
+    disableMultiSelect,
   ]);
 
   const clearSelection = React.useCallback(() => {
