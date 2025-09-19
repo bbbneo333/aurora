@@ -27,5 +27,6 @@
   "PlayerVolume1": "fas fa-volume-up",
   "PlayerVolume2": "fas fa-volume-down",
   "PlayerVolumeMuted": "fas fa-volume-mute",
-  "Search": "fas fa-search"
+  "Search": "fas fa-search",
+  "TrackPlaceholder": "fas fa-record-vinyl"
 }
