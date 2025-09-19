@@ -16,7 +16,7 @@
   color: var(--selectable-hovered-color);
 }
 
-.media-track.active .media-track-info {
+.media-track.media-active .media-track-info {
   font-weight: bold;
 }
 

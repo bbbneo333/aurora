@@ -62,7 +62,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
       {...rest}
       className={cx('media-track', className, {
         selected: isSelected || rest['aria-selected'],
-        active: isActive || isTrackActive,
+        'media-active': isActive || isTrackActive,
       })}
       onDoubleClick={(e) => {
         onDoubleClick?.(e);

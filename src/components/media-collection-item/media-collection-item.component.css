@@ -54,3 +54,7 @@
   font-size: 13px;
   color: var(--text-dark-color);
 }
+
+.collection-item.media-active .collection-item-info-title {
+  font-weight: bold;
+}
