@@ -1,6 +1,7 @@
 import React, { HTMLAttributes } from 'react';
 import classNames from 'classnames/bind';
 
+import { Icons } from '../../constants';
 import { IMediaTrack } from '../../interfaces';
 import { DateTimeUtils, Events } from '../../utils';
 import { useMediaTrackPlayback } from '../../hooks';
@@ -61,7 +62,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
       {...rest}
       className={cx('media-track', className, {
         selected: isSelected || rest['aria-selected'],
-        active: isActive || isTrackActive,
+        'media-active': isActive || isTrackActive,
       })}
       onDoubleClick={(e) => {
         onDoubleClick?.(e);
@@ -88,6 +89,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
               mediaPicture={mediaTrack.track_cover_picture}
               mediaPictureAltText={mediaTrack.track_name}
               className={cx('media-track-cover')}
+              mediaCoverPlaceholderIcon={Icons.TrackPlaceholder}
             />
           </div>
         )}

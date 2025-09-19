@@ -42,9 +42,11 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
   const { showMenu } = useContextMenu();
 
   const {
+    isMediaActive,
     isMediaPlaying,
     play,
     pause,
+    toggle,
   } = useMediaCollectionPlayback({
     mediaItem,
   });
@@ -87,8 +89,11 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       exact
       to={routerLink}
       activeClassName={cx('active')}
-      className={cx('collection-item', 'app-nav-link', variant, className)}
+      className={cx('collection-item', 'app-nav-link', variant, {
+        'media-active': isMediaActive,
+      }, className)}
       onContextMenu={handleOnContextMenu}
+      onDoubleClick={toggle}
     >
       <div className={cx('collection-item-content')}>
         {variant !== 'compact' && (
