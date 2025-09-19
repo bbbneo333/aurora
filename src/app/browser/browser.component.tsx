@@ -10,9 +10,9 @@ import {
 } from '../../components';
 
 import { AppEnums } from '../../enums';
+import { IPCService } from '../../modules/ipc';
 
 import styles from './browser.component.css';
-import AppService from '../../services/app.service';
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +27,7 @@ function BrowserHeader() {
     <div
       className={cx('browser-header')}
       onDoubleClick={() => {
-        AppService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
+        IPCService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
       }}
     >
       <BrowserNavigation/>

@@ -5,8 +5,8 @@ import { AppEnums, MediaLibraryActions, MediaTrackCoverPictureImageDataType } fr
 import store from '../store';
 import { DataStoreInputData } from '../types';
 import { MediaUtils } from '../utils';
+import { IPCService } from '../modules/ipc';
 
-import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
 
 import {
@@ -456,7 +456,7 @@ class MediaLibraryService {
       let imageCachePath;
 
       try {
-        imageCachePath = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
+        imageCachePath = await IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
           width: this.mediaPictureScaleWidth,
           height: this.mediaPictureScaleHeight,
         });

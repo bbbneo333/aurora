@@ -14,7 +14,8 @@ import { AppEnums } from '../enums';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
 import { RootState } from '../reducers';
-import { AppService, MediaProviderService } from '../services';
+import { MediaProviderService } from '../services';
+import { IPCService } from '../modules/ipc';
 
 import statePersistors from '../persistors';
 import store from '../store';
@@ -100,7 +101,7 @@ export function App() {
     });
 
     // add listeners for messages from main process
-    AppService.registerSyncMessageHandler(AppEnums.IPCRendererCommChannels.StateRemovePersisted, removeStates);
+    IPCService.registerSyncMessageHandler(AppEnums.IPCRendererCommChannels.StateRemovePersisted, removeStates);
 
     loadState(store)
       .then(() => {

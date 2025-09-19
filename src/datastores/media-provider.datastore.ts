@@ -1,13 +1,13 @@
 import { AppEnums } from '../enums';
 import { IMediaProviderData } from '../interfaces';
-import AppService from '../services/app.service';
 import { DataStoreInputData, DataStoreUpdateData } from '../types';
+import { IPCService } from '../modules/ipc';
 
 class MediaProviderDatastore {
   private readonly mediaProviderDatastoreName = 'media_providers';
 
   constructor() {
-    AppService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaProviderDatastoreName, {
+    IPCService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaProviderDatastoreName, {
       indexes: [{
         field: 'identifier',
         unique: true,
@@ -16,13 +16,13 @@ class MediaProviderDatastore {
   }
 
   findMediaProviderByIdentifier(mediaProviderIdentifier: string): Promise<IMediaProviderData | undefined> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaProviderDatastoreName, {
+    return IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     });
   }
 
   updateMediaProviderByIdentifier(mediaProviderIdentifier: string, mediaProviderUpdateData: DataStoreUpdateData<IMediaProviderData>): Promise<IMediaProviderData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaProviderDatastoreName, {
+    return IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     }, {
       $set: mediaProviderUpdateData,
@@ -30,7 +30,7 @@ class MediaProviderDatastore {
   }
 
   insertMediaProvider(mediaProviderInputData: DataStoreInputData<IMediaProviderData>): Promise<IMediaProviderData> {
-    return AppService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
+    return IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
   }
 }
 

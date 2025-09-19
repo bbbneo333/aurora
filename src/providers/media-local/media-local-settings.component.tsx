@@ -4,7 +4,8 @@ import classNames from 'classnames/bind';
 import { ActionList, Button } from '../../components';
 import { Icons } from '../../constants';
 import { AppEnums } from '../../enums';
-import { AppService, MediaProviderService } from '../../services';
+import { MediaProviderService } from '../../services';
+import { IPCService } from '../../modules/ipc';
 
 import MediaLocalConstants from './media-local.constants.json';
 import { mediaLocalSettingsStateReducer, MediaLocalSettingsStateActionType } from './media-local-settings.store';
@@ -18,7 +19,7 @@ type MediaLocalSettingsProps = {
 };
 
 function openDirectorySelectionDialog(): string | undefined {
-  return AppService.sendSyncMessage(AppEnums.IPCCommChannels.FSSelectDirectory);
+  return IPCService.sendSyncMessage(AppEnums.IPCCommChannels.FSSelectDirectory);
 }
 
 export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {

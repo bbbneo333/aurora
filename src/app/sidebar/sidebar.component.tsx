@@ -5,9 +5,9 @@ import { Icon, MediaPinnedItemList, RouterLink } from '../../components';
 import { AppEnums } from '../../enums';
 import { I18nService } from '../../services';
 import routes from '../app.routes';
+import { IPCService } from '../../modules/ipc';
 
 import styles from './sidebar.component.css';
-import AppService from '../../services/app.service';
 
 const cx = classNames.bind(styles);
 
@@ -71,7 +71,7 @@ function SidebarHeader() {
     <div
       className={cx('sidebar-header')}
       onDoubleClick={() => {
-        AppService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
+        IPCService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
       }}
     />
   );

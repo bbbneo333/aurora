@@ -2,9 +2,10 @@ import React, { HTMLAttributes, ReactNode } from 'react';
 import classNames from 'classnames/bind';
 
 import { Icons } from '../../constants';
-import { AppService, I18nService } from '../../services';
+import { I18nService } from '../../services';
 import { AppEnums } from '../../enums';
 import { Events } from '../../utils';
+import { IPCService } from '../../modules/ipc';
 
 import { LoaderIcon } from '../loader/loader-icon.component';
 import { Icon } from '../icon/icon.component';
@@ -41,7 +42,7 @@ export function UploadOverlay(props: UploadOverlayProps) {
   };
 
   const openDialog = () => {
-    const selection = AppService.sendSyncMessage(AppEnums.IPCCommChannels.FSSelectFile, {
+    const selection = IPCService.sendSyncMessage(AppEnums.IPCCommChannels.FSSelectFile, {
       extensions,
     });
     if (!selection) {
