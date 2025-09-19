@@ -9,8 +9,7 @@ import {
   RouterSwitchComponent,
 } from '../../components';
 
-import { AppEnums } from '../../enums';
-import { IPCService } from '../../modules/ipc';
+import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import styles from './browser.component.css';
 
@@ -27,7 +26,7 @@ function BrowserHeader() {
     <div
       className={cx('browser-header')}
       onDoubleClick={() => {
-        IPCService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
+        IPCService.sendSyncMessage(IPCCommChannel.AppToggleWindowFill);
       }}
     >
       <BrowserNavigation/>

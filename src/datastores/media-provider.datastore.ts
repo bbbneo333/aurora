@@ -1,13 +1,12 @@
-import { AppEnums } from '../enums';
 import { IMediaProviderData } from '../interfaces';
 import { DataStoreInputData, DataStoreUpdateData } from '../types';
-import { IPCService } from '../modules/ipc';
+import { IPCService, IPCCommChannel } from '../modules/ipc';
 
 class MediaProviderDatastore {
   private readonly mediaProviderDatastoreName = 'media_providers';
 
   constructor() {
-    IPCService.sendSyncMessage(AppEnums.IPCCommChannels.DSRegisterDatastore, this.mediaProviderDatastoreName, {
+    IPCService.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaProviderDatastoreName, {
       indexes: [{
         field: 'identifier',
         unique: true,
@@ -16,13 +15,13 @@ class MediaProviderDatastore {
   }
 
   findMediaProviderByIdentifier(mediaProviderIdentifier: string): Promise<IMediaProviderData | undefined> {
-    return IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.DSFindOne, this.mediaProviderDatastoreName, {
+    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     });
   }
 
   updateMediaProviderByIdentifier(mediaProviderIdentifier: string, mediaProviderUpdateData: DataStoreUpdateData<IMediaProviderData>): Promise<IMediaProviderData> {
-    return IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.DSUpdateOne, this.mediaProviderDatastoreName, {
+    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     }, {
       $set: mediaProviderUpdateData,
@@ -30,7 +29,7 @@ class MediaProviderDatastore {
   }
 
   insertMediaProvider(mediaProviderInputData: DataStoreInputData<IMediaProviderData>): Promise<IMediaProviderData> {
-    return IPCService.sendAsyncMessage(AppEnums.IPCCommChannels.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
+    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
   }
 }
 

@@ -3,9 +3,8 @@ import classNames from 'classnames/bind';
 
 import { Icons } from '../../constants';
 import { I18nService } from '../../services';
-import { AppEnums } from '../../enums';
 import { Events } from '../../utils';
-import { IPCService } from '../../modules/ipc';
+import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import { LoaderIcon } from '../loader/loader-icon.component';
 import { Icon } from '../icon/icon.component';
@@ -42,7 +41,7 @@ export function UploadOverlay(props: UploadOverlayProps) {
   };
 
   const openDialog = () => {
-    const selection = IPCService.sendSyncMessage(AppEnums.IPCCommChannels.FSSelectFile, {
+    const selection = IPCService.sendSyncMessage(IPCCommChannel.FSSelectFile, {
       extensions,
     });
     if (!selection) {

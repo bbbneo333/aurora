@@ -10,8 +10,8 @@ import {
   MenuItemConstructorOptions,
 } from 'electron';
 
-import { AppEnums } from '../../enums';
 import { IAppBuilder, IAppMain } from '../../interfaces';
+import { PlatformOS } from '../../modules/platform';
 
 import { DatastoreModule } from '../modules';
 
@@ -32,7 +32,7 @@ export default class MenuBuilder implements IAppBuilder {
       this.setupDevelopmentEnvironment(mainWindow);
     }
 
-    const menuTemplate = this.app.platform === AppEnums.Platforms.Darwin
+    const menuTemplate = this.app.platform === PlatformOS.Darwin
       ? this.buildDarwinTemplate(mainWindow)
       : this.buildDefaultTemplate(mainWindow);
 

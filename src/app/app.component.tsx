@@ -4,18 +4,13 @@ import { Provider, useSelector } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import _ from 'lodash';
 
-import {
-  MediaSession,
-  MediaPlayerRibbonComponent,
-} from '../components';
-
+import { MediaSession, MediaPlayerRibbonComponent } from '../components';
 import { ContextMenuProvider, ModalProvider, NotificationProvider } from '../contexts';
-import { AppEnums } from '../enums';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
 import { RootState } from '../reducers';
 import { MediaProviderService } from '../services';
-import { IPCService } from '../modules/ipc';
+import { IPCService, IPCRendererCommChannel } from '../modules/ipc';
 
 import statePersistors from '../persistors';
 import store from '../store';
@@ -101,7 +96,7 @@ export function App() {
     });
 
     // add listeners for messages from main process
-    IPCService.registerSyncMessageHandler(AppEnums.IPCRendererCommChannels.StateRemovePersisted, removeStates);
+    IPCService.registerSyncMessageHandler(IPCRendererCommChannel.StateRemovePersisted, removeStates);
 
     loadState(store)
       .then(() => {

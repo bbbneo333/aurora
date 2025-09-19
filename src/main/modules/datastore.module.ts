@@ -4,9 +4,9 @@ import path from 'path';
 import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
-import { AppEnums } from '../../enums';
 import { DatastoreUtils } from '../../utils';
 import { DataStoreQueryData } from '../../types';
+import { IPCCommChannel } from '../../modules/ipc';
 
 const debug = require('debug')('app:module:datastore_module');
 
@@ -48,14 +48,14 @@ export class DatastoreModule implements IAppModule {
   }
 
   private registerMessageHandlers(): void {
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.DSRegisterDatastore, this.registerDatastore, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSFind, this.find, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSFindOne, this.findOne, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSInsertOne, this.insertOne, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSUpdateOne, this.updateOne, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSRemove, this.remove, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSRemoveOne, this.removeOne, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.DSCount, this.count, this);
+    this.app.registerSyncMessageHandler(IPCCommChannel.DSRegisterDatastore, this.registerDatastore, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSFind, this.find, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSFindOne, this.findOne, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSInsertOne, this.insertOne, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSUpdateOne, this.updateOne, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
   }
 
   private removeDatastore(datastore: Datastore): void {

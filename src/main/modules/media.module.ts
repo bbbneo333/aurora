@@ -1,9 +1,10 @@
 import path from 'path';
 import sharp from 'sharp';
 
-import { AppEnums, ImageFileExtensions } from '../../enums';
+import { ImageFileExtensions } from '../../enums';
 import { IAppMain, IAppModule } from '../../interfaces';
 import { StringUtils } from '../../utils';
+import { IPCCommChannel } from '../../modules/ipc';
 
 export class MediaModule implements IAppModule {
   readonly defaultImageExtension = ImageFileExtensions.JPG;
@@ -16,7 +17,7 @@ export class MediaModule implements IAppModule {
   }
 
   private registerMessageHandlers() {
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, this.scaleAndCacheImage, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.MediaScaleAndCacheImage, this.scaleAndCacheImage, this);
   }
 
   private async scaleAndCacheImage(imageData: Buffer | string, imageScaleOptions: {

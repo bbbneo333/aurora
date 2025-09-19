@@ -46,9 +46,7 @@ import {
   AppAsyncMessageHandler,
 } from './types';
 
-import {
-  AppEnums,
-} from './enums';
+import { IPCCommChannel, IPCRendererCommChannel } from './modules/ipc';
 
 import * as AppBuilders from './main/builders';
 import * as AppModules from './main/modules';
@@ -190,7 +188,7 @@ class App implements IAppMain {
   }
 
   removePersistedStates() {
-    this.sendSyncMessageToRenderer(AppEnums.IPCRendererCommChannels.StateRemovePersisted);
+    this.sendSyncMessageToRenderer(IPCRendererCommChannel.StateRemovePersisted);
   }
 
   toggleWindowFill() {
@@ -360,7 +358,7 @@ class App implements IAppMain {
     this.registerAutoUpdater();
 
     // register handlers for renderer messages
-    this.registerSyncMessageHandler(AppEnums.IPCCommChannels.AppToggleWindowFill, () => {
+    this.registerSyncMessageHandler(IPCCommChannel.AppToggleWindowFill, () => {
       this.toggleWindowFill();
     });
 

@@ -2,10 +2,9 @@ import React from 'react';
 import classNames from 'classnames/bind';
 
 import { Icon, MediaPinnedItemList, RouterLink } from '../../components';
-import { AppEnums } from '../../enums';
 import { I18nService } from '../../services';
 import routes from '../app.routes';
-import { IPCService } from '../../modules/ipc';
+import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import styles from './sidebar.component.css';
 
@@ -71,7 +70,7 @@ function SidebarHeader() {
     <div
       className={cx('sidebar-header')}
       onDoubleClick={() => {
-        IPCService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
+        IPCService.sendSyncMessage(IPCCommChannel.AppToggleWindowFill);
       }}
     />
   );

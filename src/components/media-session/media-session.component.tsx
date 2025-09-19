@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-import { AppEnums, MediaEnums } from '../../enums';
+import { MediaEnums } from '../../enums';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 import { IMediaTrack } from '../../interfaces';
-import { IPCService } from '../../modules/ipc';
+import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 const debug = require('debug')('app:component:media_session_component');
 
@@ -19,7 +19,7 @@ const getSessionArtworkForMediaTrack = (mediaTrack: IMediaTrack): MediaImage | u
 
   switch (mediaTrackPicture?.image_data_type) {
     case MediaEnums.MediaTrackCoverPictureImageDataType.Path: {
-      const image = IPCService.sendSyncMessage(AppEnums.IPCCommChannels.FSReadFile, mediaTrackPicture.image_data);
+      const image = IPCService.sendSyncMessage(IPCCommChannel.FSReadFile, mediaTrackPicture.image_data);
       mediaTrackPictureBuffer = Buffer.from(image);
       break;
     }
