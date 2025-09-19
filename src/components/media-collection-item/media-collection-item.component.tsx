@@ -45,6 +45,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
     isMediaPlaying,
     play,
     pause,
+    toggle,
   } = useMediaCollectionPlayback({
     mediaItem,
   });
@@ -89,6 +90,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       activeClassName={cx('active')}
       className={cx('collection-item', 'app-nav-link', variant, className)}
       onContextMenu={handleOnContextMenu}
+      onDoubleClick={toggle}
     >
       <div className={cx('collection-item-content')}>
         {variant !== 'compact' && (

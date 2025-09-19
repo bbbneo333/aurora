@@ -21,11 +21,13 @@ export function useMediaCollectionPlayback(props: UseMediaCollectionPlaybackProp
     mediaPlaybackCurrentTrackList,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
-  const isMediaPlaying = mediaPlaybackState === MediaPlaybackState.Playing
-    && mediaPlaybackCurrentTrackList
+  const isMediaActive = mediaPlaybackCurrentTrackList
     && mediaPlaybackCurrentTrackList.id === mediaItem.id;
 
-  const play = useCallback((e: Event) => {
+  const isMediaPlaying = mediaPlaybackState === MediaPlaybackState.Playing
+    && isMediaActive;
+
+  const play = useCallback(() => {
     MediaCollectionService
       .getMediaCollectionTracks(mediaItem)
       .then((mediaTracks) => {
@@ -38,27 +40,31 @@ export function useMediaCollectionPlayback(props: UseMediaCollectionPlaybackProp
           id: mediaItem.id,
         });
       });
-
-    // this action button resides within a link
-    // stop propagation to prevent that
-    e.preventDefault();
-    e.stopPropagation();
   }, [
     mediaItem,
   ]);
 
-  const pause = useCallback((e: Event) => {
+  const pause = useCallback(() => {
     MediaPlayerService.pauseMediaPlayer();
-
-    // this action button resides within a link
-    // stop propagation to prevent that
-    e.preventDefault();
-    e.stopPropagation();
   }, []);
 
+  const toggle = useCallback(() => {
+    if (isMediaPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  }, [
+    isMediaPlaying,
+    pause,
+    play,
+  ]);
+
   return {
+    isMediaActive,
     isMediaPlaying,
     play,
     pause,
+    toggle,
   };
 }
