@@ -4,7 +4,6 @@ import classNames from 'classnames/bind';
 import { Icon, MediaPinnedItemList, RouterLink } from '../../components';
 import { I18nService } from '../../services';
 import routes from '../app.routes';
-import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import styles from './sidebar.component.css';
 
@@ -67,12 +66,7 @@ function SidebarNavigationList() {
 
 function SidebarHeader() {
   return (
-    <div
-      className={cx('sidebar-header')}
-      onDoubleClick={() => {
-        IPCService.sendSyncMessage(IPCCommChannel.AppToggleWindowFill);
-      }}
-    />
+    <div className={cx('sidebar-header', 'app-window-drag')}/>
   );
 }
 

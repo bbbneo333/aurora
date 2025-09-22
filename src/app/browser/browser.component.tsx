@@ -9,8 +9,6 @@ import {
   RouterSwitchComponent,
 } from '../../components';
 
-import { IPCService, IPCCommChannel } from '../../modules/ipc';
-
 import styles from './browser.component.css';
 
 const cx = classNames.bind(styles);
@@ -23,12 +21,7 @@ function BrowserLinks() {
 
 function BrowserHeader() {
   return (
-    <div
-      className={cx('browser-header')}
-      onDoubleClick={() => {
-        IPCService.sendSyncMessage(IPCCommChannel.AppToggleWindowFill);
-      }}
-    >
+    <div className={cx('browser-header', 'app-window-drag')}>
       <BrowserNavigation/>
       <BrowserLinks/>
     </div>
