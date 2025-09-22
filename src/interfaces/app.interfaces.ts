@@ -1,9 +1,6 @@
 import { BrowserWindow } from 'electron';
 
-import {
-  AppAsyncMessageHandler,
-  AppSyncMessageHandler,
-} from '../types';
+import { IPCAsyncMessageHandler, IPCSyncMessageHandler } from '../modules/ipc';
 
 export interface IAppMain {
   env?: string;
@@ -12,11 +9,11 @@ export interface IAppMain {
 
   quit(): void;
 
-  registerSyncMessageHandler(messageChannel: string, messageHandlerSync: AppSyncMessageHandler, messageHandlerCtx?: any): void;
+  registerSyncMessageHandler(messageChannel: string, messageHandlerSync: IPCSyncMessageHandler, messageHandlerCtx?: any): void;
 
-  registerAsyncMessageHandler(messageChannel: string, messageHandler: AppAsyncMessageHandler, messageHandlerCtx?: any): void;
+  registerAsyncMessageHandler(messageChannel: string, messageHandler: IPCAsyncMessageHandler, messageHandlerCtx?: any): void;
 
-  sendSyncMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any;
+  sendMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any;
 
   getAssetPath(...paths: string[]): string;
 

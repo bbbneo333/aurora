@@ -4,7 +4,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 import _ from 'lodash';
 
 import { Icons } from '../../constants';
-import { AppBrowserHistory } from '../../types';
 import { Icon } from '../icon/icon.component';
 
 import styles from './browser-navigation.component.css';
@@ -34,7 +33,7 @@ function BrowserNavigationButton(props: {
   } = props;
 
   const location = useLocation();
-  const history = useHistory() as AppBrowserHistory;
+  const history = useHistory();
 
   const navigationDelta = NavigationDelta[direction];
   const navigationIcon = NavigationIcon[direction];

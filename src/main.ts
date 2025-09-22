@@ -42,11 +42,11 @@ import {
 } from './interfaces';
 
 import {
-  AppSyncMessageHandler,
-  AppAsyncMessageHandler,
-} from './types';
-
-import { IPCCommChannel, IPCRendererCommChannel } from './modules/ipc';
+  IPCAsyncMessageHandler,
+  IPCCommChannel,
+  IPCRendererCommChannel,
+  IPCSyncMessageHandler,
+} from './modules/ipc';
 
 import * as AppBuilders from './main/builders';
 import * as AppModules from './main/modules';
@@ -102,7 +102,7 @@ class App implements IAppMain {
     app.quit();
   }
 
-  registerSyncMessageHandler(messageChannel: string, messageHandler: AppSyncMessageHandler, messageHandlerCtx?: any): void {
+  registerSyncMessageHandler(messageChannel: string, messageHandler: IPCSyncMessageHandler, messageHandlerCtx?: any): void {
     ipcMain.on(messageChannel, (event, ...args) => {
       debug('ipc (sync) - received message - channel - %s', messageChannel);
       // eslint-disable-next-line no-param-reassign
@@ -110,12 +110,12 @@ class App implements IAppMain {
     });
   }
 
-  registerAsyncMessageHandler(messageChannel: string, messageHandler: AppAsyncMessageHandler, messageHandlerCtx?: any): void {
+  registerAsyncMessageHandler(messageChannel: string, messageHandler: IPCAsyncMessageHandler, messageHandlerCtx?: any): void {
     ipcMain.handle(messageChannel, async (_event, ...args) => {
       try {
         debug('ipc (async) - received message - channel - %s', messageChannel);
         return await messageHandler.apply(messageHandlerCtx, args);
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Encountered error while handling message for - ${messageChannel}, ${args}`);
         console.error(err);
         // electron serializes the error before sending it back to the renderer
@@ -125,7 +125,7 @@ class App implements IAppMain {
     });
   }
 
-  sendSyncMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any {
+  sendMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any {
     const window = this.getCurrentWindow();
     window.webContents.send(messageChannel, ...messageArgs);
   }
@@ -188,7 +188,7 @@ class App implements IAppMain {
   }
 
   removePersistedStates() {
-    this.sendSyncMessageToRenderer(IPCRendererCommChannel.StateRemovePersisted);
+    this.sendMessageToRenderer(IPCRendererCommChannel.StateRemovePersisted);
   }
 
   toggleWindowFill() {
@@ -208,7 +208,7 @@ class App implements IAppMain {
         recursive: true,
       });
       debug('removeDirectorySafe - directory was removed successfully - %s', directory);
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'ENOENT') {
         debug('removeDatastore - directory does not exists - %s', directory);
       } else {
