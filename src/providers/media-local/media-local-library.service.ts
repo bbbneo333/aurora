@@ -5,9 +5,10 @@ import {
   selectCover,
 } from 'music-metadata';
 
-import { AppEnums, AudioFileExtensionList, MediaEnums } from '../../enums';
+import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
-import { AppService, MediaProviderService, MediaLibraryService } from '../../services';
+import { MediaProviderService, MediaLibraryService } from '../../services';
+import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
@@ -41,8 +42,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    const fsDirectoryReadResponse: IFSDirectoryReadResponse | undefined = await AppService
-      .sendAsyncMessage(AppEnums.IPCCommChannels.FSReadDirectory, mediaLibraryDirectory, {
+    const fsDirectoryReadResponse: IFSDirectoryReadResponse | undefined = await IPCService
+      .sendAsyncMessage(IPCCommChannel.FSReadDirectory, mediaLibraryDirectory, {
         fileExtensions: AudioFileExtensionList,
       }).catch((error) => {
         // handle in case existing directory could not be found now
@@ -120,7 +121,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private static getMediaId(mediaInput: string): string {
-    return AppService.sendSyncMessage(AppEnums.IPCCommChannels.CryptoGenerateSHA256Hash, mediaInput);
+    return IPCService.sendSyncMessage(IPCCommChannel.CryptoGenerateSHA256Hash, mediaInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {

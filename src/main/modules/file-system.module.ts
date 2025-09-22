@@ -2,8 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { dialog } from 'electron';
 
-import { AppEnums } from '../../enums';
-
 import {
   IAppMain,
   IAppModule,
@@ -12,6 +10,8 @@ import {
   IFSDirectoryReadOptions,
   IFSDirectoryReadResponse,
 } from '../../interfaces';
+
+import { IPCCommChannel } from '../../modules/ipc';
 
 export class FileSystemModule implements IAppModule {
   private readonly app: IAppMain;
@@ -22,11 +22,11 @@ export class FileSystemModule implements IAppModule {
   }
 
   private registerMessageHandlers() {
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadAsset, this.readAsset, this);
-    this.app.registerAsyncMessageHandler(AppEnums.IPCCommChannels.FSReadDirectory, this.readDirectory, this);
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSReadFile, this.readFile, this);
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectDirectory, this.selectDirectory, this);
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.FSSelectFile, this.selectFile, this);
+    this.app.registerSyncMessageHandler(IPCCommChannel.FSReadAsset, this.readAsset, this);
+    this.app.registerAsyncMessageHandler(IPCCommChannel.FSReadDirectory, this.readDirectory, this);
+    this.app.registerSyncMessageHandler(IPCCommChannel.FSReadFile, this.readFile, this);
+    this.app.registerSyncMessageHandler(IPCCommChannel.FSSelectDirectory, this.selectDirectory, this);
+    this.app.registerSyncMessageHandler(IPCCommChannel.FSSelectFile, this.selectFile, this);
   }
 
   private readAsset(fsAssetPath: string[], fsAssetReadOptions: IFSAssetReadOptions = {}) {

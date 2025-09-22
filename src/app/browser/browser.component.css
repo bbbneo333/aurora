@@ -11,15 +11,6 @@
   flex: 0 0 50px;
   height: var(--titlebar-overlay-height);
   margin: 5px;
-  /* according to electron docs, following property makes the frameless window draggable */
-  -webkit-app-region: drag;
-}
-
-.browser-header button, a {
-  /* having a draggable parent makes children inaccessible */
-  /* all clickable elements within our header should still work as expected */
-  -webkit-app-region: no-drag;
-  pointer-events: auto;
 }
 
 .browser-viewport {

@@ -1,4 +1,4 @@
-export enum IPCCommChannels {
+export enum IPCCommChannel {
   // these channels are used to send messages from renderer to main
   AppToggleWindowFill = 'app:toggle_window_fill',
   // file system (fs)
@@ -22,12 +22,8 @@ export enum IPCCommChannels {
   MediaScaleAndCacheImage = 'media:scale_and_cache_image',
 }
 
-export enum IPCRendererCommChannels {
+export enum IPCRendererCommChannel {
   // these channels are used to send messages from main to renderer
   // state
   StateRemovePersisted = 'state:remove_persisted',
-}
-
-export enum Platforms {
-  Darwin = 'darwin',
 }

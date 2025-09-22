@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
-import { AppEnums } from '../../enums';
 import { IAppMain, IAppModule } from '../../interfaces';
+import { IPCCommChannel } from '../../modules/ipc';
 
 export class CryptoModule implements IAppModule {
   private readonly app: IAppMain;
@@ -12,7 +12,7 @@ export class CryptoModule implements IAppModule {
   }
 
   private registerMessageHandlers() {
-    this.app.registerSyncMessageHandler(AppEnums.IPCCommChannels.CryptoGenerateSHA256Hash, this.generateSHA256Hash, this);
+    this.app.registerSyncMessageHandler(IPCCommChannel.CryptoGenerateSHA256Hash, this.generateSHA256Hash, this);
   }
 
   private generateSHA256Hash(data: string): string {

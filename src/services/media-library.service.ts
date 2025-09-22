@@ -1,12 +1,12 @@
 import _ from 'lodash';
 import { Semaphore } from 'async-mutex';
 
-import { AppEnums, MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
+import { MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
 import store from '../store';
 import { DataStoreInputData } from '../types';
 import { MediaUtils } from '../utils';
+import { IPCService, IPCCommChannel } from '../modules/ipc';
 
-import AppService from './app.service';
 import MediaPlayerService from './media-player.service';
 
 import {
@@ -456,7 +456,7 @@ class MediaLibraryService {
       let imageCachePath;
 
       try {
-        imageCachePath = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, mediaPicture.image_data, {
+        imageCachePath = await IPCService.sendAsyncMessage(IPCCommChannel.MediaScaleAndCacheImage, mediaPicture.image_data, {
           width: this.mediaPictureScaleWidth,
           height: this.mediaPictureScaleHeight,
         });

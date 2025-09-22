@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
 
-import { AppEnums, MediaEnums, ImageFileExtensionList } from '../../enums';
+import { MediaEnums, ImageFileExtensionList } from '../../enums';
 import { IMediaPicture } from '../../interfaces';
-import { AppService, MediaLibraryService } from '../../services';
+import { MediaLibraryService } from '../../services';
+import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import { UploadOverlay } from '../upload/upload-overlay.component';
 import { MediaCoverPicture, MediaCoverPictureProps } from './media-cover-picture.component';
@@ -22,7 +23,7 @@ export function MediaCoverPictureUploadable(props: MediaCoverPictureUploadablePr
       return;
     }
 
-    const imagePath = await AppService.sendAsyncMessage(AppEnums.IPCCommChannels.MediaScaleAndCacheImage, filePath, {
+    const imagePath = await IPCService.sendAsyncMessage(IPCCommChannel.MediaScaleAndCacheImage, filePath, {
       width: MediaLibraryService.mediaPictureScaleWidth,
       height: MediaLibraryService.mediaPictureScaleHeight,
     });

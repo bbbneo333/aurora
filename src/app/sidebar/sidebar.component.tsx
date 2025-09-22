@@ -2,12 +2,10 @@ import React from 'react';
 import classNames from 'classnames/bind';
 
 import { Icon, MediaPinnedItemList, RouterLink } from '../../components';
-import { AppEnums } from '../../enums';
 import { I18nService } from '../../services';
 import routes from '../app.routes';
 
 import styles from './sidebar.component.css';
-import AppService from '../../services/app.service';
 
 const cx = classNames.bind(styles);
 
@@ -68,12 +66,7 @@ function SidebarNavigationList() {
 
 function SidebarHeader() {
   return (
-    <div
-      className={cx('sidebar-header')}
-      onDoubleClick={() => {
-        AppService.sendSyncMessage(AppEnums.IPCCommChannels.AppToggleWindowFill);
-      }}
-    />
+    <div className={cx('sidebar-header', 'app-window-drag')}/>
   );
 }
 

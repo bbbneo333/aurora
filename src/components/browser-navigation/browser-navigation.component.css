@@ -1,28 +1,11 @@
 .browser-navigation {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
 }
 
 .browser-navigation-button {
-  background-color: var(--stage-bg-color);
-  color: var(--text-light-color);
-  display: flex;
-  align-self: center;
-  align-items: center;
-  justify-items: center;
-  padding: 8px 12px;
-  border-radius: 100%;
-  margin: 0 15px;
-  line-height: 100%;
   -webkit-text-stroke: 1px var(--stage-bg-color);
-  transition: var(--selectable-item-transition);
-  border: 2px solid var(--stage-bg-color);
-}
-
-.browser-navigation-button.disabled {
-  color: var(--text-disabled-color);
-}
-
-.browser-navigation-button:not(.disabled):hover {
-  border-color: var(--selectable-outline-color);
 }
