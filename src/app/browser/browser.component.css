@@ -15,7 +15,7 @@
   -webkit-app-region: drag;
 }
 
-.browser-header button, a {
+.browser-header > * {
   /* having a draggable parent makes children inaccessible */
   /* all clickable elements within our header should still work as expected */
   -webkit-app-region: no-drag;

@@ -4,7 +4,9 @@ import { useHistory, useLocation } from 'react-router-dom';
 import _ from 'lodash';
 
 import { Icons } from '../../constants';
+
 import { Icon } from '../icon/icon.component';
+import { Button } from '../button/button.component';
 
 import styles from './browser-navigation.component.css';
 
@@ -52,18 +54,16 @@ function BrowserNavigationButton(props: {
   ]);
 
   return (
-    <button
+    <Button
+      className={cx('browser-navigation-button')}
       disabled={navigationIsDisabled}
-      type="button"
-      className={cx('browser-navigation-button', {
-        disabled: navigationIsDisabled,
-      })}
-      onClick={() => {
+      onButtonSubmit={() => {
         history.go(navigationDelta);
       }}
+      variant={['rounded', 'outline']}
     >
       <Icon name={navigationIcon}/>
-    </button>
+    </Button>
   );
 }
 
