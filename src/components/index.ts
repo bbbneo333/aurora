@@ -24,7 +24,7 @@ export * from './media-playlist-delete-tracks-modal/media-playlist-delete-tracks
 export * from './media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-playlists/media-playlists.component';
-export * from './media-progress-bar/media-progress-bar.component';
+export * from './progress-bar/progress-bar.component';
 export * from './media-session/media-session.component';
 export * from './media-track/media-track.component';
 export * from './media-track-context-menu/media-track-context-menu.component';
