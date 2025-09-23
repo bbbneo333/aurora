@@ -26,6 +26,7 @@ export function MediaTrackLikeButton(props: {
       disabled={isLikeStatusLoading}
       onButtonSubmit={toggleLike}
       tooltip={I18nService.getString(isTrackLiked ? 'tooltip_track_dislike' : 'tooltip_track_like')}
+      variant={['rounded']}
     >
       <Icon
         className={cx('media-track-like-icon')}

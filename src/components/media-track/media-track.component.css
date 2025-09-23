@@ -42,13 +42,13 @@
 }
 
 .media-track-like-button:not(:global(.active)) {
-  display: none !important;
+  opacity: 0 !important;
 }
 
 .media-track:hover .media-track-like-button,
-.media-track:focus .media-track-like-button,
+.media-track:focus-within .media-track-like-button,
 .media-track.selected .media-track-like-button {
-  display: inline-block !important;
+  opacity: 1 !important;
 }
 
 .media-track-duration {
