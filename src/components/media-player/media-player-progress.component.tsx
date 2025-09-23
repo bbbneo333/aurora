@@ -10,7 +10,7 @@ import { MediaPlayerService } from '../../services';
 
 import { MediaProgressBarComponent } from '../media-progress-bar/media-progress-bar.component';
 
-import styles from './media-player-ribbon.component.css';
+import styles from './media-player.component.css';
 
 const cx = classNames.bind(styles);
 

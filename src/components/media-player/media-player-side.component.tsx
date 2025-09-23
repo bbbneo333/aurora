@@ -12,7 +12,7 @@ import { Button } from '../button/button.component';
 import { MediaProgressBarComponent } from '../media-progress-bar/media-progress-bar.component';
 import { RouterLinkToggle } from '../router-link-toggle/router-link-toggle.component';
 
-import styles from './media-player-ribbon.component.css';
+import styles from './media-player.component.css';
 
 const cx = classNames.bind(styles);
 
@@ -29,7 +29,7 @@ export function MediaPlayerSide() {
   // TODO: Add implementation for setMediaVolumeDragStartValue
   const [mediaVolumeDragStartValue] = useState<number | undefined>(undefined);
 
-  const handleOnVolumeChangeDragCommit = useCallback((value) => {
+  const handleOnVolumeChangeDragCommit = useCallback((value: number) => {
     MediaPlayerService.changeMediaPlayerVolume(value);
   }, []);
 

@@ -17,7 +17,7 @@ export * from './media-liked-tracks-collection-item/media-liked-tracks-collectio
 export * from './media-liked-tracks-delete-modal/media-liked-tracks-delete-modal.component';
 export * from './media-pinned-item-list/media-pinned-item-list.component';
 export * from './media-playback-button/media-playback-button.component';
-export * from './media-player-ribbon/media-player-ribbon.component';
+export * from './media-player/media-player.component';
 export * from './media-playlist-context-menu/media-playlist-context-menu.component';
 export * from './media-playlist-delete-modal/media-playlist-delete-modal.component';
 export * from './media-playlist-delete-tracks-modal/media-playlist-delete-tracks-modal.component';

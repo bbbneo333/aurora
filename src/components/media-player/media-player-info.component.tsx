@@ -11,7 +11,7 @@ import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.co
 import { MediaTrackContextMenu, MediaTrackContextMenuItem } from '../media-track-context-menu/media-track-context-menu.component';
 import { MediaTrackLikeButton } from '../media-track-like-button/media-track-like-button.component';
 
-import styles from './media-player-ribbon.component.css';
+import styles from './media-player.component.css';
 
 const cx = classNames.bind(styles);
 
