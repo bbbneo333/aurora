@@ -12,7 +12,7 @@ import {
   MediaCollectionActions,
 } from '../../components';
 
-import { Layout } from '../../constants';
+import { Icons, Layout } from '../../constants';
 import { RootState } from '../../reducers';
 import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 
@@ -43,6 +43,7 @@ export function AlbumPage() {
             <MediaCoverPicture
               mediaPicture={mediaSelectedAlbum.album_cover_picture}
               mediaPictureAltText={mediaSelectedAlbum.album_name}
+              mediaCoverPlaceholderIcon={Icons.AlbumPlaceholder}
               className={cx('album-cover-picture')}
             />
           </div>
