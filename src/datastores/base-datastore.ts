@@ -1,11 +1,11 @@
-import { IPCService, IPCCommChannel } from '../modules/ipc';
-
 import {
   DataStoreFilterData,
   DataStoreInputData,
   DataStoreQueryData,
   DataStoreUpdateData,
-} from './datastore.types';
+} from '../types';
+
+import { IPCService, IPCCommChannel } from '../modules/ipc';
 
 export abstract class BaseDatastore<T> {
   protected readonly datastoreName: string;
