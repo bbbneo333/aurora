@@ -4,6 +4,7 @@ import store from '../store';
 import { IMediaLikedTrack, IMediaLikedTrackData } from '../interfaces';
 import { MediaLikedTrackDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
+import { MediaUtils } from '../utils';
 
 import MediaLibraryService from './media-library.service';
 import NotificationService from './notification.service';
@@ -59,8 +60,9 @@ class MediaLikedTrackService {
 
   async getLikedTracks(): Promise<IMediaLikedTrack[]> {
     const likedTrackDataList = await MediaLikedTrackDatastore.findLikedTracks();
+    const likedTracks = await Promise.map(likedTrackDataList, likedTrackData => this.buildLikedTrack(likedTrackData));
 
-    return Promise.map(likedTrackDataList, likedTrackData => this.buildLikedTrack(likedTrackData));
+    return MediaUtils.sortMediaLikedTracks(likedTracks);
   }
 
   async addTrackToLiked(trackId: string, options?: { skipUserNotification?: boolean }): Promise<IMediaLikedTrack> {
