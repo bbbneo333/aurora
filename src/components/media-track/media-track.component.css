@@ -3,7 +3,7 @@
   border-radius: 5px;
 }
 
-.media-track:focus,
+.media-track:focus-within,
 .media-track.selected {
   background-color: var(--selectable-focused-bg-color) !important;
 }
