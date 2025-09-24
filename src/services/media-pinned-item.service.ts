@@ -8,9 +8,9 @@ import store from '../store';
 
 import MediaCollectionService from './media-collection.service';
 
-const debug = require('debug')('app:service:media_pinned_item_service');
-
 class MediaPinnedItemService {
+  readonly removeOnMissing = true;
+
   loadPinnedItems() {
     this.resolvePinnedItems()
       .then((mediaPinnedItems) => {
@@ -46,7 +46,7 @@ class MediaPinnedItemService {
 
   async resolvePinnedItems(): Promise<IMediaPinnedItem[]> {
     // this function fetches pinned items along with their collection item
-    // in case collection item entry is not found, it removes the pinned item
+    // in case collection item entry is not found, it removes the pinned item (if enabled)
     const dataList = await MediaPinnedItemDatastore.find();
     const items: IMediaPinnedItem[] = [];
 
@@ -56,13 +56,14 @@ class MediaPinnedItemService {
         items.push(item);
       } catch (error) {
         if (error instanceof EntityNotFoundError) {
-          // remove associated pinned item and skip it from list
-          debug('resolvePinnedItems: removing pinned item - %o', data);
+          console.warn(error);
 
-          await this.unpinCollectionItem({
-            id: data.collection_item_id,
-            type: data.collection_item_type,
-          });
+          if (this.removeOnMissing) {
+            await this.unpinCollectionItem({
+              id: data.collection_item_id,
+              type: data.collection_item_type,
+            });
+          }
         }
       }
     });
@@ -71,12 +72,21 @@ class MediaPinnedItemService {
   }
 
   async getPinnedItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem | undefined> {
-    const data = await MediaPinnedItemDatastore.findOne({
-      collection_item_id: input.id,
-      collection_item_type: input.type,
-    });
+    try {
+      const data = await MediaPinnedItemDatastore.findOne({
+        collection_item_id: input.id,
+        collection_item_type: input.type,
+      });
 
-    return data ? this.buildPinnedItem(data) : undefined;
+      return data ? await this.buildPinnedItem(data) : undefined;
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        console.warn(error);
+        return undefined;
+      }
+
+      throw error;
+    }
   }
 
   async pinCollectionItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem> {
