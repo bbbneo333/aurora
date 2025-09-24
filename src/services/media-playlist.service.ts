@@ -71,6 +71,15 @@ class MediaPlaylistService {
       });
   }
 
+  unloadMediaPlaylist(): void {
+    store.dispatch({
+      type: MediaLibraryActions.SetPlaylist,
+      data: {
+        mediaPlaylist: undefined,
+      },
+    });
+  }
+
   async searchPlaylistsByName(query: string): Promise<IMediaPlaylist[]> {
     const playlists = await MediaPlaylistDatastore.findMediaPlaylists({
       name: {

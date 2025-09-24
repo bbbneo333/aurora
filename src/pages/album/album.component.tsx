@@ -27,6 +27,8 @@ export function AlbumPage() {
 
   useEffect(() => {
     MediaLibraryService.loadMediaAlbum(albumId);
+
+    return () => MediaLibraryService.unloadMediaAlbum();
   }, [
     albumId,
   ]);
