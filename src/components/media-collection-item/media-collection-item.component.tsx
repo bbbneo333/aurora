@@ -90,6 +90,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       to={routerLink}
       activeClassName={cx('active')}
       className={cx('collection-item', 'app-nav-link', variant, {
+        selected: rest['aria-selected'],
         'media-active': isMediaActive,
       }, className)}
       onContextMenu={handleOnContextMenu}
