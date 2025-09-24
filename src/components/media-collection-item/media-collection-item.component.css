@@ -55,6 +55,6 @@
   color: var(--text-dark-color);
 }
 
-.collection-item.media-active .collection-item-info-title {
+.collection-item.current .collection-item-info-title {
   font-weight: bold;
 }
