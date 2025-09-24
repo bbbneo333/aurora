@@ -9,7 +9,7 @@ import store from '../store';
 import MediaCollectionService from './media-collection.service';
 
 class MediaPinnedItemService {
-  readonly removeOnMissing = true;
+  readonly removeOnMissing = false;
 
   loadPinnedItems() {
     this.resolvePinnedItems()

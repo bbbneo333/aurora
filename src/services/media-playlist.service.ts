@@ -43,7 +43,7 @@ export class MediaLibraryPlaylistDuplicateTracksError extends BaseError {
 }
 
 class MediaPlaylistService {
-  readonly removeOnMissing = true;
+  readonly removeOnMissing = false;
 
   loadMediaPlaylists(): void {
     this

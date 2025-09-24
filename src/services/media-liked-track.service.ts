@@ -12,7 +12,7 @@ import NotificationService from './notification.service';
 import I18nService from './i18n.service';
 
 class MediaLikedTrackService {
-  readonly removeOnMissing = true;
+  readonly removeOnMissing = false;
 
   loadLikedTracks() {
     this.resolveLikedTracks()
