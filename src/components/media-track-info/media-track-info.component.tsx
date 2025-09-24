@@ -17,7 +17,7 @@ function MediaArtistLinkSeparator() {
   );
 }
 
-export function MediaTrackAlbumLinkComponent(props: {
+export function MediaTrackAlbumLink(props: {
   mediaTrack: IMediaTrack,
   onContextMenu?: (e: React.MouseEvent) => void,
 }) {
@@ -37,7 +37,7 @@ export function MediaTrackAlbumLinkComponent(props: {
   );
 }
 
-export function MediaTrackNameComponent(props: {
+export function MediaTrackName(props: {
   mediaTrack: IMediaTrack,
   onContextMenu?: (e: React.MouseEvent) => void,
 }) {
@@ -50,7 +50,7 @@ export function MediaTrackNameComponent(props: {
   );
 }
 
-export function MediaArtistLinkComponent(props: {
+export function MediaArtistLink(props: {
   mediaArtist: IMediaArtist,
 }) {
   const {
@@ -79,7 +79,7 @@ export function MediaArtistLinksComponent(props: {
     withSeparator(
       mediaArtists,
       mediaArtist => (
-        <MediaArtistLinkComponent
+        <MediaArtistLink
           key={mediaArtist.id}
           mediaArtist={mediaArtist}
         />
@@ -89,7 +89,7 @@ export function MediaArtistLinksComponent(props: {
   );
 }
 
-export function MediaTrackInfoComponent(props: {
+export function MediaTrackInfo(props: {
   mediaTrack: IMediaTrack,
   disableAlbumLink?: boolean,
   className?: string,
@@ -108,13 +108,13 @@ export function MediaTrackInfoComponent(props: {
         {
           disableAlbumLink
             ? (
-              <MediaTrackNameComponent
+              <MediaTrackName
                 mediaTrack={mediaTrack}
                 onContextMenu={onContextMenu}
               />
             )
             : (
-              <MediaTrackAlbumLinkComponent
+              <MediaTrackAlbumLink
                 mediaTrack={mediaTrack}
                 onContextMenu={onContextMenu}
               />

@@ -8,7 +8,7 @@ import { useContextMenu } from '../../contexts';
 import { RootState } from '../../reducers';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
-import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
+import { MediaTrackInfo } from '../media-track-info/media-track-info.component';
 import { MediaTrackContextMenu, MediaTrackContextMenuItem } from '../media-track-context-menu/media-track-context-menu.component';
 import { MediaTrackLikeButton } from '../media-track-like-button/media-track-like-button.component';
 
@@ -21,7 +21,7 @@ export function MediaPlayerInfo() {
   const { mediaPlaybackCurrentMediaTrack } = useSelector((state: RootState) => state.mediaPlayer);
   const mediaTrackContextMenuId = 'media_player_playing_track_context_menu';
 
-  const onMediaTrackInfoContextMenu = useCallback((e: React.MouseEvent) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
     if (!mediaPlaybackCurrentMediaTrack) {
       return;
     }
@@ -36,7 +36,7 @@ export function MediaPlayerInfo() {
       },
       position: {
         x: rect.left,
-        y: rect.top - 150, // TODO: Hack to place menu just above element
+        y: rect.top - 155, // TODO: Hack to place menu just above element
       },
     });
   }, [
@@ -56,12 +56,12 @@ export function MediaPlayerInfo() {
           mediaPictureAltText={mediaPlaybackCurrentMediaTrack.track_album.album_name}
           mediaCoverPlaceholderIcon={Icons.TrackPlaceholder}
           className={cx('media-player-track-cover-image')}
-          onContextMenu={onMediaTrackInfoContextMenu}
+          onContextMenu={handleContextMenu}
         />
-        <MediaTrackInfoComponent
+        <MediaTrackInfo
           mediaTrack={mediaPlaybackCurrentMediaTrack}
           className={cx('media-player-track-info-container')}
-          onContextMenu={onMediaTrackInfoContextMenu}
+          onContextMenu={handleContextMenu}
         />
         <div className={cx('media-player-control', 'media-player-control-sm')}>
           <MediaTrackLikeButton mediaTrack={mediaPlaybackCurrentMediaTrack}/>

@@ -28,12 +28,19 @@
   gap: 20px;
 }
 
+.media-track-section {
+}
+
 .media-track-cover {
   width: 50px;
   height: 50px;
 }
 
-.media-track-side-column {
+.media-track-section.info {
+  flex-grow: 1;
+}
+
+.media-track-section.end {
   margin-left: auto; /* push side column all the way to the end */
   display: flex;
   gap: 20px;
@@ -55,4 +62,6 @@
   color: var(--text-dark-color);
   font-size: 12px;
   letter-spacing: 1px;
+  text-align: right;
+  width: 100px;
 }

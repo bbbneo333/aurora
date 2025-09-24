@@ -7,7 +7,7 @@ import { DateTimeUtils, Events } from '../../utils';
 import { useMediaTrackPlayback } from '../../hooks';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
-import { MediaTrackInfoComponent } from '../media-track-info/media-track-info.component';
+import { MediaTrackInfo } from '../media-track-info/media-track-info.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
 import { MediaTrackLikeButton } from '../media-track-like-button/media-track-like-button.component';
 
@@ -74,7 +74,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
       }}
     >
       <div className={cx('media-track-content')}>
-        <div className={cx('media-track-section')}>
+        <div className={cx('media-track-section', 'button')}>
           <MediaPlaybackButton
             isPlaying={isTrackPlaying}
             className={cx('media-track-playback-button')}
@@ -84,7 +84,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
           />
         </div>
         {!disableCover && (
-          <div className={cx('media-track-section')}>
+          <div className={cx('media-track-section', 'cover')}>
             <MediaCoverPicture
               mediaPicture={mediaTrack.track_cover_picture}
               mediaPictureAltText={mediaTrack.track_name}
@@ -93,14 +93,14 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
             />
           </div>
         )}
-        <div className={cx('media-track-section')}>
-          <MediaTrackInfoComponent
+        <div className={cx('media-track-section', 'info')}>
+          <MediaTrackInfo
             mediaTrack={mediaTrack}
             disableAlbumLink={disableAlbumLink}
             className={cx('media-track-info')}
           />
         </div>
-        <div className={cx('media-track-section', 'media-track-side-column')}>
+        <div className={cx('media-track-section', 'end')}>
           <div className={cx('media-track-like')}>
             <MediaTrackLikeButton
               mediaTrack={mediaTrack}
