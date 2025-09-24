@@ -278,6 +278,16 @@ class MediaLibraryService {
       });
   }
 
+  unloadMediaAlbum(): void {
+    store.dispatch({
+      type: MediaLibraryActions.SetAlbum,
+      data: {
+        mediaAlbum: undefined,
+        mediaAlbumTracks: undefined,
+      },
+    });
+  }
+
   loadMediaArtists(): void {
     this
       .getMediaArtists()
@@ -303,6 +313,16 @@ class MediaLibraryService {
           },
         });
       });
+  }
+
+  unloadMediaArtist(): void {
+    store.dispatch({
+      type: MediaLibraryActions.SetArtist,
+      data: {
+        mediaArtist: undefined,
+        mediaArtistAlbums: undefined,
+      },
+    });
   }
 
   private async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {

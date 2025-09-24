@@ -33,6 +33,8 @@ export function PlaylistPage() {
 
   useEffect(() => {
     MediaPlaylistService.loadMediaPlaylist(playlistId);
+
+    return () => MediaPlaylistService.unloadMediaPlaylist();
   }, [
     playlistId,
   ]);
@@ -47,7 +49,6 @@ export function PlaylistPage() {
         setMediaPlaylistTracks(tracks);
       });
   }, [
-    playlistId,
     mediaSelectedPlaylist,
   ]);
 

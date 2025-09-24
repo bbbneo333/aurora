@@ -21,6 +21,8 @@ export function ArtistPage() {
 
   useEffect(() => {
     MediaLibraryService.loadMediaArtist(artistId);
+
+    return () => MediaLibraryService.unloadMediaArtist();
   }, [
     artistId,
   ]);
