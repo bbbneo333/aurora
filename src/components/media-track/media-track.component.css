@@ -4,7 +4,7 @@
 }
 
 .media-track:focus,
-.media-track[aria-selected="true"] {
+.media-track.selected {
   background-color: var(--selectable-focused-bg-color) !important;
 }
 
@@ -47,7 +47,7 @@
 
 .media-track:hover .media-track-like-button,
 .media-track:focus .media-track-like-button,
-.media-track[aria-selected="true"] .media-track-like-button {
+.media-track.selected .media-track-like-button {
   display: inline-block !important;
 }
 
