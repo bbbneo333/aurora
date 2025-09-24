@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 
 import {
   MediaCoverPicture,
-  MediaArtistLinkComponent,
+  MediaArtistLink,
   MediaTrackList,
   MediaTrackContextMenuItem,
   MediaCollectionActions,
@@ -55,7 +55,7 @@ export function AlbumPage() {
               {mediaSelectedAlbum.album_name}
             </div>
             <div className={cx('album-header-info')}>
-              <MediaArtistLinkComponent mediaArtist={mediaSelectedAlbum.album_artist}/>
+              <MediaArtistLink mediaArtist={mediaSelectedAlbum.album_artist}/>
             </div>
           </div>
         </div>
