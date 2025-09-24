@@ -29,11 +29,11 @@ export function MediaPlayerSide() {
   // TODO: Add implementation for setMediaVolumeDragStartValue
   const [mediaVolumeDragStartValue] = useState<number | undefined>(undefined);
 
-  const handleOnVolumeChangeDragCommit = useCallback((value: number) => {
+  const handleVolumeChangeDragCommit = useCallback((value: number) => {
     MediaPlayerService.changeMediaPlayerVolume(value);
   }, []);
 
-  const handleOnVolumeButtonSubmit = useCallback(() => {
+  const handleVolumeButtonSubmit = useCallback(() => {
     // in case the drag brought down the volume all the way to 0, we will try to raise the volume to either:
     // (a) maximum value from where the first drag started originally started, or
     // (b) maximum volume
@@ -79,7 +79,7 @@ export function MediaPlayerSide() {
         </RouterLinkToggle>
         <Button
           className={cx('media-player-control', 'media-player-control-sm', 'media-player-volume-button')}
-          onButtonSubmit={handleOnVolumeButtonSubmit}
+          onButtonSubmit={handleVolumeButtonSubmit}
         >
           <Icon name={mediaVolumeButtonIcon}/>
         </Button>
@@ -90,7 +90,7 @@ export function MediaPlayerSide() {
               ? 0
               : mediaPlaybackVolumeCurrent}
             maxValue={mediaPlaybackVolumeMaxLimit}
-            onDragCommit={handleOnVolumeChangeDragCommit}
+            onDragCommit={handleVolumeChangeDragCommit}
           />
         </div>
       </Col>
