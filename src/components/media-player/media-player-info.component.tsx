@@ -3,6 +3,7 @@ import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
 
+import { Icons } from '../../constants';
 import { useContextMenu } from '../../contexts';
 import { RootState } from '../../reducers';
 
@@ -53,6 +54,7 @@ export function MediaPlayerInfo() {
         <MediaCoverPicture
           mediaPicture={mediaPlaybackCurrentMediaTrack.track_album.album_cover_picture}
           mediaPictureAltText={mediaPlaybackCurrentMediaTrack.track_album.album_name}
+          mediaCoverPlaceholderIcon={Icons.TrackPlaceholder}
           className={cx('media-player-track-cover-image')}
           onContextMenu={onMediaTrackInfoContextMenu}
         />
