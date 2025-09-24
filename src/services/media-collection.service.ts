@@ -35,10 +35,10 @@ class MediaCollectionService {
         return MediaLibraryService.getMediaArtistTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.Playlist: {
-        return MediaPlaylistService.getMediaPlaylistTracks(mediaCollectionItem.id);
+        return MediaPlaylistService.resolveMediaPlaylistTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.LikedTracks: {
-        return MediaLikedTrackService.getLikedTracks();
+        return MediaLikedTrackService.resolveLikedTracks();
       }
       default:
         throw new Error(`Unsupported media collection type - ${mediaCollectionItem.type}`);

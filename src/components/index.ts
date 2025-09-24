@@ -17,14 +17,14 @@ export * from './media-liked-tracks-collection-item/media-liked-tracks-collectio
 export * from './media-liked-tracks-delete-modal/media-liked-tracks-delete-modal.component';
 export * from './media-pinned-item-list/media-pinned-item-list.component';
 export * from './media-playback-button/media-playback-button.component';
-export * from './media-player-ribbon/media-player-ribbon.component';
+export * from './media-player/media-player.component';
 export * from './media-playlist-context-menu/media-playlist-context-menu.component';
 export * from './media-playlist-delete-modal/media-playlist-delete-modal.component';
 export * from './media-playlist-delete-tracks-modal/media-playlist-delete-tracks-modal.component';
 export * from './media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-playlists/media-playlists.component';
-export * from './media-progress-bar/media-progress-bar.component';
+export * from './progress-bar/progress-bar.component';
 export * from './media-session/media-session.component';
 export * from './media-track/media-track.component';
 export * from './media-track-context-menu/media-track-context-menu.component';

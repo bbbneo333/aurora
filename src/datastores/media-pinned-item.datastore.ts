@@ -1,5 +1,6 @@
-import { BaseDatastore } from '../types/base-datastore';
 import { IMediaPinnedItemData } from '../interfaces';
+
+import { BaseDatastore } from './base-datastore';
 
 class MediaPinnedItemDatastore extends BaseDatastore<IMediaPinnedItemData> {
   constructor() {

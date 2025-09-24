@@ -42,7 +42,7 @@ export function PlaylistPage() {
       return;
     }
 
-    MediaPlaylistService.getMediaPlaylistTracks(mediaSelectedPlaylist.id)
+    MediaPlaylistService.resolveMediaPlaylistTracks(mediaSelectedPlaylist.id)
       .then((tracks) => {
         setMediaPlaylistTracks(tracks);
       });

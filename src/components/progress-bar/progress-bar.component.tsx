@@ -12,27 +12,15 @@ import { SystemEnums } from '../../enums';
 
 import { Button } from '../button/button.component';
 
-import styles from './media-progress-bar.component.scss';
+import { getValueFromPercent } from './progress-bar.utils';
+import { ProgressJumpDirection, ProgressStateActionType, progressStateReducer } from './progress-bar.reducer';
+import styles from './progress-bar.component.scss';
 
-const debug = require('debug')('app:component:media_progress_bar_component');
+const debug = require('debug')('app:component:progress_bar');
 
 const cx = classNames.bind(styles);
 
-enum MediaProgressStateActionType {
-  MediaProgressUpdate = 'mediaProgress/update',
-  MediaProgressStartDrag = 'mediaProgress/startDrag',
-  MediaProgressUpdateDrag = 'mediaProgress/updateDrag',
-  MediaProgressEndDrag = 'mediaProgress/endDrag',
-  MediaProgressCommitDrag = 'mediaProgress/commitDrag',
-  MediaProgressJump = 'mediaProgress/jump',
-}
-
-enum MediaProgressJumpDirection {
-  Left = 'mediaProgress/jump/left',
-  Right = 'mediaProgress/jump/right',
-}
-
-type MediaProgressBarComponentProps = {
+export type ProgressBarComponentProps = {
   value?: number;
   maxValue?: number;
   disabled?: boolean;
@@ -45,169 +33,7 @@ type MediaProgressBarComponentProps = {
   onDragCommit?(value: number): void;
 };
 
-type MediaProgressState = {
-  mediaProgressIsDragging: boolean;
-  mediaProgressDragPercent: number;
-  mediaProgressUncommittedDragPercent: number | undefined,
-};
-
-type MediaProgressStateAction = {
-  type: MediaProgressStateActionType,
-  data?: any;
-};
-
-function getPercentFromValue(mediaProgressValue: number, mediaProgressMaxThreshold: number): number {
-  return (mediaProgressValue / mediaProgressMaxThreshold) * 100;
-}
-
-function getValueFromPercent(mediaProgressPercent: number, mediaProgressMaxThreshold: number): number {
-  const value = (mediaProgressPercent / 100) * mediaProgressMaxThreshold;
-  return Number(value.toFixed());
-}
-
-function getPercentFromPosition(mediaProgressPosition: number, mediaProgressContainerElement: HTMLDivElement, mediaProgressMaxThreshold: number): number {
-  const mediaProgressContainerPositionStartX = mediaProgressContainerElement.getBoundingClientRect().left;
-  const mediaProgressContainerPositionEndX = mediaProgressContainerElement.getBoundingClientRect().right;
-
-  let mediaProgressPercent: number;
-
-  if (mediaProgressPosition < mediaProgressContainerPositionStartX) {
-    // drag is out of bounds from the start
-    mediaProgressPercent = 0;
-  } else if (mediaProgressPosition > mediaProgressContainerPositionEndX) {
-    // drag is out of bounds from the end
-    mediaProgressPercent = 100;
-  } else {
-    debug('getPercentFromPosition - media progress position - (x) %f', mediaProgressPosition);
-    debug('getPercentFromPosition - media progress container position - (start) %f (end) %f', mediaProgressContainerPositionStartX, mediaProgressContainerPositionEndX);
-
-    const mediaProgressOffset = mediaProgressPosition - mediaProgressContainerPositionStartX;
-    const mediaProgressContainerWidth = mediaProgressContainerPositionEndX - mediaProgressContainerPositionStartX;
-
-    const mediaProgressContainerBreakpoint = mediaProgressContainerWidth / mediaProgressMaxThreshold;
-    const mediaProgressNearBreakpoint = Math.ceil((mediaProgressOffset / mediaProgressContainerBreakpoint)) * mediaProgressContainerBreakpoint;
-
-    mediaProgressPercent = getPercentFromValue(mediaProgressNearBreakpoint, mediaProgressContainerWidth);
-  }
-
-  return mediaProgressPercent;
-}
-
-function mediaProgressStateReducer(state: MediaProgressState, action: MediaProgressStateAction): MediaProgressState {
-  switch (action.type) {
-    case MediaProgressStateActionType.MediaProgressUpdate: {
-      const {
-        mediaProgress,
-        mediaProgressMaxValue,
-      } = action.data;
-
-      const mediaProgressDragPercent = getPercentFromValue(mediaProgress, mediaProgressMaxValue);
-
-      return {
-        ...state,
-        mediaProgressDragPercent,
-      };
-    }
-    case MediaProgressStateActionType.MediaProgressStartDrag: {
-      return {
-        ...state,
-        mediaProgressIsDragging: true,
-      };
-    }
-    case MediaProgressStateActionType.MediaProgressUpdateDrag: {
-      const {
-        eventPositionX,
-        mediaProgressBarContainerRef,
-        mediaProgressMaxValue,
-      } = action.data;
-
-      // if any of the required references is missing, do nothing, this is just for safety and won't likely happen
-      if (!mediaProgressBarContainerRef || !mediaProgressBarContainerRef.current) {
-        return state;
-      }
-
-      const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-      const mediaProgressUncommittedDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, mediaProgressMaxValue);
-
-      // we won't be doing anything in case the computed progress value is same
-      if (mediaProgressUncommittedDragPercent === state.mediaProgressDragPercent) {
-        return state;
-      }
-
-      return {
-        ...state,
-        mediaProgressUncommittedDragPercent,
-      };
-    }
-    case MediaProgressStateActionType.MediaProgressEndDrag: {
-      return {
-        ...state,
-        mediaProgressIsDragging: false,
-      };
-    }
-    case MediaProgressStateActionType.MediaProgressJump: {
-      const {
-        eventPositionX,
-        eventDirection,
-        mediaProgressBarContainerRef,
-        mediaProgressMaxValue,
-      } = action.data;
-
-      if (state.mediaProgressIsDragging) {
-        throw Error('MediaProgressBarComponent encountered error at MediaProgressJump - Progress handler is currently dragging');
-      }
-      if (state.mediaProgressUncommittedDragPercent !== undefined) {
-        throw Error('MediaProgressBarComponent encountered error at MediaProgressJump - Progress handler has existing uncommitted drag');
-      }
-
-      // if any of the required references is missing, do nothing, this is just for safety and won't likely happen
-      if (!mediaProgressBarContainerRef || !mediaProgressBarContainerRef.current) {
-        return state;
-      }
-      const mediaProgressContainerElement = (mediaProgressBarContainerRef.current as unknown as HTMLDivElement);
-
-      // progress can be jumped in following ways:
-      // - via providing event position (x axis)
-      // - via providing event direction (left / right)
-      let mediaProgressUncommittedDragPercent;
-
-      if (eventPositionX) {
-        mediaProgressUncommittedDragPercent = getPercentFromPosition(eventPositionX, mediaProgressContainerElement, mediaProgressMaxValue);
-      } else if (eventDirection) {
-        if (eventDirection === MediaProgressJumpDirection.Left) {
-          mediaProgressUncommittedDragPercent = Math.max(state.mediaProgressDragPercent - 10, 0);
-        } else {
-          mediaProgressUncommittedDragPercent = Math.min(state.mediaProgressDragPercent + 10, 100);
-        }
-      }
-
-      // we won't be doing anything in case the progress value could not be calculated or is same
-      if (mediaProgressUncommittedDragPercent === undefined || mediaProgressUncommittedDragPercent === state.mediaProgressDragPercent) {
-        return state;
-      }
-
-      return {
-        ...state,
-        mediaProgressUncommittedDragPercent,
-      };
-    }
-    case MediaProgressStateActionType.MediaProgressCommitDrag: {
-      const {
-        mediaProgressPercent,
-      } = action.data;
-
-      return {
-        ...state,
-        mediaProgressDragPercent: mediaProgressPercent,
-        mediaProgressUncommittedDragPercent: undefined,
-      };
-    }
-    default:
-      return state;
-  }
-}
-
-export function MediaProgressBarComponent(props: MediaProgressBarComponentProps = {}) {
+export function ProgressBar(props: ProgressBarComponentProps = {}) {
   const {
     value = 0,
     maxValue = 100,
@@ -227,7 +53,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     mediaProgressIsDragging,
     mediaProgressDragPercent,
     mediaProgressUncommittedDragPercent,
-  }, mediaProgressStateDispatch] = useReducer(mediaProgressStateReducer, {
+  }, mediaProgressStateDispatch] = useReducer(progressStateReducer, {
     mediaProgressIsDragging: false,
     mediaProgressDragPercent: 0,
     mediaProgressUncommittedDragPercent: undefined,
@@ -245,7 +71,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     debug('onMouseDown - event coords - (x) %f (y) %f', e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
-      type: MediaProgressStateActionType.MediaProgressStartDrag,
+      type: ProgressStateActionType.StartDrag,
     });
 
     e.stopPropagation();
@@ -261,12 +87,12 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     }
 
     const eventDirection = e.key === SystemEnums.KeyboardKeyCodes.ArrowLeft
-      ? MediaProgressJumpDirection.Left
-      : MediaProgressJumpDirection.Right;
+      ? ProgressJumpDirection.Left
+      : ProgressJumpDirection.Right;
     debug('onButtonMove - event direction - %s', eventDirection);
 
     mediaProgressStateDispatch({
-      type: MediaProgressStateActionType.MediaProgressJump,
+      type: ProgressStateActionType.Jump,
       data: {
         eventDirection,
         mediaProgressBarContainerRef,
@@ -287,7 +113,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     debug('onMouseClick - event coords - (x) %f (y) %f', e.pageX, e.pageY);
 
     mediaProgressStateDispatch({
-      type: MediaProgressStateActionType.MediaProgressJump,
+      type: ProgressStateActionType.Jump,
       data: {
         eventPositionX: e.pageX,
         mediaProgressBarContainerRef,
@@ -307,7 +133,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     // in order to force re-render, useEffect is set to listen on prop value and triggers the re-render via setting the state
     // @see - https://stackoverflow.com/questions/54865764/react-usestate-does-not-reload-state-from-props
     mediaProgressStateDispatch({
-      type: MediaProgressStateActionType.MediaProgressUpdate,
+      type: ProgressStateActionType.Update,
       data: {
         mediaProgress: value,
         mediaProgressMaxValue: maxValue,
@@ -324,7 +150,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       debug('ending drag due to disabled during an active drag');
 
       mediaProgressStateDispatch({
-        type: MediaProgressStateActionType.MediaProgressEndDrag,
+        type: ProgressStateActionType.EndDrag,
       });
     }
   }, [
@@ -346,7 +172,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       debug('onMouseMove - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressIsDragging, e.pageX, e.pageY);
 
       mediaProgressStateDispatch({
-        type: MediaProgressStateActionType.MediaProgressUpdateDrag,
+        type: ProgressStateActionType.UpdateDrag,
         data: {
           eventPositionX: e.pageX,
           mediaProgressBarContainerRef,
@@ -367,7 +193,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
       debug('onMouseUp - dragging? - %s, event coords - (x) %f (y) %f', mediaProgressIsDragging, e.pageX, e.pageY);
 
       mediaProgressStateDispatch({
-        type: MediaProgressStateActionType.MediaProgressEndDrag,
+        type: ProgressStateActionType.EndDrag,
       });
 
       e.stopPropagation();
@@ -423,7 +249,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
         onDragCommit(mediaProgressUncommittedValue);
       }
       mediaProgressStateDispatch({
-        type: MediaProgressStateActionType.MediaProgressCommitDrag,
+        type: ProgressStateActionType.CommitDrag,
         data: {
           mediaProgressPercent: mediaProgressUncommittedDragPercent,
         },
@@ -470,7 +296,7 @@ export function MediaProgressBarComponent(props: MediaProgressBarComponentProps 
     }
 
     mediaProgressStateDispatch({
-      type: MediaProgressStateActionType.MediaProgressCommitDrag,
+      type: ProgressStateActionType.CommitDrag,
       data: {
         mediaProgressPercent: mediaProgressDragPercentToCommit,
       },

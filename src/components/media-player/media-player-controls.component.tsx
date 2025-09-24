@@ -13,7 +13,7 @@ import { DOM, Events } from '../../utils';
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
 
-import styles from './media-player-ribbon.component.css';
+import styles from './media-player.component.css';
 
 const cx = classNames.bind(styles);
 

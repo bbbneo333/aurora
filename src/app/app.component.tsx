@@ -4,7 +4,7 @@ import { Provider, useSelector } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import _ from 'lodash';
 
-import { MediaSession, MediaPlayerRibbonComponent } from '../components';
+import { MediaSession, MediaPlayer } from '../components';
 import { ContextMenuProvider, ModalProvider, NotificationProvider } from '../contexts';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
@@ -50,7 +50,7 @@ function Player({ active = false }) {
     })}
     >
       <MediaSession/>
-      <MediaPlayerRibbonComponent/>
+      <MediaPlayer/>
     </div>
   );
 }
@@ -64,7 +64,7 @@ function Window() {
   return (
     <Router>
       <NotificationProvider snackbarSx={{
-        bottom: playerIsActive ? '110px !important' : undefined, // TODO: Hack to keep it floating above player ribbon
+        bottom: playerIsActive ? '110px !important' : undefined, // TODO: Hack to keep it floating above player
       }}
       >
         <ModalProvider>

@@ -8,9 +8,9 @@ import { MediaEnums } from '../../enums';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 
-import { MediaProgressBarComponent } from '../media-progress-bar/media-progress-bar.component';
+import { ProgressBar } from '../progress-bar/progress-bar.component';
 
-import styles from './media-player-ribbon.component.css';
+import styles from './media-player.component.css';
 
 const cx = classNames.bind(styles);
 
@@ -23,7 +23,7 @@ export function MediaPlayerProgress() {
 
   const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
 
-  const handleOnMediaProgressDragUpdate = useCallback((value) => {
+  const handleProgressDragUpdate = useCallback((value: number) => {
     setMediaProgressDragValue(value);
     // we don't want updated value to be committed
     return false;
@@ -31,7 +31,7 @@ export function MediaPlayerProgress() {
     setMediaProgressDragValue,
   ]);
 
-  const handleOnMediaProgressDragCommit = useCallback((value) => {
+  const handleProgressDragCommit = useCallback((value: number) => {
     MediaPlayerService.seekMediaTrack(value);
     setMediaProgressDragValue(undefined);
   }, [
@@ -51,12 +51,12 @@ export function MediaPlayerProgress() {
             : (mediaPlaybackCurrentMediaProgress || 0))}
         </div>
         <div className={cx('media-player-progress-bar-container')}>
-          <MediaProgressBarComponent
+          <ProgressBar
             disabled={mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
             value={mediaPlaybackCurrentMediaProgress}
             maxValue={mediaPlaybackCurrentMediaTrack.track_duration}
-            onDragUpdate={handleOnMediaProgressDragUpdate}
-            onDragCommit={handleOnMediaProgressDragCommit}
+            onDragUpdate={handleProgressDragUpdate}
+            onDragCommit={handleProgressDragCommit}
           />
         </div>
         <div className={cx('media-player-progress-counter', 'end')}>

@@ -13,9 +13,15 @@ import {
 
 import { MediaPlaylistDatastore } from '../datastores';
 import { DatastoreUtils, MediaUtils } from '../utils';
-import { BaseError, DataStoreInputData, DataStoreUpdateData } from '../types';
 import store from '../store';
 import { MediaLibraryActions } from '../enums';
+
+import {
+  BaseError,
+  DataStoreInputData,
+  DataStoreUpdateData,
+  EntityNotFoundError,
+} from '../types';
 
 import NotificationService from './notification.service';
 import I18nService from './i18n.service';
@@ -37,6 +43,8 @@ export class MediaLibraryPlaylistDuplicateTracksError extends BaseError {
 }
 
 class MediaPlaylistService {
+  readonly removeOnMissing = false;
+
   loadMediaPlaylists(): void {
     this
       .getMediaPlaylists()
@@ -81,13 +89,33 @@ class MediaPlaylistService {
     return mediaPlaylistData ? this.buildMediaPlaylist(mediaPlaylistData) : undefined;
   }
 
-  async getMediaPlaylistTracks(mediaPlaylistId: string): Promise<IMediaPlaylistTrack[]> {
+  async resolveMediaPlaylistTracks(mediaPlaylistId: string): Promise<IMediaPlaylistTrack[]> {
+    // this function fetches playlist tracks along with the linked media track
+    // in case media track is not found, it removes the playlist track entry (if enabled)
     const playlist = await this.getMediaPlaylist(mediaPlaylistId);
     if (!playlist) {
       throw new Error(`MediaLibraryService encountered error at getMediaPlaylistTracks - Playlist not found - ${mediaPlaylistId}`);
     }
+    const playlistTracks: IMediaPlaylistTrack[] = [];
+    const playlistTrackIdsMissing: string[] = [];
 
-    return this.buildMediaPlaylistTracks(playlist.tracks);
+    await Promise.map(playlist.tracks, async (data) => {
+      try {
+        const track = await this.buildMediaPlaylistTrack(data);
+        playlistTracks.push(track);
+      } catch (error) {
+        if (error instanceof EntityNotFoundError) {
+          console.warn(error);
+          playlistTrackIdsMissing.push(data.playlist_track_id);
+        }
+      }
+    });
+
+    if (!_.isEmpty(playlistTrackIdsMissing) && this.removeOnMissing) {
+      await this.deleteMediaPlaylistTracks(mediaPlaylistId, playlistTrackIdsMissing);
+    }
+
+    return playlistTracks;
   }
 
   async getMediaPlaylists(): Promise<IMediaPlaylist[]> {
@@ -213,23 +241,16 @@ class MediaPlaylistService {
     return Promise.all(mediaPlaylistDataList.map((mediaPlaylistData: any) => this.buildMediaPlaylist(mediaPlaylistData)));
   }
 
-  private async buildMediaPlaylistTracks(mediaPlaylistTrackDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistTrack[]> {
-    // TODO: Added a hack here to ignore playlist tracks that could not be found locally anymore
-    //  Ideally, such entries should have a status like "unavailable"
-
-    // @ts-ignore
-    return Promise
-      .all(mediaPlaylistTrackDataList.map(mediaPlaylistTrackData => this.buildMediaPlaylistTrack(mediaPlaylistTrackData)))
-      .then(mediaPlaylistTracks => mediaPlaylistTracks.filter(mediaPlaylistTrack => !_.isNil(mediaPlaylistTrack)));
-  }
-
-  private async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack | undefined> {
+  private async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack> {
     const mediaTrack = await MediaLibraryService.getMediaTrackForProvider(mediaPlaylistTrackData.provider, mediaPlaylistTrackData.provider_id);
     if (!mediaTrack) {
-      return undefined;
+      throw new EntityNotFoundError(`${mediaPlaylistTrackData.provider}-${mediaPlaylistTrackData.provider_id}`, 'track');
     }
 
-    return _.assign({}, mediaPlaylistTrackData, mediaTrack);
+    return {
+      ...mediaTrack,
+      ...mediaPlaylistTrackData,
+    };
   }
 
   private async getDefaultNewPlaylistName(): Promise<string> {

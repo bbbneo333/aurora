@@ -4,14 +4,18 @@ import store from '../store';
 import { IMediaLikedTrack, IMediaLikedTrackData } from '../interfaces';
 import { MediaLikedTrackDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
+import { EntityNotFoundError } from '../types';
+import { MediaUtils } from '../utils';
 
 import MediaLibraryService from './media-library.service';
 import NotificationService from './notification.service';
 import I18nService from './i18n.service';
 
 class MediaLikedTrackService {
+  readonly removeOnMissing = false;
+
   loadLikedTracks() {
-    this.getLikedTracks()
+    this.resolveLikedTracks()
       .then((tracks: IMediaLikedTrack[]) => {
         store.dispatch({
           type: MediaLibraryActions.SetLikedTracks,
@@ -50,17 +54,48 @@ class MediaLikedTrackService {
   }
 
   async getLikedTrack(trackId: string): Promise<IMediaLikedTrack | undefined> {
-    const likedTrackData = await MediaLikedTrackDatastore.findLikedTrack({
-      track_id: trackId,
-    });
+    try {
+      const likedTrackData = await MediaLikedTrackDatastore.findLikedTrack({
+        track_id: trackId,
+      });
 
-    return likedTrackData ? this.buildLikedTrack(likedTrackData) : undefined;
+      return likedTrackData ? await this.buildLikedTrack(likedTrackData) : undefined;
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        console.warn(error);
+        return undefined;
+      }
+
+      throw error;
+    }
   }
 
-  async getLikedTracks(): Promise<IMediaLikedTrack[]> {
+  async resolveLikedTracks(): Promise<IMediaLikedTrack[]> {
+    // this function fetches liked tracks along with the linked media track
+    // in case media track is not found, it removes the liked track entry (if enabled)
     const likedTrackDataList = await MediaLikedTrackDatastore.findLikedTracks();
+    const likedTracks: IMediaLikedTrack[] = [];
 
-    return Promise.map(likedTrackDataList, likedTrackData => this.buildLikedTrack(likedTrackData));
+    await Promise.map(likedTrackDataList, async (data) => {
+      try {
+        const track = await this.buildLikedTrack(data);
+        likedTracks.push(track);
+      } catch (error) {
+        if (error instanceof EntityNotFoundError) {
+          console.warn(error);
+
+          if (this.removeOnMissing) {
+            await this.removeTrackFromLiked(data.track_id, {
+              skipUserNotification: true,
+            });
+          }
+        }
+      }
+    });
+
+    // const likedTracks = await Promise.map(likedTrackDataList, likedTrackData => this.buildLikedTrack(likedTrackData));
+
+    return MediaUtils.sortMediaLikedTracks(likedTracks);
   }
 
   async addTrackToLiked(trackId: string, options?: { skipUserNotification?: boolean }): Promise<IMediaLikedTrack> {
@@ -137,7 +172,7 @@ class MediaLikedTrackService {
   private async buildLikedTrack(likedTrackData: IMediaLikedTrackData): Promise<IMediaLikedTrack> {
     const track = await MediaLibraryService.getMediaTrack(likedTrackData.track_id);
     if (!track) {
-      throw new Error(`Encountered error at buildLikedTrack - Could not get track for track_id - ${likedTrackData.track_id}`);
+      throw new EntityNotFoundError(likedTrackData.track_id, 'track');
     }
 
     return {

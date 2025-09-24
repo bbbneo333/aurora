@@ -90,7 +90,8 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       to={routerLink}
       activeClassName={cx('active')}
       className={cx('collection-item', 'app-nav-link', variant, {
-        'media-active': isMediaActive,
+        current: isMediaActive,
+        selected: rest['aria-selected'],
       }, className)}
       onContextMenu={handleOnContextMenu}
       onDoubleClick={toggle}
