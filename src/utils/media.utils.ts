@@ -2,6 +2,7 @@ import {
   IMediaAlbum,
   IMediaArtist,
   IMediaLikedTrack,
+  IMediaLikedTrackInputData,
   IMediaPinnedItem,
   IMediaPinnedItemInputData,
   IMediaPlaylist,
@@ -106,4 +107,12 @@ export function getPinnedItemKey(item: IMediaPinnedItem) {
 
 export function getPinnedItemKeyFromInput(input: IMediaPinnedItemInputData) {
   return `${input.type}_${input.id}`;
+}
+
+export function getLikedTrackKey(track: IMediaLikedTrack) {
+  return `${track.provider}_${track.provider_id}`;
+}
+
+export function getLikedTrackKeyFromInput(input: IMediaLikedTrackInputData) {
+  return `${input.provider}_${input.provider_id}`;
 }

@@ -3,25 +3,26 @@ import { Modal } from 'react-bootstrap';
 
 import { ModalComponent } from '../../contexts';
 import { useDataAction } from '../../hooks';
+import { IMediaLikedTrackInputData } from '../../interfaces';
 import { I18nService, MediaLikedTrackService } from '../../services';
 
 import { Button } from '../button/button.component';
 
 export const MediaLikedTracksDeleteModal: ModalComponent<{
-  likedTracksIds: string[];
+  likedTracksInputList: IMediaLikedTrackInputData[];
 }, {
-  deletedLikedTrackIds: string[];
+  deletedLikedTrackInputList: IMediaLikedTrackInputData[];
 }> = (props) => {
   const {
-    likedTracksIds,
+    likedTracksInputList,
     onComplete,
   } = props;
 
   const deleteLikedTracks = useDataAction(async () => {
-    await MediaLikedTrackService.removeTracksFromLiked(likedTracksIds);
+    await MediaLikedTrackService.removeTracksFromLiked(likedTracksInputList);
 
     onComplete({
-      deletedLikedTrackIds: likedTracksIds,
+      deletedLikedTrackInputList: likedTracksInputList,
     });
   });
 

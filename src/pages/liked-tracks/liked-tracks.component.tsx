@@ -27,16 +27,19 @@ export function LikedTracksPage() {
   const sortedMediaLikedTracks = useSelector(selectSortedLikedTracks);
 
   const handleSelectionDelete = useCallback((likedTracksIds: string[]) => new Promise<boolean>((resolve) => {
+    const mediaLikedTrackForDelete = sortedMediaLikedTracks.filter(track => likedTracksIds.includes(track.id));
+
     showModal(MediaLikedTracksDeleteModal, {
-      likedTracksIds,
+      likedTracksInputList: mediaLikedTrackForDelete,
     }, {
       onComplete: (res) => {
         // success signal if selected were deleted
-        resolve(!isEmpty(res?.deletedLikedTrackIds));
+        resolve(!isEmpty(res?.deletedLikedTrackInputList));
       },
     });
   }), [
     showModal,
+    sortedMediaLikedTracks,
   ]);
 
   useEffect(() => {

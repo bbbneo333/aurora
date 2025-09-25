@@ -1,7 +1,7 @@
 import { omit } from 'lodash';
 
 import store from '../store';
-import { IMediaLikedTrack, IMediaLikedTrackData } from '../interfaces';
+import { IMediaLikedTrack, IMediaLikedTrackData, IMediaLikedTrackInputData } from '../interfaces';
 import { MediaLikedTrackDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
 import { EntityNotFoundError } from '../types';
@@ -29,8 +29,8 @@ class MediaLikedTrackService {
       });
   }
 
-  loadTrackLikedStatus(trackId: string) {
-    this.getLikedTrack(trackId)
+  loadTrackLikedStatus(input: IMediaLikedTrackInputData) {
+    this.getLikedTrack(input)
       .then((mediaLikedTrack) => {
         if (mediaLikedTrack) {
           store.dispatch({
@@ -43,7 +43,7 @@ class MediaLikedTrackService {
           store.dispatch({
             type: MediaLibraryActions.RemoveMediaTrackFromLiked,
             data: {
-              mediaTrackId: trackId,
+              mediaLikedTrackInput: input,
             },
           });
         }
@@ -53,10 +53,11 @@ class MediaLikedTrackService {
       });
   }
 
-  async getLikedTrack(trackId: string): Promise<IMediaLikedTrack | undefined> {
+  async getLikedTrack(input: IMediaLikedTrackInputData): Promise<IMediaLikedTrack | undefined> {
     try {
       const likedTrackData = await MediaLikedTrackDatastore.findLikedTrack({
-        track_id: trackId,
+        provider: input.provider,
+        provider_id: input.provider_id,
       });
 
       return likedTrackData ? await this.buildLikedTrack(likedTrackData) : undefined;
@@ -85,7 +86,10 @@ class MediaLikedTrackService {
           console.warn(error);
 
           if (this.removeOnMissing) {
-            await this.removeTrackFromLiked(data.track_id, {
+            await this.removeTrackFromLiked({
+              provider: data.provider,
+              provider_id: data.provider_id,
+            }, {
               skipUserNotification: true,
             });
           }
@@ -98,15 +102,19 @@ class MediaLikedTrackService {
     return MediaUtils.sortMediaLikedTracks(likedTracks);
   }
 
-  async addTrackToLiked(trackId: string, options?: { skipUserNotification?: boolean }): Promise<IMediaLikedTrack> {
+  async addTrackToLiked(input: IMediaLikedTrackInputData, options?: { skipUserNotification?: boolean }): Promise<IMediaLikedTrack> {
     // we will always remove existing entry before adding a new one
-    await this.removeTrackFromLiked(trackId, {
+    await this.removeTrackFromLiked({
+      provider: input.provider,
+      provider_id: input.provider_id,
+    }, {
       skipUserNotification: true,
     });
 
     // now add
     const likedTrackData = await MediaLikedTrackDatastore.insertLikedTrack({
-      track_id: trackId,
+      provider: input.provider,
+      provider_id: input.provider_id,
       added_at: Date.now(),
     });
 
@@ -126,8 +134,11 @@ class MediaLikedTrackService {
     return likedTrack;
   }
 
-  async addTracksToLiked(trackIds: string[], options?: { skipUserNotification?: boolean }): Promise<IMediaLikedTrack[]> {
-    const mediaLikedTracks = await Promise.map(trackIds, trackId => this.addTrackToLiked(trackId, {
+  async addTracksToLiked(inputList: IMediaLikedTrackInputData[], options?: { skipUserNotification?: boolean }): Promise<IMediaLikedTrack[]> {
+    const mediaLikedTracks = await Promise.map(inputList, input => this.addTrackToLiked({
+      provider: input.provider,
+      provider_id: input.provider_id,
+    }, {
       skipUserNotification: true,
     }));
 
@@ -138,15 +149,16 @@ class MediaLikedTrackService {
     return mediaLikedTracks;
   }
 
-  async removeTrackFromLiked(trackId: string, options?: { skipUserNotification?: boolean }): Promise<void> {
+  async removeTrackFromLiked(input: IMediaLikedTrackInputData, options?: { skipUserNotification?: boolean }): Promise<void> {
     await MediaLikedTrackDatastore.deleteLikedTrack({
-      track_id: trackId,
+      provider: input.provider,
+      provider_id: input.provider_id,
     });
 
     store.dispatch({
       type: MediaLibraryActions.RemoveMediaTrackFromLiked,
       data: {
-        mediaTrackId: trackId,
+        mediaLikedTrackInput: input,
       },
     });
 
@@ -155,8 +167,11 @@ class MediaLikedTrackService {
     }
   }
 
-  async removeTracksFromLiked(trackIds: string[], options?: { skipUserNotification?: boolean }): Promise<void> {
-    await Promise.map(trackIds, trackId => this.removeTrackFromLiked(trackId, {
+  async removeTracksFromLiked(inputList: IMediaLikedTrackInputData[], options?: { skipUserNotification?: boolean }): Promise<void> {
+    await Promise.map(inputList, input => this.removeTrackFromLiked({
+      provider: input.provider,
+      provider_id: input.provider_id,
+    }, {
       skipUserNotification: true,
     }));
 
@@ -170,9 +185,9 @@ class MediaLikedTrackService {
   }
 
   private async buildLikedTrack(likedTrackData: IMediaLikedTrackData): Promise<IMediaLikedTrack> {
-    const track = await MediaLibraryService.getMediaTrack(likedTrackData.track_id);
+    const track = await MediaLibraryService.getMediaTrackForProvider(likedTrackData.provider, likedTrackData.provider_id);
     if (!track) {
-      throw new EntityNotFoundError(likedTrackData.track_id, 'track');
+      throw new EntityNotFoundError(`${likedTrackData.provider}-${likedTrackData.provider_id}`, 'track');
     }
 
     return {
