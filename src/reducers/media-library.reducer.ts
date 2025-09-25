@@ -310,7 +310,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       };
     }
     case MediaLibraryActions.RemoveMediaTrackFromLiked: {
-      // data.mediaLikedTrackInput: IMediaLikedTrackInput
+      // data.mediaLikedTrackInput: IMediaLikedTrackInputData
       const { mediaLikedTrackInput } = action.data;
       const mediaLikedTrackKey = MediaUtils.getLikedTrackKeyFromInput(mediaLikedTrackInput);
 
@@ -354,8 +354,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         },
       };
     }
-    case MediaLibraryActions.RemovePinnedCollectionItem: {
-      // data.mediaCollectionItem: IMediaCollectionItem
+    case MediaLibraryActions.RemovePinnedItem: {
+      // data.mediaPinnedItemInput: IMediaPinnedItemInputData
       const { mediaPinnedItemInput } = action.data;
       const mediaPinnedItemKey = MediaUtils.getPinnedItemKeyFromInput(mediaPinnedItemInput);
 
