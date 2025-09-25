@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { MediaHeaderNavigationLinkComponent, RouterSwitchComponent } from '../../components';
+import { MediaHeaderNavigationLink, RouterSwitchComponent } from '../../components';
 
 import styles from './player.component.css';
 import routes from './player.routes';
@@ -21,7 +21,7 @@ export function PlayerHeader() {
     <div className={cx('player-header')}>
       <div className={cx('player-header-navigation-list')}>
         {routes.map(route => route.tHeaderName && (
-          <MediaHeaderNavigationLinkComponent
+          <MediaHeaderNavigationLink
             key={route.path}
             tName={route.tHeaderName}
             path={route.path}

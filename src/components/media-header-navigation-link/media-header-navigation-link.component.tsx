@@ -8,7 +8,7 @@ import styles from './media-header-navigation-link.component.css';
 
 const cx = classNames.bind(styles);
 
-export function MediaHeaderNavigationLinkComponent(props: {
+export function MediaHeaderNavigationLink(props: {
   tName: string,
   path: string,
 }) {
