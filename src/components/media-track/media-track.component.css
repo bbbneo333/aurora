@@ -63,5 +63,5 @@
   font-size: 12px;
   letter-spacing: 1px;
   text-align: right;
-  width: 100px;
+  width: 70px; /* TODO: Hack to fit long durations (eg: 02:35:40) */
 }

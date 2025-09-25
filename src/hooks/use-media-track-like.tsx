@@ -13,15 +13,15 @@ export function useMediaTrackLike(props: {
   const { mediaTrack, mediaTracks } = props;
   const [isLikeStatusLoading, setIsLikeStatusLoading] = useState(false);
 
-  const isTrackLiked = useSelector(makeSelectIsTrackLiked(mediaTrack?.id));
-  const areAllTracksLiked = useSelector(makeSelectAreAllTracksLiked(mediaTracks?.map(t => t.id)));
+  const isTrackLiked = useSelector(makeSelectIsTrackLiked(mediaTrack));
+  const areAllTracksLiked = useSelector(makeSelectAreAllTracksLiked(mediaTracks));
 
   useEffect(() => {
     if (!mediaTrack) {
       return;
     }
 
-    MediaLikedTrackService.loadTrackLikedStatus(mediaTrack.id);
+    MediaLikedTrackService.loadTrackLikedStatus(mediaTrack);
   }, [
     mediaTrack,
   ]);
@@ -32,7 +32,7 @@ export function useMediaTrackLike(props: {
     }
 
     mediaTracks.forEach((track: IMediaTrack) => {
-      MediaLikedTrackService.loadTrackLikedStatus(track.id);
+      MediaLikedTrackService.loadTrackLikedStatus(track);
     });
   }, [
     mediaTracks,
@@ -45,18 +45,18 @@ export function useMediaTrackLike(props: {
       if (mediaTrack) {
         if (isTrackLiked) {
           // remove
-          await MediaLikedTrackService.removeTrackFromLiked(mediaTrack.id);
+          await MediaLikedTrackService.removeTrackFromLiked(mediaTrack);
         } else {
           // add
-          await MediaLikedTrackService.addTrackToLiked(mediaTrack.id);
+          await MediaLikedTrackService.addTrackToLiked(mediaTrack);
         }
       } else if (mediaTracks && !isEmpty(mediaTracks)) {
         if (areAllTracksLiked) {
           // remove
-          await MediaLikedTrackService.removeTracksFromLiked(mediaTracks.map(track => track.id));
+          await MediaLikedTrackService.removeTracksFromLiked(mediaTracks);
         } else {
           // add
-          await MediaLikedTrackService.addTracksToLiked(mediaTracks.map(track => track.id));
+          await MediaLikedTrackService.addTracksToLiked(mediaTracks);
         }
       }
     } catch (error) {

@@ -8,9 +8,11 @@
 
 .browser-header {
   display: flex;
+  align-items: center;
   flex: 0 0 50px;
   height: var(--titlebar-overlay-height);
   margin: 5px;
+  gap: 15px;
 }
 
 .browser-viewport {

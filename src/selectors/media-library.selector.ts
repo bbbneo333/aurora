@@ -1,7 +1,7 @@
 import { every, isNil, values } from 'lodash';
 import { createSelector } from 'reselect';
 
-import { IMediaCollectionItem } from '../interfaces';
+import { IMediaLikedTrackInputData, IMediaPinnedItemInputData } from '../interfaces';
 import { RootState } from '../reducers';
 import { MediaUtils } from '../utils';
 
@@ -12,17 +12,17 @@ export const selectSortedLikedTracks = createSelector(
   mediaLikedTracksRecord => MediaUtils.sortMediaLikedTracks(values(mediaLikedTracksRecord)),
 );
 
-export const makeSelectIsTrackLiked = (trackId?: string) => createSelector(
+export const makeSelectIsTrackLiked = (input?: IMediaLikedTrackInputData) => createSelector(
   [selectMediaLikedTracksRecord],
-  mediaLikedTracksRecord => !!trackId && !!mediaLikedTracksRecord[trackId],
+  mediaLikedTracksRecord => !!input && !!mediaLikedTracksRecord[MediaUtils.getLikedTrackKeyFromInput(input)],
 );
 
-export const makeSelectAreAllTracksLiked = (trackIds?: string[]) => createSelector(
+export const makeSelectAreAllTracksLiked = (inputList?: IMediaLikedTrackInputData[]) => createSelector(
   [selectMediaLikedTracksRecord],
   (mediaLikedTracksRecord) => {
-    if (!trackIds || trackIds.length === 0) return false;
+    if (!inputList || inputList.length === 0) return false;
 
-    return every(trackIds, (id: string) => !isNil(mediaLikedTracksRecord[id]));
+    return every(inputList, input => !isNil(mediaLikedTracksRecord[MediaUtils.getLikedTrackKeyFromInput(input)]));
   },
 );
 
@@ -33,7 +33,7 @@ export const selectSortedPinnedItems = createSelector(
   mediaPinnedItemsRecord => MediaUtils.sortMediaPinnedItems(values(mediaPinnedItemsRecord)),
 );
 
-export const makeSelectIsCollectionPinned = (item?: IMediaCollectionItem) => createSelector(
+export const makeSelectIsCollectionPinned = (input?: IMediaPinnedItemInputData) => createSelector(
   [selectMediaPinnedItemsRecord],
-  mediaPinnedItemsRecord => !!item && !!mediaPinnedItemsRecord[MediaUtils.getPinnedItemKeyFromInput(item)],
+  mediaPinnedItemsRecord => !!input && !!mediaPinnedItemsRecord[MediaUtils.getPinnedItemKeyFromInput(input)],
 );

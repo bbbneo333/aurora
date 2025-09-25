@@ -10,8 +10,6 @@ class MediaLikedTracksDatastore {
       indexes: [{
         field: 'id',
         unique: true,
-      }, {
-        field: 'track_id',
       }],
     });
   }

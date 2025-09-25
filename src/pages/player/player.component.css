@@ -1,6 +1,6 @@
 .player-header-navigation-list {
   display: flex;
   flex-direction: row;
-  align-self: center;
   align-items: center;
+  gap: 15px;
 }

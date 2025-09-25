@@ -285,14 +285,18 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
 
       return {
         ...state,
-        mediaLikedTracksRecord: keyBy(mediaLikedTracks, 'track_id'),
+        mediaLikedTracksRecord: keyBy(
+          mediaLikedTracks,
+          track => MediaUtils.getLikedTrackKey(track),
+        ),
       };
     }
     case MediaLibraryActions.AddMediaTrackToLiked: {
       // data.mediaLikedTrack: IMediaLikedTrack - liked track to be added
       const { mediaLikedTrack } = action.data;
+      const mediaLikedTrackKey = MediaUtils.getLikedTrackKey(mediaLikedTrack);
 
-      if (state.mediaLikedTracksRecord[mediaLikedTrack.track_id]) {
+      if (state.mediaLikedTracksRecord[mediaLikedTrackKey]) {
         // already there, skip update
         return state;
       }
@@ -301,22 +305,23 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         ...state,
         mediaLikedTracksRecord: {
           ...state.mediaLikedTracksRecord,
-          [mediaLikedTrack.track_id]: mediaLikedTrack,
+          [mediaLikedTrackKey]: mediaLikedTrack,
         },
       };
     }
     case MediaLibraryActions.RemoveMediaTrackFromLiked: {
-      // data.mediaTrackId: string - media track id
-      const { mediaTrackId } = action.data;
+      // data.mediaLikedTrackInput: IMediaLikedTrackInputData
+      const { mediaLikedTrackInput } = action.data;
+      const mediaLikedTrackKey = MediaUtils.getLikedTrackKeyFromInput(mediaLikedTrackInput);
 
-      if (!state.mediaLikedTracksRecord[mediaTrackId]) {
+      if (!state.mediaLikedTracksRecord[mediaLikedTrackKey]) {
         // already removed, skip update
         return state;
       }
 
       return {
         ...state,
-        mediaLikedTracksRecord: omit(state.mediaLikedTracksRecord, mediaTrackId),
+        mediaLikedTracksRecord: omit(state.mediaLikedTracksRecord, mediaLikedTrackKey),
       };
     }
     case MediaLibraryActions.SetPinnedItems: {
@@ -349,8 +354,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
         },
       };
     }
-    case MediaLibraryActions.RemovePinnedCollectionItem: {
-      // data.mediaCollectionItem: IMediaCollectionItem
+    case MediaLibraryActions.RemovePinnedItem: {
+      // data.mediaPinnedItemInput: IMediaPinnedItemInputData
       const { mediaPinnedItemInput } = action.data;
       const mediaPinnedItemKey = MediaUtils.getPinnedItemKeyFromInput(mediaPinnedItemInput);
 

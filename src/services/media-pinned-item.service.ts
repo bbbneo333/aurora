@@ -35,7 +35,7 @@ class MediaPinnedItemService {
           });
         } else {
           store.dispatch({
-            type: MediaLibraryActions.RemovePinnedCollectionItem,
+            type: MediaLibraryActions.RemovePinnedItem,
             data: {
               mediaPinnedItemInput: input,
             },
@@ -118,7 +118,7 @@ class MediaPinnedItemService {
     });
 
     store.dispatch({
-      type: MediaLibraryActions.RemovePinnedCollectionItem,
+      type: MediaLibraryActions.RemovePinnedItem,
       data: {
         mediaPinnedItemInput: input,
       },
