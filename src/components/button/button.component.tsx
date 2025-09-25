@@ -109,7 +109,7 @@ export function Button(props: ButtonProps) {
         aria-disabled={disabled}
         ref={mediaButtonContainerRef}
         role="button"
-        tabIndex={0}
+        tabIndex={disabled ? -1 : 0}
         // for some reason, in our custom implementation setting delay directly to tooltip is not working
         // we use timeout then to open up the tooltip
         onMouseEnter={() => setTooltipOpen(true)}
