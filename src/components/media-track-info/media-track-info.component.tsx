@@ -6,6 +6,8 @@ import { IMediaArtist, IMediaTrack } from '../../interfaces';
 import { StringUtils, withSeparator } from '../../utils';
 
 import { RouterLink } from '../router-link/router-link.component';
+import { Text, TextProps } from '../text/text.component';
+import { TextMarquee, TextMarqueeProps } from '../text/text-marquee.component';
 
 import styles from './media-track-info.component.css';
 
@@ -17,11 +19,28 @@ function MediaArtistLinkSeparator() {
   );
 }
 
+function MediaText(props: {
+  marquee?: boolean;
+} & (TextProps | TextMarqueeProps)) {
+  const { marquee, ...rest } = props;
+
+  if (marquee) {
+    return (
+      <TextMarquee {...rest}/>
+    );
+  }
+
+  return (
+    <Text {...rest}/>
+  );
+}
+
 export function MediaTrackAlbumLink(props: {
-  mediaTrack: IMediaTrack,
-  onContextMenu?: (e: React.MouseEvent) => void,
+  mediaTrack: IMediaTrack;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  marquee?: boolean;
 }) {
-  const { mediaTrack, onContextMenu } = props;
+  const { mediaTrack, onContextMenu, marquee } = props;
 
   return (
     <RouterLink
@@ -32,30 +51,34 @@ export function MediaTrackAlbumLink(props: {
       className={cx('media-track-album-link', 'app-nav-link')}
       onContextMenu={onContextMenu}
     >
-      {mediaTrack.track_name}
+      <MediaText marquee={marquee}>
+        {mediaTrack.track_name}
+      </MediaText>
     </RouterLink>
   );
 }
 
 export function MediaTrackName(props: {
-  mediaTrack: IMediaTrack,
-  onContextMenu?: (e: React.MouseEvent) => void,
+  mediaTrack: IMediaTrack;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  marquee?: boolean;
 }) {
-  const { mediaTrack, onContextMenu } = props;
+  const { mediaTrack, onContextMenu, marquee } = props;
 
   return (
     <div className={cx('media-track-name')} onContextMenu={onContextMenu}>
-      {mediaTrack.track_name}
+      <MediaText marquee={marquee}>
+        {mediaTrack.track_name}
+      </MediaText>
     </div>
   );
 }
 
 export function MediaArtistLink(props: {
-  mediaArtist: IMediaArtist,
+  mediaArtist: IMediaArtist;
+  marquee?: boolean;
 }) {
-  const {
-    mediaArtist,
-  } = props;
+  const { mediaArtist, marquee } = props;
 
   return (
     <RouterLink
@@ -65,15 +88,18 @@ export function MediaArtistLink(props: {
       })}
       className={cx('media-track-artist-link', 'app-nav-link')}
     >
-      {mediaArtist.artist_name}
+      <MediaText marquee={marquee}>
+        {mediaArtist.artist_name}
+      </MediaText>
     </RouterLink>
   );
 }
 
-export function MediaArtistLinksComponent(props: {
-  mediaArtists: IMediaArtist[],
+export function MediaArtistLinks(props: {
+  mediaArtists: IMediaArtist[];
+  marquee?: boolean;
 }) {
-  const { mediaArtists } = props;
+  const { mediaArtists, marquee } = props;
 
   return (
     withSeparator(
@@ -82,6 +108,7 @@ export function MediaArtistLinksComponent(props: {
         <MediaArtistLink
           key={mediaArtist.id}
           mediaArtist={mediaArtist}
+          marquee={marquee}
         />
       ),
       <MediaArtistLinkSeparator/>,
@@ -90,16 +117,18 @@ export function MediaArtistLinksComponent(props: {
 }
 
 export function MediaTrackInfo(props: {
-  mediaTrack: IMediaTrack,
-  disableAlbumLink?: boolean,
-  className?: string,
-  onContextMenu?: (e: React.MouseEvent) => void,
+  mediaTrack: IMediaTrack;
+  disableAlbumLink?: boolean;
+  className?: string;
+  onContextMenu?: (e: React.MouseEvent) => void;
+  marquee?: boolean;
 }) {
   const {
     mediaTrack,
     disableAlbumLink = false,
     className,
     onContextMenu,
+    marquee,
   } = props;
 
   return (
@@ -109,12 +138,14 @@ export function MediaTrackInfo(props: {
           disableAlbumLink
             ? (
               <MediaTrackName
+                marquee={marquee}
                 mediaTrack={mediaTrack}
                 onContextMenu={onContextMenu}
               />
             )
             : (
               <MediaTrackAlbumLink
+                marquee={marquee}
                 mediaTrack={mediaTrack}
                 onContextMenu={onContextMenu}
               />
@@ -122,7 +153,10 @@ export function MediaTrackInfo(props: {
         }
       </div>
       <div className={cx('media-track-info-subtitle')}>
-        <MediaArtistLinksComponent mediaArtists={mediaTrack.track_artists}/>
+        <MediaArtistLinks
+          marquee={marquee}
+          mediaArtists={mediaTrack.track_artists}
+        />
       </div>
     </div>
   );

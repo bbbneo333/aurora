@@ -16,6 +16,8 @@
   /*context menu*/
   --context-menu-color: #b3b3b3;
   --context-menu-bg-color: #282828;
+  --context-menu-max-overflow-width: 250px;
+  --context-menu-max-overflow-height: 300px;
   /*button*/
   --button-primary-bg-color: #009233;
   --button-primary-hovered-bg-color: #007a2b;

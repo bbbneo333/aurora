@@ -59,6 +59,7 @@ export function MediaPlayerInfo() {
           onContextMenu={handleContextMenu}
         />
         <MediaTrackInfo
+          marquee
           mediaTrack={mediaPlaybackCurrentMediaTrack}
           className={cx('media-player-track-info-container')}
           onContextMenu={handleContextMenu}

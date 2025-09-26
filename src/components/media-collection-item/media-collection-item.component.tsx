@@ -8,6 +8,7 @@ import { IMediaCollectionItem } from '../../interfaces';
 import { RouterLink } from '../router-link/router-link.component';
 import { MediaPlaybackButton } from '../media-playback-button/media-playback-button.component';
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
+import { Text } from '../text/text.component';
 
 import styles from './media-collection-item.component.css';
 
@@ -119,7 +120,9 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
         )}
         <div className={cx('collection-item-section', 'collection-item-info')}>
           <div className={cx('collection-item-info-title')}>
-            {mediaItem.name}
+            <Text>
+              {mediaItem.name}
+            </Text>
           </div>
           {subtitle && (
             <div className={cx('collection-item-info-subtitle')}>

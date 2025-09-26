@@ -4,6 +4,7 @@
   flex-direction: column;
   background-color: var(--stage-content-bg-color);
   color: var(--text-light-color);
+  overflow: hidden;
 }
 
 .browser-header {
