@@ -12,3 +12,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.text-marquee-container {
+}
+
+.text-marquee.active {
+  animation-name: marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
+  max-width: 100%;
+  text-overflow: clip;
+  overflow: visible;
+}
+
+.text-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    /* duplicated keyframe to hold at start */
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-1 * var(--marquee-width)));
+  }
+}

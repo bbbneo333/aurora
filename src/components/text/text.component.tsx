@@ -9,15 +9,18 @@ export type TextProps = {
   children?: React.ReactNode;
 } & React.HTMLAttributes<HTMLSpanElement>;
 
-export function Text(props: TextProps) {
+export const Text = React.forwardRef<HTMLSpanElement, TextProps>((props, ref) => {
   const { children, ...rest } = props;
 
   return (
     <span
       {...rest}
-      className={cx('text')}
+      ref={ref}
+      className={cx('text', rest.className)}
     >
       {children}
     </span>
   );
-}
+});
+
+Text.displayName = 'Text';
