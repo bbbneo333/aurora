@@ -6,3 +6,4 @@ export * from './use-media-collection-playback';
 export * from './use-media-track-like';
 export * from './use-media-track-playback';
 export * from './use-persistent-scroll';
+export * from './use-scroll-lock';
