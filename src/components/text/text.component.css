@@ -5,3 +5,10 @@
   text-overflow: ellipsis;
   min-width: 0; /* critical when inside flex */
 }
+
+.text-clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

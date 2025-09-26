@@ -39,4 +39,5 @@ export * from './router-link-toggle/router-link-toggle.component';
 export * from './router-link/router-link.component';
 export * from './text/text.component';
 export * from './text-input/text-input.component';
+export * from './text/text-clamp.component';
 export * from './upload/upload-overlay.component';

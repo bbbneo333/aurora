@@ -5,13 +5,18 @@ import styles from './text.component.css';
 
 const cx = classNames.bind(styles);
 
-export function Text(props: {
+export type TextProps = {
   children?: React.ReactNode;
-}) {
-  const { children } = props;
+} & React.HTMLAttributes<HTMLSpanElement>;
+
+export function Text(props: TextProps) {
+  const { children, ...rest } = props;
 
   return (
-    <span className={cx('text')}>
+    <span
+      {...rest}
+      className={cx('text')}
+    >
       {children}
     </span>
   );

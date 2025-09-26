@@ -5,9 +5,15 @@ import { isEmpty } from 'lodash';
 import classNames from 'classnames/bind';
 
 import { Icons, Layout } from '../../constants';
-import { MediaAlbums, MediaCollectionActions, MediaCoverPicture } from '../../components';
 import { RootState } from '../../reducers';
 import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
+
+import {
+  MediaAlbums,
+  MediaCollectionActions,
+  MediaCoverPicture,
+  TextClamp,
+} from '../../components';
 
 import styles from './artist.component.css';
 
@@ -48,7 +54,9 @@ export function ArtistPage() {
               {I18nService.getString('label_artist_header')}
             </div>
             <div className={cx('artist-header-name')}>
-              {mediaSelectedArtist.artist_name}
+              <TextClamp>
+                {mediaSelectedArtist.artist_name}
+              </TextClamp>
             </div>
             <div className={cx('artist-header-info')}/>
           </div>

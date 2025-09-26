@@ -10,6 +10,7 @@ import {
   MediaTrackList,
   MediaTrackContextMenuItem,
   MediaCollectionActions,
+  TextClamp,
 } from '../../components';
 
 import { Icons, Layout } from '../../constants';
@@ -54,7 +55,9 @@ export function AlbumPage() {
               {I18nService.getString('label_album_header')}
             </div>
             <div className={cx('album-header-name')}>
-              {mediaSelectedAlbum.album_name}
+              <TextClamp>
+                {mediaSelectedAlbum.album_name}
+              </TextClamp>
             </div>
             <div className={cx('album-header-info')}>
               <MediaArtistLink mediaArtist={mediaSelectedAlbum.album_artist}/>

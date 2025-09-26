@@ -17,6 +17,7 @@ import {
   MediaPlaylistDeleteTracksModal,
   MediaTrackContextMenuItem,
   MediaTrackList,
+  TextClamp,
 } from '../../components';
 
 import styles from './playlist.component.css';
@@ -120,7 +121,9 @@ export function PlaylistPage() {
               {I18nService.getString('label_playlist_header')}
             </div>
             <div className={cx('playlist-header-name')}>
-              {mediaSelectedPlaylist.name}
+              <TextClamp>
+                {mediaSelectedPlaylist.name}
+              </TextClamp>
             </div>
           </div>
         </div>
