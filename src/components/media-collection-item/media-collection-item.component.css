@@ -25,6 +25,7 @@
   align-items: center;
   gap: 20px;
   padding: 10px;
+  min-width: 0; /* allow children to shrink when needed */
 }
 
 .collection-item.compact .collection-item-content {
@@ -37,12 +38,14 @@
 }
 
 .collection-item-info {
+  flex-flow: column;
   display: flex;
   flex-flow: column;
   align-items: flex-start;
-  white-space: nowrap;
-  overflow: hidden;
   gap: 5px;
+  flex: 1 1 auto; /* take remaining horizontal space and be allowed to shrink */
+  min-width: 0;
+  overflow: visible; /* children handle their own overflow */
 }
 
 .collection-item-info-title {
@@ -57,4 +60,10 @@
 
 .collection-item.current .collection-item-info-title {
   font-weight: bold;
+}
+
+.collection-item-info-title,
+.collection-item-info-subtitle {
+  width: 100%;
+  overflow: hidden;
 }

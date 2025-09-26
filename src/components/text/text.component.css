@@ -1,6 +1,7 @@
 .text {
-  white-space: nowrap;
+  display: block; /* or inline-block depending on context */
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 100%;
+  min-width: 0; /* critical when inside flex */
 }
