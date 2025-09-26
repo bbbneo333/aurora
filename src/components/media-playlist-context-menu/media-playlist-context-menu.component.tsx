@@ -13,6 +13,7 @@ import { I18nService, MediaCollectionService, MediaPlaylistService } from '../..
 import { MediaLibraryPlaylistDuplicateTracksError } from '../../services/media-playlist.service';
 
 import { Icon } from '../icon/icon.component';
+import { Text } from '../text/text.component';
 import { TextInput } from '../text-input/text-input.component';
 import { MediaPlaylistDeleteModal } from '../media-playlist-delete-modal/media-playlist-delete-modal.component';
 import { MediaPlaylistEditModal } from '../media-playlist-edit-modal/media-playlist-edit-modal.component';
@@ -180,16 +181,22 @@ export function MediaPlaylistContextMenu(props: MediaPlaylistContextMenuProps) {
             {I18nService.getString('label_playlists_empty')}
           </Item>
         )}
-        {mediaPlaylistsToShow.map(mediaPlaylist => (
-          <Item
-            key={mediaPlaylist.id}
-            id={MediaPlaylistContextMenuItemAction.AddToPlaylist}
-            onClick={handleMenuItemClick}
-            data={{ mediaPlaylistId: mediaPlaylist.id }}
-          >
-            {mediaPlaylist.name}
-          </Item>
-        ))}
+        {/* react contextify does not have inbuilt support for handling scroll, so this is being set manually for the list */}
+        <div className="app-scrollable" style={{ maxHeight: 'var(--context-menu-max-overflow-height)' }}>
+          {mediaPlaylistsToShow.map(mediaPlaylist => (
+            <Item
+              style={{ maxWidth: 'var(--context-menu-max-overflow-width)', overflowY: 'hidden' }}
+              key={mediaPlaylist.id}
+              id={MediaPlaylistContextMenuItemAction.AddToPlaylist}
+              onClick={handleMenuItemClick}
+              data={{ mediaPlaylistId: mediaPlaylist.id }}
+            >
+              <Text>
+                {mediaPlaylist.name}
+              </Text>
+            </Item>
+          ))}
+        </div>
       </>
     );
   }
