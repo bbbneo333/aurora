@@ -19,7 +19,13 @@ class MediaPlaylistDatastore {
   }
 
   insertMediaPlaylist(mediaPlaylistInputData: DataStoreInputData<IMediaPlaylistData>): Promise<IMediaPlaylistData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaPlaylistsDatastoreName, mediaPlaylistInputData);
+    const now = Date.now();
+
+    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaPlaylistsDatastoreName, {
+      ...mediaPlaylistInputData,
+      created_at: now,
+      updated_at: now,
+    });
   }
 
   addMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackInputDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistData> {
@@ -30,6 +36,9 @@ class MediaPlaylistDatastore {
         tracks: {
           $each: mediaTrackInputDataList,
         },
+      },
+      $set: {
+        updated_at: Date.now(),
       },
     });
   }
@@ -44,6 +53,9 @@ class MediaPlaylistDatastore {
             $in: mediaPlaylistTrackIds,
           },
         },
+      },
+      $set: {
+        updated_at: Date.now(),
       },
     });
   }
@@ -66,7 +78,10 @@ class MediaPlaylistDatastore {
     return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
-      $set: mediaPlaylistUpdateData,
+      $set: {
+        ...mediaPlaylistUpdateData,
+        updated_at: Date.now(),
+      },
     });
   }
 }

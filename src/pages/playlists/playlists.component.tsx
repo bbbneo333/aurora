@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import { useHistory } from 'react-router-dom';
 
 import { Icons, Routes } from '../../constants';
-import { RootState } from '../../reducers';
+import { selectSortedPlaylists } from '../../selectors';
 import { I18nService, MediaPlaylistService } from '../../services';
 import { StringUtils } from '../../utils';
 
@@ -48,7 +48,7 @@ function PlaylistsEmptySection() {
 }
 
 export function PlaylistsPage() {
-  const mediaPlaylists = useSelector((state: RootState) => state.mediaLibrary.mediaPlaylists);
+  const mediaPlaylists = useSelector(selectSortedPlaylists);
 
   useEffect(() => {
     MediaPlaylistService.loadMediaPlaylists();

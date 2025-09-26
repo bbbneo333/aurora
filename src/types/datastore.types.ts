@@ -32,6 +32,6 @@ export type DataStoreQueryData<T> = {
   limit?: number,
 };
 
-export type DataStoreInputData<T = any> = Omit<T, 'id'>;
+export type DataStoreInputData<T = any> = Omit<T, 'id' | 'created_at' | 'updated_at'>;
 
 export type DataStoreUpdateData<T = any> = Partial<Omit<T, 'id' | 'created_at'>>;

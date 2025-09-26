@@ -141,7 +141,6 @@ class MediaPlaylistService {
     const inputData: DataStoreInputData<IMediaPlaylistData> = _.defaults(mediaPlaylistInputData, {
       name: await this.getDefaultNewPlaylistName(),
       tracks: [],
-      created_at: Date.now(),
     });
     inputData.tracks = inputData.tracks.map(trackInputData => this.buildMediaPlaylistTrackFromInput(trackInputData));
 

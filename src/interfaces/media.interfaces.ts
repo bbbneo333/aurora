@@ -163,6 +163,7 @@ export interface IMediaPlaylistData {
   tracks: IMediaPlaylistTrackData[];
   cover_picture?: IMediaPicture;
   created_at: number;
+  updated_at: number;
 }
 
 export interface IMediaPlaylistTrackData extends IMediaProviderTrackData {
