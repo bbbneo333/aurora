@@ -37,7 +37,9 @@
 }
 
 .media-track-section.info {
-  flex-grow: 1;
+  flex: 1 1 auto; /* take remaining horizontal space and be allowed to shrink */
+  min-width: 0;
+  overflow: visible; /* children handle their own overflow */
 }
 
 .media-track-section.end {

@@ -6,6 +6,7 @@ import { IMediaArtist, IMediaTrack } from '../../interfaces';
 import { StringUtils, withSeparator } from '../../utils';
 
 import { RouterLink } from '../router-link/router-link.component';
+import { Text } from '../text/text.component';
 
 import styles from './media-track-info.component.css';
 
@@ -32,7 +33,9 @@ export function MediaTrackAlbumLink(props: {
       className={cx('media-track-album-link', 'app-nav-link')}
       onContextMenu={onContextMenu}
     >
-      {mediaTrack.track_name}
+      <Text>
+        {mediaTrack.track_name}
+      </Text>
     </RouterLink>
   );
 }
@@ -45,7 +48,9 @@ export function MediaTrackName(props: {
 
   return (
     <div className={cx('media-track-name')} onContextMenu={onContextMenu}>
-      {mediaTrack.track_name}
+      <Text>
+        {mediaTrack.track_name}
+      </Text>
     </div>
   );
 }
@@ -65,12 +70,14 @@ export function MediaArtistLink(props: {
       })}
       className={cx('media-track-artist-link', 'app-nav-link')}
     >
-      {mediaArtist.artist_name}
+      <Text>
+        {mediaArtist.artist_name}
+      </Text>
     </RouterLink>
   );
 }
 
-export function MediaArtistLinksComponent(props: {
+export function MediaArtistLinks(props: {
   mediaArtists: IMediaArtist[],
 }) {
   const { mediaArtists } = props;
@@ -122,7 +129,7 @@ export function MediaTrackInfo(props: {
         }
       </div>
       <div className={cx('media-track-info-subtitle')}>
-        <MediaArtistLinksComponent mediaArtists={mediaTrack.track_artists}/>
+        <MediaArtistLinks mediaArtists={mediaTrack.track_artists}/>
       </div>
     </div>
   );

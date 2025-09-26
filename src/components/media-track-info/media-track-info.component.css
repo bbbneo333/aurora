@@ -2,10 +2,10 @@
   display: flex;
   flex-flow: column;
   align-items: flex-start;
-  white-space: nowrap;
-  overflow: hidden;
+  overflow: visible;
   padding: var(--selectable-focus-ring-size); /* this is to not clip focus ring */
   gap: 5px;
+  min-width: 0;
 }
 
 .media-track-info-title {
@@ -17,6 +17,13 @@
   font-size: 13px;
   color: var(--text-dark-color);
 }
+
+.media-track-info-title,
+.media-track-info-subtitle {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 
 .media-track-album-link,
 .media-track-artist-link {
