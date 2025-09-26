@@ -46,7 +46,7 @@ export function mediaPlaylistComparator(
   mediaPlaylistA: IMediaPlaylist,
   mediaPlaylistB: IMediaPlaylist,
 ) {
-  return mediaPlaylistA.created_at > mediaPlaylistB.created_at ? -1 : 1;
+  return mediaPlaylistA.updated_at > mediaPlaylistB.updated_at ? -1 : 1;
 }
 
 export function mediaLikedTracksComparator(

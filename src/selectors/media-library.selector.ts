@@ -37,3 +37,10 @@ export const makeSelectIsCollectionPinned = (input?: IMediaPinnedItemInputData) 
   [selectMediaPinnedItemsRecord],
   mediaPinnedItemsRecord => !!input && !!mediaPinnedItemsRecord[MediaUtils.getPinnedItemKeyFromInput(input)],
 );
+
+export const selectMediaPlaylists = (state: RootState) => state.mediaLibrary.mediaPlaylists;
+
+export const selectSortedPlaylists = createSelector(
+  [selectMediaPlaylists],
+  mediaPlaylists => MediaUtils.sortMediaPlaylists(mediaPlaylists),
+);

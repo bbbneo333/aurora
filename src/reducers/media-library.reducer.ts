@@ -1,4 +1,4 @@
-import { omit, keyBy } from 'lodash';
+import { omit, keyBy, pullAt } from 'lodash';
 
 import { MediaLibraryActions } from '../enums';
 import { ArrayUtils, MediaUtils } from '../utils';
@@ -251,14 +251,16 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       // data.mediaPlaylist: IMediaPlaylist - playlist need to be added
       const { mediaPlaylist } = action.data;
       const { mediaPlaylists } = state;
+      const mediaPlaylistsUpdated = [...mediaPlaylists];
       let { mediaSelectedPlaylist } = state;
 
       const mediaPlaylistIdx = mediaPlaylists.findIndex(exMediaPlaylist => mediaPlaylist.id === exMediaPlaylist.id);
-      if (mediaPlaylistIdx === -1) {
-        ArrayUtils.updateSortedArray<IMediaPlaylist>(mediaPlaylists, mediaPlaylist, MediaUtils.mediaPlaylistComparator);
-      } else {
-        mediaPlaylists[mediaPlaylistIdx] = mediaPlaylist;
+      if (mediaPlaylistIdx !== -1) {
+        // remove and let the flow add again
+        pullAt(mediaPlaylistsUpdated, mediaPlaylistIdx);
       }
+
+      mediaPlaylistsUpdated.push(mediaPlaylist);
 
       if (mediaSelectedPlaylist?.id === mediaPlaylist.id) {
         mediaSelectedPlaylist = mediaPlaylist;
@@ -266,7 +268,7 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
 
       return {
         ...state,
-        mediaPlaylists,
+        mediaPlaylists: mediaPlaylistsUpdated,
         mediaSelectedPlaylist,
       };
     }
