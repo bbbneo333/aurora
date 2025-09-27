@@ -10,7 +10,7 @@ import {
 } from 'react-contexify';
 
 import { useContextMenu } from '../../contexts';
-import { useMediaTrackLike } from '../../hooks';
+import { useMediaTrackLike, useScrollLock } from '../../hooks';
 import { I18nService, MediaPlayerService, MediaPlaylistService } from '../../services';
 
 import {
@@ -51,6 +51,10 @@ export function MediaTrackContextMenu(props: {
   const { id, menuItems } = props;
   const { menuProps, hideAll } = useContextMenu<MediaTrackContextMenuItemProps>();
   const { mediaTrack, mediaTracks, mediaTrackList } = menuProps || {};
+  const { triggerScrollLock } = useScrollLock({
+    scrollableSelector: '.app-scrollable',
+    blockableSelector: '.contexify.contexify_willEnter-fade',
+  });
 
   const {
     isTrackLiked,
@@ -133,7 +137,7 @@ export function MediaTrackContextMenu(props: {
   ]);
 
   return (
-    <Menu id={id}>
+    <Menu id={id} onVisibilityChange={triggerScrollLock}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaTrackContextMenuItem.AddToQueue:

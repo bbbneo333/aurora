@@ -3,11 +3,8 @@ import classNames from 'classnames/bind';
 
 import routes from '../app.routes';
 
-import {
-  BrowserNavigation,
-  BrowserScroll,
-  RouterSwitchComponent,
-} from '../../components';
+import { BrowserNavigation, RouterSwitchComponent } from '../../components';
+import { usePersistentScroll } from '../../hooks';
 
 import styles from './browser.component.css';
 
@@ -29,11 +26,11 @@ function BrowserHeader() {
 }
 
 function BrowserViewport() {
-  const browserRef = useRef(null);
+  const viewportRef = useRef(null);
+  usePersistentScroll({ viewportRef });
 
   return (
-    <div ref={browserRef} className={cx('browser-viewport', 'app-scrollable')}>
-      <BrowserScroll browserRef={browserRef}/>
+    <div ref={viewportRef} className={cx('browser-viewport', 'app-scrollable')}>
       <RouterSwitchComponent routes={routes.main}/>
     </div>
   );

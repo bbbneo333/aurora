@@ -85,6 +85,11 @@ body {
 .app-scrollable {
   overflow-y: scroll;
   overflow-x: hidden;
+  scrollbar-gutter: stable; /* keeps the space for scrollbar reserved */
+}
+
+.app-scrollable.locked {
+  overflow: hidden;
 }
 
 .app-scrollable::-webkit-scrollbar-track {

@@ -3,7 +3,7 @@ import { Menu } from 'react-contexify';
 import classNames from 'classnames/bind';
 
 import { useContextMenu, useModal } from '../../contexts';
-import { useMediaCollectionPin, useMediaCollectionPlayback } from '../../hooks';
+import { useMediaCollectionPin, useMediaCollectionPlayback, useScrollLock } from '../../hooks';
 import { Icons } from '../../constants';
 import { IMediaCollectionItem } from '../../interfaces';
 import { MediaCollectionItemType } from '../../enums';
@@ -32,6 +32,10 @@ export function MediaCollectionActions(props: {
   const { mediaItem, hasTracks = true } = props;
   const { showMenu } = useContextMenu();
   const { showModal } = useModal();
+  const { triggerScrollLock } = useScrollLock({
+    scrollableSelector: '.app-scrollable',
+    blockableSelector: '.contexify.contexify_willEnter-fade',
+  });
 
   const mediaContextMenuId = 'media_collection_context_menu';
   const allowAddToPlaylist = [MediaCollectionItemType.Artist, MediaCollectionItemType.Album].includes(mediaItem.type);
@@ -93,7 +97,7 @@ export function MediaCollectionActions(props: {
           >
             <Icon name={Icons.Add}/>
           </Button>
-          <Menu id={mediaContextMenuId}>
+          <Menu id={mediaContextMenuId} onVisibilityChange={triggerScrollLock}>
             <MediaPlaylistContextMenu type="add"/>
           </Menu>
         </>

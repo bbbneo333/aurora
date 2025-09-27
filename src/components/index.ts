@@ -1,6 +1,5 @@
 export * from './action-list/action-list.component';
 export * from './browser-navigation/browser-navigation.component';
-export * from './browser-scroll/browser-scroll.component';
 export * from './button/button.component';
 export * from './icon/icon.component';
 export * from './interactive-list/interactive-list.component';

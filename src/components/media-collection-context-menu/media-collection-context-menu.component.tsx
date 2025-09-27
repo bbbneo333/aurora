@@ -9,7 +9,7 @@ import {
 } from 'react-contexify';
 
 import { useContextMenu } from '../../contexts';
-import { useMediaCollectionPin } from '../../hooks';
+import { useMediaCollectionPin, useScrollLock } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
 import { I18nService, MediaCollectionService, MediaPlayerService } from '../../services';
 
@@ -39,6 +39,10 @@ export function MediaCollectionContextMenu(props: {
   const { id, menuItems } = props;
   const { menuProps, hideAll } = useContextMenu<MediaCollectionContextMenuItemProps>();
   const { mediaItem } = menuProps || {};
+  const { triggerScrollLock } = useScrollLock({
+    scrollableSelector: '.app-scrollable',
+    blockableSelector: '.contexify.contexify_willEnter-fade',
+  });
 
   const {
     isPinned,
@@ -83,7 +87,7 @@ export function MediaCollectionContextMenu(props: {
   ]);
 
   return (
-    <Menu id={id}>
+    <Menu id={id} onVisibilityChange={triggerScrollLock}>
       {menuItems.map((menuItem, menuItemPointer) => {
         switch (menuItem) {
           case MediaCollectionContextMenuItem.Pin:
