@@ -95,6 +95,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
 
   const clearSelection = React.useCallback(() => {
     setSelectedItemIds([]);
+    setLastSelectedIndex(null);
   }, []);
 
   const clearFocus = React.useCallback(() => {
@@ -109,12 +110,19 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     }
   }, []);
 
-  const handleSelect = React.useCallback((e: React.MouseEvent, itemId: string, index: number) => {
+  const handleSelect = React.useCallback((
+    e: React.MouseEvent,
+    itemId: string,
+    index: number,
+  ): string[] => {
+    let nextSelected: string[] = [];
+
     if (disableMultiSelect) {
       // single item selection
-      setSelectedItemIds([itemId]);
+      nextSelected = [itemId];
+      setSelectedItemIds(nextSelected);
       setLastSelectedIndex(index);
-      return;
+      return nextSelected;
     }
 
     if (Events.isShiftKey(e)) {
@@ -122,47 +130,48 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
       if (lastSelectedIndex !== null) {
         const start = Math.min(lastSelectedIndex, index);
         const end = Math.max(lastSelectedIndex, index);
-        const newRange = items.slice(start, end + 1).map(item => getItemId(item));
-        setSelectedItemIds(newRange);
+        nextSelected = items.slice(start, end + 1).map(item => getItemId(item));
+        setSelectedItemIds(nextSelected);
       }
     } else if (Events.isModifierKey(e)) {
       // toggle
-      setSelectedItemIds(prev => (prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]));
+      nextSelected = selectedItemIds.includes(itemId)
+        ? selectedItemIds.filter(id => id !== itemId)
+        : [...selectedItemIds, itemId];
+
+      setSelectedItemIds(nextSelected);
     } else {
       // normal click = single select
-      setSelectedItemIds([itemId]);
+      nextSelected = [itemId];
+      setSelectedItemIds(nextSelected);
     }
 
     setLastSelectedIndex(index);
+    return nextSelected;
   }, [
     disableMultiSelect,
     getItemId,
     items,
     lastSelectedIndex,
-  ]);
-
-  const handleContextMenu = React.useCallback((e: React.MouseEvent, itemId: string) => {
-    if (!onContextMenu) {
-      return;
-    }
-    e.preventDefault();
-
-    const updatedSelectedIds = selectedItemIds.includes(itemId)
-      ? selectedItemIds
-      : [...selectedItemIds, itemId];
-
-    // update state only if something changed
-    if (updatedSelectedIds !== selectedItemIds) {
-      setSelectedItemIds(updatedSelectedIds);
-    }
-
-    onContextMenu(e, updatedSelectedIds);
-  }, [
-    onContextMenu,
     selectedItemIds,
   ]);
+
+  const handleContextMenu = (e: React.MouseEvent, itemId: string, index: number) => {
+    if (!onContextMenu) return;
+    e.preventDefault();
+
+    let next: string[] = selectedItemIds;
+
+    // we still need to do selection thingy when context menu is requested
+    if (Events.isShiftKey(e) || Events.isModifierKey(e)) {
+      next = handleSelect(e, itemId, index);
+    } else if (!selectedItemIds.includes(itemId)) {
+      next = [itemId];
+      setSelectedItemIds(next);
+    }
+
+    onContextMenu(e, next);
+  };
 
   const handleDragStart = () => {
     // snapshot before change for rollback
