@@ -65,7 +65,7 @@ export class DatastoreModule implements IAppModule {
     try {
       fs.unlinkSync(datastoreFilename);
       debug('removeDatastore - datastore file was removed successfully');
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'ENOENT') {
         debug('removeDatastore - datastore file does not exists');
       } else {
@@ -118,10 +118,11 @@ export class DatastoreModule implements IAppModule {
       'skip',
       'limit',
     ], (key) => {
-      const value = _.get(datastoreName, key);
+      const value = _.get(datastoreQueryDoc, key);
 
       if (!_.isNil(value)) {
-        _.set(cursor, key, value);
+        // @ts-ignore
+        cursor[key]?.(value);
       }
     });
 
