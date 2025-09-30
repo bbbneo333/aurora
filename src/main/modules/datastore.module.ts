@@ -22,7 +22,7 @@ type DatastoreOptions = {
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;
   private readonly datastores: Record<string, Datastore> = {};
-  private readonly datastoreDataPath = 'db';
+  private readonly datastoreDataPath = 'Databases';
 
   constructor(app: IAppMain) {
     this.app = app;

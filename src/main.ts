@@ -139,7 +139,7 @@ class App implements IAppMain {
   }
 
   getDataPath(...paths: string[]): string {
-    return path.join(app.getPath('appData'), this.dataPath, ...paths);
+    return path.join(app.getPath('userData'), this.dataPath, ...paths);
   }
 
   createDataDir(...paths: string[]): string {

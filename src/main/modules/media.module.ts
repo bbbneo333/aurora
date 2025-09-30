@@ -9,7 +9,7 @@ import { IPCCommChannel } from '../../modules/ipc';
 export class MediaModule implements IAppModule {
   readonly defaultImageExtension = ImageFileExtensions.JPG;
   private readonly app: IAppMain;
-  private readonly imagesDataPath = path.join('cache', 'images');
+  private readonly imagesDataPath = path.join('Images');
 
   constructor(app: IAppMain) {
     this.app = app;
