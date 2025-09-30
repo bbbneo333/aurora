@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Howl } from 'howler';
 
 import { IMediaPlayback, IMediaPlaybackOptions } from '../../interfaces';
@@ -10,7 +9,7 @@ const debug = require('debug')('app:provider:media_local:media_playback');
 
 export class MediaLocalPlayback implements IMediaPlayback {
   private readonly mediaTrack: IMediaLocalTrack;
-  private readonly mediaPlaybackLocalAudio: any;
+  private readonly mediaPlaybackLocalAudio: Howl;
   private mediaPlaybackId: number | undefined;
   private mediaPlaybackEnded = false;
 
@@ -41,7 +40,8 @@ export class MediaLocalPlayback implements IMediaPlayback {
 
       // play returns a unique sound ID that can be passed
       // into any method on Howl to control that specific sound
-      this.mediaPlaybackId = this.mediaPlaybackLocalAudio.play();
+      // important - pass down the stored id if resuming playback
+      this.mediaPlaybackId = this.mediaPlaybackLocalAudio.play(this.mediaPlaybackId);
       debug('playing track id - %s, playback id - %d', this.mediaTrack.id, this.mediaPlaybackId);
     });
   }
@@ -51,7 +51,7 @@ export class MediaLocalPlayback implements IMediaPlayback {
   }
 
   checkIfPlaying(): boolean {
-    return this.mediaPlaybackLocalAudio.playing();
+    return this.mediaPlaybackLocalAudio.playing(this.mediaPlaybackId);
   }
 
   checkIfEnded(): boolean {
