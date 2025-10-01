@@ -1,6 +1,7 @@
 export enum IPCCommChannel {
   // these channels are used to send messages from renderer to main
   AppToggleWindowFill = 'app:toggle_window_fill',
+  AppSettingsReset = 'app:settings_reset',
   // file system (fs)
   FSReadAsset = 'fs:read_asset',
   FSSelectDirectory = 'fs:select_directory',

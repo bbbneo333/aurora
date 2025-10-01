@@ -25,6 +25,7 @@ export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-playlists/media-playlists.component';
 export * from './progress-bar/progress-bar.component';
 export * from './media-session/media-session.component';
+export * from './media-settings-reset-dialog/media-settings-reset-dialog.component';
 export * from './media-track/media-track.component';
 export * from './media-track-context-menu/media-track-context-menu.component';
 export * from './media-track-list/media-track-list.component';

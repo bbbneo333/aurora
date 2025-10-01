@@ -7,6 +7,7 @@ import MediaPlayerService from './media-player.service';
 import MediaPlaylistService from './media-playlist.service';
 import MediaProviderService from './media-provider.service';
 import NotificationService from './notification.service';
+import SettingsService from './settings.service';
 
 export {
   I18nService,
@@ -18,4 +19,5 @@ export {
   MediaPlaylistService,
   MediaProviderService,
   NotificationService,
+  SettingsService,
 };

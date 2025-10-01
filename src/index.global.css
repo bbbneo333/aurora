@@ -22,6 +22,9 @@
   --button-primary-bg-color: #009233;
   --button-primary-hovered-bg-color: #007a2b;
   --button-primary-active-bg-color: #004d19;
+  --button-danger-bg-color: #dc3545;
+  --button-danger-hovered-bg-color: #bb2d3b;
+  --button-danger-active-bg-color: #9a2530;
   /*selectable*/
   --selectable-color: #b3b3b3;
   --selectable-bg-color: #181818;
@@ -196,13 +199,7 @@ body {
 
 .modal-footer {
   border: none;
-}
-
-.modal-footer [role="button"] {
-  padding: 15px;
-  border-radius: 15px;
-  font-weight: bold;
-  font-size: 16px;
+  gap: 10px;
 }
 
 /*.modal-footer [role="button"]:not([disabled]):hover {*/

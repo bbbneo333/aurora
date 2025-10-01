@@ -385,7 +385,6 @@ export default class MenuBuilder implements IAppBuilder {
   }
 
   private reloadApp() {
-    const browserWindow = this.app.getCurrentWindow();
-    browserWindow.webContents.reload();
+    this.app.reloadApp();
   }
 }

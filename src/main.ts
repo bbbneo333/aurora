@@ -202,6 +202,11 @@ class App implements IAppMain {
     }
   }
 
+  reloadApp() {
+    const window = this.getCurrentWindow();
+    window.webContents.reload();
+  }
+
   private removeDirectorySafe(directory: string) {
     try {
       fs.rmdirSync(directory, {
@@ -358,9 +363,7 @@ class App implements IAppMain {
     this.registerAutoUpdater();
 
     // register handlers for renderer messages
-    this.registerSyncMessageHandler(IPCCommChannel.AppToggleWindowFill, () => {
-      this.toggleWindowFill();
-    });
+    this.registerRendererEvents();
 
     return mainWindow;
   }
@@ -411,6 +414,17 @@ class App implements IAppMain {
   private runBuilders(mainWindow: BrowserWindow): void {
     this.builders.forEach((builder) => {
       builder.build(mainWindow);
+    });
+  }
+
+  private registerRendererEvents(): void {
+    this.registerSyncMessageHandler(IPCCommChannel.AppToggleWindowFill, () => {
+      this.toggleWindowFill();
+    });
+
+    this.registerSyncMessageHandler(IPCCommChannel.AppSettingsReset, () => {
+      this.removeAppData();
+      this.reloadApp();
     });
   }
 }

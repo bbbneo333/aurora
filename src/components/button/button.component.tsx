@@ -24,7 +24,7 @@ export type ButtonProps = React.DetailsHTMLAttributes<HTMLDivElement> & {
   tooltip?: string;
 };
 
-export type ButtonVariant = 'primary' | 'rounded' | 'outline' | 'lg';
+export type ButtonVariant = 'primary' | 'danger' | 'rounded' | 'outline' | 'lg';
 
 export function Button(props: ButtonProps) {
   const {
@@ -47,7 +47,7 @@ export function Button(props: ButtonProps) {
 
   // merge our own classnames with the provided ones
   // variant is simply applied as a classname
-  const mediaButtonClassName = cx('button', variant, className);
+  const mediaButtonClassName = cx('button', { disabled }, variant, className);
 
   React.useEffect(() => {
     // for adding listeners to button
