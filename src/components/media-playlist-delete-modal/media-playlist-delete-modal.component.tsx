@@ -45,7 +45,7 @@ export const MediaPlaylistDeleteModal: ModalComponent<{
           {I18nService.getString('button_dialog_cancel')}
         </Button>
         <Button
-          className="primary"
+          variant="danger"
           disabled={deletePlaylist.loading}
           onButtonSubmit={deletePlaylist.perform}
         >

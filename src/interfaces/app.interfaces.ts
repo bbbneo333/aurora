@@ -32,6 +32,8 @@ export interface IAppMain {
   removePersistedStates(): void;
 
   toggleWindowFill(): void;
+
+  reloadApp(): void;
 }
 
 export interface IAppBuilder {

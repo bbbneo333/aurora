@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-export type ModalComponent<P, R, E = Error> = React.ComponentType<P & {
+export type ModalComponent<P = {}, R = {}, E = Error> = React.ComponentType<P & {
   onComplete: (result?: R, error?: E) => void;
 }>;
 
@@ -11,7 +11,7 @@ export type ModalOptions<R = any, E = any> = {
 
 export type ShowModal = <P, R, E = Error>(
   Component: ModalComponent<P, R, E>,
-  props: P,
+  props?: P,
   options?: ModalOptions<R, E>
 ) => void;
 
@@ -48,6 +48,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const showModal: ShowModal = React.useCallback((Component, mProps, mOptions = {}) => {
     modalOptionsRef.current = mOptions;
     setModalContent(
+      // @ts-ignore
       <Component
         {...mProps}
         onComplete={hideModal}

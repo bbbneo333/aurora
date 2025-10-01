@@ -84,51 +84,49 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
   }
 
   return (
-    <div>
-      <div className={cx('settings-section')}>
-        <div className={cx('settings-heading')}>
-          Selected Directories
+    <div className={cx('settings-section')}>
+      <div className={cx('settings-heading')}>
+        Selected Directories
+      </div>
+      <div className={cx('settings-content')}>
+        <div className={cl('settings-directory-list')}>
+          <ActionList
+            items={settings.library.directories.map(directory => (
+              {
+                id: directory,
+                label: directory,
+                icon: Icons.Folder,
+              }
+            ))}
+            onRemove={(directory) => {
+              mediaLocalSettingsDispatch({
+                type: MediaLocalSettingsStateActionType.RemoveDirectory,
+                data: {
+                  directory,
+                },
+              });
+            }}
+          />
         </div>
-        <div className={cx('settings-content')}>
-          <div className={cl('settings-directory-list')}>
-            <ActionList
-              items={settings.library.directories.map(directory => (
-                {
-                  id: directory,
-                  label: directory,
-                  icon: Icons.Folder,
-                }
-              ))}
-              onRemove={(directory) => {
+        <div className={cl('settings-add-directory')}>
+          <Button
+            className={cl('settings-add-directory-button')}
+            icon={Icons.AddCircle}
+            iconClassName={cl('settings-add-directory-button-icon')}
+            onButtonSubmit={() => {
+              const selectedDirectory = openDirectorySelectionDialog();
+              if (selectedDirectory) {
                 mediaLocalSettingsDispatch({
-                  type: MediaLocalSettingsStateActionType.RemoveDirectory,
+                  type: MediaLocalSettingsStateActionType.AddDirectory,
                   data: {
-                    directory,
+                    selectedDirectory,
                   },
                 });
-              }}
-            />
-          </div>
-          <div className={cl('settings-add-directory')}>
-            <Button
-              className={cl('settings-add-directory-button')}
-              icon={Icons.AddCircle}
-              iconClassName={cl('settings-add-directory-button-icon')}
-              onButtonSubmit={() => {
-                const selectedDirectory = openDirectorySelectionDialog();
-                if (selectedDirectory) {
-                  mediaLocalSettingsDispatch({
-                    type: MediaLocalSettingsStateActionType.AddDirectory,
-                    data: {
-                      selectedDirectory,
-                    },
-                  });
-                }
-              }}
-            >
-              Add Directory
-            </Button>
-          </div>
+              }
+            }}
+          >
+            Add Directory
+          </Button>
         </div>
       </div>
     </div>
