@@ -1,7 +1,9 @@
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 import { assign, set } from 'lodash';
 
 const debug = require('debug')('app:service:ipc_service');
+
+type IpcRendererListener = (event: IpcRendererEvent, ...args: any[]) => void;
 
 export class IPCService {
   static sendSyncMessage(messageChannel: string, ...messageArgs: any[]): any {
@@ -22,10 +24,17 @@ export class IPCService {
     return result;
   }
 
-  static registerSyncMessageHandler(messageChannel: string, messageHandler: any, messageHandlerCtx?: any): void {
-    ipcRenderer.on(messageChannel, (event, ...args) => {
+  static registerSyncMessageHandler(messageChannel: string, messageHandler: any, messageHandlerCtx?: any): IpcRendererListener {
+    const listener = (event: IpcRendererEvent, ...args: any[]) => {
       debug('ipc (sync) - received message - channel - %s', messageChannel);
       set(event, 'returnValue', messageHandler.apply(messageHandlerCtx, args));
-    });
+    };
+    ipcRenderer.on(messageChannel, listener);
+
+    return listener;
+  }
+
+  static removeSyncMessageListener(messageChannel: string, messageListener: IpcRendererListener): void {
+    ipcRenderer.off(messageChannel, messageListener);
   }
 }

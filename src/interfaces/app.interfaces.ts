@@ -6,6 +6,7 @@ export interface IAppMain {
   env?: string;
   platform?: string;
   debug: boolean;
+  displayName?: string;
 
   quit(): void;
 

@@ -1,5 +1,6 @@
 {
   "name": "aurora",
+  "productName": "Aurora",
   "version": "0.1.0",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
@@ -41,7 +42,8 @@
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "icon": "assets/icons/icon.icns"
     },
     "dmg": {
       "contents": [
@@ -60,13 +62,15 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "assets/icons/icon.ico"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Development",
+      "icon": "assets/icons"
     },
     "directories": {
       "app": "src",

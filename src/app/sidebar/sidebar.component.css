@@ -59,7 +59,7 @@
 }
 
 .sidebar-logo {
-  background-image: url('../../../assets/logo-wide.png');
+  /*background-image: url('../../../assets/logo-wide.png');*/
   background-size: contain;
   width: 100%;
   height: 45px;
