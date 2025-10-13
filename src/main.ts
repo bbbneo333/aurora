@@ -215,6 +215,12 @@ class App implements IAppMain {
     app.dock.setIcon(this.iconPath);
     app.setName(this.displayName);
     app.setAppUserModelId('com.bbbneo333.aurora');
+
+    app.setAboutPanelOptions({
+      applicationName: this.displayName,
+      applicationVersion: app.getVersion(),
+      iconPath: this.iconPath,
+    });
   }
 
   private removeDirectorySafe(directory: string) {
