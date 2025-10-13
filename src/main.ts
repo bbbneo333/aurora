@@ -58,13 +58,15 @@ class App implements IAppMain {
   readonly env?: string;
   readonly platform?: string;
   readonly debug: boolean;
+  readonly displayName = 'Aurora';
 
   private mainWindow?: BrowserWindow;
   private readonly forceExtensionDownload: boolean;
   private readonly startMinimized?: boolean;
   private readonly resourcesPath: string;
   private readonly enableAutoUpdater = false;
-  private readonly htmlFilePath = path.join(__dirname, 'index.html');
+  private readonly htmlFilePath: string;
+  private readonly iconPath: string;
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
   private readonly windowWidth = 1024;
@@ -81,8 +83,11 @@ class App implements IAppMain {
     this.forceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
     this.startMinimized = process.env.START_MINIMIZED === 'true';
     this.resourcesPath = process.resourcesPath;
-    this.dataPath = this.debug ? 'Aurora-debug' : 'Aurora';
+    this.dataPath = this.debug ? `${this.displayName}-debug` : this.displayName;
+    this.htmlFilePath = path.join(__dirname, 'index.html');
+    this.iconPath = this.getAssetPath('icons', 'icon.png');
 
+    this.configureApp();
     this.installSourceMapSupport();
     this.configureLogger();
     this.installDebugSupport();
@@ -157,9 +162,7 @@ class App implements IAppMain {
     return this.mainWindow;
   }
 
-  getModule<T>(type: {
-    new(data: any): T,
-  }): T {
+  getModule<T>(type: { new(data: any): T }): T {
     const module = this.modules.find(m => m instanceof type);
     if (!module) {
       throw new Error(`App encountered error at getModule - Module not found - ${type.name}`);
@@ -205,6 +208,13 @@ class App implements IAppMain {
   reloadApp() {
     const window = this.getCurrentWindow();
     window.webContents.reload();
+  }
+
+  private configureApp(): void {
+    app.name = this.displayName;
+    app.dock.setIcon(this.iconPath);
+    app.setName(this.displayName);
+    app.setAppUserModelId('com.bbbneo333.aurora');
   }
 
   private removeDirectorySafe(directory: string) {
@@ -298,7 +308,7 @@ class App implements IAppMain {
       height: this.windowHeight,
       minWidth: this.windowMinWidth,
       minHeight: this.windowMinHeight,
-      icon: this.getAssetPath('icon.png'),
+      icon: this.iconPath,
       titleBarStyle: 'hiddenInset',
       frame: false,
       webPreferences: {

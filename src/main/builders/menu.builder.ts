@@ -62,10 +62,10 @@ export default class MenuBuilder implements IAppBuilder {
 
   private buildDarwinTemplate(browserWindow: BrowserWindow): DarwinMenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Electron',
+      label: this.app.displayName,
       submenu: [
         {
-          label: 'About ElectronReact',
+          label: `About ${this.app.displayName}`,
           selector: 'orderFrontStandardAboutPanel:',
         },
         {
@@ -79,7 +79,7 @@ export default class MenuBuilder implements IAppBuilder {
           type: 'separator',
         },
         {
-          label: 'Hide ElectronReact',
+          label: `Hide ${this.app.displayName}`,
           accelerator: 'Command+H',
           selector: 'hide:',
         },
