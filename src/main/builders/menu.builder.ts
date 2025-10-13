@@ -12,6 +12,7 @@ import {
 
 import { IAppBuilder, IAppMain } from '../../interfaces';
 import { PlatformOS } from '../../modules/platform';
+import { IPCRendererCommChannel } from '../../modules/ipc';
 
 import { DatastoreModule } from '../modules';
 
@@ -67,6 +68,16 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: `About ${this.app.displayName}`,
           selector: 'orderFrontStandardAboutPanel:',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Settings',
+          accelerator: 'Command+,',
+          click: () => {
+            this.openSettings();
+          },
         },
         {
           type: 'separator',
@@ -386,5 +397,9 @@ export default class MenuBuilder implements IAppBuilder {
 
   private reloadApp() {
     this.app.reloadApp();
+  }
+
+  private openSettings() {
+    this.app.sendMessageToRenderer(IPCRendererCommChannel.UIOpenSettings);
   }
 }
