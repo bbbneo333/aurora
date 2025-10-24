@@ -31,7 +31,8 @@
       "index.html",
       "main.prod.js",
       "main.prod.js.map",
-      "package.json"
+      "package.json",
+      "assets/**/*"
     ],
     "afterSign": ".erb/scripts/Notarize.js",
     "mac": {
@@ -89,7 +90,8 @@
     "asar": true,
     "asarUnpack": [
       "**/node_modules/sharp/**/*",
-      "**/node_modules/@img/**/*"
+      "**/node_modules/@img/**/*",
+      "assets/icons/**"
     ]
   },
   "repository": {
@@ -130,9 +132,9 @@
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@types/bluebird-global": "^3.5.12",
-    "@types/howler": "^2.2.1",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
+    "@types/howler": "^2.2.1",
     "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.170",
     "@types/node": "14.14.10",

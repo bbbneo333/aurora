@@ -48,6 +48,10 @@ import {
   IPCSyncMessageHandler,
 } from './modules/ipc';
 
+import {
+  PlatformOS,
+} from './modules/platform';
+
 import * as AppBuilders from './main/builders';
 import * as AppModules from './main/modules';
 
@@ -66,7 +70,6 @@ class App implements IAppMain {
   private readonly resourcesPath: string;
   private readonly enableAutoUpdater = false;
   private readonly htmlFilePath: string;
-  private readonly iconPath: string;
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
   private readonly windowWidth = 1024;
@@ -85,7 +88,6 @@ class App implements IAppMain {
     this.resourcesPath = process.resourcesPath;
     this.dataPath = this.debug ? `${this.displayName}-debug` : this.displayName;
     this.htmlFilePath = path.join(__dirname, 'index.html');
-    this.iconPath = this.getAssetPath('icons', 'icon.png');
 
     this.configureApp();
     this.installSourceMapSupport();
@@ -101,6 +103,18 @@ class App implements IAppMain {
       debug: this.debug,
       chromiumVersion: _.get(process, 'versions.chrome'),
     });
+  }
+
+  get iconPath(): string {
+    let icon = 'icon.png';
+
+    if (process.platform === PlatformOS.Darwin) {
+      icon = 'icon-squircle.png';
+    } else if (process.platform === PlatformOS.Windows) {
+      icon = 'icon.ico';
+    }
+
+    return this.getAssetPath('icons', icon);
   }
 
   quit(): void {
@@ -388,7 +402,7 @@ class App implements IAppMain {
     app.on('window-all-closed', () => {
       // respect the OSX convention of having the application in memory even
       // after all windows have been closed
-      if (this.platform !== 'darwin') {
+      if (this.platform !== PlatformOS.Darwin) {
         app.quit();
       }
     });

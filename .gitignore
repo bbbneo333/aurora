@@ -45,11 +45,13 @@ main.js.map
 src/main.dev.js
 src/main.dev.js.map
 
+# IDE
 .idea
+
+# Misc
 npm-debug.log.*
 *.css.d.ts
 *.sass.d.ts
 *.scss.d.ts
-
-# dev
+tmp
 dev
