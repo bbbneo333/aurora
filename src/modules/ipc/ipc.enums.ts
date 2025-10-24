@@ -27,4 +27,6 @@ export enum IPCRendererCommChannel {
   // these channels are used to send messages from main to renderer
   // state
   StateRemovePersisted = 'state:remove_persisted',
+  // ui
+  UIOpenSettings = 'ui:open_settings',
 }

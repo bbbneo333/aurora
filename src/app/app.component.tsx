@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Provider, useSelector } from 'react-redux';
-import { MemoryRouter as Router } from 'react-router-dom';
+import { MemoryRouter as Router, useHistory, useLocation } from 'react-router-dom';
 import _ from 'lodash';
 
 import { MediaSession, MediaPlayer } from '../components';
+import { Routes } from '../constants';
 import { ContextMenuProvider, ModalProvider, NotificationProvider } from '../contexts';
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
@@ -33,6 +34,33 @@ function Splash() {
 // app > stage
 
 function Stage() {
+  const history = useHistory();
+  const location = useLocation();
+
+  // ui related handlers need to be registered under router tree
+  useEffect(() => {
+    const listener = IPCService.registerSyncMessageHandler(IPCRendererCommChannel.UIOpenSettings, () => {
+      if (location.pathname !== Routes.Settings) {
+        history.push(Routes.Settings);
+      }
+    });
+
+    return () => {
+      IPCService.removeSyncMessageListener(IPCRendererCommChannel.UIOpenSettings, listener);
+    };
+  }, [
+    history,
+    location.pathname,
+  ]);
+
+  useEffect(() => {
+    const listener = IPCService.registerSyncMessageHandler(IPCRendererCommChannel.StateRemovePersisted, removeStates);
+
+    return () => {
+      IPCService.removeSyncMessageListener(IPCRendererCommChannel.StateRemovePersisted, listener);
+    };
+  }, []);
+
   return (
     <div className={cx('app-stage')}>
       <Sidebar/>
@@ -94,9 +122,6 @@ export function App() {
     _.forEach(statePersistors, (statePersistor: IAppStatePersistor, stateKey: string) => {
       registerStatePersistor(stateKey, statePersistor);
     });
-
-    // add listeners for messages from main process
-    IPCService.registerSyncMessageHandler(IPCRendererCommChannel.StateRemovePersisted, removeStates);
 
     loadState(store)
       .then(() => {

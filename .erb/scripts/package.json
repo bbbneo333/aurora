@@ -1,0 +1,11 @@
+{
+  "name": "aurora-scripts",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "png-to-ico": "^3.0.1",
+    "sharp": "^0.34.4"
+  }
+}

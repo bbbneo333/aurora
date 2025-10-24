@@ -48,6 +48,10 @@ import {
   IPCSyncMessageHandler,
 } from './modules/ipc';
 
+import {
+  PlatformOS,
+} from './modules/platform';
+
 import * as AppBuilders from './main/builders';
 import * as AppModules from './main/modules';
 
@@ -58,13 +62,14 @@ class App implements IAppMain {
   readonly env?: string;
   readonly platform?: string;
   readonly debug: boolean;
+  readonly displayName = 'Aurora';
 
   private mainWindow?: BrowserWindow;
   private readonly forceExtensionDownload: boolean;
   private readonly startMinimized?: boolean;
   private readonly resourcesPath: string;
   private readonly enableAutoUpdater = false;
-  private readonly htmlFilePath = path.join(__dirname, 'index.html');
+  private readonly htmlFilePath: string;
   private readonly builders: IAppBuilder[] = [];
   private readonly modules: IAppModule[] = [];
   private readonly windowWidth = 1024;
@@ -81,8 +86,10 @@ class App implements IAppMain {
     this.forceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
     this.startMinimized = process.env.START_MINIMIZED === 'true';
     this.resourcesPath = process.resourcesPath;
-    this.dataPath = this.debug ? 'Aurora-debug' : 'Aurora';
+    this.dataPath = this.debug ? `${this.displayName}-debug` : this.displayName;
+    this.htmlFilePath = path.join(__dirname, 'index.html');
 
+    this.configureApp();
     this.installSourceMapSupport();
     this.configureLogger();
     this.installDebugSupport();
@@ -96,6 +103,18 @@ class App implements IAppMain {
       debug: this.debug,
       chromiumVersion: _.get(process, 'versions.chrome'),
     });
+  }
+
+  get iconPath(): string {
+    let icon = 'icon.png';
+
+    if (process.platform === PlatformOS.Darwin) {
+      icon = 'icon-squircle.png';
+    } else if (process.platform === PlatformOS.Windows) {
+      icon = 'icon.ico';
+    }
+
+    return this.getAssetPath('icons', icon);
   }
 
   quit(): void {
@@ -157,9 +176,7 @@ class App implements IAppMain {
     return this.mainWindow;
   }
 
-  getModule<T>(type: {
-    new(data: any): T,
-  }): T {
+  getModule<T>(type: { new(data: any): T }): T {
     const module = this.modules.find(m => m instanceof type);
     if (!module) {
       throw new Error(`App encountered error at getModule - Module not found - ${type.name}`);
@@ -205,6 +222,19 @@ class App implements IAppMain {
   reloadApp() {
     const window = this.getCurrentWindow();
     window.webContents.reload();
+  }
+
+  private configureApp(): void {
+    app.name = this.displayName;
+    app.dock.setIcon(this.iconPath);
+    app.setName(this.displayName);
+    app.setAppUserModelId('com.bbbneo333.aurora');
+
+    app.setAboutPanelOptions({
+      applicationName: this.displayName,
+      applicationVersion: app.getVersion(),
+      iconPath: this.iconPath,
+    });
   }
 
   private removeDirectorySafe(directory: string) {
@@ -298,7 +328,7 @@ class App implements IAppMain {
       height: this.windowHeight,
       minWidth: this.windowMinWidth,
       minHeight: this.windowMinHeight,
-      icon: this.getAssetPath('icon.png'),
+      icon: this.iconPath,
       titleBarStyle: 'hiddenInset',
       frame: false,
       webPreferences: {
@@ -372,7 +402,7 @@ class App implements IAppMain {
     app.on('window-all-closed', () => {
       // respect the OSX convention of having the application in memory even
       // after all windows have been closed
-      if (this.platform !== 'darwin') {
+      if (this.platform !== PlatformOS.Darwin) {
         app.quit();
       }
     });
