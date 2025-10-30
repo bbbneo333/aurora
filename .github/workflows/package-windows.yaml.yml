@@ -40,14 +40,15 @@ jobs:
 
       # package windows app — typically creates Aurora Setup.exe or Aurora-win32-x64.zip
       - name: Package Windows App
+        shell: bash
         run: |
           yarn package:win
-        shell: bash
 
       # gets the branch name and uploads an artifact
       # branch name gets sanitized and artifacts gets uploaded for the branch with format - macos-build-<branch-name>
       - name: Extract branch name
         id: set-artifact
+        shell: bash
         run: |
           RAW_BRANCH="${{ github.head_ref || github.ref_name }}"
           SAFE_BRANCH=$(echo "$RAW_BRANCH" | sed 's#[^a-zA-Z0-9_.-]#-#g')
@@ -78,6 +79,7 @@ jobs:
           path: ./release
 
       - name: Extract version
+        shell: bash
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             TAG="${{ github.event.inputs.version }}"
@@ -94,6 +96,7 @@ jobs:
 
       - name: Ensure tag
         if: github.event_name == 'workflow_dispatch'
+        shell: bash
         run: |
           git fetch --tags
           if git rev-parse "${{ github.event.inputs.version }}" >/dev/null 2>&1; then
