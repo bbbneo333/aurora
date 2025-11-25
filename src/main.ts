@@ -78,6 +78,7 @@ class App implements IAppMain {
   private readonly windowMinHeight = 642;
   private readonly dataPath: string;
   private isQuitting = false;
+  private localProtocols = new Set(['file:', 'app:']);
 
   constructor() {
     this.env = process.env.NODE_ENV;
@@ -373,17 +374,28 @@ class App implements IAppMain {
       }
     });
 
+    // when a new browser window is requested
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-      // if it's an external URL → open in default browser
-      if (/^https?:\/\//.test(url)) {
-        debug('web window openExternal - %s', url);
+      // if navigating externally, let os handle it
+      if (!this.isUrlLocal(url)) {
+        debug('openExternal using setWindowOpenHandler - %s', url);
         shell.openExternal(url);
 
         return { action: 'deny' };
       }
 
-      // if it's internal → allow React Router to handle it
+      // if it's internal → let the app handle it
       return { action: 'allow' };
+    });
+
+    // when navigating away
+    mainWindow.webContents.on('will-navigate', (e, url) => {
+      if (!this.isUrlLocal(url)) {
+        debug('openExternal using will-navigate - %s', url);
+
+        e.preventDefault();
+        shell.openExternal(url);
+      }
     });
 
     // run builders
@@ -452,10 +464,26 @@ class App implements IAppMain {
       this.toggleWindowFill();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppSettingsReset, () => {
+    this.registerSyncMessageHandler(IPCCommChannel.AppResetSettings, () => {
       this.removeAppData();
       this.reloadApp();
     });
+
+    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => ({
+      display_name: this.displayName,
+      version: app.getVersion(),
+    }));
+  }
+
+  private isUrlLocal(url: string): boolean {
+    try {
+      const { protocol } = new URL(url);
+
+      return this.localProtocols.has(protocol);
+    } catch (err: any) {
+      debug('isNavigatingLocally encountered error - %s', err.message);
+      return false;
+    }
   }
 }
 

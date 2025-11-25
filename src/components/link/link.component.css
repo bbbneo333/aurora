@@ -1,0 +1,13 @@
+.link {
+  font-size: inherit;
+  color: inherit !important;
+  transition: var(--selectable-item-transition);
+}
+
+.link:hover {
+  color: var(--text-light-color) !important;
+}
+
+.link > :global(.icon) {
+  margin-right: 5px;
+}
