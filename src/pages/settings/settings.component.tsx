@@ -2,10 +2,17 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 
-import { Button, MediaSettingsResetDialog } from '../../components';
+import {
+  Button,
+  Icon,
+  MediaSettingsResetDialog,
+  Link,
+} from '../../components';
+
+import { Icons, Links } from '../../constants';
 import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
-import { I18nService } from '../../services';
+import { AppService, I18nService } from '../../services';
 
 import styles from './settings.component.css';
 
@@ -49,14 +56,12 @@ export function SettingsPage() {
       <div className={cx('settings-header')}>
         {I18nService.getString('label_settings_header')}
       </div>
-
       <div className={cx('settings-section')}>
         <ProviderSettings/>
       </div>
-
       <div className={cx('settings-section')}>
         <div className={cx('settings-heading')}>
-          Danger Zone
+          {I18nService.getString('label_settings_reset_header')}
         </div>
         <div className={cx('settings-content')}>
           <div>
@@ -72,6 +77,22 @@ export function SettingsPage() {
               {I18nService.getString('button_reset_settings')}
             </Button>
           </div>
+        </div>
+      </div>
+      <div className={cx('settings-section')}>
+        <div className={cx('settings-content', 'links')}>
+          <div>
+            <Link href={Links.Project}>
+              <Icon name={Icons.Github}/>
+              {AppService.getDisplayName()}
+              &nbsp;
+              <span>{AppService.getVersion()}</span>
+            </Link>
+          </div>
+          <Link href={Links.ProjectReportIssue}>
+            <Icon name={Icons.Bug}/>
+            {I18nService.getString('link_report_issue')}
+          </Link>
         </div>
       </div>
     </div>
