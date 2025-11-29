@@ -3,10 +3,12 @@ import { BrowserWindow } from 'electron';
 import { IPCAsyncMessageHandler, IPCSyncMessageHandler } from '../modules/ipc';
 
 export interface IAppMain {
-  env?: string;
-  platform?: string;
-  debug: boolean;
-  displayName?: string;
+  readonly env?: string;
+  readonly platform?: string;
+  readonly debug: boolean;
+  readonly displayName?: string;
+  readonly version: string;
+  readonly description: string;
 
   quit(): void;
 

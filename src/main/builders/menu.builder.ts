@@ -6,8 +6,10 @@
 
 import {
   BrowserWindow,
+  dialog,
   Menu,
   MenuItemConstructorOptions,
+  shell,
 } from 'electron';
 
 import { IAppBuilder, IAppMain } from '../../interfaces';
@@ -15,10 +17,9 @@ import { PlatformOS } from '../../modules/platform';
 import { IPCRendererCommChannel } from '../../modules/ipc';
 
 import { DatastoreModule } from '../modules';
+import { Links } from '../../constants';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
-  selector?: string;
-  submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
 export default class MenuBuilder implements IAppBuilder {
@@ -67,7 +68,9 @@ export default class MenuBuilder implements IAppBuilder {
       submenu: [
         {
           label: `About ${this.app.displayName}`,
-          selector: 'orderFrontStandardAboutPanel:',
+          click: () => {
+            this.openAboutWindow();
+          },
         },
         {
           type: 'separator',
@@ -92,16 +95,16 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: `Hide ${this.app.displayName}`,
           accelerator: 'Command+H',
-          selector: 'hide:',
+          role: 'hide',
         },
         {
           label: 'Hide Others',
           accelerator: 'Command+Shift+H',
-          selector: 'hideOtherApplications:',
+          role: 'hideOthers',
         },
         {
           label: 'Show All',
-          selector: 'unhideAllApplications:',
+          role: 'unhide',
         },
         {
           type: 'separator',
@@ -115,18 +118,19 @@ export default class MenuBuilder implements IAppBuilder {
         },
       ],
     };
+
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
         {
           label: 'Undo',
           accelerator: 'Command+Z',
-          selector: 'undo:',
+          role: 'undo',
         },
         {
           label: 'Redo',
           accelerator: 'Shift+Command+Z',
-          selector: 'redo:',
+          role: 'redo',
         },
         {
           type: 'separator',
@@ -134,25 +138,26 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Cut',
           accelerator: 'Command+X',
-          selector: 'cut:',
+          role: 'cut',
         },
         {
           label: 'Copy',
           accelerator: 'Command+C',
-          selector: 'copy:',
+          role: 'copy',
         },
         {
           label: 'Paste',
           accelerator: 'Command+V',
-          selector: 'paste:',
+          role: 'paste',
         },
         {
           label: 'Select All',
           accelerator: 'Command+A',
-          selector: 'selectAll:',
+          role: 'selectAll',
         },
       ],
     };
+
     const subMenuViewDev: DarwinMenuItemConstructorOptions = {
       label: 'View',
       submenu: [
@@ -191,18 +196,20 @@ export default class MenuBuilder implements IAppBuilder {
         },
       ],
     };
+    const subMenuView = this.app.debug ? subMenuViewDev : subMenuViewProd;
+
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
       label: 'Window',
       submenu: [
         {
           label: 'Close',
           accelerator: 'Command+W',
-          selector: 'performClose:',
+          role: 'close',
         },
         {
           label: 'Minimize',
           accelerator: 'Command+M',
-          selector: 'performMiniaturize:',
+          role: 'minimize',
         },
         {
           label: 'Fill',
@@ -215,60 +222,34 @@ export default class MenuBuilder implements IAppBuilder {
         },
         {
           label: 'Bring All to Front',
-          selector: 'arrangeInFront:',
-        },
-      ],
-    };
-    const subMenuDebug: DarwinMenuItemConstructorOptions = {
-      label: 'Debug',
-      submenu: [
-        {
-          label: 'Open Application Data Folder',
-          click: () => {
-            const appDataPath = this.app.getDataPath();
-            this.app.openPath(appDataPath);
-          },
-        },
-        {
-          label: 'Remove AppData and Reload',
-          click: () => {
-            this.removeAppData();
-            this.reloadApp();
-          },
-        },
-        {
-          label: 'Remove DataStores and Reload',
-          click: () => {
-            this.removeDataStores();
-            this.reloadApp();
-          },
-        },
-        {
-          label: 'Remove Persisted States and Reload',
-          click: () => {
-            this.removePersistedStates();
-            this.reloadApp();
-          },
-        },
-        {
-          label: 'Compact DataStores',
-          click: () => {
-            const datastore = this.app.getModule(DatastoreModule);
-            datastore.compactDatastores();
-          },
+          role: 'front',
         },
       ],
     };
 
-    const subMenuView = this.app.debug ? subMenuViewDev : subMenuViewProd;
+    const subMenuHelp: DarwinMenuItemConstructorOptions = {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'Report Issue',
+          click: () => shell.openExternal(Links.ProjectReportIssue),
+        },
+        {
+          label: 'Source Code',
+          click: () => shell.openExternal(Links.Project),
+        },
+      ],
+    };
+
     const subMenuList = [
       subMenuAbout,
       subMenuEdit,
       subMenuView,
       subMenuWindow,
+      subMenuHelp,
     ];
     if (this.app.debug) {
-      subMenuList.push(subMenuDebug);
+      subMenuList.push(this.buildDebugMenu());
     }
 
     return subMenuList;
@@ -279,41 +260,83 @@ export default class MenuBuilder implements IAppBuilder {
       label: '&File',
       submenu: [
         {
-          label: '&Open',
-          accelerator: 'Ctrl+O',
+          label: `&About ${this.app.displayName}`,
+          click: () => {
+            this.openAboutWindow();
+          },
         },
         {
-          label: '&Close',
-          accelerator: 'Ctrl+W',
-          click: () => {
-            browserWindow.close();
-          },
+          label: '&Settings',
+          accelerator: 'Ctrl+,',
+          click: () => this.openSettings(),
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: '&Quit',
+          accelerator: 'Ctrl+Q',
+          click: () => this.app.quit(),
         },
       ],
     };
+
+    const subMenuEdit: MenuItemConstructorOptions = {
+      label: '&Edit',
+      submenu: [
+        {
+          label: '&Undo',
+          accelerator: 'Ctrl+Z',
+          role: 'undo',
+        },
+        {
+          label: '&Redo',
+          accelerator: 'Ctrl+Shift+Z',
+          role: 'redo',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Cu&t',
+          accelerator: 'Ctrl+X',
+          role: 'cut',
+        },
+        {
+          label: '&Copy',
+          accelerator: 'Ctrl+C',
+          role: 'copy',
+        },
+        {
+          label: '&Paste',
+          accelerator: 'Ctrl+V',
+          role: 'paste',
+        },
+        {
+          label: 'Select &All',
+          accelerator: 'Ctrl+A',
+          role: 'selectAll',
+        },
+      ],
+    };
+
     const subMenuViewDev: MenuItemConstructorOptions = {
       label: '&View',
       submenu: [
         {
           label: '&Reload',
           accelerator: 'Ctrl+R',
-          click: () => {
-            browserWindow.webContents.reload();
-          },
+          click: () => browserWindow.webContents.reload(),
         },
         {
           label: 'Toggle &Full Screen',
           accelerator: 'F11',
-          click: () => {
-            browserWindow.setFullScreen(!browserWindow.isFullScreen());
-          },
+          click: () => browserWindow.setFullScreen(!browserWindow.isFullScreen()),
         },
         {
           label: 'Toggle &Developer Tools',
-          accelerator: 'Alt+Ctrl+I',
-          click: () => {
-            browserWindow.webContents.toggleDevTools();
-          },
+          accelerator: 'Ctrl+Shift+I',
+          click: () => browserWindow.webContents.toggleDevTools(),
         },
       ],
     };
@@ -323,13 +346,63 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Toggle &Full Screen',
           accelerator: 'F11',
-          click: () => {
-            browserWindow.setFullScreen(!browserWindow.isFullScreen());
-          },
+          click: () => browserWindow.setFullScreen(!browserWindow.isFullScreen()),
         },
       ],
     };
-    const subMenuDebug: MenuItemConstructorOptions = {
+    const subMenuView = this.app.debug ? subMenuViewDev : subMenuViewProd;
+
+    const subMenuWindow: MenuItemConstructorOptions = {
+      label: '&Window',
+      submenu: [
+        {
+          label: '&Close',
+          accelerator: 'Ctrl+W',
+          role: 'close',
+        },
+        {
+          label: '&Minimize',
+          accelerator: 'Ctrl+M',
+          role: 'minimize',
+        },
+        {
+          label: '&Fill',
+          click: () => this.app.toggleWindowFill(),
+        },
+      ],
+    };
+
+    const subMenuHelp: MenuItemConstructorOptions = {
+      label: '&Help',
+      submenu: [
+        {
+          label: '&Report Issue',
+          click: () => shell.openExternal(Links.ProjectReportIssue),
+        },
+        {
+          label: '&Source Code',
+          click: () => shell.openExternal(Links.Project),
+        },
+      ],
+    };
+
+    const menu: MenuItemConstructorOptions[] = [
+      subMenuFile,
+      subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      subMenuHelp,
+    ];
+
+    if (this.app.debug) {
+      menu.push(this.buildDebugMenu());
+    }
+
+    return menu;
+  }
+
+  private buildDebugMenu(): MenuItemConstructorOptions {
+    return {
       label: 'Debug',
       submenu: [
         {
@@ -369,17 +442,6 @@ export default class MenuBuilder implements IAppBuilder {
         },
       ],
     };
-
-    const subMenuList = [
-      subMenuFile,
-    ];
-    if (this.app.debug) {
-      subMenuList.push(subMenuViewDev, subMenuDebug);
-    } else {
-      subMenuList.push(subMenuViewProd);
-    }
-
-    return subMenuList;
   }
 
   private removeAppData() {
@@ -401,5 +463,18 @@ export default class MenuBuilder implements IAppBuilder {
 
   private openSettings() {
     this.app.sendMessageToRenderer(IPCRendererCommChannel.UIOpenSettings);
+  }
+
+  private openAboutWindow() {
+    dialog.showMessageBox({
+      type: 'info',
+      title: 'About',
+      message: `${this.app.displayName} - ${this.app.version}`,
+      detail: this.app.description,
+      buttons: ['Close', 'Source Code', 'Report Issue'],
+    }).then((result) => {
+      if (result.response === 1) shell.openExternal(Links.Project);
+      if (result.response === 2) shell.openExternal(Links.ProjectReportIssue);
+    });
   }
 }

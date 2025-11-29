@@ -63,6 +63,7 @@ class App implements IAppMain {
   readonly platform?: string;
   readonly debug: boolean;
   readonly displayName = 'Aurora';
+  readonly description = 'A cross-platform music player built with Electron';
 
   private mainWindow?: BrowserWindow;
   private readonly forceExtensionDownload: boolean;
@@ -106,16 +107,8 @@ class App implements IAppMain {
     });
   }
 
-  get iconPath(): string {
-    let icon = 'icon.png';
-
-    if (process.platform === PlatformOS.Darwin) {
-      icon = 'icon-squircle.png';
-    } else if (process.platform === PlatformOS.Windows) {
-      icon = 'icon.ico';
-    }
-
-    return this.getAssetPath('icons', icon);
+  get version(): string {
+    return app.getVersion();
   }
 
   quit(): void {
@@ -225,6 +218,18 @@ class App implements IAppMain {
     window.webContents.reload();
   }
 
+  private get iconPath(): string {
+    let icon = 'icon.png';
+
+    if (process.platform === PlatformOS.Darwin) {
+      icon = 'icon-squircle.png';
+    } else if (process.platform === PlatformOS.Windows) {
+      icon = 'icon.ico';
+    }
+
+    return this.getAssetPath('icons', icon);
+  }
+
   private configureApp(): void {
     app.name = this.displayName;
     app.dock.setIcon(this.iconPath);
@@ -233,7 +238,7 @@ class App implements IAppMain {
 
     app.setAboutPanelOptions({
       applicationName: this.displayName,
-      applicationVersion: app.getVersion(),
+      applicationVersion: this.version,
       iconPath: this.iconPath,
     });
   }
@@ -471,7 +476,7 @@ class App implements IAppMain {
 
     this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => ({
       display_name: this.displayName,
-      version: app.getVersion(),
+      version: this.version,
     }));
   }
 
