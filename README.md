@@ -14,22 +14,28 @@ and broad audio format support — including high-quality lossless formats.
 - Clean and simple user interface
 - Works across platforms (Windows, macOS, Linux)
 
-## Roadmap
+## Development
 
-- Native support for Spotify, YouTube Music, and Amazon Music
-- Theme customization support
+Pre-requirements:
 
-## Starting Development
+- NodeJS - `^20.19.5`
+- Yarn - `^1.22.22`
 
-Start the app in the `dev` environment:
+Install packages:
+
+```bash
+yarn install
+```
+
+Start the app in `dev` environment:
 
 ```bash
 yarn start
 ```
 
-## Packaging for Production
+## Packaging
 
-To package apps for the local platform:
+To package app for local platform:
 
 ```bash
 yarn package
