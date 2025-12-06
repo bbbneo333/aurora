@@ -89,10 +89,12 @@ export function SettingsPage() {
               <span>{AppService.getVersion()}</span>
             </Link>
           </div>
-          <Link href={Links.ProjectReportIssue}>
-            <Icon name={Icons.Bug}/>
-            {I18nService.getString('link_report_issue')}
-          </Link>
+          <div>
+            <Link href={Links.ProjectReportIssue}>
+              <Icon name={Icons.Bug}/>
+              {I18nService.getString('link_report_issue')}
+            </Link>
+          </div>
         </div>
       </div>
     </div>
