@@ -3,6 +3,7 @@ import { IPCCommChannel, IPCService } from '../modules/ipc';
 export type AppDetails = {
   display_name: string;
   version: string;
+  build: string;
   logs_path: string;
 };
 
@@ -15,6 +16,10 @@ export default class AppService {
 
   static getVersion(): string {
     return this.getDetail('version');
+  }
+
+  static getBuildVersion() {
+    return this.getDetail('build');
   }
 
   static getLogsPath(): string {

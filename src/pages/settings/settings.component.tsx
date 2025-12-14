@@ -84,9 +84,7 @@ export function SettingsPage() {
           <div>
             <Link href={Links.Project}>
               <Icon name={Icons.Github}/>
-              {AppService.getDisplayName()}
-              &nbsp;
-              <span>{AppService.getVersion()}</span>
+              {`${AppService.getDisplayName()} - ${AppService.getVersion()} (${AppService.getBuildVersion()})`}
             </Link>
           </div>
           <div>

@@ -4,10 +4,12 @@ import { IPCAsyncMessageHandler, IPCSyncMessageHandler } from '../modules/ipc';
 
 export interface IAppMain {
   readonly env?: string;
-  readonly platform?: string;
   readonly debug: boolean;
+  readonly prod: boolean;
+  readonly version?: string;
+  readonly build?: string;
+  readonly platform?: string;
   readonly displayName?: string;
-  readonly version: string;
   readonly description: string;
 
   quit(): void;

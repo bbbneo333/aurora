@@ -456,7 +456,7 @@ export default class MenuBuilder implements IAppBuilder {
     dialog.showMessageBox({
       type: 'info',
       title: 'About',
-      message: `${this.app.displayName} - ${this.app.version}`,
+      message: `${this.app.displayName} - ${this.app.version} (${this.app.build})`,
       detail: this.app.description,
       buttons: ['Close', 'Source Code', 'Report Issue'],
     }).then((result) => {
