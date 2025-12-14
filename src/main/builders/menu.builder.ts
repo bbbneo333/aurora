@@ -9,7 +9,6 @@ import {
   dialog,
   Menu,
   MenuItemConstructorOptions,
-  shell,
 } from 'electron';
 
 import { IAppBuilder, IAppMain } from '../../interfaces';
@@ -35,8 +34,8 @@ export default class MenuBuilder implements IAppBuilder {
     }
 
     const menuTemplate = this.app.platform === PlatformOS.Darwin
-      ? this.buildDarwinTemplate(mainWindow)
-      : this.buildDefaultTemplate(mainWindow);
+      ? this.buildDarwinTemplate()
+      : this.buildDefaultTemplate();
 
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
@@ -62,15 +61,13 @@ export default class MenuBuilder implements IAppBuilder {
     });
   }
 
-  private buildDarwinTemplate(browserWindow: BrowserWindow): DarwinMenuItemConstructorOptions[] {
+  private buildDarwinTemplate(): DarwinMenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
       label: this.app.displayName,
       submenu: [
         {
           label: `About ${this.app.displayName}`,
-          click: () => {
-            this.openAboutWindow();
-          },
+          click: () => this.openAboutWindow(),
         },
         {
           type: 'separator',
@@ -78,9 +75,7 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Settings',
           accelerator: 'Command+,',
-          click: () => {
-            this.openSettings();
-          },
+          click: () => this.openSettings(),
         },
         {
           type: 'separator',
@@ -112,9 +107,7 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Quit',
           accelerator: 'Command+Q',
-          click: () => {
-            this.app.quit();
-          },
+          click: () => this.quitApp(),
         },
       ],
     };
@@ -164,23 +157,17 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Reload',
           accelerator: 'Command+R',
-          click: () => {
-            browserWindow.webContents.reload();
-          },
+          click: () => this.reloadApp(),
         },
         {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
-          click: () => {
-            browserWindow.setFullScreen(!browserWindow.isFullScreen());
-          },
+          click: () => this.toggleFullScreen(),
         },
         {
           label: 'Toggle Developer Tools',
           accelerator: 'Alt+Command+I',
-          click: () => {
-            browserWindow.webContents.toggleDevTools();
-          },
+          click: () => this.toggleDevTools(),
         },
       ],
     };
@@ -190,9 +177,7 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Toggle Full Screen',
           accelerator: 'Ctrl+Command+F',
-          click: () => {
-            browserWindow.setFullScreen(!browserWindow.isFullScreen());
-          },
+          click: () => this.toggleFullScreen(),
         },
       ],
     };
@@ -213,9 +198,7 @@ export default class MenuBuilder implements IAppBuilder {
         },
         {
           label: 'Fill',
-          click: () => {
-            this.app.toggleWindowFill();
-          },
+          click: () => this.toggleWindowFill(),
         },
         {
           type: 'separator',
@@ -232,11 +215,15 @@ export default class MenuBuilder implements IAppBuilder {
       submenu: [
         {
           label: 'Report Issue',
-          click: () => shell.openExternal(Links.ProjectReportIssue),
+          click: () => this.reportIssue(),
         },
         {
           label: 'Source Code',
-          click: () => shell.openExternal(Links.Project),
+          click: () => this.sourceCode(),
+        },
+        {
+          label: 'Open Logs Folder',
+          click: () => this.openLogsFolder(),
         },
       ],
     };
@@ -255,15 +242,13 @@ export default class MenuBuilder implements IAppBuilder {
     return subMenuList;
   }
 
-  private buildDefaultTemplate(browserWindow: BrowserWindow): MenuItemConstructorOptions[] {
+  private buildDefaultTemplate(): MenuItemConstructorOptions[] {
     const subMenuFile: MenuItemConstructorOptions = {
       label: '&File',
       submenu: [
         {
           label: `&About ${this.app.displayName}`,
-          click: () => {
-            this.openAboutWindow();
-          },
+          click: () => this.openAboutWindow(),
         },
         {
           label: '&Settings',
@@ -276,7 +261,7 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: '&Quit',
           accelerator: 'Ctrl+Q',
-          click: () => this.app.quit(),
+          click: () => this.quitApp(),
         },
       ],
     };
@@ -326,17 +311,17 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: '&Reload',
           accelerator: 'Ctrl+R',
-          click: () => browserWindow.webContents.reload(),
+          click: () => this.reloadApp(),
         },
         {
           label: 'Toggle &Full Screen',
           accelerator: 'F11',
-          click: () => browserWindow.setFullScreen(!browserWindow.isFullScreen()),
+          click: () => this.toggleFullScreen(),
         },
         {
           label: 'Toggle &Developer Tools',
           accelerator: 'Ctrl+Shift+I',
-          click: () => browserWindow.webContents.toggleDevTools(),
+          click: () => this.toggleDevTools(),
         },
       ],
     };
@@ -346,7 +331,7 @@ export default class MenuBuilder implements IAppBuilder {
         {
           label: 'Toggle &Full Screen',
           accelerator: 'F11',
-          click: () => browserWindow.setFullScreen(!browserWindow.isFullScreen()),
+          click: () => this.toggleFullScreen(),
         },
       ],
     };
@@ -367,7 +352,7 @@ export default class MenuBuilder implements IAppBuilder {
         },
         {
           label: '&Fill',
-          click: () => this.app.toggleWindowFill(),
+          click: () => this.toggleWindowFill(),
         },
       ],
     };
@@ -377,11 +362,15 @@ export default class MenuBuilder implements IAppBuilder {
       submenu: [
         {
           label: '&Report Issue',
-          click: () => shell.openExternal(Links.ProjectReportIssue),
+          click: () => this.reportIssue(),
         },
         {
           label: '&Source Code',
-          click: () => shell.openExternal(Links.Project),
+          click: () => this.sourceCode(),
+        },
+        {
+          label: 'Open &Logs Folder',
+          click: () => this.openLogsFolder(),
         },
       ],
     };
@@ -407,10 +396,7 @@ export default class MenuBuilder implements IAppBuilder {
       submenu: [
         {
           label: 'Open Application Data Folder',
-          click: () => {
-            const appDataPath = this.app.getDataPath();
-            this.app.openPath(appDataPath);
-          },
+          click: () => this.openDataFolder(),
         },
         {
           label: 'Remove AppData and Reload',
@@ -435,10 +421,7 @@ export default class MenuBuilder implements IAppBuilder {
         },
         {
           label: 'Compact DataStores',
-          click: () => {
-            const datastore = this.app.getModule(DatastoreModule);
-            datastore.compactDatastores();
-          },
+          click: () => this.compactDatastores(),
         },
       ],
     };
@@ -457,6 +440,10 @@ export default class MenuBuilder implements IAppBuilder {
     this.app.removePersistedStates();
   }
 
+  private quitApp() {
+    this.app.quit();
+  }
+
   private reloadApp() {
     this.app.reloadApp();
   }
@@ -473,8 +460,43 @@ export default class MenuBuilder implements IAppBuilder {
       detail: this.app.description,
       buttons: ['Close', 'Source Code', 'Report Issue'],
     }).then((result) => {
-      if (result.response === 1) shell.openExternal(Links.Project);
-      if (result.response === 2) shell.openExternal(Links.ProjectReportIssue);
+      if (result.response === 1) this.sourceCode();
+      if (result.response === 2) this.reportIssue();
     });
+  }
+
+  private sourceCode() {
+    this.app.openLink(Links.Project);
+  }
+
+  private reportIssue() {
+    this.app.openLink(Links.ProjectReportIssue);
+  }
+
+  private openDataFolder() {
+    const appDataPath = this.app.getDataPath();
+    this.app.openPath(appDataPath);
+  }
+
+  private openLogsFolder() {
+    const appLogsPath = this.app.getLogsPath();
+    this.app.openPath(appLogsPath);
+  }
+
+  private toggleFullScreen() {
+    this.app.toggleFullScreen();
+  }
+
+  private toggleWindowFill() {
+    this.app.toggleWindowFill();
+  }
+
+  private toggleDevTools() {
+    this.app.toggleDevTools();
+  }
+
+  private compactDatastores() {
+    const datastore = this.app.getModule(DatastoreModule);
+    datastore.compactDatastores();
   }
 }

@@ -22,6 +22,8 @@ export interface IAppMain {
 
   getDataPath(...paths: string[]): string;
 
+  getLogsPath(file?: string): string;
+
   createDataDir(...paths: string[]): string;
 
   getCurrentWindow(): BrowserWindow;
@@ -30,11 +32,17 @@ export interface IAppMain {
 
   openPath(path: string): void;
 
+  openLink(link: string): void;
+
   removeAppData(): void;
 
   removePersistedStates(): void;
 
   toggleWindowFill(): void;
+
+  toggleFullScreen(): void;
+
+  toggleDevTools(): void;
 
   reloadApp(): void;
 }

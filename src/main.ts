@@ -19,7 +19,7 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import fs from 'fs';
 import electronUpdater from 'electron-updater';
-import electronLog from 'electron-log';
+import electronLog from 'electron-log/main';
 import electronDebug from 'electron-debug';
 import _ from 'lodash';
 
@@ -80,6 +80,9 @@ class App implements IAppMain {
   private readonly dataPath: string;
   private isQuitting = false;
   private localProtocols = new Set(['file:', 'app:']);
+  private logsDataDir = 'Logs';
+  private logsMainFile = 'main.log';
+  private logsRendererFile = 'renderer.log';
 
   constructor() {
     this.env = process.env.NODE_ENV;
@@ -91,15 +94,17 @@ class App implements IAppMain {
     this.dataPath = this.debug ? `${this.displayName}-debug` : this.displayName;
     this.htmlFilePath = path.join(__dirname, 'index.html');
 
+    this.configureLogger();
     this.configureApp();
     this.installSourceMapSupport();
-    this.configureLogger();
     this.installDebugSupport();
     this.registerBuilders();
     this.registerModules();
     this.registerEvents();
 
-    debug('app instantiated - %o', {
+    // console.log generally not allowed, but this one is important
+    // eslint-disable-next-line no-console
+    console.log('app instantiated - %o', {
       env: this.env,
       platform: this.platform,
       debug: this.debug,
@@ -155,6 +160,14 @@ class App implements IAppMain {
     return path.join(app.getPath('userData'), this.dataPath, ...paths);
   }
 
+  getLogsPath(file?: string) {
+    if (file) {
+      return this.getDataPath(this.logsDataDir, file);
+    }
+
+    return this.getDataPath(this.logsDataDir);
+  }
+
   createDataDir(...paths: string[]): string {
     const dataPath = this.getDataPath(...paths);
     fs.mkdirSync(dataPath, { recursive: true });
@@ -188,7 +201,17 @@ class App implements IAppMain {
         // the failure if a failure occurred, otherwise ""
         // @see - https://www.electronjs.org/docs/latest/api/shell
         if (!_.isEmpty(errorMessage)) {
-          debug('encountered error at openPath when opening - %s, error - %s', pathToOpen, errorMessage);
+          console.error('encountered error at openPath when opening - %s, error - %s', pathToOpen, errorMessage);
+        }
+      });
+  }
+
+  openLink(linkToOpen: string): void {
+    shell
+      .openExternal(linkToOpen)
+      .then((errorMessage) => {
+        if (!_.isEmpty(errorMessage)) {
+          console.error('encountered error at openExternal when opening - %s, error - %s', linkToOpen, errorMessage);
         }
       });
   }
@@ -211,6 +234,20 @@ class App implements IAppMain {
     } else {
       mainWindow.maximize();
     }
+  }
+
+  toggleFullScreen() {
+    const { mainWindow } = this;
+    if (!mainWindow) return;
+
+    mainWindow.setFullScreen(!mainWindow.isFullScreen());
+  }
+
+  toggleDevTools() {
+    const { mainWindow } = this;
+    if (!this.debug || !mainWindow) return;
+
+    mainWindow.webContents.toggleDevTools();
   }
 
   reloadApp() {
@@ -248,10 +285,9 @@ class App implements IAppMain {
       fs.rmdirSync(directory, {
         recursive: true,
       });
-      debug('removeDirectorySafe - directory was removed successfully - %s', directory);
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        debug('removeDatastore - directory does not exists - %s', directory);
+        console.error('removeDatastore - directory does not exists - %s', directory);
       } else {
         throw error;
       }
@@ -267,7 +303,14 @@ class App implements IAppMain {
   }
 
   private configureLogger() {
+    this.createDataDir(this.logsDataDir);
+
     electronLog.transports.file.level = 'info';
+    electronLog.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+    electronLog.transports.file.resolvePathFn = () => this.getLogsPath(this.logsMainFile);
+    electronLog.initialize();
+
+    Object.assign(console, electronLog.functions);
   }
 
   private installDebugSupport(): void {
@@ -299,7 +342,7 @@ class App implements IAppMain {
         debug('extensions were installed successfully');
       })
       .catch((error) => {
-        debug('encountered error while installing extensions - %s', error);
+        console.error('encountered error while installing extensions - %s', error);
       });
   }
 
@@ -321,7 +364,7 @@ class App implements IAppMain {
         }
       })
       .catch((updateCheckError) => {
-        debug('autoUpdater.encountered error at checkForUpdatesAndNotify - %s', updateCheckError);
+        console.error('autoUpdater.encountered error at checkForUpdatesAndNotify - %s', updateCheckError);
       });
   }
 
@@ -474,10 +517,7 @@ class App implements IAppMain {
       this.reloadApp();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => ({
-      display_name: this.displayName,
-      version: this.version,
-    }));
+    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetailsForRenderer());
   }
 
   private isUrlLocal(url: string): boolean {
@@ -486,9 +526,17 @@ class App implements IAppMain {
 
       return this.localProtocols.has(protocol);
     } catch (err: any) {
-      debug('isNavigatingLocally encountered error - %s', err.message);
+      console.error('isNavigatingLocally encountered error - %s', err.message);
       return false;
     }
+  }
+
+  private getDetailsForRenderer() {
+    return {
+      display_name: this.displayName,
+      version: this.version,
+      logs_path: this.getLogsPath(this.logsRendererFile),
+    };
   }
 }
 

@@ -9,7 +9,7 @@ import { IPCCommChannel } from '../../modules/ipc';
 export class MediaModule implements IAppModule {
   readonly defaultImageExtension = ImageFileExtensions.JPG;
   private readonly app: IAppMain;
-  private readonly imagesDataPath = path.join('Images');
+  private readonly imagesDataDir = 'Images';
 
   constructor(app: IAppMain) {
     this.app = app;
@@ -25,7 +25,7 @@ export class MediaModule implements IAppModule {
     height: number,
   }): Promise<string> {
     const source = typeof imageData === 'string' ? imageData : Buffer.from(imageData);
-    const imageCacheDir = this.app.createDataDir(this.imagesDataPath);
+    const imageCacheDir = this.app.createDataDir(this.imagesDataDir);
     const imageCachePath = path.join(imageCacheDir, `${StringUtils.generateId()}.${this.defaultImageExtension}`);
 
     await sharp(source)
