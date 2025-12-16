@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🔒 Report a Security Vulnerability
+    url: mailto:bbbneo333@gmail.com
+    about: Please report security vulnerabilities responsibly via email instead of opening a public issue.

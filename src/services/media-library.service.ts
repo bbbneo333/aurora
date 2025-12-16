@@ -481,7 +481,7 @@ class MediaLibraryService {
           height: this.mediaPictureScaleHeight,
         });
       } catch (error) {
-        debug('encountered error while processing image - %s', error);
+        console.error('encountered error while processing image - %s', error);
       }
 
       if (!imageCachePath) {

@@ -19,7 +19,7 @@ import 'regenerator-runtime/runtime';
 import path from 'path';
 import fs from 'fs';
 import electronUpdater from 'electron-updater';
-import electronLog from 'electron-log';
+import electronLog from 'electron-log/main';
 import electronDebug from 'electron-debug';
 import _ from 'lodash';
 
@@ -58,11 +58,25 @@ import * as AppModules from './main/modules';
 const sourceMapSupport = require('source-map-support');
 const debug = require('debug')('app:main');
 
+function createElectronLogger(name: string, filePath: string) {
+  const logger = electronLog.create({ logId: name });
+  logger.transports.file.level = 'info';
+  logger.transports.file.maxSize = 10 * 1024 * 1024; // 10 MB
+  logger.transports.file.format = `[${name}] [{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}`;
+  logger.transports.file.resolvePathFn = () => filePath;
+
+  return logger;
+}
+
 class App implements IAppMain {
   readonly env?: string;
-  readonly platform?: string;
   readonly debug: boolean;
+  readonly prod: boolean;
+  readonly version?: string;
+  readonly build?: string;
+  readonly platform?: string;
   readonly displayName = 'Aurora';
+  readonly description = 'A cross-platform music player built with Electron';
 
   private mainWindow?: BrowserWindow;
   private readonly forceExtensionDownload: boolean;
@@ -79,43 +93,43 @@ class App implements IAppMain {
   private readonly dataPath: string;
   private isQuitting = false;
   private localProtocols = new Set(['file:', 'app:']);
+  private logsDataDir = 'Logs';
+  private logsMainFile = 'main.log';
+  private logsRendererFile = 'renderer.log';
 
   constructor() {
     this.env = process.env.NODE_ENV;
-    this.platform = process.platform;
     this.debug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+    this.prod = process.env.NODE_ENV === 'production';
+    this.version = process.env.APP_VERSION;
+    this.build = process.env.BUILD_VERSION;
+    this.platform = process.platform;
     this.forceExtensionDownload = !!process.env.UPGRADE_EXTENSIONS;
     this.startMinimized = process.env.START_MINIMIZED === 'true';
     this.resourcesPath = process.resourcesPath;
     this.dataPath = this.debug ? `${this.displayName}-debug` : this.displayName;
     this.htmlFilePath = path.join(__dirname, 'index.html');
 
+    this.configureLogger();
     this.configureApp();
     this.installSourceMapSupport();
-    this.configureLogger();
     this.installDebugSupport();
     this.registerBuilders();
     this.registerModules();
     this.registerEvents();
 
-    debug('app instantiated - %o', {
+    // console.log generally not allowed, but this one is important
+    // eslint-disable-next-line no-console
+    console.log('[MAIN_INIT] - %o', {
       env: this.env,
-      platform: this.platform,
       debug: this.debug,
-      chromiumVersion: _.get(process, 'versions.chrome'),
+      prod: this.prod,
+      version: this.version,
+      build: process.env.BUILD_VERSION,
+      platform: this.platform,
+      chromium: _.get(process, 'versions.chrome'),
+      time: new Date().toISOString(),
     });
-  }
-
-  get iconPath(): string {
-    let icon = 'icon.png';
-
-    if (process.platform === PlatformOS.Darwin) {
-      icon = 'icon-squircle.png';
-    } else if (process.platform === PlatformOS.Windows) {
-      icon = 'icon.ico';
-    }
-
-    return this.getAssetPath('icons', icon);
   }
 
   quit(): void {
@@ -162,6 +176,14 @@ class App implements IAppMain {
     return path.join(app.getPath('userData'), this.dataPath, ...paths);
   }
 
+  getLogsPath(file?: string) {
+    if (file) {
+      return this.getDataPath(this.logsDataDir, file);
+    }
+
+    return this.getDataPath(this.logsDataDir);
+  }
+
   createDataDir(...paths: string[]): string {
     const dataPath = this.getDataPath(...paths);
     fs.mkdirSync(dataPath, { recursive: true });
@@ -195,7 +217,17 @@ class App implements IAppMain {
         // the failure if a failure occurred, otherwise ""
         // @see - https://www.electronjs.org/docs/latest/api/shell
         if (!_.isEmpty(errorMessage)) {
-          debug('encountered error at openPath when opening - %s, error - %s', pathToOpen, errorMessage);
+          console.error('encountered error at openPath when opening - %s, error - %s', pathToOpen, errorMessage);
+        }
+      });
+  }
+
+  openLink(linkToOpen: string): void {
+    shell
+      .openExternal(linkToOpen)
+      .then((errorMessage) => {
+        if (!_.isEmpty(errorMessage)) {
+          console.error('encountered error at openExternal when opening - %s, error - %s', linkToOpen, errorMessage);
         }
       });
   }
@@ -220,9 +252,35 @@ class App implements IAppMain {
     }
   }
 
+  toggleFullScreen() {
+    const { mainWindow } = this;
+    if (!mainWindow) return;
+
+    mainWindow.setFullScreen(!mainWindow.isFullScreen());
+  }
+
+  toggleDevTools() {
+    const { mainWindow } = this;
+    if (!this.debug || !mainWindow) return;
+
+    mainWindow.webContents.toggleDevTools();
+  }
+
   reloadApp() {
     const window = this.getCurrentWindow();
     window.webContents.reload();
+  }
+
+  private get iconPath(): string {
+    let icon = 'icon.png';
+
+    if (process.platform === PlatformOS.Darwin) {
+      icon = 'icon-squircle.png';
+    } else if (process.platform === PlatformOS.Windows) {
+      icon = 'icon.ico';
+    }
+
+    return this.getAssetPath('icons', icon);
   }
 
   private configureApp(): void {
@@ -233,7 +291,7 @@ class App implements IAppMain {
 
     app.setAboutPanelOptions({
       applicationName: this.displayName,
-      applicationVersion: app.getVersion(),
+      applicationVersion: this.version,
       iconPath: this.iconPath,
     });
   }
@@ -243,10 +301,9 @@ class App implements IAppMain {
       fs.rmdirSync(directory, {
         recursive: true,
       });
-      debug('removeDirectorySafe - directory was removed successfully - %s', directory);
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        debug('removeDatastore - directory does not exists - %s', directory);
+        console.error('removeDatastore - directory does not exists - %s', directory);
       } else {
         throw error;
       }
@@ -254,7 +311,7 @@ class App implements IAppMain {
   }
 
   private installSourceMapSupport(): void {
-    if (this.env !== 'production') {
+    if (!this.prod) {
       return;
     }
 
@@ -262,7 +319,27 @@ class App implements IAppMain {
   }
 
   private configureLogger() {
-    electronLog.transports.file.level = 'info';
+    if (!this.prod) {
+      return;
+    }
+
+    this.createDataDir(this.logsDataDir);
+
+    const mainLog = createElectronLogger('main', this.getLogsPath(this.logsMainFile));
+    const rendererLog = createElectronLogger('renderer', this.getLogsPath(this.logsRendererFile));
+
+    electronLog.hooks.push((message) => {
+      // @ts-ignore
+      if (message.variables.processType === 'renderer') {
+        rendererLog[message.level](message.data);
+        return false; // prevent default logger from handling it
+      }
+
+      return message;
+    });
+
+    electronLog.initialize();
+    Object.assign(console, mainLog.functions);
   }
 
   private installDebugSupport(): void {
@@ -294,7 +371,7 @@ class App implements IAppMain {
         debug('extensions were installed successfully');
       })
       .catch((error) => {
-        debug('encountered error while installing extensions - %s', error);
+        console.error('encountered error while installing extensions - %s', error);
       });
   }
 
@@ -316,7 +393,7 @@ class App implements IAppMain {
         }
       })
       .catch((updateCheckError) => {
-        debug('autoUpdater.encountered error at checkForUpdatesAndNotify - %s', updateCheckError);
+        console.error('autoUpdater.encountered error at checkForUpdatesAndNotify - %s', updateCheckError);
       });
   }
 
@@ -469,10 +546,7 @@ class App implements IAppMain {
       this.reloadApp();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => ({
-      display_name: this.displayName,
-      version: app.getVersion(),
-    }));
+    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetailsForRenderer());
   }
 
   private isUrlLocal(url: string): boolean {
@@ -481,9 +555,18 @@ class App implements IAppMain {
 
       return this.localProtocols.has(protocol);
     } catch (err: any) {
-      debug('isNavigatingLocally encountered error - %s', err.message);
+      console.error('isNavigatingLocally encountered error - %s', err.message);
       return false;
     }
+  }
+
+  private getDetailsForRenderer() {
+    return {
+      display_name: this.displayName,
+      version: this.version,
+      build: this.build,
+      logs_path: this.getLogsPath(this.logsRendererFile),
+    };
   }
 }
 

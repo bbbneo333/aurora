@@ -84,15 +84,15 @@ export function SettingsPage() {
           <div>
             <Link href={Links.Project}>
               <Icon name={Icons.Github}/>
-              {AppService.getDisplayName()}
-              &nbsp;
-              <span>{AppService.getVersion()}</span>
+              {`${AppService.getDisplayName()} - ${AppService.getVersion()} (${AppService.getBuildVersion()})`}
             </Link>
           </div>
-          <Link href={Links.ProjectReportIssue}>
-            <Icon name={Icons.Bug}/>
-            {I18nService.getString('link_report_issue')}
-          </Link>
+          <div>
+            <Link href={Links.ProjectReportIssue}>
+              <Icon name={Icons.Bug}/>
+              {I18nService.getString('link_report_issue')}
+            </Link>
+          </div>
         </div>
       </div>
     </div>

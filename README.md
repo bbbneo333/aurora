@@ -1,35 +1,114 @@
 # Aurora
 
-**Aurora** is a lightweight, cross-platform music player built for audiophiles and casual listeners alike. It delivers a clean, intuitive interface and broad audio format support — including high-quality lossless formats.
+**Aurora** is a lightweight, open-source, cross-platform music player built for audiophiles and casual listeners alike.  
+It focuses on a clean interface, local playback, and full user control — without ads, tracking, or cloud dependencies.
 
-<img width="1728" height="1080" alt="Screenshot 2024-12-24 at 16 39 16" src="https://github.com/user-attachments/assets/5877a9f3-a3a8-4995-9b35-77a5cf9e5bfd" />
+![Main UI](docs/images/screenshot-main-ui.png)
+
+---
 
 ## Features
 
-- Select a directory to add tracks
-- View music by album and artist
-- Playlist management: create, edit, and manage playlists locally
-- Manage playback queue
-- Clean and simple user interface
-- Works across platforms (Windows, macOS, Linux)
+- Add and manage music by selecting local directories
+- Browse music by album and artist
+- Playlist management (create, edit, reorder — stored locally)
+- Playback queue management
+- Support for common and lossless audio formats
+- Clean, distraction-free UI
+- Works and tested on **macOS**, **Windows**, and **Linux** builds are being currently tested.
 
-## Roadmap
+---
 
-- Native support for Spotify, YouTube Music, and Amazon Music
-- Theme customization support
+## Privacy & Security
 
-## Starting Development
+Aurora is designed to be **fully local-first**:
 
-Start the app in the `dev` environment:
+- ❌ No telemetry
+- ❌ No analytics
+- ❌ No user tracking
+- ❌ No background network requests
+- ✅ All data stays on your machine
+
+Aurora does not collect, store, or transmit any personal or usage data.
+
+---
+
+## macOS — Important Notice (Unsigned App)
+
+Aurora is currently **not code-signed or notarized** because it is distributed as an independent open-source project without an Apple Developer
+account.
+
+### What this means
+
+When you open Aurora on macOS for the first time, you may see:
+
+> “Aurora cannot be opened because the developer cannot be verified.”
+
+### How to open Aurora safely
+
+1. Download the `.dmg` from **GitHub Releases**
+2. Drag **Aurora.app** into your **Applications** folder
+3. Right-click **Aurora.app** → **Open**
+4. Click **Open** again when prompted
+5. (Optional) After first launch, macOS will trust the app normally
+
+Aurora does **nothing malicious** — this warning exists purely because the app is unsigned.
+
+---
+
+## Installation
+
+### macOS
+
+- Download the `.dmg` from the **Releases** page
+- Drag Aurora into Applications
+- Follow the steps above to bypass Gatekeeper
+
+### Windows / Linux
+
+_Coming Soon_
+
+---
+
+## Development
+
+### Prerequisites
+
+- Node.js `^20.19.5`
+- Yarn `^1.22.22`
+
+### Run in development
 
 ```bash
+git clone https://github.com/<your-username>/aurora.git
+cd aurora
+yarn install
 yarn start
 ```
 
-## Packaging for Production
-
-To package apps for the local platform:
+## Packaging
 
 ```bash
 yarn package
 ```
+
+Artifacts will be generated in the `release` output directory.
+
+## Bug Reports & Feedback
+
+- Report bugs via GitHub Issues
+- Feature requests and discussions are welcome
+
+Please open an issue with:
+
+- Clear steps to reproduce
+- Expected vs actual behavior
+- OS and Aurora version
+- Screenshots or logs if available
+
+👉 https://github.com/bbbneo333/aurora/issues
+
+## License
+
+Aurora is released under the MIT License.
+See [LICENSE](./LICENSE) for details.
