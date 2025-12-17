@@ -33,6 +33,7 @@
   transition: var(--selectable-item-transition);
   background: none;
   border: none;
+  display: inline-flex; /* for laying out links inline */
 }
 
 .media-track-album-link:hover,
