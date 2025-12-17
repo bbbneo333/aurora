@@ -3,12 +3,22 @@
   position: relative;
 }
 
+.text-input-container:focus-within {
+  box-shadow: inset 0 0 0 2px var(--selectable-focus-ring-color);
+}
+
 .text-input {
   width: inherit;
   color: var(--text-dark-color);
   background: none;
   border: none;
   padding: 0 20px;
+}
+
+.text-input:focus,
+.text-input:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .text-input-overlay {
