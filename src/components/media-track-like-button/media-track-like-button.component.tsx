@@ -24,7 +24,18 @@ export function MediaTrackLikeButton(props: {
       {...rest}
       className={cx(className, 'media-track-like-button', { active: isTrackLiked })}
       disabled={isLikeStatusLoading}
-      onButtonSubmit={toggleLike}
+      onButtonSubmit={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        toggleLike();
+      }}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        toggleLike();
+      }}
       tooltip={I18nService.getString(isTrackLiked ? 'tooltip_track_dislike' : 'tooltip_track_like')}
       variant={['rounded']}
     >
