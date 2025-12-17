@@ -95,27 +95,6 @@ export function MediaArtistLink(props: {
   );
 }
 
-export function MediaArtistLinks(props: {
-  mediaArtists: IMediaArtist[];
-  marquee?: boolean;
-}) {
-  const { mediaArtists, marquee } = props;
-
-  return (
-    withSeparator(
-      mediaArtists,
-      mediaArtist => (
-        <MediaArtistLink
-          key={mediaArtist.id}
-          mediaArtist={mediaArtist}
-          marquee={marquee}
-        />
-      ),
-      <MediaArtistLinkSeparator/>,
-    )
-  );
-}
-
 export function MediaTrackInfo(props: {
   mediaTrack: IMediaTrack;
   disableAlbumLink?: boolean;
@@ -134,29 +113,37 @@ export function MediaTrackInfo(props: {
   return (
     <div className={cx('media-track-info', className)}>
       <div className={cx('media-track-info-title')}>
-        {
-          disableAlbumLink
-            ? (
-              <MediaTrackName
-                marquee={marquee}
-                mediaTrack={mediaTrack}
-                onContextMenu={onContextMenu}
-              />
-            )
-            : (
-              <MediaTrackAlbumLink
-                marquee={marquee}
-                mediaTrack={mediaTrack}
-                onContextMenu={onContextMenu}
-              />
-            )
-        }
+        <MediaText marquee={marquee}>
+          {
+            disableAlbumLink
+              ? (
+                <MediaTrackName
+                  mediaTrack={mediaTrack}
+                  onContextMenu={onContextMenu}
+                />
+              )
+              : (
+                <MediaTrackAlbumLink
+                  mediaTrack={mediaTrack}
+                  onContextMenu={onContextMenu}
+                />
+              )
+          }
+        </MediaText>
       </div>
       <div className={cx('media-track-info-subtitle')}>
-        <MediaArtistLinks
-          marquee={marquee}
-          mediaArtists={mediaTrack.track_artists}
-        />
+        <MediaText marquee={marquee}>
+          {withSeparator(
+            mediaTrack.track_artists,
+            mediaArtist => (
+              <MediaArtistLink
+                key={mediaArtist.id}
+                mediaArtist={mediaArtist}
+              />
+            ),
+            <MediaArtistLinkSeparator/>,
+          )}
+        </MediaText>
       </div>
     </div>
   );
