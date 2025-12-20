@@ -161,6 +161,12 @@ body {
   border-radius: 2px;
 }
 
+/*no focus rings in any context menu child*/
+.contexify_itemContent *:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .contexify_itemContent > .icon {
   margin-right: 5px;
 }
