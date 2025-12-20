@@ -35,10 +35,8 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       modalOptionsRef.current?.onComplete?.(result, error);
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error('Error in onComplete:', err.message);
-      }
+    } catch (err: any) {
+      console.error('Error in onComplete');
       console.error(err);
     } finally {
       modalOptionsRef.current = null;
