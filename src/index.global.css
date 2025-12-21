@@ -74,7 +74,11 @@
 }
 
 :focus {
-  outline: 2px solid var(--selectable-focus-ring-color);
+  outline: none;
+}
+
+:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--selectable-focus-ring-color);
 }
 
 body {
@@ -155,6 +159,12 @@ body {
   color: inherit;
   transition: var(--selectable-item-transition);
   border-radius: 2px;
+}
+
+/*no focus rings in any context menu child*/
+.contexify_itemContent *:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .contexify_itemContent > .icon {

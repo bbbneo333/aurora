@@ -85,11 +85,9 @@ export function progressStateReducer(state: ProgressState, action: ProgressState
         mediaProgressMaxValue,
       } = action.data;
 
-      if (state.mediaProgressIsDragging) {
-        throw Error('MediaProgressBarComponent encountered error at MediaProgressJump - Progress handler is currently dragging');
-      }
-      if (state.mediaProgressUncommittedDragPercent !== undefined) {
-        throw Error('MediaProgressBarComponent encountered error at MediaProgressJump - Progress handler has existing uncommitted drag');
+      // allow jump without committing
+      if (state.mediaProgressIsDragging || state.mediaProgressUncommittedDragPercent !== undefined) {
+        return state;
       }
 
       // if any of the required references is missing, do nothing, this is just for safety and won't likely happen

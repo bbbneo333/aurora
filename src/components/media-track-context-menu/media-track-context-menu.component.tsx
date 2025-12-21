@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { isEmpty } from 'lodash';
 
 import {
@@ -134,6 +134,12 @@ export function MediaTrackContextMenu(props: {
     mediaTrackList,
     mediaTracks,
     toggleLike,
+  ]);
+
+  useEffect(() => () => {
+    triggerScrollLock();
+  }, [
+    triggerScrollLock,
   ]);
 
   return (

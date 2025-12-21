@@ -93,10 +93,6 @@
   background: var(--selectable-bg-color);
 }
 
-.button.rounded.primary {
-  box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
-}
-
 .button:not(.disabled).rounded.outline:hover {
   background: var(--selectable-hovered-bg-color);
 }

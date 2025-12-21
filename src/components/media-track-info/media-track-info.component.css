@@ -8,6 +8,12 @@
   min-width: 0;
 }
 
+.media-track-info-title,
+.media-track-info-subtitle {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .media-track-info-title {
   font-size: 15px;
   color: var(--text-light-color);
@@ -18,14 +24,9 @@
   color: var(--text-dark-color);
 }
 
-.media-track-info-title,
-.media-track-info-subtitle {
-  max-width: 100%;
-  overflow: hidden;
-}
-
 .media-track-album-link,
 .media-track-artist-link {
+  display: inline-flex;
   font-size: inherit;
   color: inherit !important;
   padding: 0;

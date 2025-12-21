@@ -81,6 +81,7 @@ export function MediaCollectionTile(props: MediaCollectionTileProps) {
                 onPause={pause}
                 variant={['rounded', 'primary']}
                 tabIndex={-1}
+                className={cx('collection-tile-cover-action-button')}
               />
             </div>
           </div>

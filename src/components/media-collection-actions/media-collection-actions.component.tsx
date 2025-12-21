@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Menu } from 'react-contexify';
 import classNames from 'classnames/bind';
 
@@ -56,6 +56,12 @@ export function MediaCollectionActions(props: {
   } = useMediaCollectionPin({
     mediaItem,
   });
+
+  useEffect(() => () => {
+    triggerScrollLock();
+  }, [
+    triggerScrollLock,
+  ]);
 
   return (
     <div className={cx('media-collection-actions')}>

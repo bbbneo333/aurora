@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import {
   Menu,
@@ -84,6 +84,12 @@ export function MediaCollectionContextMenu(props: {
     hideAll,
     mediaItem,
     togglePinned,
+  ]);
+
+  useEffect(() => () => {
+    triggerScrollLock();
+  }, [
+    triggerScrollLock,
   ]);
 
   return (
