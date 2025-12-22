@@ -80,7 +80,7 @@ _Coming Soon_
 ### Run in development
 
 ```bash
-git clone https://github.com/<your-username>/aurora.git
+git clone https://github.com/bbbneo333/aurora.git
 cd aurora
 yarn install
 yarn start
