@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect, useSyncExternalStore } from 'react';
 import classNames from 'classnames/bind';
 
 import { ActionList, Button } from '../../components';
@@ -7,7 +7,8 @@ import { MediaProviderService } from '../../services';
 import { IPCService, IPCCommChannel } from '../../modules/ipc';
 
 import MediaLocalConstants from './media-local.constants.json';
-import { mediaLocalSettingsStateReducer, MediaLocalSettingsStateActionType } from './media-local-settings.store';
+import { mediaLocalStore, MediaLocalStateActionType } from './media-local.store';
+import MediaLocalLibraryService from './media-local-library.service';
 
 import styles from './media-local-settings.component.css';
 
@@ -22,31 +23,29 @@ function openDirectorySelectionDialog(): string | undefined {
 }
 
 export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
-  const [{
+  const state = useSyncExternalStore(
+    mediaLocalStore.subscribe,
+    mediaLocalStore.getState,
+  );
+
+  const {
     settings,
     dirty,
     loading,
     saving,
-    // saved,
-  }, mediaLocalSettingsDispatch] = useReducer(mediaLocalSettingsStateReducer, {
-    settings: undefined,
-    dirty: false,
-    loading: false,
-    loaded: false,
-    saving: false,
-    saved: false,
-  });
+    syncing,
+  } = state;
 
   useEffect(() => {
-    mediaLocalSettingsDispatch({
-      type: MediaLocalSettingsStateActionType.SettingsLoad,
+    mediaLocalStore.dispatch({
+      type: MediaLocalStateActionType.SettingsLoad,
     });
 
     MediaProviderService
       .getMediaProviderSettings(MediaLocalConstants.Provider)
       .then((mediaSettings) => {
-        mediaLocalSettingsDispatch({
-          type: MediaLocalSettingsStateActionType.SettingsLoaded,
+        mediaLocalStore.dispatch({
+          type: MediaLocalStateActionType.SettingsLoaded,
           data: {
             settings: mediaSettings,
           },
@@ -59,15 +58,15 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
       return;
     }
 
-    mediaLocalSettingsDispatch({
-      type: MediaLocalSettingsStateActionType.SettingsSave,
+    mediaLocalStore.dispatch({
+      type: MediaLocalStateActionType.SettingsSave,
     });
 
     MediaProviderService
       .updateMediaProviderSettings(MediaLocalConstants.Provider, settings)
       .then(() => {
-        mediaLocalSettingsDispatch({
-          type: MediaLocalSettingsStateActionType.SettingsSaved,
+        mediaLocalStore.dispatch({
+          type: MediaLocalStateActionType.SettingsSaved,
         });
       });
   }, [
@@ -99,8 +98,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               }
             ))}
             onRemove={(directory) => {
-              mediaLocalSettingsDispatch({
-                type: MediaLocalSettingsStateActionType.RemoveDirectory,
+              mediaLocalStore.dispatch({
+                type: MediaLocalStateActionType.RemoveDirectory,
                 data: {
                   directory,
                 },
@@ -108,16 +107,14 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             }}
           />
         </div>
-        <div className={cl('settings-add-directory')}>
+        <div className={cl('settings-directory-action')}>
           <Button
-            className={cl('settings-add-directory-button')}
             icon={Icons.AddCircle}
-            iconClassName={cl('settings-add-directory-button-icon')}
             onButtonSubmit={() => {
               const selectedDirectory = openDirectorySelectionDialog();
               if (selectedDirectory) {
-                mediaLocalSettingsDispatch({
-                  type: MediaLocalSettingsStateActionType.AddDirectory,
+                mediaLocalStore.dispatch({
+                  type: MediaLocalStateActionType.AddDirectory,
                   data: {
                     selectedDirectory,
                   },
@@ -126,6 +123,17 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             }}
           >
             Add Directory
+          </Button>
+        </div>
+        <div className={cl('settings-sync-action')}>
+          <Button
+            icon={syncing ? Icons.Refreshing : Icons.Refresh}
+            disabled={syncing}
+            onButtonSubmit={() => {
+              MediaLocalLibraryService.syncMediaTracks();
+            }}
+          >
+            Refresh
           </Button>
         </div>
       </div>

@@ -1,33 +1,47 @@
 import _ from 'lodash';
+import { createStore } from 'redux';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
 
-export enum MediaLocalSettingsStateActionType {
+export enum MediaLocalStateActionType {
   SettingsLoad = 'mediaLocalSettings/settingsLoad',
   SettingsLoaded = 'mediaLocalSettings/settingsLoaded',
   SettingsSave = 'mediaLocalSettings/settingsSave',
   SettingsSaved = 'mediaLocalSettings/settingsSaved',
   AddDirectory = 'mediaLocalSettings/addDirectory',
   RemoveDirectory = 'mediaLocalSettings/removeDirectory',
+  StartSync = 'mediaLocalSettings/startSync',
+  FinishSync = 'mediaLocalSettings/finishSync',
 }
 
-export type MediaLocalSettingsState = {
+export type MediaLocalState = {
   settings: IMediaLocalSettings | undefined,
   dirty: boolean,
   loading: boolean,
   loaded: boolean,
   saving: boolean,
   saved: boolean,
+  syncing: boolean,
 };
 
-export type MediaLocalSettingsStateAction = {
-  type: MediaLocalSettingsStateActionType,
+export type MediaLocalStateAction = {
+  type: MediaLocalStateActionType,
   data?: any;
 };
 
-export function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, action: MediaLocalSettingsStateAction): MediaLocalSettingsState {
+const mediaLocalInitialState: MediaLocalState = {
+  settings: undefined,
+  dirty: false,
+  loading: false,
+  loaded: false,
+  saving: false,
+  saved: false,
+  syncing: false,
+};
+
+function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState, action: MediaLocalStateAction): MediaLocalState {
   switch (action.type) {
-    case MediaLocalSettingsStateActionType.SettingsLoad: {
+    case MediaLocalStateActionType.SettingsLoad: {
       return {
         ...state,
         settings: undefined,
@@ -35,7 +49,7 @@ export function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, a
         loaded: false,
       };
     }
-    case MediaLocalSettingsStateActionType.SettingsLoaded: {
+    case MediaLocalStateActionType.SettingsLoaded: {
       // data.settings - loaded settings
       return {
         ...state,
@@ -44,13 +58,13 @@ export function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, a
         loaded: true,
       };
     }
-    case MediaLocalSettingsStateActionType.SettingsSave: {
+    case MediaLocalStateActionType.SettingsSave: {
       return {
         ...state,
         saving: true,
       };
     }
-    case MediaLocalSettingsStateActionType.SettingsSaved: {
+    case MediaLocalStateActionType.SettingsSaved: {
       return {
         ...state,
         dirty: false,
@@ -58,7 +72,7 @@ export function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, a
         saved: true,
       };
     }
-    case MediaLocalSettingsStateActionType.AddDirectory: {
+    case MediaLocalStateActionType.AddDirectory: {
       // data.selectedDirectory - directory which needs to be added
       const { selectedDirectory } = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
@@ -79,7 +93,7 @@ export function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, a
         dirty: directoriesAreUpdated,
       };
     }
-    case MediaLocalSettingsStateActionType.RemoveDirectory: {
+    case MediaLocalStateActionType.RemoveDirectory: {
       // data.directory - directory which needs to be removed
       const { directory } = action.data;
       const directories = state.settings ? state.settings.library.directories : [];
@@ -101,7 +115,21 @@ export function mediaLocalSettingsStateReducer(state: MediaLocalSettingsState, a
         dirty: directoriesAreUpdated,
       };
     }
+    case MediaLocalStateActionType.StartSync: {
+      return {
+        ...state,
+        syncing: true,
+      };
+    }
+    case MediaLocalStateActionType.FinishSync: {
+      return {
+        ...state,
+        syncing: false,
+      };
+    }
     default:
       return state;
   }
 }
+
+export const mediaLocalStore = createStore(mediaLocalStateReducer);
