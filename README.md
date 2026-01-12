@@ -94,6 +94,10 @@ yarn package
 
 Artifacts will be generated in the `release` output directory.
 
+## Releasing
+
+See [RELEASE](./RELEASE.md)
+
 ## Bug Reports & Feedback
 
 - Report bugs via GitHub Issues
