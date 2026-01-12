@@ -10,10 +10,10 @@ It focuses on a clean interface, local playback, and full user control — witho
 ## Features
 
 - Add and manage music by selecting local directories
+- Supported formats - `flac`, `mp3`, `m4a`, `wav` (Head out to [issues](/issues) to request new formats).
 - Browse music by album and artist
 - Playlist management (create, edit, reorder — stored locally)
 - Playback queue management
-- Support for common and lossless audio formats
 - Clean, distraction-free UI
 - Works and tested on **macOS**, **Windows**, and **Linux** builds are being currently tested.
 
