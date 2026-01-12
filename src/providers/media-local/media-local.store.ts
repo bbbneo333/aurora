@@ -15,7 +15,7 @@ export enum MediaLocalStateActionType {
 }
 
 export type MediaLocalState = {
-  settings: IMediaLocalSettings | undefined,
+  settings: IMediaLocalSettings,
   dirty: boolean,
   loading: boolean,
   loaded: boolean,
@@ -30,7 +30,11 @@ export type MediaLocalStateAction = {
 };
 
 const mediaLocalInitialState: MediaLocalState = {
-  settings: undefined,
+  settings: {
+    library: {
+      directories: [],
+    },
+  },
   dirty: false,
   loading: false,
   loaded: false,
@@ -44,7 +48,6 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
     case MediaLocalStateActionType.SettingsLoad: {
       return {
         ...state,
-        settings: undefined,
         loading: true,
         loaded: false,
       };

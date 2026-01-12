@@ -74,14 +74,6 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     settings,
   ]);
 
-  if (loading || !settings || saving) {
-    return (
-      <div>
-        Loading
-      </div>
-    );
-  }
-
   return (
     <div className={cx('settings-section')}>
       <div className={cx('settings-heading')}>
@@ -109,6 +101,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         </div>
         <div className={cl('settings-directory-action')}>
           <Button
+            disabled={loading || saving}
             icon={Icons.AddCircle}
             onButtonSubmit={() => {
               const selectedDirectory = openDirectorySelectionDialog();
