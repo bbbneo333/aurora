@@ -5,6 +5,8 @@ import {
   selectCover,
 } from 'music-metadata';
 
+import { Semaphore } from 'async-mutex';
+
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
 import { MediaProviderService, MediaLibraryService } from '../../services';
@@ -13,10 +15,13 @@ import { IPCService, IPCCommChannel } from '../../modules/ipc';
 import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
 import MediaLocalUtils from './media-local.utils';
+import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store';
 
 const debug = require('debug')('app:provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
+  private readonly mediaSyncLock = new Semaphore(1);
+
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
     debug('onProviderRegistered - starting sync');
@@ -35,9 +40,20 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   async syncMediaTracks() {
-    await MediaLibraryService.syncMedia(MediaLocalConstants.Provider, async () => {
+    // use mediaSyncLock to only run one sync at a time
+    await this.mediaSyncLock.runExclusive(async () => {
+      mediaLocalStore.dispatch({
+        type: MediaLocalStateActionType.StartSync,
+      });
+      await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
+
       const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
       await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
+
+      await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
+      mediaLocalStore.dispatch({
+        type: MediaLocalStateActionType.FinishSync,
+      });
     });
   }
 
