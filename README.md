@@ -1,5 +1,8 @@
 # Aurora
 
+[![Downloads](https://img.shields.io/github/downloads/bbbneo333/aurora/total)](https://github.com/bbbneo333/aurora/releases)
+[![CI](https://github.com/bbbneo333/aurora/actions/workflows/checks.yml/badge.svg)](https://github.com/bbbneo333/aurora/actions/workflows/checks.yml)
+
 **Aurora** is a lightweight, open-source, cross-platform music player built for audiophiles and casual listeners alike.  
 It focuses on a clean interface, local playback, and full user control — without ads, tracking, or cloud dependencies.
 
@@ -10,12 +13,23 @@ It focuses on a clean interface, local playback, and full user control — witho
 ## Features
 
 - Add and manage music by selecting local directories
-- Supported formats - `flac`, `mp3`, `m4a`, `wav` (Head out to [issues](/issues) to request new formats).
+- Supported formats - `flac`, `mp3`, `m4a`, `wav` (Head out to [issues](https://github.com/bbbneo333/aurora/issues) to request new formats).
 - Browse music by album and artist
 - Playlist management (create, edit, reorder — stored locally)
 - Playback queue management
 - Clean, distraction-free UI
 - Works and tested on **macOS**, **Windows**, and **Linux** builds are being currently tested.
+
+---
+
+## System Requirements
+
+| Platform | Architecture | Status | Minimum OS |
+|---------|---------------|--------|------------|
+| macOS   | Apple Silicon (ARM64) | ✅ Available | macOS 12.0 (Monterey) |
+| macOS   | Intel (x64)          | 🚧 Coming soon | macOS 12.0 (Monterey) |
+| Windows | x64                  | 🚧 Coming soon | Windows 10 |
+| Linux   | x64                  | 🚧 Coming soon | Ubuntu 20.04+ (glibc 2.31+) |
 
 ---
 
@@ -86,6 +100,8 @@ yarn install
 yarn start
 ```
 
+---
+
 ## Packaging
 
 ```bash
@@ -94,9 +110,13 @@ yarn package
 
 Artifacts will be generated in the `release` output directory.
 
+---
+
 ## Releasing
 
 See [RELEASE](./RELEASE.md)
+
+---
 
 ## Bug Reports & Feedback
 
@@ -111,6 +131,8 @@ Please open an issue with:
 - Screenshots or logs if available
 
 👉 https://github.com/bbbneo333/aurora/issues
+
+---
 
 ## License
 
