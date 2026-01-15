@@ -61,8 +61,9 @@ jobs:
         with:
           name: ${{ steps.set-artifact.outputs.artifact_name }}
           path: |
-            release/win*/Aurora*.exe
-            release/win*/Aurora*.zip
+            release/Aurora Setup*.exe
+            release/Aurora-*-win.zip
+            release/latest.yml
           overwrite: true
 
   # runs when running on tag or manually (via dispatch), gets the version name from tag or input and publishes a release
