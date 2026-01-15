@@ -28,13 +28,15 @@
     "productName": "Aurora",
     "appId": "com.bbbneo333.aurora",
     "files": [
-      "dist/",
-      "node_modules/",
+      "dist/**",
+      "node_modules/**",
       "index.html",
       "main.prod.js",
       "main.prod.js.map",
       "package.json",
-      "assets/**/*"
+      "assets/**",
+      "!**/*.md",
+      "!**/*.map"
     ],
     "afterSign": ".erb/scripts/Notarize.js",
     "mac": {
