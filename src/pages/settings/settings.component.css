@@ -24,3 +24,7 @@
   flex-flow: column;
   gap: 10px;
 }
+
+.settings-content.links {
+  color: var(--text-dark-color);
+}

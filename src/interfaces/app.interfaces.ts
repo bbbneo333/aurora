@@ -3,10 +3,14 @@ import { BrowserWindow } from 'electron';
 import { IPCAsyncMessageHandler, IPCSyncMessageHandler } from '../modules/ipc';
 
 export interface IAppMain {
-  env?: string;
-  platform?: string;
-  debug: boolean;
-  displayName?: string;
+  readonly env?: string;
+  readonly debug: boolean;
+  readonly prod: boolean;
+  readonly version?: string;
+  readonly build?: string;
+  readonly platform?: string;
+  readonly displayName?: string;
+  readonly description: string;
 
   quit(): void;
 
@@ -20,6 +24,8 @@ export interface IAppMain {
 
   getDataPath(...paths: string[]): string;
 
+  getLogsPath(file?: string): string;
+
   createDataDir(...paths: string[]): string;
 
   getCurrentWindow(): BrowserWindow;
@@ -28,11 +34,17 @@ export interface IAppMain {
 
   openPath(path: string): void;
 
+  openLink(link: string): void;
+
   removeAppData(): void;
 
   removePersistedStates(): void;
 
   toggleWindowFill(): void;
+
+  toggleFullScreen(): void;
+
+  toggleDevTools(): void;
 
   reloadApp(): void;
 }

@@ -3,10 +3,12 @@
   "AddCircle": "fas fa-plus-circle",
   "AlbumPlaceholder": "fas fa-compact-disc",
   "ArtistPlaceholder": "fas fa-user",
+  "Bug": "fas fa-bug",
   "Close": "fas fa-times",
   "Delete": "fas fa-trash",
   "Edit": "fas fa-pen",
   "Folder": "fas fa-folder",
+  "Github": "fab fa-github",
   "LinkLibrary": "fas fa-layer-group",
   "LinkSettings": "fas fa-cog",
   "MediaPlay": "fas fa-play",
@@ -27,6 +29,8 @@
   "PlayerVolume1": "fas fa-volume-up",
   "PlayerVolume2": "fas fa-volume-down",
   "PlayerVolumeMuted": "fas fa-volume-mute",
+  "Refresh": "fas fa-sync-alt",
+  "Refreshing": "fas fa-sync-alt fa-spin",
   "Search": "fas fa-search",
   "TrackPlaceholder": "fas fa-record-vinyl"
 }

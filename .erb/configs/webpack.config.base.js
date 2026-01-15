@@ -5,7 +5,12 @@
 import path from 'path';
 import webpack from 'webpack';
 
+import packageJson from '../../package.json';
 import { dependencies as externals } from '../../src/package.json';
+
+const { execSync } = require('child_process');
+
+const commitHash = execSync('git rev-parse --short HEAD').toString().trim();
 
 export default {
   externals: [...Object.keys(externals || {})],
@@ -36,6 +41,8 @@ export default {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
+      APP_VERSION: packageJson.version,
+      BUILD_VERSION: commitHash,
     }),
   ],
 };

@@ -54,6 +54,10 @@
   opacity: 1;
 }
 
+.collection-tile-cover-action-button {
+  box-shadow: 0 8px 32px rgb(0 0 0 / 80%);
+}
+
 .collection-tile-info {
   display: flex;
   flex-flow: column;

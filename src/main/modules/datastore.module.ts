@@ -22,7 +22,7 @@ type DatastoreOptions = {
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;
   private readonly datastores: Record<string, Datastore> = {};
-  private readonly datastoreDataPath = 'Databases';
+  private readonly datastoreDataDir = 'Databases';
 
   constructor(app: IAppMain) {
     this.app = app;
@@ -67,7 +67,7 @@ export class DatastoreModule implements IAppModule {
       debug('removeDatastore - datastore file was removed successfully');
     } catch (error: any) {
       if (error.code === 'ENOENT') {
-        debug('removeDatastore - datastore file does not exists');
+        console.error('removeDatastore - datastore file does not exists');
       } else {
         throw error;
       }
@@ -89,7 +89,7 @@ export class DatastoreModule implements IAppModule {
 
     // configure datastore
     datastore.on('error', (_datastore, event: string, error: Error) => {
-      debug('datastore encountered error - %s, event - %s, error - %s', datastoreName, event, error.message);
+      console.error('datastore encountered error - %s, event - %s, error - %s', datastoreName, event, error.message);
     });
 
     if (datastoreOptions.indexes) {
@@ -192,7 +192,7 @@ export class DatastoreModule implements IAppModule {
   }
 
   private getDatastorePath(datastoreName: string): string {
-    const dir = this.app.createDataDir(this.datastoreDataPath);
+    const dir = this.app.createDataDir(this.datastoreDataDir);
     return path.join(dir, `${datastoreName}.db`);
   }
 }

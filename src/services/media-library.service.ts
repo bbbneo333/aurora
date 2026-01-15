@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { Semaphore } from 'async-mutex';
 
 import { MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
 import store from '../store';
@@ -26,22 +25,11 @@ import {
   IMediaTrackData,
 } from '../interfaces';
 
-export type MediaSyncFunction = () => Promise<void>;
-
 const debug = require('debug')('app:service:media_library_service');
 
 class MediaLibraryService {
   readonly mediaPictureScaleWidth = 500;
   readonly mediaPictureScaleHeight = 500;
-  private readonly mediaSyncLock = new Semaphore(1);
-
-  async syncMedia(mediaProviderIdentifier: string, syncFn: MediaSyncFunction): Promise<void> {
-    await this.mediaSyncLock.runExclusive(async () => {
-      await this.startMediaTrackSync(mediaProviderIdentifier);
-      await syncFn();
-      await this.finishMediaTrackSync(mediaProviderIdentifier);
-    });
-  }
 
   async checkAndInsertMediaArtists(mediaArtistInputDataList: DataStoreInputData<IMediaArtistData>[]): Promise<IMediaArtist[]> {
     return Promise.all(mediaArtistInputDataList.map(mediaArtistInputData => this.checkAndInsertMediaArtist(mediaArtistInputData)));
@@ -325,7 +313,7 @@ class MediaLibraryService {
     });
   }
 
-  private async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
+  async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at startMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
@@ -346,7 +334,7 @@ class MediaLibraryService {
     });
   }
 
-  private async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
+  async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
@@ -481,7 +469,7 @@ class MediaLibraryService {
           height: this.mediaPictureScaleHeight,
         });
       } catch (error) {
-        debug('encountered error while processing image - %s', error);
+        console.error('encountered error while processing image - %s', error);
       }
 
       if (!imageCachePath) {
