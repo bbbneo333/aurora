@@ -285,7 +285,6 @@ class App implements IAppMain {
 
   private configureApp(): void {
     app.name = this.displayName;
-    app.dock.setIcon(this.iconPath);
     app.setName(this.displayName);
     app.setAppUserModelId('com.bbbneo333.aurora');
 
@@ -294,6 +293,9 @@ class App implements IAppMain {
       applicationVersion: this.version,
       iconPath: this.iconPath,
     });
+
+    // darwin only
+    app.dock?.setIcon(this.iconPath);
   }
 
   private removeDirectorySafe(directory: string) {
