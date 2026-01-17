@@ -274,9 +274,9 @@ class App implements IAppMain {
   private get iconPath(): string {
     let icon = 'icon.png';
 
-    if (process.platform === PlatformOS.Darwin) {
+    if (this.platform === PlatformOS.Darwin) {
       icon = 'icon-squircle.png';
-    } else if (process.platform === PlatformOS.Windows) {
+    } else if (this.platform === PlatformOS.Windows) {
       icon = 'icon.ico';
     }
 
@@ -401,7 +401,7 @@ class App implements IAppMain {
 
   private async createWindow(): Promise<BrowserWindow> {
     await this.installExtensions();
-    const isDarwin = process.platform === PlatformOS.Darwin;
+    const isDarwin = this.platform === PlatformOS.Darwin;
 
     const mainWindow = new BrowserWindow({
       show: false,
@@ -455,7 +455,8 @@ class App implements IAppMain {
       // else simply hide the window, we let the app run in background
       if (this.isQuitting) {
         this.mainWindow = undefined;
-      } else {
+      } else if (this.platform === PlatformOS.Darwin) {
+        // on macOS - we keep the renderer process alive but still closing the window
         event.preventDefault();
         mainWindow.hide();
       }
