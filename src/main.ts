@@ -401,6 +401,7 @@ class App implements IAppMain {
 
   private async createWindow(): Promise<BrowserWindow> {
     await this.installExtensions();
+    const isDarwin = process.platform === PlatformOS.Darwin;
 
     const mainWindow = new BrowserWindow({
       show: false,
@@ -409,7 +410,14 @@ class App implements IAppMain {
       minWidth: this.windowMinWidth,
       minHeight: this.windowMinHeight,
       icon: this.iconPath,
-      titleBarStyle: 'hiddenInset',
+      titleBarStyle: isDarwin ? 'hiddenInset' : 'hidden',
+      ...(!isDarwin ? {
+        titleBarOverlay: {
+          color: '#1d1d1d', // should match --stage-content-bg-color
+          symbolColor: '#e9ecef', // should match --text-light-color
+          height: 60, // should match --titlebar-overlay-height
+        },
+      } : {}),
       frame: false,
       webPreferences: {
         nodeIntegration: true,
