@@ -121,10 +121,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload DMG to GitHub Release
+      - name: Rename release artifact
+        run: |
+          mv ./release/Aurora.zip ./release/Aurora-macos-arm64-${{ env.TAG_NAME }}.zip
+
+      - name: Upload package to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: ./release/Aurora.zip
+          files: ./release/Aurora-macos-arm64-${{ env.TAG_NAME }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

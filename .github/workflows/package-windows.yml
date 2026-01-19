@@ -62,8 +62,6 @@ jobs:
           name: ${{ steps.set-artifact.outputs.artifact_name }}
           path: |
             release/Aurora Setup*.exe
-            release/Aurora-*-win.zip
-            release/latest.yml
           overwrite: true
 
   # runs when running on tag or manually (via dispatch), gets the version name from tag or input and publishes a release
@@ -117,12 +115,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload DMG to GitHub Release
+      - name: Rename Windows installer
+        shell: pwsh
+        run: |
+          $file = Get-ChildItem "release/Aurora Setup*.exe" | Select-Object -First 1
+          Rename-Item $file.FullName "release/Aurora-windows-x64-${{ env.TAG_NAME }}.exe"
+
+      - name: Upload Windows installer to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG_NAME }}
-          files: |
-            release/win*/Aurora*.exe
-            release/win*/Aurora*.zip
+          files: ./release/Aurora-windows-x64-${{ env.TAG_NAME }}.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
