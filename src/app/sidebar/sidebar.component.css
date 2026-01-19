@@ -18,6 +18,10 @@
 
 .sidebar-header {
   height: var(--titlebar-overlay-height);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 30px;
 }
 
 .sidebar-navigation-list {

@@ -557,7 +557,7 @@ class App implements IAppMain {
       this.reloadApp();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetailsForRenderer());
+    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetails());
   }
 
   private isUrlLocal(url: string): boolean {
@@ -571,11 +571,12 @@ class App implements IAppMain {
     }
   }
 
-  private getDetailsForRenderer() {
+  private getDetails() {
     return {
       display_name: this.displayName,
       version: this.version,
       build: this.build,
+      platform: this.platform,
       logs_path: this.getLogsPath(this.logsRendererFile),
     };
   }

@@ -16,6 +16,7 @@
   "MediaLike": "far fa-heart",
   "MediaLiked": "fas fa-heart",
   "MediaPin": "fas fa-thumbtack",
+  "Menu": "fas fa-bars",
   "NavigationBack": "fas fa-chevron-left",
   "NavigationForward": "fas fa-chevron-right",
   "PlaylistPlaceholder": "fas fa-music",
