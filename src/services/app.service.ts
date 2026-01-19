@@ -18,4 +18,8 @@ export default class AppService {
 
     return this.Details;
   }
+
+  static resetAppData(): void {
+    IPCService.sendSyncMessage(IPCCommChannel.AppResetSettings);
+  }
 }

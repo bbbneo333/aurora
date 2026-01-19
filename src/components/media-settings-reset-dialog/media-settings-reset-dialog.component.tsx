@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal } from 'react-bootstrap';
 
 import { ModalComponent } from '../../contexts';
-import { I18nService, SettingsService } from '../../services';
+import { AppService, I18nService } from '../../services';
 
 import { Button } from '../button/button.component';
 
@@ -30,7 +30,7 @@ export const MediaSettingsResetDialog: ModalComponent = (props) => {
         <Button
           variant={['danger']}
           onButtonSubmit={() => {
-            SettingsService.resetAppData();
+            AppService.resetAppData();
           }}
         >
           {I18nService.getString('button_dialog_confirm')}
