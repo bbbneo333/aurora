@@ -27,6 +27,7 @@
   "build": {
     "productName": "Aurora",
     "appId": "com.bbbneo333.aurora",
+    "artifactName": "${productName}-${os}-${arch}-${version}.${ext}",
     "files": [
       "dist/**",
       "node_modules/**",
