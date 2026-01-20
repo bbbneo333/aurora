@@ -1,4 +1,4 @@
-name: windows
+name: macos
 
 on:
   pull_request:
@@ -20,8 +20,8 @@ on:
 
 jobs:
   build:
-    name: Build Windows
-    runs-on: windows-latest
+    name: Build macOS (arm64)
+    runs-on: macos-latest
 
     outputs:
       tag: ${{ steps.version.outputs.tag }}
@@ -66,19 +66,32 @@ jobs:
             echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Package Windows app
+      # Build + Gatekeeper workaround + ZIP
+      - name: Package macOS app
         shell: bash
         env:
           VERSION: ${{ steps.version.outputs.tag }}
         run: |
-          yarn package:win
+          yarn package:mac
+
+          APP_PATH="release/mac-arm64/Aurora.app"
+          ZIP_PATH="release/Aurora-macos-arm64-${VERSION}.zip"
+
+          # Ad-hoc sign (prevents "app is damaged")
+          codesign --deep --force --sign - "$APP_PATH"
+
+          # Remove Gatekeeper quarantine
+          xattr -rd com.apple.quarantine "$APP_PATH"
+
+          # Create distributable ZIP
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
 
       # Always upload CI artifact
-      - name: Upload Windows artifact
+      - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-x64
-          path: release/*.exe
+          name: macos-arm64
+          path: release/Aurora-macos-arm64-*.zip
           overwrite: true
 
   release:
@@ -91,10 +104,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download Windows artifact
+      - name: Download macOS artifact
         uses: actions/download-artifact@v4
         with:
-          name: windows-x64
+          name: macos-arm64
           path: release
 
       # Ensure tag exists for workflow_dispatch
@@ -102,21 +115,23 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
+          TAG="${{ needs.build-macos.outputs.tag }}"
+
           git fetch --tags
-          if git rev-parse "${{ needs.build-windows.outputs.tag }}" >/dev/null 2>&1; then
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag already exists"
           else
-            git tag "${{ needs.build-windows.outputs.tag }}"
-            git push origin "${{ needs.build-windows.outputs.tag }}"
+            git tag "$TAG"
+            git push origin "$TAG"
           fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.build-windows.outputs.tag }}
-          name: Release ${{ needs.build-windows.outputs.tag }}
-          prerelease: ${{ needs.build-windows.outputs.prerelease }}
+          tag_name: ${{ needs.build-macos.outputs.tag }}
+          name: Release ${{ needs.build-macos.outputs.tag }}
+          prerelease: ${{ needs.build-macos.outputs.prerelease }}
           files: |
-            release/*.exe
+            release/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
