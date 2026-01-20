@@ -274,9 +274,9 @@ class App implements IAppMain {
   private get iconPath(): string {
     let icon = 'icon.png';
 
-    if (process.platform === PlatformOS.Darwin) {
+    if (this.platform === PlatformOS.Darwin) {
       icon = 'icon-squircle.png';
-    } else if (process.platform === PlatformOS.Windows) {
+    } else if (this.platform === PlatformOS.Windows) {
       icon = 'icon.ico';
     }
 
@@ -285,7 +285,6 @@ class App implements IAppMain {
 
   private configureApp(): void {
     app.name = this.displayName;
-    app.dock.setIcon(this.iconPath);
     app.setName(this.displayName);
     app.setAppUserModelId('com.bbbneo333.aurora');
 
@@ -294,6 +293,9 @@ class App implements IAppMain {
       applicationVersion: this.version,
       iconPath: this.iconPath,
     });
+
+    // darwin only
+    app.dock?.setIcon(this.iconPath);
   }
 
   private removeDirectorySafe(directory: string) {
@@ -399,6 +401,7 @@ class App implements IAppMain {
 
   private async createWindow(): Promise<BrowserWindow> {
     await this.installExtensions();
+    const isDarwin = this.platform === PlatformOS.Darwin;
 
     const mainWindow = new BrowserWindow({
       show: false,
@@ -407,7 +410,14 @@ class App implements IAppMain {
       minWidth: this.windowMinWidth,
       minHeight: this.windowMinHeight,
       icon: this.iconPath,
-      titleBarStyle: 'hiddenInset',
+      titleBarStyle: isDarwin ? 'hiddenInset' : 'hidden',
+      ...(!isDarwin ? {
+        titleBarOverlay: {
+          color: '#1d1d1d', // should match --stage-content-bg-color
+          symbolColor: '#e9ecef', // should match --text-light-color
+          height: 60, // should match --titlebar-overlay-height
+        },
+      } : {}),
       frame: false,
       webPreferences: {
         nodeIntegration: true,
@@ -445,7 +455,8 @@ class App implements IAppMain {
       // else simply hide the window, we let the app run in background
       if (this.isQuitting) {
         this.mainWindow = undefined;
-      } else {
+      } else if (this.platform === PlatformOS.Darwin) {
+        // on macOS - we keep the renderer process alive but still closing the window
         event.preventDefault();
         mainWindow.hide();
       }
@@ -546,7 +557,7 @@ class App implements IAppMain {
       this.reloadApp();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetailsForRenderer());
+    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetails());
   }
 
   private isUrlLocal(url: string): boolean {
@@ -560,11 +571,12 @@ class App implements IAppMain {
     }
   }
 
-  private getDetailsForRenderer() {
+  private getDetails() {
     return {
       display_name: this.displayName,
       version: this.version,
       build: this.build,
+      platform: this.platform,
       logs_path: this.getLogsPath(this.logsRendererFile),
     };
   }

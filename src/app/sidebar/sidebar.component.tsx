@@ -1,9 +1,18 @@
 import React from 'react';
 import classNames from 'classnames/bind';
 
-import { Icon, MediaPinnedItemList, RouterLink } from '../../components';
-import { I18nService } from '../../services';
+import {
+  Button,
+  Icon,
+  MediaPinnedItemList,
+  RouterLink,
+} from '../../components';
+
+import { AppService, I18nService } from '../../services';
 import routes from '../app.routes';
+import { Icons } from '../../constants';
+import { PlatformOS } from '../../modules/platform';
+import { IPCCommChannel, IPCService } from '../../modules/ipc';
 
 import styles from './sidebar.component.css';
 
@@ -66,7 +75,16 @@ function SidebarNavigationList() {
 
 function SidebarHeader() {
   return (
-    <div className={cx('sidebar-header', 'app-window-drag')}/>
+    <div className={cx('sidebar-header', 'app-window-drag')}>
+      {AppService.details.platform !== PlatformOS.Darwin && (
+        <Button
+          icon={Icons.Menu}
+          onButtonSubmit={() => {
+            IPCService.sendSyncMessage(IPCCommChannel.AppOpenMenu);
+          }}
+        />
+      )}
+    </div>
   );
 }
 

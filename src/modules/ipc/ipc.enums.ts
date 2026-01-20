@@ -3,6 +3,7 @@ export enum IPCCommChannel {
   AppToggleWindowFill = 'app:toggle_window_fill',
   AppResetSettings = 'app:reset_settings',
   AppReadDetails = 'app:read_details',
+  AppOpenMenu = 'app:open_menu',
   // file system (fs)
   FSReadAsset = 'fs:read_asset',
   FSSelectDirectory = 'fs:select_directory',
