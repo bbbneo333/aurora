@@ -66,6 +66,13 @@ jobs:
             echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Sync app version with tag
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.tag }}"
+          VERSION="${VERSION#v}"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+
       # Build + Gatekeeper workaround + ZIP
       - name: Package macOS app
         shell: bash
