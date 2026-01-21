@@ -58,7 +58,7 @@ jobs:
             BUILD="${GITHUB_RUN_NUMBER}"
             COMMIT="${GITHUB_SHA::7}"
 
-            VERSION="v${BASE_VERSION}-dev.${BUILD}+git${COMMIT}"
+            VERSION="v${BASE_VERSION}-dev.${BUILD_NUM}.git${COMMIT}"
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
