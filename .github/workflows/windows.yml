@@ -15,7 +15,6 @@ on:
     inputs:
       version:
         description: 'Version tag (e.g. v1.2.3 or v1.2.3-beta)'
-        required: true
         type: string
 
 jobs:
@@ -24,7 +23,7 @@ jobs:
     runs-on: windows-latest
 
     outputs:
-      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
       prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
@@ -45,38 +44,42 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Resolve version once (tag or workflow_dispatch input)
+      # Resolve version once (input, tag or commit)
       - name: Resolve version
         id: version
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ github.event.inputs.version }}"
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
           elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            TAG="${GITHUB_REF#refs/tags/}"
+            VERSION="${GITHUB_REF#refs/tags/}"
           else
-            TAG="dev-${GITHUB_SHA::7}"
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            BUILD="${GITHUB_RUN_NUMBER}"
+            COMMIT="${GITHUB_SHA::7}"
+
+            VERSION="v${BASE_VERSION}-dev.${BUILD}+git${COMMIT}"
           fi
 
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-          if [[ "$TAG" == *-* ]]; then
+          if [[ "$VERSION" == *-* ]]; then
             echo "prerelease=true" >> $GITHUB_OUTPUT
           else
             echo "prerelease=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Sync app version with tag
+      - name: Sync app version
         shell: bash
         run: |
-          VERSION="${{ steps.version.outputs.tag }}"
+          VERSION="${{ steps.version.outputs.version }}"
           VERSION="${VERSION#v}"
           npm version "$VERSION" --no-git-tag-version --allow-same-version
 
       - name: Package Windows app
         shell: bash
         env:
-          VERSION: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           yarn package:win
 
@@ -109,20 +112,23 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
+          TAG="${{ needs.build.outputs.version }}"
+
           git fetch --tags
-          if git rev-parse "${{ needs.build-windows.outputs.tag }}" >/dev/null 2>&1; then
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
             echo "Tag already exists"
           else
-            git tag "${{ needs.build-windows.outputs.tag }}"
-            git push origin "${{ needs.build-windows.outputs.tag }}"
+            git tag "$TAG"
+            git push origin "$TAG"
           fi
 
+      # Create release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.build-windows.outputs.tag }}
-          name: Release ${{ needs.build-windows.outputs.tag }}
-          prerelease: ${{ needs.build-windows.outputs.prerelease }}
+          tag_name: ${{ needs.build.outputs.version }}
+          name: Release ${{ needs.build.outputs.version }}
+          prerelease: ${{ needs.build.outputs.prerelease }}
           files: |
             release/*.exe
         env:
