@@ -3,6 +3,11 @@
 - Pushing a version tag triggers the CI pipeline to build and publish the release.
 - Release notes must be added manually if required.
 
+## Notes
+
+- Version is controlled by root `package.json`. `src/package.json` just holds a dummy to follow convention.
+- Version is then injected in script via `--config.extraMetadata.version=$npm_package_version`
+
 ## Major Release
 
 Prepare:

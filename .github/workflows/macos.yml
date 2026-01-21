@@ -1,0 +1,148 @@
+name: macos
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.2.3 or v1.2.3-beta)'
+        type: string
+
+jobs:
+  build:
+    name: Build macOS (arm64)
+    runs-on: macos-latest
+
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Resolve version once (input, tag or commit)
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            BASE_VERSION=$(node -p "require('./package.json').version")
+            BUILD="${GITHUB_RUN_NUMBER}"
+            COMMIT="${GITHUB_SHA::7}"
+
+            VERSION="v${BASE_VERSION}-dev.${BUILD}+git${COMMIT}"
+          fi
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+          if [[ "$VERSION" == *-* ]]; then
+            echo "prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Sync app version
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          VERSION="${VERSION#v}"
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+
+      # Build + Gatekeeper workaround + ZIP
+      - name: Package macOS app
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          yarn package:mac
+
+          APP_PATH="release/mac-arm64/Aurora.app"
+          ZIP_PATH="release/Aurora-macos-arm64-${VERSION}.zip"
+
+          # Ad-hoc sign (prevents "app is damaged")
+          codesign --deep --force --sign - "$APP_PATH"
+
+          # Remove Gatekeeper quarantine
+          xattr -rd com.apple.quarantine "$APP_PATH"
+
+          # Create distributable ZIP
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
+
+      # Always upload CI artifact
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64
+          path: release/Aurora-macos-arm64-*.zip
+          overwrite: true
+
+  release:
+    name: GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-arm64
+          path: release
+
+      # Ensure tag exists for workflow_dispatch
+      - name: Ensure tag exists
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          TAG="${{ needs.build.outputs.version }}"
+
+          git fetch --tags
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag already exists"
+          else
+            git tag "$TAG"
+            git push origin "$TAG"
+          fi
+
+      # Create release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.build.outputs.version }}
+          name: Release ${{ needs.build.outputs.version }}
+          prerelease: ${{ needs.build.outputs.prerelease }}
+          files: |
+            release/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
