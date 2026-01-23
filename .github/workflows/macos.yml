@@ -19,8 +19,16 @@ on:
 
 jobs:
   build:
-    name: Build macOS
-    runs-on: macos-latest
+    name: Build macOS (${{ matrix.arch }})
+    strategy:
+      matrix:
+        include:
+          - runner: macos-latest
+            arch: arm64
+          - runner: macos-13
+            arch: x64
+
+    runs-on: ${{ matrix.runner }}
 
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -57,7 +65,6 @@ jobs:
             BASE_VERSION=$(node -p "require('./package.json').version")
             BUILD="${GITHUB_RUN_NUMBER}"
             COMMIT="${GITHUB_SHA::7}"
-
             VERSION="${BASE_VERSION}-dev.${BUILD}.git${COMMIT}"
           fi
 
@@ -83,11 +90,18 @@ jobs:
         shell: bash
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          ARCH: ${{ matrix.arch }}
         run: |
           yarn package:mac
 
-          APP_PATH="release/mac-universal/Aurora.app"
-          ZIP_PATH="release/Aurora-macos-universal-${VERSION}.zip"
+          if [ "$ARCH" = "arm64" ]; then
+            APP_DIR="mac-arm64"
+          else
+            APP_DIR="mac"
+          fi
+
+          APP_PATH="release/${APP_DIR}/Aurora.app"
+          ZIP_PATH="release/Aurora-macos-${ARCH}-${VERSION}.zip"
 
           # Ad-hoc sign (prevents "app is damaged")
           codesign --deep --force --sign - "$APP_PATH"
@@ -102,8 +116,8 @@ jobs:
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-universal
-          path: release/Aurora-macos-universal-*.zip
+          name: macos-${{ matrix.arch }}
+          path: release/Aurora-macos-${{ matrix.arch }}-*.zip
           overwrite: true
 
   release:
@@ -116,10 +130,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download macOS artifact
+      - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
-          name: macos-universal
           path: release
 
       # Ensure tag exists for workflow_dispatch
@@ -144,7 +157,6 @@ jobs:
           tag_name: ${{ needs.build.outputs.version }}
           name: Release ${{ needs.build.outputs.version }}
           prerelease: ${{ needs.build.outputs.prerelease }}
-          files: |
-            release/*.zip
+          files: release/**/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
