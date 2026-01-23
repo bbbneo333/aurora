@@ -58,8 +58,11 @@ jobs:
             BUILD="${GITHUB_RUN_NUMBER}"
             COMMIT="${GITHUB_SHA::7}"
 
-            VERSION="v${BASE_VERSION}-dev.${BUILD}.git${COMMIT}"
+            VERSION="${BASE_VERSION}-dev.${BUILD}.git${COMMIT}"
           fi
+
+          # Remove 'v' to keep the slug consistent
+          VERSION="${VERSION#v}"
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -73,7 +76,6 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          VERSION="${VERSION#v}"
           npm version "$VERSION" --no-git-tag-version --allow-same-version
 
       - name: Package Windows app
