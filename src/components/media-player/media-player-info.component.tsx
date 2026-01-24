@@ -18,7 +18,7 @@ const cx = classNames.bind(styles);
 
 export function MediaPlayerInfo() {
   const { showMenu } = useContextMenu();
-  const { mediaPlaybackCurrentMediaTrack } = useSelector((state: RootState) => state.mediaPlayer);
+  const mediaPlaybackCurrentMediaTrack = useSelector((state: RootState) => state.mediaPlayer.mediaPlaybackCurrentMediaTrack);
   const mediaTrackContextMenuId = 'media_player_playing_track_context_menu';
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {

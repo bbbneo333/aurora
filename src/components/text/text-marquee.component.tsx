@@ -25,10 +25,16 @@ export function TextMarquee(props: TextMarqueeProps) {
   const [isOverflowing, setIsOverflowing] = React.useState(false);
   const [animationDuration, setAnimationDuration] = React.useState(0);
   const [textWidth, setTextWidth] = React.useState(0);
+  const [trigger, setTrigger] = React.useState<number>(0);
 
-  React.useEffect(() => {
+  const restart = () => {
+    setTrigger(i => i + 1);
+  };
+
+  const measure = React.useCallback(() => {
     const container = containerRef.current;
     const text = textRef.current;
+
     if (container && text) {
       const containerWidth = container.clientWidth;
       const textScrollWidth = text.scrollWidth;
@@ -41,8 +47,31 @@ export function TextMarquee(props: TextMarqueeProps) {
       }
     }
   }, [
-    children,
     speed,
+  ]);
+
+  React.useLayoutEffect(() => {
+    restart();
+    measure();
+  }, [
+    children,
+    measure,
+  ]);
+
+  React.useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return undefined;
+
+    // to re-measure when container resizes
+    const ro = new ResizeObserver(() => {
+      restart();
+      measure();
+    });
+    ro.observe(container);
+
+    return () => ro.disconnect();
+  }, [
+    measure,
   ]);
 
   return (
@@ -51,6 +80,7 @@ export function TextMarquee(props: TextMarqueeProps) {
       className={cx('text-marquee-container')}
     >
       <Text
+        key={trigger} // to reset animation when text changes
         ref={textRef}
         {...rest}
         className={cx('text-marquee', {
