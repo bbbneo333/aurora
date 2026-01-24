@@ -23,8 +23,7 @@
 }
 
 .media-player-track-cover-image {
-  height: 70px !important;
-  width: 70px !important;
+  flex: 0 0 70px;
   /* size for placeholder icon */
   font-size: 30px;
 }

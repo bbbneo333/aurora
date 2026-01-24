@@ -6,6 +6,7 @@
   padding: var(--selectable-focus-ring-size); /* this is to not clip focus ring */
   gap: 5px;
   min-width: 0;
+  flex-grow: 1;
 }
 
 .media-track-info-title,
