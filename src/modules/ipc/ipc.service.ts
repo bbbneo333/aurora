@@ -1,5 +1,7 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { assign, set } from 'lodash';
+import { set } from 'lodash';
+
+import { isIPCErrorObj, deserializeIPCError } from './error';
 
 const debug = require('debug')('app:service:ipc_service');
 
@@ -14,11 +16,8 @@ export class IPCService {
     const result = await ipcRenderer.invoke(messageChannel, ...messageArgs);
 
     // custom handling for errors received from main process
-    // eslint-disable-next-line no-underscore-dangle
-    if (result?.__isError) {
-      const error = new Error(result.message);
-      assign(error, result);
-      throw error;
+    if (isIPCErrorObj(result)) {
+      throw deserializeIPCError(result);
     }
 
     return result;
