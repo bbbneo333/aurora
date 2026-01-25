@@ -23,13 +23,25 @@ function removeStateFromLocalStorage(key: string): void {
 }
 
 async function saveStateToStorage(state: any, stateKey: string, statePersistor: IAppStatePersistor) {
-  const serializedState = statePersistor?.serialize ? await statePersistor.serialize(state) : state;
-  saveStateToLocalStorage(stateKey, serializedState);
+  try {
+    const serializedState = statePersistor?.serialize ? await statePersistor.serialize(state) : state;
+    saveStateToLocalStorage(stateKey, serializedState);
+  } catch (err) {
+    console.error('Encountered an error while saving state', stateKey, state);
+    console.error(err);
+  }
 }
 
 async function loadStateFromStorage(stateKey: string, statePersistor: IAppStatePersistor): Promise<any> {
-  const savedState = loadStateFromLocalStorage(stateKey);
-  return statePersistor?.deserialize ? statePersistor.deserialize(savedState) : savedState;
+  try {
+    const savedState = loadStateFromLocalStorage(stateKey);
+    return statePersistor?.deserialize ? await statePersistor.deserialize(savedState) : savedState;
+  } catch (err) {
+    console.error('Encountered an error while loading state', stateKey);
+    console.error(err);
+
+    return null;
+  }
 }
 
 async function saveStateForPersistors(state: RootState) {
@@ -54,8 +66,14 @@ async function loadAndStateForPersistors(state: RootState) {
 
       if (stateValue) {
         debug('exhausting state - %s - %o', stateKey, stateValue);
-        const stateExisting = state[stateKey];
-        await statePersistor.exhaust(stateExisting, stateValue);
+
+        try {
+          const stateExisting = state[stateKey];
+          await statePersistor.exhaust(stateExisting, stateValue);
+        } catch (err) {
+          console.error('Encountered error while exhausting state', stateKey, stateValue);
+          console.error(err);
+        }
       }
     }
   });
