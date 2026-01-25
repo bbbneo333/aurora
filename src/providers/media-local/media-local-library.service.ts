@@ -62,15 +62,12 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       .sendAsyncMessage(IPCCommChannel.FSReadDirectory, mediaLibraryDirectory, {
         fileExtensions: AudioFileExtensionList,
       }).catch((error) => {
-        // handle in case existing directory could not be found now
-        if (error.code === 'ENOENT') {
-          return;
-        }
-        throw error;
+        // just log on error, continue the sync process
+        console.error(error);
       });
 
     if (!fsDirectoryReadResponse) {
-      debug('addTracksFromDirectory - no contents received, skipping directory - %s', mediaLibraryDirectory);
+      debug('addTracksFromDirectory - no valid contents received, skipping directory - %s', mediaLibraryDirectory);
       return;
     }
 
