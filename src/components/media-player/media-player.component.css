@@ -29,13 +29,13 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  mix-blend-mode: screen;
+  mix-blend-mode: color-dodge;
+  filter: blur(35px) saturate(180%);
   opacity: 0.8;
-  filter: blur(95px) saturate(115%);
 
-  background: radial-gradient(90% 60% at -10% 40%, var(--media-player-tint-color-1) 0%, transparent 70%),
-  radial-gradient(90% 60% at 110% 30%, var(--media-player-tint-color-2) 0%, transparent 70%),
-  radial-gradient(70% 60% at 50% 120%, var(--media-player-tint-color-3) 0%, transparent 80%);
+  background: radial-gradient(120% 90% at -30% -20%, var(--media-player-tint-color-1) 0%, transparent 75%),
+  radial-gradient(110% 80% at 130% -10%, var(--media-player-tint-color-2) 0%, transparent 75%),
+  radial-gradient(100% 90% at 50% 130%, var(--media-player-tint-color-3) 0%, transparent 80%);
 }
 
 .media-player-container > * {
