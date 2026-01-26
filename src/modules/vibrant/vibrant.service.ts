@@ -1,15 +1,20 @@
-import worker from './vibrant.worker';
-
-// TODO: Add support for worker
-// import * as Comlink from 'comlink';
-
-// const worker = Comlink.wrap(new Worker(
-//   new URL('./vibrant.worker.ts', window.location.href),
-//   { type: 'module' },
-// ));
+import Vibrant from './vibrant.worker';
 
 export class VibrantService {
-  static getColors(imagePath: string) {
-    return worker.getColors(imagePath);
+  static async getColors(imagePath: string) {
+    const palette = await Vibrant.from(imagePath).getPalette();
+
+    const swatches = [
+      palette.Vibrant,
+      palette.LightVibrant,
+      palette.Muted,
+      palette.DarkVibrant,
+    ].filter(Boolean);
+
+    const useful = swatches
+      .map(s => s!.hex)
+      .slice(0, 3);
+
+    return useful.slice(0, 3);
   }
 }
