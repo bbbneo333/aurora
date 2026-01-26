@@ -22,7 +22,7 @@ export const useMediaBackgroundTint = () => {
 
   React.useEffect(() => {
     // we determine tint based on track's album art
-    const picture = mediaPlaybackCurrentMediaTrack?.track_album.album_cover_picture;
+    const picture = mediaPlaybackCurrentMediaTrack?.track_cover_picture || mediaPlaybackCurrentMediaTrack?.track_album.album_cover_picture;
     const pictureIsValid = !!picture && picture.image_data_type === MediaTrackCoverPictureImageDataType.Path;
 
     if (!pictureIsValid) {
