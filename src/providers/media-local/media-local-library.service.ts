@@ -11,6 +11,7 @@ import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
 import { MediaProviderService, MediaLibraryService } from '../../services';
 import { IPCService, IPCCommChannel } from '../../modules/ipc';
+import { CryptoService } from '../../modules/crypto';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
@@ -134,7 +135,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private static getMediaId(mediaInput: string): string {
-    return IPCService.sendSyncMessage(IPCCommChannel.CryptoGenerateSHA256Hash, mediaInput);
+    return CryptoService.generateSHA256Hash(mediaInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
