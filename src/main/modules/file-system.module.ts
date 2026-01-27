@@ -1,12 +1,11 @@
 import fs from 'fs';
-import path from 'path';
 import { dialog } from 'electron';
+import { walk } from '@nodelib/fs.walk';
 
 import {
   IAppMain,
   IAppModule,
   IFSAssetReadOptions,
-  IFSDirectoryFile,
   IFSDirectoryReadOptions,
   IFSDirectoryReadResponse,
 } from '../../interfaces';
@@ -34,89 +33,41 @@ export class FileSystemModule implements IAppModule {
     return fs.readFileSync(assetResourcePath, fsAssetReadOptions.encoding);
   }
 
+  // @TODO: This needs to be improved. Not ideal for big libraries. Results should be streamable.
   private readDirectory(fsDirPath: string, fsDirReadOptions: IFSDirectoryReadOptions = {}): Promise<IFSDirectoryReadResponse> {
-    const dirReadFiles: IFSDirectoryFile[] = [];
-    const dirReadStats = {
-      total_files_scanned: 0,
-      total_files_selected: 0,
-      total_time_taken: 0,
-    };
+    const { fileExtensions } = fsDirReadOptions;
     const dirReadTimeStart = Date.now();
 
-    function readDirectoryItem(dir: string, done: Function) {
-      fs.readdir(dir, (dirReadErr: Error | null, dirList: string[]) => {
-        if (dirReadErr) {
-          return done(dirReadErr);
-        }
-
-        let dirPointer = 0;
-
-        return (function next(fileIterateErr?: Error): void {
-          if (fileIterateErr) {
-            return done(fileIterateErr);
-          }
-
-          let dirItem = dirList[dirPointer];
-          dirPointer += 1;
-
-          if (!dirItem) {
-            // important - call DONE not NEXT, in order to signal end of dir
-            return done(null);
-          }
-          dirItem = path.resolve(dir, dirItem);
-
-          return fs.stat(dirItem, (dirStatErr: Error | null, dirStat) => {
-            if (dirStatErr) {
-              return done(dirStatErr);
-            }
-            if (dirStat && dirStat.isDirectory()) {
-              return readDirectoryItem(dirItem, next);
-            }
-
-            // update stats (scanned)
-            dirReadStats.total_files_scanned += 1;
-
-            // skip file treatment if ignore by extensions
-            // info - path.extname will extract out the extension from provided path: 'path/to/index.html' => .html
-            // info - provided extensions do not have '.' prefix, handle accordingly
-            // important - there can be cases where item does not have any extension (extname resolves to null), handle accordingly
-            if (fsDirReadOptions.fileExtensions) {
-              const dirItemExtension = (path.extname(dirItem) || '').slice(1);
-
-              if (!fsDirReadOptions.fileExtensions.includes(dirItemExtension)) {
-                return next();
-              }
-            }
-
-            // update stats (selected)
-            dirReadStats.total_files_selected += 1;
-
-            // add file
-            dirReadFiles.push({
-              path: dirItem,
-              name: path.basename(dirItem),
-            });
-
-            // continue iteration
-            return next();
-          });
-        }());
-      });
-    }
-
     return new Promise((resolve, reject) => {
-      readDirectoryItem(fsDirPath, (dirReadErr: Error) => {
-        if (dirReadErr) {
-          return reject(dirReadErr);
+      walk(fsDirPath, {
+        followSymbolicLinks: false,
+        stats: false,
+        throwErrorOnBrokenSymbolicLink: false,
+        entryFilter: (entry): boolean => {
+          const { name } = entry;
+          const i = name.lastIndexOf('.');
+          if (i === -1) return false;
+
+          return !fileExtensions || fileExtensions.includes(name.slice(i + 1).toLowerCase());
+        },
+        errorFilter: (error): boolean => {
+          // we go silent on any error
+          console.warn('Encountered error in readDirectory - %s', error.message);
+          return true;
+        },
+      }, (error, entries) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve({
+            files: entries,
+            stats: {
+              total_files_scanned: entries.length,
+              total_files_selected: entries.length,
+              total_time_taken: Date.now() - dirReadTimeStart,
+            },
+          });
         }
-
-        // update stats
-        dirReadStats.total_time_taken = Date.now() - dirReadTimeStart;
-
-        return resolve({
-          files: dirReadFiles,
-          stats: dirReadStats,
-        });
       });
     });
   }
@@ -126,7 +77,7 @@ export class FileSystemModule implements IAppModule {
   }
 
   private selectDirectory(): string | undefined {
-    // prompt user to select a directory, showOpenDialogSync will either returns string[] or undefined (in case user cancels the operation)
+    // prompt user to select a directory, showOpenDialogSync will either return string[] or undefined (in case user cancels the operation)
     // important - this will only select a single directory (openDirectory will make sure only single directory is allowed to be selected)
     // @see - https://www.electronjs.org/docs/api/dialog#dialogshowopendialogsyncbrowserwindow-options
     const fsSelectedDirectories = dialog.showOpenDialogSync(this.app.getCurrentWindow(), {
