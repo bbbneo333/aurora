@@ -135,7 +135,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private static getMediaId(mediaInput: string): string {
-    return CryptoService.generateSHA256Hash(mediaInput);
+    return CryptoService.sha256(mediaInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
