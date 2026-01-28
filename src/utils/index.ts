@@ -7,6 +7,7 @@ import * as MediaUtils from './media.utils';
 import * as PromiseUtils from './promise.utils';
 import * as StringUtils from './string.utils';
 
+export * from './fs.utils';
 export * from './render.utils';
 
 export {

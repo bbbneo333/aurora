@@ -6,8 +6,8 @@ import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';
 import chalk from 'chalk';
-import {merge} from 'webpack-merge';
-import {spawn, execSync} from 'child_process';
+import { merge } from 'webpack-merge';
+import { spawn, execSync } from 'child_process';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 
 import baseConfig from './webpack.config.base';
@@ -241,7 +241,7 @@ export default merge(baseConfig, {
     inline: true,
     lazy: false,
     hot: true,
-    headers: {'Access-Control-Allow-Origin': '*'},
+    headers: { 'Access-Control-Allow-Origin': '*' },
     contentBase: path.join(__dirname, 'dist'),
     watchOptions: {
       aggregateTimeout: 300,

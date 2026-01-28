@@ -19,8 +19,6 @@ export enum IPCCommChannel {
   DSUpdateOne = 'ds:update_one',
   DSRemoveOne = 'ds:remove_one',
   DSRemove = 'ds:remove',
-  // crypto
-  CryptoGenerateSHA256Hash = 'crypto:generate_sha_256_hash',
   // media
   MediaScaleAndCacheImage = 'media:scale_and_cache_image',
 }
