@@ -3,8 +3,9 @@ import sharp from 'sharp';
 
 import { ImageFileExtensions } from '../../enums';
 import { IAppMain, IAppModule } from '../../interfaces';
-import { StringUtils } from '../../utils';
 import { IPCCommChannel } from '../../modules/ipc';
+import { CryptoService } from '../../modules/crypto';
+import { isFile } from '../../utils';
 
 export class MediaModule implements IAppModule {
   readonly defaultImageExtension = ImageFileExtensions.JPG;
@@ -25,11 +26,21 @@ export class MediaModule implements IAppModule {
     height: number,
   }): Promise<string> {
     const source = typeof imageData === 'string' ? imageData : Buffer.from(imageData);
+    const { width, height } = imageScaleOptions;
+
     const imageCacheDir = this.app.createDataDir(this.imagesDataDir);
-    const imageCachePath = path.join(imageCacheDir, `${StringUtils.generateId()}.${this.defaultImageExtension}`);
+    // we use image (path or buffer data) and dimensions as cache key
+    const imageCacheKey = CryptoService.sha1(imageData, `${width}x${height}`);
+    const imageCachePath = path.join(imageCacheDir, `${imageCacheKey}.${this.defaultImageExtension}`);
+
+    // if file already exists, return that
+    // otherwise create and store new image
+    if (isFile(imageCachePath)) {
+      return imageCachePath;
+    }
 
     await sharp(source)
-      .resize(imageScaleOptions.width, imageScaleOptions.height, {
+      .resize(width, height, {
         fit: 'cover',
         position: 'center',
       })
