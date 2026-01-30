@@ -29,8 +29,8 @@ export class MediaModule implements IAppModule {
     const { width, height } = imageScaleOptions;
 
     const imageCacheDir = this.app.createDataDir(this.imagesDataDir);
-    const imageDims = `${width}x${height}`;
-    const imageCacheKey = CryptoService.sha1(imageData, imageDims);
+    // we use image (path or buffer data) and dimensions as cache key
+    const imageCacheKey = CryptoService.sha1(imageData, `${width}x${height}`);
     const imageCachePath = path.join(imageCacheDir, `${imageCacheKey}.${this.defaultImageExtension}`);
 
     // if file already exists, return that
