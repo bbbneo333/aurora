@@ -1,5 +1,5 @@
 import { IMediaLikedTrackData } from '../interfaces';
-import { DataStoreFilterData, DataStoreInputData } from '../types';
+import { DataStoreFilterData, DataStoreInputData } from '../modules/datastore';
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaLikedTracksDatastore {

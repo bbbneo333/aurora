@@ -3,7 +3,7 @@ import {
   DataStoreInputData,
   DataStoreQueryData,
   DataStoreUpdateData,
-} from '../types';
+} from '../modules/datastore';
 
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 

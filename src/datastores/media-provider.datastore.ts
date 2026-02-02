@@ -1,5 +1,5 @@
 import { IMediaProviderData } from '../interfaces';
-import { DataStoreInputData, DataStoreUpdateData } from '../types';
+import { DataStoreInputData, DataStoreUpdateData } from '../modules/datastore';
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaProviderDatastore {

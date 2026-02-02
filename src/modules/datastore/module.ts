@@ -4,20 +4,11 @@ import path from 'path';
 import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
-import { DatastoreUtils } from '../../utils';
-import { DataStoreQueryData } from '../../types';
-import { IPCCommChannel, IPCMain } from '../../modules/ipc';
+import { IPCCommChannel, IPCMain } from '../ipc';
+import { DatastoreUtils } from './utils';
+import { DatastoreIndex, DatastoreOptions, DataStoreQueryData } from './types';
 
 const debug = require('debug')('app:module:datastore_module');
-
-type DatastoreIndex = {
-  field: string,
-  unique?: boolean,
-};
-
-type DatastoreOptions = {
-  indexes?: DatastoreIndex[]
-};
 
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;

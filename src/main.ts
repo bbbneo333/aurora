@@ -40,18 +40,13 @@ import {
   IAppModule,
 } from './interfaces';
 
-import {
-  IPCMain,
-  IPCCommChannel,
-  IPCRendererCommChannel,
-} from './modules/ipc';
+import { IPCMain, IPCCommChannel, IPCRendererCommChannel } from './modules/ipc';
+import { PlatformOS } from './modules/platform';
+import { DatastoreModule } from './modules/datastore';
+import { FileSystemModule } from './modules/file-system';
+import { ImageModule } from './modules/image';
 
-import {
-  PlatformOS,
-} from './modules/platform';
-
-import * as AppBuilders from './main/builders';
-import * as AppModules from './main/modules';
+import { MenuBuilder } from './main/builders';
 
 const sourceMapSupport = require('source-map-support');
 const debug = require('debug')('app:main');
@@ -505,15 +500,21 @@ class App implements IAppMain {
   }
 
   private registerBuilders(): void {
-    const builders = _.map(AppBuilders, AppBuilder => new AppBuilder(this));
-    debug('registering builders - %o', _.map(builders, builder => builder.constructor.name));
-    this.builders.push(...builders);
+    debug('registering builders...');
+
+    this.builders.push(new MenuBuilder(this));
+
+    debug('builder registration completed!');
   }
 
   private registerModules(): void {
-    const modules = _.map(AppModules, AppModule => new AppModule(this));
-    debug('registering modules - %o', _.map(modules, module => module.constructor.name));
-    this.modules.push(...modules);
+    debug('registering modules...');
+
+    this.modules.push(new DatastoreModule(this));
+    this.modules.push(new ImageModule(this));
+    this.modules.push(new FileSystemModule(this));
+
+    debug('module registration completed!');
   }
 
   private runBuilders(mainWindow: BrowserWindow): void {

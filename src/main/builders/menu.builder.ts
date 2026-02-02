@@ -12,11 +12,11 @@ import {
 } from 'electron';
 
 import { IAppBuilder, IAppMain } from '../../interfaces';
-import { PlatformOS } from '../../modules/platform';
-import { IPCCommChannel, IPCMain, IPCRendererCommChannel } from '../../modules/ipc';
-
-import { DatastoreModule } from '../modules';
 import { Links } from '../../constants';
+
+import { DatastoreModule } from '../../modules/datastore';
+import { IPCCommChannel, IPCMain, IPCRendererCommChannel } from '../../modules/ipc';
+import { PlatformOS } from '../../modules/platform';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
 }

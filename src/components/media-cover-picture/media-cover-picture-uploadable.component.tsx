@@ -23,7 +23,7 @@ export function MediaCoverPictureUploadable(props: MediaCoverPictureUploadablePr
       return;
     }
 
-    const imagePath = await IPCRenderer.sendAsyncMessage(IPCCommChannel.MediaScaleAndCacheImage, filePath, {
+    const imagePath = await IPCRenderer.sendAsyncMessage(IPCCommChannel.ImageScale, filePath, {
       width: MediaLibraryService.mediaPictureScaleWidth,
       height: MediaLibraryService.mediaPictureScaleHeight,
     });

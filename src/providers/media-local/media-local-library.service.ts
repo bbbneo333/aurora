@@ -8,10 +8,12 @@ import {
 import { Semaphore } from 'async-mutex';
 
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
-import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
+import { IMediaLibraryService } from '../../interfaces';
 import { MediaProviderService, MediaLibraryService } from '../../services';
-import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
+
 import { CryptoService } from '../../modules/crypto';
+import { FSFile } from '../../modules/file-system';
+import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
@@ -59,79 +61,90 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    const fsDirectoryReadResponse: IFSDirectoryReadResponse | undefined = await IPCRenderer
-      .sendAsyncMessage(IPCCommChannel.FSReadDirectory, mediaLibraryDirectory, {
+    return new Promise((resolve) => {
+      IPCRenderer.stream(IPCCommChannel.FSReadDirectoryStream, {
+        directory: mediaLibraryDirectory,
         fileExtensions: AudioFileExtensionList,
-      }).catch((error) => {
-        // just log on error, continue the sync process
-        console.error(error);
-      });
+      }, (data: { files: FSFile[] }) => {
+        // on data
+        const { files } = data;
 
-    if (!fsDirectoryReadResponse) {
-      debug('addTracksFromDirectory - no valid contents received, skipping directory - %s', mediaLibraryDirectory);
-      return;
-    }
-
-    await Promise.mapSeries(fsDirectoryReadResponse.files, async (fsDirectoryReadFile) => {
-      debug('addTracksFromDirectory - found file - %s', fsDirectoryReadFile.path);
-      const mediaSyncTimestamp = Date.now();
-
-      // read metadata
-      const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(fsDirectoryReadFile.path);
-      // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
-      const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
-      // generate local id - we are using location of the file to uniquely identify the track
-      const mediaTrackId = MediaLocalLibraryService.getMediaId(fsDirectoryReadFile.path);
-      // add media artist
-      const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
-        ? audioMetadata.common.artists.map(audioArtist => ({
-          artist_name: audioArtist,
-          provider: MediaLocalConstants.Provider,
-          provider_id: MediaLocalLibraryService.getMediaId(audioArtist),
-          sync_timestamp: mediaSyncTimestamp,
-        }))
-        : [{
-          artist_name: 'unknown artist',
-          provider: MediaLocalConstants.Provider,
-          provider_id: MediaLocalLibraryService.getMediaId('unknown artist'),
-          sync_timestamp: mediaSyncTimestamp,
-        }]);
-      // add media album
-      const mediaAlbumName = audioMetadata.common.album || 'unknown album';
-      const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
-        album_name: mediaAlbumName,
-        album_artist_id: mediaArtistDataList[0].id,
-        album_cover_picture: audioCoverPicture ? {
-          image_data: audioCoverPicture.data,
-          image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-        } : undefined,
-        provider: MediaLocalConstants.Provider,
-        provider_id: MediaLocalLibraryService.getMediaId(mediaAlbumName),
-        sync_timestamp: mediaSyncTimestamp,
-      });
-      // add media track
-      await MediaLibraryService.checkAndInsertMediaTrack({
-        provider: MediaLocalConstants.Provider,
-        provider_id: mediaTrackId,
-        // fallback to file name if title could not be found in metadata
-        track_name: audioMetadata.common.title || fsDirectoryReadFile.name,
-        track_number: audioMetadata.common.track.no || 0,
-        track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
-        track_cover_picture: audioCoverPicture ? {
-          image_data: audioCoverPicture.data,
-          image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
-        } : undefined,
-        track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
-        track_album_id: mediaAlbumData.id,
-        extra: {
-          location: {
-            address: fsDirectoryReadFile.path,
-          },
-        },
-        sync_timestamp: mediaSyncTimestamp,
+        files.forEach((file) => {
+          this.addFile(file).catch((err: Error) => {
+            console.error('Encountered error while adding track from file - %s', file.name);
+            console.error(err);
+          });
+        });
+      }, (err: Error) => {
+        // on error
+        // don't stop, just log
+        console.error('Encountered error while reading files from path - %s', mediaLibraryDirectory);
+        console.error(err);
+      }, () => {
+        // on done
+        resolve();
       });
     });
-    debug('addTracksFromDirectory - finished processing - %o', fsDirectoryReadResponse.stats);
+  }
+
+  private async addFile(file: FSFile) {
+    debug('addTracksFromDirectory - found file - %s', file.path);
+    const mediaSyncTimestamp = Date.now();
+
+    // read metadata
+    const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(file.path);
+    // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
+    const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
+    // generate local id - we are using location of the file to uniquely identify the track
+    const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
+    // add media artist
+    const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
+      ? audioMetadata.common.artists.map(audioArtist => ({
+        artist_name: audioArtist,
+        provider: MediaLocalConstants.Provider,
+        provider_id: MediaLocalLibraryService.getMediaId(audioArtist),
+        sync_timestamp: mediaSyncTimestamp,
+      }))
+      : [{
+        artist_name: 'unknown artist',
+        provider: MediaLocalConstants.Provider,
+        provider_id: MediaLocalLibraryService.getMediaId('unknown artist'),
+        sync_timestamp: mediaSyncTimestamp,
+      }]);
+    // add media album
+    const mediaAlbumName = audioMetadata.common.album || 'unknown album';
+    const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
+      album_name: mediaAlbumName,
+      album_artist_id: mediaArtistDataList[0].id,
+      album_cover_picture: audioCoverPicture ? {
+        image_data: audioCoverPicture.data,
+        image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+      } : undefined,
+      provider: MediaLocalConstants.Provider,
+      provider_id: MediaLocalLibraryService.getMediaId(mediaAlbumName),
+      sync_timestamp: mediaSyncTimestamp,
+    });
+    // add media track
+    await MediaLibraryService.checkAndInsertMediaTrack({
+      provider: MediaLocalConstants.Provider,
+      provider_id: mediaTrackId,
+      // fallback to file name if title could not be found in metadata
+      track_name: audioMetadata.common.title || file.name,
+      track_number: audioMetadata.common.track.no || 0,
+      track_duration: MediaLocalUtils.parseMediaMetadataDuration(audioMetadata.format.duration),
+      track_cover_picture: audioCoverPicture ? {
+        image_data: audioCoverPicture.data,
+        image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+      } : undefined,
+      track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
+      track_album_id: mediaAlbumData.id,
+      extra: {
+        location: {
+          address: file.path,
+        },
+      },
+      sync_timestamp: mediaSyncTimestamp,
+    });
   }
 
   private static getMediaId(mediaInput: string): string {

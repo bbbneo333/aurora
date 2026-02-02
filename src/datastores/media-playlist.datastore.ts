@@ -1,4 +1,4 @@
-import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
+import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../modules/datastore';
 import { IMediaPlaylistData, IMediaPlaylistTrackData } from '../interfaces';
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 

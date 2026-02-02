@@ -2,8 +2,9 @@ import _ from 'lodash';
 
 import { MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
 import store from '../store';
-import { DataStoreInputData } from '../types';
 import { MediaUtils } from '../utils';
+
+import { DataStoreInputData } from '../modules/datastore';
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 import MediaPlayerService from './media-player.service';
@@ -464,7 +465,7 @@ class MediaLibraryService {
       let imageCachePath;
 
       try {
-        imageCachePath = await IPCRenderer.sendAsyncMessage(IPCCommChannel.MediaScaleAndCacheImage, mediaPicture.image_data, {
+        imageCachePath = await IPCRenderer.sendAsyncMessage(IPCCommChannel.ImageScale, mediaPicture.image_data, {
           width: this.mediaPictureScaleWidth,
           height: this.mediaPictureScaleHeight,
         });
