@@ -12,7 +12,7 @@ import { AppService, I18nService } from '../../services';
 import routes from '../app.routes';
 import { Icons } from '../../constants';
 import { PlatformOS } from '../../modules/platform';
-import { IPCCommChannel, IPCService } from '../../modules/ipc';
+import { IPCCommChannel, IPCRenderer } from '../../modules/ipc';
 
 import styles from './sidebar.component.css';
 
@@ -80,7 +80,7 @@ function SidebarHeader() {
         <Button
           icon={Icons.Menu}
           onButtonSubmit={() => {
-            IPCService.sendSyncMessage(IPCCommChannel.AppOpenMenu);
+            IPCRenderer.sendSyncMessage(IPCCommChannel.AppOpenMenu);
           }}
         />
       )}

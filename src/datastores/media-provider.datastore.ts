@@ -1,12 +1,12 @@
 import { IMediaProviderData } from '../interfaces';
 import { DataStoreInputData, DataStoreUpdateData } from '../types';
-import { IPCService, IPCCommChannel } from '../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaProviderDatastore {
   private readonly mediaProviderDatastoreName = 'media_providers';
 
   constructor() {
-    IPCService.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaProviderDatastoreName, {
+    IPCRenderer.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaProviderDatastoreName, {
       indexes: [{
         field: 'identifier',
         unique: true,
@@ -15,13 +15,13 @@ class MediaProviderDatastore {
   }
 
   findMediaProviderByIdentifier(mediaProviderIdentifier: string): Promise<IMediaProviderData | undefined> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaProviderDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     });
   }
 
   updateMediaProviderByIdentifier(mediaProviderIdentifier: string, mediaProviderUpdateData: DataStoreUpdateData<IMediaProviderData>): Promise<IMediaProviderData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaProviderDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaProviderDatastoreName, {
       identifier: mediaProviderIdentifier,
     }, {
       $set: mediaProviderUpdateData,
@@ -29,7 +29,7 @@ class MediaProviderDatastore {
   }
 
   insertMediaProvider(mediaProviderInputData: DataStoreInputData<IMediaProviderData>): Promise<IMediaProviderData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaProviderDatastoreName, mediaProviderInputData);
   }
 }
 

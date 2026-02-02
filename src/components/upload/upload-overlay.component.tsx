@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { Icons } from '../../constants';
 import { I18nService } from '../../services';
 import { Events } from '../../utils';
-import { IPCService, IPCCommChannel } from '../../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
 import { LoaderIcon } from '../loader/loader-icon.component';
 import { Icon } from '../icon/icon.component';
@@ -41,7 +41,7 @@ export function UploadOverlay(props: UploadOverlayProps) {
   };
 
   const openDialog = () => {
-    const selection = IPCService.sendSyncMessage(IPCCommChannel.FSSelectFile, {
+    const selection = IPCRenderer.sendSyncMessage(IPCCommChannel.FSSelectFile, {
       extensions,
     });
     if (!selection) {

@@ -5,7 +5,7 @@ import { MediaEnums } from '../../enums';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 import { IMediaTrack } from '../../interfaces';
-import { IPCService, IPCCommChannel } from '../../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
 const debug = require('debug')('app:component:media_session_component');
 
@@ -19,7 +19,7 @@ const getSessionArtworkForMediaTrack = (mediaTrack: IMediaTrack): MediaImage | u
 
   switch (mediaTrackPicture?.image_data_type) {
     case MediaEnums.MediaTrackCoverPictureImageDataType.Path: {
-      const image = IPCService.sendSyncMessage(IPCCommChannel.FSReadFile, mediaTrackPicture.image_data);
+      const image = IPCRenderer.sendSyncMessage(IPCCommChannel.FSReadFile, mediaTrackPicture.image_data);
       mediaTrackPictureBuffer = Buffer.from(image);
       break;
     }

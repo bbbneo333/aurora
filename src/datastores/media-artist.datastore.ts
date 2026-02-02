@@ -1,12 +1,12 @@
 import { IMediaArtistData } from '../interfaces';
 import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
-import { IPCService, IPCCommChannel } from '../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaArtistDatastore {
   private readonly mediaArtistDatastoreName = 'media_artists';
 
   constructor() {
-    IPCService.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaArtistDatastoreName, {
+    IPCRenderer.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaArtistDatastoreName, {
       indexes: [{
         field: 'id',
         unique: true,
@@ -19,23 +19,23 @@ class MediaArtistDatastore {
   }
 
   findMediaArtistById(mediaArtistId: string): Promise<IMediaArtistData | undefined> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaArtistDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaArtistDatastoreName, {
       id: mediaArtistId,
     });
   }
 
   findMediaArtist(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>): Promise<IMediaArtistData | undefined> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 
   findMediaArtists(mediaArtistFilterData?: DataStoreFilterData<IMediaArtistData>): Promise<IMediaArtistData[]> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaArtistDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaArtistDatastoreName, {
       filter: mediaArtistFilterData,
     });
   }
 
   updateArtistById(mediaArtistId: string, mediaArtistUpdateData: DataStoreUpdateData<IMediaArtistData>): Promise<IMediaArtistData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaArtistDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaArtistDatastoreName, {
       id: mediaArtistId,
     }, {
       $set: mediaArtistUpdateData,
@@ -43,11 +43,11 @@ class MediaArtistDatastore {
   }
 
   insertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaArtistDatastoreName, mediaArtistInputData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaArtistDatastoreName, mediaArtistInputData);
   }
 
   deleteArtists(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>): Promise<void> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaArtistDatastoreName, mediaArtistFilterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 }
 

@@ -1,13 +1,11 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { set } from 'lodash';
 
 import { isIPCErrorObj, deserializeIPCError } from './error';
+import { IPCListener } from './types';
 
 const debug = require('debug')('app:service:ipc_service');
 
-type IpcRendererListener = (event: IpcRendererEvent, ...args: any[]) => void;
-
-export class IPCService {
+export class IPCRenderer {
   static sendSyncMessage(messageChannel: string, ...messageArgs: any[]): any {
     return ipcRenderer.sendSync(messageChannel, ...messageArgs);
   }
@@ -23,17 +21,17 @@ export class IPCService {
     return result;
   }
 
-  static registerSyncMessageHandler(messageChannel: string, messageHandler: any, messageHandlerCtx?: any): IpcRendererListener {
-    const listener = (event: IpcRendererEvent, ...args: any[]) => {
-      debug('ipc (sync) - received message - channel - %s', messageChannel);
-      set(event, 'returnValue', messageHandler.apply(messageHandlerCtx, args));
+  static addMessageHandler(messageChannel: string, messageHandler: (...args: any[]) => void): IPCListener {
+    const listener = (_: IpcRendererEvent, ...args: any[]) => {
+      debug('ipc - received message - channel - %s', messageChannel);
+      messageHandler(...args);
     };
-    ipcRenderer.on(messageChannel, listener);
 
+    ipcRenderer.on(messageChannel, listener);
     return listener;
   }
 
-  static removeSyncMessageListener(messageChannel: string, messageListener: IpcRendererListener): void {
+  static removeMessageHandler(messageChannel: string, messageListener: IPCListener): void {
     ipcRenderer.off(messageChannel, messageListener);
   }
 }

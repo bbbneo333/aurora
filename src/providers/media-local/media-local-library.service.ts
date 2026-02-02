@@ -10,7 +10,7 @@ import { Semaphore } from 'async-mutex';
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IFSDirectoryReadResponse, IMediaLibraryService } from '../../interfaces';
 import { MediaProviderService, MediaLibraryService } from '../../services';
-import { IPCService, IPCCommChannel } from '../../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 import { CryptoService } from '../../modules/crypto';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
@@ -59,7 +59,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    const fsDirectoryReadResponse: IFSDirectoryReadResponse | undefined = await IPCService
+    const fsDirectoryReadResponse: IFSDirectoryReadResponse | undefined = await IPCRenderer
       .sendAsyncMessage(IPCCommChannel.FSReadDirectory, mediaLibraryDirectory, {
         fileExtensions: AudioFileExtensionList,
       }).catch((error) => {

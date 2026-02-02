@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 import { ActionList, Button } from '../../components';
 import { Icons } from '../../constants';
 import { MediaProviderService } from '../../services';
-import { IPCService, IPCCommChannel } from '../../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
 import MediaLocalConstants from './media-local.constants.json';
 import { mediaLocalStore, MediaLocalStateActionType } from './media-local.store';
@@ -19,7 +19,7 @@ type MediaLocalSettingsProps = {
 };
 
 function openDirectorySelectionDialog(): string | undefined {
-  return IPCService.sendSyncMessage(IPCCommChannel.FSSelectDirectory);
+  return IPCRenderer.sendSyncMessage(IPCCommChannel.FSSelectDirectory);
 }
 
 export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
