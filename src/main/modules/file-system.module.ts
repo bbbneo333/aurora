@@ -10,7 +10,7 @@ import {
   IFSDirectoryReadResponse,
 } from '../../interfaces';
 
-import { IPCCommChannel } from '../../modules/ipc';
+import { IPCCommChannel, IPCMain } from '../../modules/ipc';
 
 export class FileSystemModule implements IAppModule {
   private readonly app: IAppMain;
@@ -21,11 +21,11 @@ export class FileSystemModule implements IAppModule {
   }
 
   private registerMessageHandlers() {
-    this.app.registerSyncMessageHandler(IPCCommChannel.FSReadAsset, this.readAsset, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.FSReadDirectory, this.readDirectory, this);
-    this.app.registerSyncMessageHandler(IPCCommChannel.FSReadFile, this.readFile, this);
-    this.app.registerSyncMessageHandler(IPCCommChannel.FSSelectDirectory, this.selectDirectory, this);
-    this.app.registerSyncMessageHandler(IPCCommChannel.FSSelectFile, this.selectFile, this);
+    IPCMain.addSyncMessageHandler(IPCCommChannel.FSReadAsset, this.readAsset, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.FSReadDirectory, this.readDirectory, this);
+    IPCMain.addSyncMessageHandler(IPCCommChannel.FSReadFile, this.readFile, this);
+    IPCMain.addSyncMessageHandler(IPCCommChannel.FSSelectDirectory, this.selectDirectory, this);
+    IPCMain.addSyncMessageHandler(IPCCommChannel.FSSelectFile, this.selectFile, this);
   }
 
   private readAsset(fsAssetPath: string[], fsAssetReadOptions: IFSAssetReadOptions = {}) {

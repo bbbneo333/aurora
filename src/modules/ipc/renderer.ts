@@ -1,9 +1,9 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 
 import { isIPCErrorObj, deserializeIPCError } from './error';
-import { IPCListener } from './types';
+import { IPCRenderListener } from './types';
 
-const debug = require('debug')('app:service:ipc_service');
+const debug = require('debug')('ipc:renderer');
 
 export class IPCRenderer {
   static sendSyncMessage(messageChannel: string, ...messageArgs: any[]): any {
@@ -21,7 +21,7 @@ export class IPCRenderer {
     return result;
   }
 
-  static addMessageHandler(messageChannel: string, messageHandler: (...args: any[]) => void): IPCListener {
+  static addMessageHandler(messageChannel: string, messageHandler: (...args: any[]) => void): IPCRenderListener {
     const listener = (_: IpcRendererEvent, ...args: any[]) => {
       debug('ipc - received message - channel - %s', messageChannel);
       messageHandler(...args);
@@ -31,7 +31,7 @@ export class IPCRenderer {
     return listener;
   }
 
-  static removeMessageHandler(messageChannel: string, messageListener: IPCListener): void {
+  static removeMessageHandler(messageChannel: string, messageListener: IPCRenderListener): void {
     ipcRenderer.off(messageChannel, messageListener);
   }
 }

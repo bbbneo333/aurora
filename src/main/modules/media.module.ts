@@ -3,7 +3,7 @@ import sharp from 'sharp';
 
 import { ImageFileExtensions } from '../../enums';
 import { IAppMain, IAppModule } from '../../interfaces';
-import { IPCCommChannel } from '../../modules/ipc';
+import { IPCCommChannel, IPCMain } from '../../modules/ipc';
 import { CryptoService } from '../../modules/crypto';
 import { isFile } from '../../utils';
 
@@ -18,7 +18,7 @@ export class MediaModule implements IAppModule {
   }
 
   private registerMessageHandlers() {
-    this.app.registerAsyncMessageHandler(IPCCommChannel.MediaScaleAndCacheImage, this.scaleAndCacheImage, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.MediaScaleAndCacheImage, this.scaleAndCacheImage, this);
   }
 
   private async scaleAndCacheImage(imageData: Buffer | string, imageScaleOptions: {

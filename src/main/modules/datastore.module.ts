@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { IAppMain, IAppModule } from '../../interfaces';
 import { DatastoreUtils } from '../../utils';
 import { DataStoreQueryData } from '../../types';
-import { IPCCommChannel } from '../../modules/ipc';
+import { IPCCommChannel, IPCMain } from '../../modules/ipc';
 
 const debug = require('debug')('app:module:datastore_module');
 
@@ -48,14 +48,14 @@ export class DatastoreModule implements IAppModule {
   }
 
   private registerMessageHandlers(): void {
-    this.app.registerSyncMessageHandler(IPCCommChannel.DSRegisterDatastore, this.registerDatastore, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSFind, this.find, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSFindOne, this.findOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSInsertOne, this.insertOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSUpdateOne, this.updateOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
+    IPCMain.addSyncMessageHandler(IPCCommChannel.DSRegisterDatastore, this.registerDatastore, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSFind, this.find, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSFindOne, this.findOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSInsertOne, this.insertOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpdateOne, this.updateOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
   }
 
   private removeDatastore(datastore: Datastore): void {
