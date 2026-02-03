@@ -20,7 +20,7 @@ import MediaLocalConstants from './media-local.constants.json';
 import MediaLocalUtils from './media-local.utils';
 import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store';
 
-const debug = require('debug')('app:provider:media_local:media_library');
+const debug = require('debug')('provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
   private readonly mediaSyncLock = new Semaphore(1);

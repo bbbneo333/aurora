@@ -17,7 +17,7 @@ import MediaProviderService from './media-provider.service';
 import NotificationService from './notification.service';
 import I18nService from './i18n.service';
 
-const debug = require('debug')('app:service:media_player_service');
+const debug = require('debug')('service:media_player');
 
 class MediaPlayerService {
   private mediaProgressReportRetryCount = 15;

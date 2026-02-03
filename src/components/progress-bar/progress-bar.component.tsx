@@ -16,7 +16,7 @@ import { getValueFromPercent } from './progress-bar.utils';
 import { ProgressJumpDirection, ProgressStateActionType, progressStateReducer } from './progress-bar.reducer';
 import styles from './progress-bar.component.scss';
 
-const debug = require('debug')('app:component:progress_bar');
+const debug = require('debug')('component:progress_bar');
 
 const cx = classNames.bind(styles);
 

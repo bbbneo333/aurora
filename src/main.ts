@@ -49,7 +49,7 @@ import { ImageModule } from './modules/image';
 import { MenuBuilder } from './main/builders';
 
 const sourceMapSupport = require('source-map-support');
-const debug = require('debug')('app:main');
+const debug = require('debug')('main');
 
 function createElectronLogger(name: string, filePath: string) {
   const logger = electronLog.create({ logId: name });

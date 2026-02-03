@@ -24,7 +24,7 @@
  outline.js v1.2.0 - https://github.com/lindsayevans/outline.js
  */
 
-const debug = require('debug')('app:vendor:js:outline');
+const debug = require('debug')('vendor:js:outline');
 
 (function (d) {
 
