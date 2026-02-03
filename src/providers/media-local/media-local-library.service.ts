@@ -5,15 +5,15 @@ import {
   selectCover,
 } from 'music-metadata';
 
-import { Semaphore } from 'async-mutex';
+import PQueue from 'p-queue';
 
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
-import { MediaProviderService, MediaLibraryService } from '../../services';
+import { MediaLibraryService, MediaProviderService } from '../../services';
 
 import { CryptoService } from '../../modules/crypto';
 import { FSFile } from '../../modules/file-system';
-import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
+import { IPCCommChannel, IPCRenderer } from '../../modules/ipc';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
 import MediaLocalConstants from './media-local.constants.json';
@@ -23,7 +23,8 @@ import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store'
 const debug = require('debug')('provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
-  private readonly mediaSyncLock = new Semaphore(1);
+  private readonly syncQueue = new PQueue({ concurrency: 1, autoStart: true });
+  private readonly syncAddFileQueue = new PQueue({ concurrency: 50, autoStart: true });
 
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
@@ -43,38 +44,36 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   async syncMediaTracks() {
-    // use mediaSyncLock to only run one sync at a time
-    await this.mediaSyncLock.runExclusive(async () => {
+    return this.syncQueue.add(async () => {
+      debug('syncMediaTracks - started sync');
+
       mediaLocalStore.dispatch({
         type: MediaLocalStateActionType.StartSync,
       });
       await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
 
       const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-      await Promise.mapSeries(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
+      await Promise.map(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
 
       await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
       mediaLocalStore.dispatch({
         type: MediaLocalStateActionType.FinishSync,
       });
+
+      debug('syncMediaTracks - finished sync');
     });
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    return new Promise((resolve) => {
+    debug('addTracksFromDirectory - adding tracks from directory - %s', mediaLibraryDirectory);
+
+    await new Promise((resolve) => {
       IPCRenderer.stream(IPCCommChannel.FSReadDirectoryStream, {
         directory: mediaLibraryDirectory,
         fileExtensions: AudioFileExtensionList,
       }, (data: { files: FSFile[] }) => {
         // on data
-        const { files } = data;
-
-        files.forEach((file) => {
-          this.addFile(file).catch((err: Error) => {
-            console.error('Encountered error while adding track from file - %s', file.name);
-            console.error(err);
-          });
-        });
+        this.addTracksFromFiles(data.files);
       }, (err: Error) => {
         // on error
         // don't stop, just log
@@ -82,15 +81,30 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         console.error(err);
       }, () => {
         // on done
-        resolve();
+        // wait for add tracks to be finished
+        this.syncAddFileQueue.onIdle().then(() => {
+          resolve();
+        });
       });
+    });
+
+    debug('addTracksFromDirectory - finished adding tracks from directory - %s', mediaLibraryDirectory);
+  }
+
+  private async addTracksFromFiles(files: FSFile[]) {
+    files.forEach((file) => {
+      debug('addTracksFromDirectory - found file at - %s', file.path);
+
+      this.syncAddFileQueue.add(() => this.addTrackFromFile(file)
+        .then((track) => {
+          debug('addTracksFromDirectory - added track from file - %s - %s', file.name, track.id);
+        })
+        .catch(err => console.error(err)));
     });
   }
 
-  private async addFile(file: FSFile) {
-    debug('addTracksFromDirectory - found file - %s', file.path);
+  private async addTrackFromFile(file: FSFile) {
     const mediaSyncTimestamp = Date.now();
-
     // read metadata
     const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(file.path);
     // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
@@ -125,7 +139,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       sync_timestamp: mediaSyncTimestamp,
     });
     // add media track
-    await MediaLibraryService.checkAndInsertMediaTrack({
+    return MediaLibraryService.checkAndInsertMediaTrack({
       provider: MediaLocalConstants.Provider,
       provider_id: mediaTrackId,
       // fallback to file name if title could not be found in metadata
