@@ -3,7 +3,7 @@ import { Col, Row } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useSelector } from 'react-redux';
 
-import { DateTimeUtils } from '../../utils';
+import { MediaUtils } from '../../utils';
 import { MediaEnums } from '../../enums';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
@@ -46,7 +46,7 @@ export function MediaPlayerProgress() {
     <Row className={cx('media-player-progress-container')}>
       <Col className={cx('col-12', 'media-player-progress-column')}>
         <div className={cx('media-player-progress-counter', 'start')}>
-          {DateTimeUtils.formatSecondsToDuration(mediaProgressDragValue !== undefined
+          {MediaUtils.formatMediaTrackDuration(mediaProgressDragValue !== undefined
             ? mediaProgressDragValue
             : (mediaPlaybackCurrentMediaProgress || 0))}
         </div>
@@ -60,7 +60,7 @@ export function MediaPlayerProgress() {
           />
         </div>
         <div className={cx('media-player-progress-counter', 'end')}>
-          {DateTimeUtils.formatSecondsToDuration(mediaPlaybackCurrentMediaTrack.track_duration)}
+          {MediaUtils.formatMediaTrackDuration(mediaPlaybackCurrentMediaTrack.track_duration)}
         </div>
       </Col>
     </Row>

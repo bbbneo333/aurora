@@ -3,7 +3,7 @@ import classNames from 'classnames/bind';
 
 import { Icons } from '../../constants';
 import { IMediaTrack } from '../../interfaces';
-import { DateTimeUtils, Events } from '../../utils';
+import { Events, MediaUtils } from '../../utils';
 import { useMediaTrackPlayback } from '../../hooks';
 
 import { MediaCoverPicture } from '../media-cover-picture/media-cover-picture.component';
@@ -108,7 +108,7 @@ export function MediaTrack<T extends IMediaTrack>(props: MediaTrackProps<T>) {
             />
           </div>
           <div className={cx('media-track-duration')}>
-            {DateTimeUtils.formatSecondsToDuration(mediaTrack.track_duration)}
+            {MediaUtils.formatMediaTrackDuration(mediaTrack.track_duration)}
           </div>
         </div>
       </div>
