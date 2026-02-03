@@ -1,5 +1,12 @@
 import { IMediaArtistData } from '../interfaces';
-import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../modules/datastore';
+
+import {
+  DataStoreFilterData,
+  DataStoreInputData,
+  DataStoreUpdateData,
+  DatastoreUtils,
+} from '../modules/datastore';
+
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaArtistDatastore {
@@ -12,6 +19,7 @@ class MediaArtistDatastore {
         unique: true,
       }, {
         field: 'provider_id',
+        unique: true,
       }, {
         field: 'artist_name',
       }],
@@ -48,6 +56,19 @@ class MediaArtistDatastore {
 
   deleteArtists(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>): Promise<void> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaArtistDatastoreName, mediaArtistFilterData);
+  }
+
+  upsertMediaArtist(input: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
+    const id = DatastoreUtils.composeId(input.provider, input.provider_id);
+
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaArtistDatastoreName, {
+      id,
+    }, {
+      $set: {
+        ...input,
+        id,
+      },
+    });
   }
 }
 

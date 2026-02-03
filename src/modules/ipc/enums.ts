@@ -19,6 +19,7 @@ export enum IPCCommChannel {
   DSUpdateOne = 'ds:update_one',
   DSRemoveOne = 'ds:remove_one',
   DSRemove = 'ds:remove',
+  DSUpsertOne = 'ds:upsert_one',
   // image
   ImageScale = 'image:scale',
 }

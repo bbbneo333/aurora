@@ -47,6 +47,7 @@ export class DatastoreModule implements IAppModule {
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpsertOne, this.upsertOne, this);
   }
 
   private removeDatastore(datastore: Datastore): void {
@@ -166,6 +167,17 @@ export class DatastoreModule implements IAppModule {
     const datastore = this.getDatastore(datastoreName);
 
     return datastore.count(datastoreFindOneDoc);
+  }
+
+  // important - upsert callers are required to provide their own id
+  private async upsertOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object) {
+    const datastore = this.getDatastore(datastoreName);
+
+    return datastore.update(datastoreFindOneDoc, datastoreUpdateOneDoc, {
+      multi: false,
+      upsert: true,
+      returnUpdatedDocs: true,
+    });
   }
 
   private getDatastore(datastoreName: string): Datastore {
