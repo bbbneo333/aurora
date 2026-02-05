@@ -7,7 +7,7 @@ import { MediaPlayerService } from '../../services';
 import { IMediaTrack } from '../../interfaces';
 import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
-const debug = require('debug')('component:media_session');
+const debug = require('debug')('aurora:component:media_session');
 
 const getSessionArtworkForMediaTrack = (mediaTrack: IMediaTrack): MediaImage | undefined => {
   const mediaTrackPicture = mediaTrack.track_cover_picture;

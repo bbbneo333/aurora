@@ -26,7 +26,7 @@ import {
   IMediaTrackData,
 } from '../interfaces';
 
-const debug = require('debug')('service:media_library');
+const debug = require('debug')('aurora:service:media_library');
 
 class MediaLibraryService {
   readonly mediaPictureScaleWidth = 500;

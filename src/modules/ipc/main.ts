@@ -9,7 +9,7 @@ import {
   IPCMainAsyncListener,
 } from './types';
 
-const debug = require('debug')('module:ipc:main');
+const debug = require('debug')('aurora:module:ipc:main');
 
 export class IPCMain {
   static addSyncMessageHandler(messageChannel: string, messageHandler: IPCSyncMessageHandler, messageHandlerCtx?: any): IPCMainSyncListener {

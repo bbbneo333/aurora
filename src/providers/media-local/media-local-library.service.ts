@@ -21,7 +21,7 @@ import MediaLocalConstants from './media-local.constants.json';
 import MediaLocalUtils from './media-local.utils';
 import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store';
 
-const debug = require('debug')('provider:media_local:media_library');
+const debug = require('debug')('aurora:provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
   private readonly syncQueue = new PQueue({ concurrency: 1, autoStart: true });

@@ -8,7 +8,7 @@ import { IPCCommChannel, IPCMain } from '../ipc';
 import { DatastoreUtils } from './utils';
 import { DatastoreIndex, DatastoreOptions, DataStoreQueryData } from './types';
 
-const debug = require('debug')('module:datastore');
+const debug = require('debug')('aurora:module:datastore');
 
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;

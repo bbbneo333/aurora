@@ -4,7 +4,7 @@ import { isIPCErrorObj, deserializeIPCError } from './error';
 import { IPCStream } from './stream';
 import { IPCRenderListener } from './types';
 
-const debug = require('debug')('module:ipc:renderer');
+const debug = require('debug')('aurora:module:ipc:renderer');
 
 export class IPCRenderer {
   static sendSyncMessage(messageChannel: string, ...messageArgs: any[]): any {

@@ -3,7 +3,7 @@ import { MediaProviderDatastore } from '../datastores';
 import { IMediaProvider } from '../interfaces';
 import store from '../store';
 
-const debug = require('debug')('service:media_provider');
+const debug = require('debug')('aurora:service:media_provider');
 
 class MediaProviderService {
   registerMediaProvider(mediaProvider: IMediaProvider) {

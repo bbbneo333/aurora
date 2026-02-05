@@ -5,7 +5,7 @@ import { IMediaPlayback, IMediaPlaybackOptions } from '../../interfaces';
 import { IMediaLocalTrack } from './media-local.interfaces';
 import MediaLocalUtils from './media-local.utils';
 
-const debug = require('debug')('provider:media_local:media_playback');
+const debug = require('debug')('aurora:provider:media_local:media_playback');
 
 export class MediaLocalPlayback implements IMediaPlayback {
   private readonly mediaTrack: IMediaLocalTrack;
