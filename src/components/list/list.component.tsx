@@ -21,20 +21,20 @@ import type { DragEndEvent } from '@dnd-kit/core/dist/types';
 import { SafePointerSensor } from '../../types';
 import { DOM, Events } from '../../utils';
 
-import styles from './interactive-list.component.css';
-import { InteractiveListItem } from './interactive-list-item.component';
+import styles from './list.component.css';
+import { ListItem } from './list-item.component';
 
 const cx = classNames.bind(styles);
 
-function isElementInteractiveItem(element: HTMLElement) {
-  return !isNil(element.dataset?.interactiveItemId);
+function isElementListItem(element: HTMLElement) {
+  return !isNil(element.dataset?.listItemId);
 }
 
-export type InteractiveListItemType = {
+export type ListItemType = {
   id?: string;
 };
 
-export type InteractiveListProps<T> = {
+export type ListProps<T> = {
   items: T[];
   children: (item: T, index: number) => React.ReactElement;
   className?: string;
@@ -46,7 +46,7 @@ export type InteractiveListProps<T> = {
   disableMultiSelect?: boolean;
 };
 
-export function InteractiveList<T extends InteractiveListItemType>(props: InteractiveListProps<T>) {
+export function List<T extends ListItemType>(props: ListProps<T>) {
   const {
     items,
     children,
@@ -104,7 +104,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
     if (
       activeElement
       && activeElement instanceof HTMLElement
-      && isElementInteractiveItem(activeElement)
+      && isElementListItem(activeElement)
     ) {
       activeElement.blur();
     }
@@ -283,7 +283,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
   ]);
 
   return (
-    <div ref={containerRef} className={cx('interactive-list', className)}>
+    <div ref={containerRef} className={cx('list', className)}>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -300,7 +300,7 @@ export function InteractiveList<T extends InteractiveListItemType>(props: Intera
             const child = children(item, index);
 
             return (
-              <InteractiveListItem
+              <ListItem
                 key={itemId}
                 itemId={itemId}
                 index={index}
