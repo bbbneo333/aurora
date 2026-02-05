@@ -10,6 +10,7 @@ import PQueue from 'p-queue';
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
 import { MediaLibraryService, MediaProviderService } from '../../services';
+import { DateTimeUtils } from '../../utils';
 
 import { CryptoService } from '../../modules/crypto';
 import { FSFile } from '../../modules/file-system';
@@ -24,7 +25,7 @@ const debug = require('debug')('provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
   private readonly syncQueue = new PQueue({ concurrency: 1, autoStart: true });
-  private readonly syncAddFileQueue = new PQueue({ concurrency: 50, autoStart: true });
+  private readonly syncAddFileQueue = new PQueue({ concurrency: 50, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout of 5 minutes
 
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
@@ -47,6 +48,14 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     return this.syncQueue.add(async () => {
       debug('syncMediaTracks - started sync');
 
+      const syncStart = performance.now();
+      let syncFileCount = 0;
+
+      const fileSyncComplete = () => {
+        syncFileCount += 1;
+      };
+      this.syncAddFileQueue.on('completed', fileSyncComplete);
+
       mediaLocalStore.dispatch({
         type: MediaLocalStateActionType.StartSync,
       });
@@ -56,18 +65,26 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       await Promise.map(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
 
       await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
+      const syncDuration = performance.now() - syncStart;
+
       mediaLocalStore.dispatch({
         type: MediaLocalStateActionType.FinishSync,
+        data: {
+          syncDuration,
+          syncFileCount,
+        },
       });
 
-      debug('syncMediaTracks - finished sync');
+      this.syncAddFileQueue.off('completed', fileSyncComplete);
+
+      debug('syncMediaTracks - finished sync, took - %s, files added - %d', DateTimeUtils.formatDuration(syncDuration), syncFileCount);
     });
   }
 
   private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
-    debug('addTracksFromDirectory - adding tracks from directory - %s', mediaLibraryDirectory);
+    return new Promise((resolve) => {
+      debug('addTracksFromDirectory - adding tracks from directory - %s', mediaLibraryDirectory);
 
-    await new Promise((resolve) => {
       IPCRenderer.stream(IPCCommChannel.FSReadDirectoryStream, {
         directory: mediaLibraryDirectory,
         fileExtensions: AudioFileExtensionList,
@@ -83,23 +100,26 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         // on done
         // wait for add tracks to be finished
         this.syncAddFileQueue.onIdle().then(() => {
+          debug('addTracksFromDirectory - finished adding tracks from directory - %s', mediaLibraryDirectory);
           resolve();
         });
       });
     });
-
-    debug('addTracksFromDirectory - finished adding tracks from directory - %s', mediaLibraryDirectory);
   }
 
-  private async addTracksFromFiles(files: FSFile[]) {
+  private addTracksFromFiles(files: FSFile[]) {
     files.forEach((file) => {
       debug('addTracksFromDirectory - found file at - %s', file.path);
 
-      this.syncAddFileQueue.add(() => this.addTrackFromFile(file)
+      this.syncAddFileQueue
+        .add(() => this.addTrackFromFile(file))
         .then((track) => {
           debug('addTracksFromDirectory - added track from file - %s - %s', file.name, track.id);
         })
-        .catch(err => console.error(err)));
+        .catch((err) => {
+          console.error('addTracksFromDirectory - encountered error while adding file - %s', file.name);
+          console.error(err);
+        });
     });
   }
 

@@ -22,6 +22,8 @@ export type MediaLocalState = {
   saving: boolean,
   saved: boolean,
   syncing: boolean,
+  syncDuration: number, // in ms
+  syncFileCount: number,
 };
 
 export type MediaLocalStateAction = {
@@ -41,6 +43,8 @@ const mediaLocalInitialState: MediaLocalState = {
   saving: false,
   saved: false,
   syncing: false,
+  syncDuration: 0,
+  syncFileCount: 0,
 };
 
 function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState, action: MediaLocalStateAction): MediaLocalState {
@@ -122,12 +126,20 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
       return {
         ...state,
         syncing: true,
+        syncDuration: 0,
+        syncFileCount: 0,
       };
     }
     case MediaLocalStateActionType.FinishSync: {
+      // data.syncDuration - duration in ms
+      // data.syncFileCount - file count
+      const { syncDuration = 0, syncFileCount = 0 } = action.data;
+
       return {
         ...state,
         syncing: false,
+        syncDuration,
+        syncFileCount,
       };
     }
     default:

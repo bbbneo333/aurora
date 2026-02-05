@@ -4,6 +4,8 @@ import classNames from 'classnames/bind';
 import { ActionList, Button } from '../../components';
 import { Icons } from '../../constants';
 import { MediaProviderService } from '../../services';
+import { DateTimeUtils } from '../../utils';
+
 import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
 import MediaLocalConstants from './media-local.constants.json';
@@ -34,6 +36,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     loading,
     saving,
     syncing,
+    syncDuration,
+    syncFileCount,
   } = state;
 
   useEffect(() => {
@@ -125,6 +129,15 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             onButtonSubmit={() => {
               MediaLocalLibraryService.syncMediaTracks();
             }}
+            tooltip={(
+              <>
+                Files Scanned:&nbsp;
+                {syncFileCount}
+                <br/>
+                Time Taken:&nbsp;
+                {DateTimeUtils.formatDuration(syncDuration)}
+              </>
+            )}
           >
             Refresh
           </Button>

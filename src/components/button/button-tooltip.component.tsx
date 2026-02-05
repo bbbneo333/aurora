@@ -2,7 +2,7 @@ import React from 'react';
 import { Tooltip } from '@mui/material';
 
 export function ButtonTooltip(props: {
-  title?: string;
+  title?: string | React.ReactElement;
   anchorEl?: HTMLElement | null;
   open?: boolean;
 }) {
@@ -28,6 +28,7 @@ export function ButtonTooltip(props: {
             borderRadius: '6px',
             padding: '6px 12px',
             boxShadow: '0 16px 24px rgb(0 0 0 / 30%), 0 6px 8px rgb(0 0 0 / 20%)',
+            whiteSpace: 'pre-line',
           },
         },
       }}
