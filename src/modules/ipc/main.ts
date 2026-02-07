@@ -40,4 +40,8 @@ export class IPCMain {
     electron.ipcMain.handle(messageChannel, listener);
     return listener;
   }
+
+  static removeMessageHandler(messageChannel: string, messageListener: IPCSyncMessageHandler | IPCAsyncMessageHandler) {
+    electron.ipcMain.off(messageChannel, messageListener);
+  }
 }

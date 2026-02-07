@@ -42,18 +42,37 @@ export class IPCRenderer {
     msgDataHandler: (data: T) => void,
     msgErrorHandler?: (err: Error) => void,
     msgCompleteHandler?: () => void,
+    signal?: AbortSignal,
   ) {
-    const eventId = this.sendSyncMessage(msgChannel, msgOptions);
-    const channels = IPCStream.composeChannels(msgChannel, eventId);
+    const channels = IPCStream.createChannels(msgChannel);
 
     const dataListener = this.addMessageHandler(channels.data, msgDataHandler);
     const errorListener = msgErrorHandler && this.addMessageHandler(channels.error, msgErrorHandler);
+
+    let abortListener: any;
+    if (signal) {
+      abortListener = () => {
+        if (signal.aborted) {
+          this.sendSyncMessage(channels.abort);
+        }
+      };
+
+      signal.addEventListener('abort', abortListener, { once: true });
+    }
+
     const completeListener = this.addMessageHandler(channels.complete, () => {
+      // cleanup
       this.removeMessageHandler(channels.data, dataListener);
       if (errorListener) this.removeMessageHandler(channels.error, errorListener);
+      if (signal && abortListener) signal.removeEventListener('abort', abortListener);
+
+      // ack
       if (msgCompleteHandler) msgCompleteHandler();
 
+      // finish
       this.removeMessageHandler(channels.complete, completeListener);
     });
+
+    this.sendSyncMessage(msgChannel, channels.eventId, msgOptions);
   }
 }

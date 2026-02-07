@@ -5,11 +5,13 @@ export class IPCStream {
     const data = `${base}-${eventId}-data`;
     const error = `${base}-${eventId}-error`;
     const complete = `${base}-${eventId}-complete`;
+    const abort = `${base}-${eventId}-abort`;
 
     return {
       data,
       error,
       complete,
+      abort,
     };
   }
 

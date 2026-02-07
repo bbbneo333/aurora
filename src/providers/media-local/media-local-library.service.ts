@@ -10,6 +10,7 @@ import PQueue from 'p-queue';
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
 import { MediaLibraryService, MediaProviderService } from '../../services';
+import { SingleFlight } from '../../types';
 import { DateTimeUtils } from '../../utils';
 
 import { CryptoService } from '../../modules/crypto';
@@ -24,8 +25,8 @@ import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store'
 const debug = require('debug')('aurora:provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
-  private readonly syncQueue = new PQueue({ concurrency: 1, autoStart: true });
   private readonly syncAddFileQueue = new PQueue({ concurrency: 50, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout of 5 minutes
+  private readonly syncRunner = new SingleFlight();
 
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
@@ -45,74 +46,97 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   async syncMediaTracks() {
-    return this.syncQueue.add(async () => {
+    return this.syncRunner.run(async (signal: AbortSignal) => {
       debug('syncMediaTracks - started sync');
 
       const syncStart = performance.now();
       let syncFileCount = 0;
 
-      const fileSyncComplete = () => {
-        syncFileCount += 1;
-      };
-      this.syncAddFileQueue.on('completed', fileSyncComplete);
+      // finalize
+      const finalize = (() => {
+        const onCompleted = () => {
+          syncFileCount += 1;
+        };
+        const onAbort = () => this.syncAddFileQueue.clear();
 
-      mediaLocalStore.dispatch({
-        type: MediaLocalStateActionType.StartSync,
-      });
-      await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
+        this.syncAddFileQueue.on('completed', onCompleted);
+        signal.addEventListener('abort', onAbort);
 
-      const mediaProviderSettings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-      await Promise.map(mediaProviderSettings.library.directories, mediaLibraryDirectory => this.addTracksFromDirectory(mediaLibraryDirectory));
+        return () => {
+          this.syncAddFileQueue.off('completed', onCompleted);
+          signal.removeEventListener('abort', onAbort);
+        };
+      })();
 
-      await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
-      const syncDuration = performance.now() - syncStart;
+      try {
+        // start
+        mediaLocalStore.dispatch({ type: MediaLocalStateActionType.StartSync });
+        await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
+        const settings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
+        await Promise.map(settings.library.directories, directory => this.addTracksFromDirectory(directory, signal));
 
-      mediaLocalStore.dispatch({
-        type: MediaLocalStateActionType.FinishSync,
-        data: {
-          syncDuration,
+        // wait
+        await this.syncAddFileQueue.onIdle();
+
+        // done
+        await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
+        const syncDuration = performance.now() - syncStart;
+        mediaLocalStore.dispatch({
+          type: MediaLocalStateActionType.FinishSync,
+          data: {
+            syncDuration,
+            syncFileCount,
+          },
+        });
+
+        debug(
+          'syncMediaTracks - finished sync, took - %s, files added - %d',
+          DateTimeUtils.formatDuration(syncDuration),
           syncFileCount,
-        },
-      });
-
-      this.syncAddFileQueue.off('completed', fileSyncComplete);
-
-      debug('syncMediaTracks - finished sync, took - %s, files added - %d', DateTimeUtils.formatDuration(syncDuration), syncFileCount);
+        );
+      } finally {
+        finalize();
+      }
     });
   }
 
-  private async addTracksFromDirectory(mediaLibraryDirectory: string): Promise<void> {
+  private addTracksFromDirectory(mediaLibraryDirectory: string, signal: AbortSignal): Promise<void> {
     return new Promise((resolve) => {
       debug('addTracksFromDirectory - adding tracks from directory - %s', mediaLibraryDirectory);
 
-      IPCRenderer.stream(IPCCommChannel.FSReadDirectoryStream, {
-        directory: mediaLibraryDirectory,
-        fileExtensions: AudioFileExtensionList,
-      }, (data: { files: FSFile[] }) => {
-        // on data
-        this.addTracksFromFiles(data.files);
-      }, (err: Error) => {
-        // on error
-        // don't stop, just log
-        console.error('Encountered error while reading files from path - %s', mediaLibraryDirectory);
-        console.error(err);
-      }, () => {
-        // on done
-        // wait for add tracks to be finished
-        this.syncAddFileQueue.onIdle().then(() => {
+      IPCRenderer.stream(
+        IPCCommChannel.FSReadDirectoryStream, {
+          directory: mediaLibraryDirectory,
+          fileExtensions: AudioFileExtensionList,
+        }, (data: { files: FSFile[] }) => {
+          // on data
+          this.addTracksFromFiles(data.files, signal);
+        }, (err: Error) => {
+          // on error
+          // don't stop, just log
+          console.error('Encountered error while reading files from path - %s', mediaLibraryDirectory);
+          console.error(err);
+        }, () => {
+          // on done
           debug('addTracksFromDirectory - finished adding tracks from directory - %s', mediaLibraryDirectory);
           resolve();
-        });
-      });
+        },
+        signal,
+      );
     });
   }
 
-  private addTracksFromFiles(files: FSFile[]) {
+  private addTracksFromFiles(files: FSFile[], signal: AbortSignal) {
     files.forEach((file) => {
+      if (signal.aborted) {
+        debug('addTracksFromDirectory - operation aborted, skipping - %s', file.name);
+        return;
+      }
+
       debug('addTracksFromDirectory - found file at - %s', file.path);
 
       this.syncAddFileQueue
-        .add(() => this.addTrackFromFile(file))
+        .add(() => this.addTrackFromFile(file), { signal })
         .then((track) => {
           debug('addTracksFromDirectory - added track from file - %s - %s', file.name, track.id);
         })

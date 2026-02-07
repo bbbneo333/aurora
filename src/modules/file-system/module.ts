@@ -18,6 +18,8 @@ import {
 
 import { IPCCommChannel, IPCMain, IPCStream } from '../ipc';
 
+const debug = require('debug')('aurora:module:file-system');
+
 export class FileSystemModule implements IAppModule {
   private readonly app: IAppMain;
 
@@ -39,25 +41,43 @@ export class FileSystemModule implements IAppModule {
     return fs.readFileSync(assetResourcePath, options?.encoding);
   }
 
-  private readDirectoryStream(params: FSReadDirectoryParams): string {
+  private readDirectoryStream(eventId: string, params: FSReadDirectoryParams) {
     const { directory, fileExtensions } = params;
-    const channels = IPCStream.createChannels(IPCCommChannel.FSReadDirectoryStream);
+    const channels = IPCStream.composeChannels(IPCCommChannel.FSReadDirectoryStream, eventId);
+
+    const batchSize = 100;
+    let batch: FSFile[] = [];
+    let finished = false;
+    let abortListener: any;
+
+    const sendBatch = () => {
+      if (!batch.length) return;
+
+      debug('readDirectoryStream - sending batch, eventId - %s, batchSize - %s', eventId, batch.length);
+      this.app.sendMessageToRenderer(channels.data, { files: batch });
+      batch = [];
+    };
+
+    const finalize = () => {
+      if (finished) return;
+      finished = true;
+
+      debug('readDirectoryStream - finalizing, eventId - %s', eventId);
+
+      sendBatch();
+      this.app.sendMessageToRenderer(channels.complete);
+      if (abortListener) IPCMain.removeMessageHandler(channels.abort, abortListener);
+    };
 
     const entryFilter = (entry: Entry): boolean => {
       if (!entry.dirent.isFile()) return false;
-      if (isEmpty(fileExtensions)) return true;
+      if (!fileExtensions || isEmpty(fileExtensions)) return true;
 
       const i = entry.name.lastIndexOf('.');
       if (i === -1) return false;
 
       const ext = entry.name.slice(i + 1).toLowerCase();
-      return fileExtensions?.includes(ext) as boolean;
-    };
-
-    const sendBatch = (batch: FSFile[]) => {
-      this.app.sendMessageToRenderer(channels.data, {
-        files: batch,
-      });
+      return fileExtensions.includes(ext);
     };
 
     const walker = walkStream(directory, {
@@ -67,32 +87,33 @@ export class FileSystemModule implements IAppModule {
       entryFilter,
     });
 
-    let batch: FSFile[] = [];
-    const batchSize = 100;
+    // stream
+    walker
+      .on('data', (entry: Entry) => {
+        batch.push({
+          path: entry.path,
+          name: path.basename(entry.path),
+        });
 
-    walker.on('data', (entry: Entry) => {
-      batch.push({
-        path: entry.path,
-        name: path.basename(entry.path),
-      });
+        if (batch.length >= batchSize) {
+          sendBatch();
+        }
+      })
+      .on('error', (err: Error) => {
+        if (err.message !== 'Aborted') {
+          this.app.sendMessageToRenderer(channels.error, err);
+        }
+      })
+      .on('close', finalize)
+      .on('end', finalize);
 
-      if (batch.length >= batchSize) {
-        sendBatch(batch);
-        batch = [];
-      }
-    });
+    // abort
+    abortListener = () => {
+      debug('readDirectoryStream - abort received - %s', eventId);
+      walker.destroy(new Error('Aborted'));
+    };
 
-    walker.on('error', (err: Error) => {
-      console.error('Encountered error in readDirectory', err.message);
-      this.app.sendMessageToRenderer(channels.error, err);
-    });
-
-    walker.on('end', () => {
-      if (batch.length) sendBatch(batch);
-      this.app.sendMessageToRenderer(channels.complete);
-    });
-
-    return channels.eventId;
+    IPCMain.addSyncMessageHandler(channels.abort, abortListener);
   }
 
   private readFile(filePath: string) {
