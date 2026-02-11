@@ -6,7 +6,15 @@ import _ from 'lodash';
 import { IAppMain, IAppModule } from '../../interfaces';
 import { IPCCommChannel, IPCMain } from '../ipc';
 import { DatastoreUtils } from './utils';
-import { DatastoreIndex, DatastoreOptions, DataStoreQueryData } from './types';
+
+import {
+  DataStoreFilterData,
+  DatastoreIndex,
+  DataStoreInputData,
+  DatastoreOptions,
+  DataStoreQueryData,
+  DataStoreUpdateData,
+} from './types';
 
 const debug = require('debug')('aurora:module:datastore');
 
@@ -101,7 +109,7 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData<never>): Promise<any> {
+  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
     const cursor = datastore.find(datastoreQueryDoc.filter);
 
@@ -121,12 +129,12 @@ export class DatastoreModule implements IAppModule {
     return cursor.exec();
   }
 
-  private findOne(datastoreName: string, datastoreFindOneDoc: object): Promise<any> {
+  private findOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-    return datastore.findOne(datastoreFindOneDoc);
+    return datastore.findOne(datastoreFindDoc);
   }
 
-  private insertOne(datastoreName: string, datastoreInsertDoc: object): Promise<any> {
+  private insertOne(datastoreName: string, datastoreInsertDoc: DataStoreInputData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore
@@ -136,18 +144,18 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private async updateOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object): Promise<void> {
+  private async updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore
-    return datastore.update(datastoreFindOneDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
+    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
       multi: false,
       upsert: false,
       returnUpdatedDocs: true,
     });
   }
 
-  private async remove(datastoreName: string, datastoreFindDoc: object): Promise<void> {
+  private async remove(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
     await datastore.remove(datastoreFindDoc, {
@@ -155,29 +163,44 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private async removeOne(datastoreName: string, datastoreFindOneDoc: object): Promise<void> {
+  private async removeOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
-    await datastore.remove(datastoreFindOneDoc, {
+    await datastore.remove(datastoreFindDoc, {
       multi: false,
     });
   }
 
-  private async count(datastoreName: string, datastoreFindOneDoc?: object): Promise<number> {
+  private async count(datastoreName: string, datastoreFindDoc?: DataStoreFilterData): Promise<number> {
     const datastore = this.getDatastore(datastoreName);
 
-    return datastore.count(datastoreFindOneDoc);
+    return datastore.count(datastoreFindDoc);
   }
 
-  // important - upsert callers are required to provide their own id
-  private async upsertOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object) {
+  // nedb does not provide atomic upserts - so we had to resolve to insert/update calls
+  // important - make sure datastoreUpdateOneDoc is complete doc, not a partial one
+  // otherwise race conditions can cause data corruption
+  private async upsertOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: DataStoreUpdateData) {
     const datastore = this.getDatastore(datastoreName);
 
-    return datastore.update(datastoreFindOneDoc, datastoreUpdateOneDoc, {
-      multi: false,
-      upsert: true,
-      returnUpdatedDocs: true,
-    });
+    try {
+      return await datastore.insert({
+        ...datastoreUpdateOneDoc,
+        id: DatastoreUtils.generateId(),
+      });
+    } catch (e: any) {
+      if (e.errorType === 'uniqueViolated') {
+        return datastore.update(datastoreFindDoc, {
+          $set: datastoreUpdateOneDoc,
+        }, {
+          multi: false,
+          upsert: false,
+          returnUpdatedDocs: true,
+        });
+      }
+
+      throw e;
+    }
   }
 
   private getDatastore(datastoreName: string): Datastore {

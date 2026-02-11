@@ -26,7 +26,7 @@ export type DataStoreLogicalOperators<T> = {
   $where?: (this: T) => boolean;
 };
 
-export type DataStoreFilterData<T> = {
+export type DataStoreFilterData<T = any> = {
   [P in keyof T]?: T[P] | DataStoreComparisonOperators<T[P]>;
 } & DataStoreLogicalOperators<T>;
 
@@ -34,7 +34,7 @@ export type DataStoreSortData<T> = {
   [P in keyof T]?: number
 };
 
-export type DataStoreQueryData<T> = {
+export type DataStoreQueryData<T = any> = {
   filter: DataStoreFilterData<T>,
   sort?: DataStoreSortData<T>,
   skip?: number,

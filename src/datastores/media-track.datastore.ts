@@ -4,7 +4,6 @@ import {
   DataStoreFilterData,
   DataStoreInputData,
   DataStoreUpdateData,
-  DatastoreUtils,
 } from '../modules/datastore';
 
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
@@ -53,16 +52,10 @@ class MediaTrackDatastore {
   }
 
   upsertMediaTrack(input: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {
-    const id = DatastoreUtils.composeId(input.provider, input.provider_id);
-
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaTrackDatastoreName, {
-      id,
-    }, {
-      $set: {
-        ...input,
-        id,
-      },
-    });
+      provider: input.provider,
+      provider_id: input.provider_id,
+    }, input);
   }
 }
 

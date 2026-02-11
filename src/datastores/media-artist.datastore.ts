@@ -4,7 +4,6 @@ import {
   DataStoreFilterData,
   DataStoreInputData,
   DataStoreUpdateData,
-  DatastoreUtils,
 } from '../modules/datastore';
 
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
@@ -59,16 +58,10 @@ class MediaArtistDatastore {
   }
 
   upsertMediaArtist(input: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
-    const id = DatastoreUtils.composeId(input.provider, input.provider_id);
-
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaArtistDatastoreName, {
-      id,
-    }, {
-      $set: {
-        ...input,
-        id,
-      },
-    });
+      provider: input.provider,
+      provider_id: input.provider_id,
+    }, input);
   }
 }
 
