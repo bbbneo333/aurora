@@ -99,9 +99,17 @@ export class FileSystemModule implements IAppModule {
           sendBatch();
         }
       })
-      .on('error', (err: Error) => {
+      .on('error', (err: any) => {
+        debug('readDirectoryStream - encountered error - %s', eventId);
+        console.error(err);
+
         if (err.message !== 'Aborted') {
           this.app.sendMessageToRenderer(channels.error, err);
+
+          // ENOENT will be treated as fatal
+          if (err.code === 'ENOENT') {
+            finalize();
+          }
         }
       })
       .on('close', finalize)
