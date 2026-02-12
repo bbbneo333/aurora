@@ -128,16 +128,16 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
   private addTracksFromFiles(files: FSFile[], signal: AbortSignal) {
     files.forEach((file) => {
-      if (signal.aborted) {
-        debug('addTracksFromDirectory - operation aborted, skipping - %s', file.name);
-        return;
-      }
-
-      debug('addTracksFromDirectory - found file at - %s', file.path);
+      debug('addTracksFromDirectory - found file at - %s, queueing...', file.path);
 
       this.syncAddFileQueue
-        .add(() => this.addTrackFromFile(file), { signal })
-        .then((track) => {
+        .add(async () => {
+          if (signal.aborted) {
+            debug('addTracksFromDirectory - operation aborted, skipping - %s', file.name);
+            return;
+          }
+
+          const track = await this.addTrackFromFile(file);
           debug('addTracksFromDirectory - added track from file - %s - %s', file.name, track.id);
         })
         .catch((err) => {
