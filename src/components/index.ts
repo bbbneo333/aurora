@@ -42,4 +42,5 @@ export * from './text/text.component';
 export * from './text/text-clamp.component';
 export * from './text/text-marquee.component';
 export * from './text-input/text-input.component';
+export * from './tooltip/tooltip.component';
 export * from './upload/upload-overlay.component';

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Tooltip } from '@mui/material';
+
+import { Tooltip } from '../tooltip/tooltip.component';
 
 export function ButtonTooltip(props: {
   title?: string | React.ReactElement;
@@ -19,17 +20,6 @@ export function ButtonTooltip(props: {
       slotProps={{
         popper: {
           anchorEl,
-        },
-        tooltip: {
-          sx: {
-            backgroundColor: 'var(--selectable-focused-bg-color)',
-            color: 'var(--selectable-hovered-color)',
-            fontSize: '13px',
-            borderRadius: '6px',
-            padding: '6px 12px',
-            boxShadow: '0 16px 24px rgb(0 0 0 / 30%), 0 6px 8px rgb(0 0 0 / 20%)',
-            whiteSpace: 'pre-line',
-          },
         },
       }}
     >

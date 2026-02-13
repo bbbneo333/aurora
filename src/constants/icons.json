@@ -7,6 +7,7 @@
   "Close": "fas fa-times",
   "Delete": "fas fa-trash",
   "Edit": "fas fa-pen",
+  "Error": "fas fa-exclamation-triangle",
   "Folder": "fas fa-folder",
   "Github": "fab fa-github",
   "LinkLibrary": "fas fa-layer-group",

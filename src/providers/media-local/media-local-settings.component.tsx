@@ -1,5 +1,7 @@
 import React, { useEffect, useSyncExternalStore } from 'react';
 import classNames from 'classnames/bind';
+import { ArgumentArray } from 'classnames';
+import { isNil } from 'lodash';
 
 import { ActionList, Button } from '../../components';
 import { Icons } from '../../constants';
@@ -17,7 +19,7 @@ import styles from './media-local-settings.component.css';
 const cl = classNames.bind(styles);
 
 type MediaLocalSettingsProps = {
-  cx: (...args: string[]) => string,
+  cx: (...args: ArgumentArray) => string,
 };
 
 function openDirectorySelectionDialog(): string | undefined {
@@ -38,6 +40,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     syncing,
     syncDuration,
     syncFileCount,
+    syncDirectoryStats,
   } = state;
 
   useEffect(() => {
@@ -86,13 +89,18 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
       <div className={cx('settings-content')}>
         <div className={cl('settings-directory-list')}>
           <ActionList
-            items={settings.library.directories.map(directory => (
-              {
+            items={settings.library.directories.map((directory) => {
+              const dirError = syncDirectoryStats[directory]?.error;
+              const dirHasError = !isNil(dirError);
+
+              return {
                 id: directory,
                 label: directory,
-                icon: Icons.Folder,
-              }
-            ))}
+                icon: dirHasError ? Icons.Error : Icons.Folder,
+                iconClass: cl(dirHasError && 'settings-directory-icon-error'),
+                iconTooltip: dirError,
+              };
+            })}
             onRemove={(directory) => {
               mediaLocalStore.dispatch({
                 type: MediaLocalStateActionType.RemoveDirectory,

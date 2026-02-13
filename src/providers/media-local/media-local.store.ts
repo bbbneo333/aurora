@@ -12,6 +12,7 @@ export enum MediaLocalStateActionType {
   RemoveDirectory = 'mediaLocalSettings/removeDirectory',
   StartSync = 'mediaLocalSettings/startSync',
   FinishSync = 'mediaLocalSettings/finishSync',
+  UpdateDirectoryStats = 'mediaLocalSettings/updateDirectoryStats',
 }
 
 export type MediaLocalState = {
@@ -24,6 +25,9 @@ export type MediaLocalState = {
   syncing: boolean,
   syncDuration: number, // in ms
   syncFileCount: number,
+  syncDirectoryStats: Record<string, {
+    error?: string,
+  }>,
 };
 
 export type MediaLocalStateAction = {
@@ -45,6 +49,7 @@ const mediaLocalInitialState: MediaLocalState = {
   syncing: false,
   syncDuration: 0,
   syncFileCount: 0,
+  syncDirectoryStats: {},
 };
 
 function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState, action: MediaLocalStateAction): MediaLocalState {
@@ -128,6 +133,7 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         syncing: true,
         syncDuration: 0,
         syncFileCount: 0,
+        syncDirectoryStats: {},
       };
     }
     case MediaLocalStateActionType.FinishSync: {
@@ -140,6 +146,23 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         syncing: false,
         syncDuration,
         syncFileCount,
+      };
+    }
+    case MediaLocalStateActionType.UpdateDirectoryStats: {
+      // data.directory - string
+      // data.statsKey - string ['error']
+      // data.statsValue - any
+      const { directory, statsKey, statsValue } = action.data;
+
+      return {
+        ...state,
+        syncDirectoryStats: {
+          ...state.syncDirectoryStats,
+          [directory]: {
+            ...state.syncDirectoryStats[directory] || {},
+            [statsKey]: statsValue,
+          },
+        },
       };
     }
     default:

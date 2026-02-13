@@ -134,6 +134,16 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           // don't stop, just log
           console.error('Encountered error while reading files from path - %s', mediaLibraryDirectory);
           console.error(err);
+
+          // update stats
+          mediaLocalStore.dispatch({
+            type: MediaLocalStateActionType.UpdateDirectoryStats,
+            data: {
+              directory: mediaLibraryDirectory,
+              statsKey: 'error',
+              statsValue: err.message,
+            },
+          });
         }, () => {
           // on done
           debug('addTracksFromDirectory - finished adding tracks from directory - %s', mediaLibraryDirectory);
