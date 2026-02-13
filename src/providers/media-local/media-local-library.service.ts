@@ -25,7 +25,7 @@ import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store'
 const debug = require('debug')('aurora:provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
-  private readonly syncAddFileQueue = new PQueue({ concurrency: 50, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout of 5 minutes
+  private readonly syncAddFileQueue = new PQueue({ concurrency: 10, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout 5 minutes / track
   private readonly syncLock = new Semaphore(1);
   private syncAbortController: AbortController | null = null;
 

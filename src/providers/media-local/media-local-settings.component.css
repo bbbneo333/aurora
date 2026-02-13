@@ -1,3 +1,7 @@
 .settings-directory-icon-error {
   color: var(--text-danger-color);
 }
+
+.settings-directory-progress-text {
+  color: var(--text-dark-color);
+}

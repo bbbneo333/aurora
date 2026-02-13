@@ -12,7 +12,7 @@ const cx = classNames.bind(styles);
 
 export type ActionItem = {
   id: string;
-  label: string;
+  label: string | React.ReactElement;
   icon?: string;
   iconClass?: string;
   iconTooltip?: string;

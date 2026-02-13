@@ -1,7 +1,7 @@
 import React, { useEffect, useSyncExternalStore } from 'react';
 import classNames from 'classnames/bind';
 import { ArgumentArray } from 'classnames';
-import { isNil } from 'lodash';
+import { isNil, isNumber } from 'lodash';
 
 import { ActionList, Button } from '../../components';
 import { Icons } from '../../constants';
@@ -11,7 +11,7 @@ import { DateTimeUtils } from '../../utils';
 import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
 import MediaLocalConstants from './media-local.constants.json';
-import { mediaLocalStore, MediaLocalStateActionType } from './media-local.store';
+import { mediaLocalStore, MediaLocalStateActionType, MediaSyncDirectoryStats } from './media-local.store';
 import MediaLocalLibraryService from './media-local-library.service';
 
 import styles from './media-local-settings.component.css';
@@ -24,6 +24,41 @@ type MediaLocalSettingsProps = {
 
 function openDirectorySelectionDialog(): string | undefined {
   return IPCRenderer.sendSyncMessage(IPCCommChannel.FSSelectDirectory);
+}
+
+function MediaDirectoryLabel(props: {
+  directory: string;
+  syncing?: boolean;
+  stats?: MediaSyncDirectoryStats;
+}) {
+  const {
+    directory,
+    syncing = false,
+    stats = {},
+  } = props;
+
+  const hasError = !isNil(stats.error);
+  const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesAdded);
+
+  if (!syncing || !hasValidProgress || hasError) {
+    return (
+      <>
+        {directory}
+      </>
+    );
+  }
+
+  const progress = `(${stats.filesAdded} / ${stats.filesFound})`;
+
+  return (
+    <div>
+      {directory}
+      &nbsp;
+      <span className={cl('settings-directory-progress-text')}>
+        {progress}
+      </span>
+    </div>
+  );
 }
 
 export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
@@ -90,15 +125,15 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         <div className={cl('settings-directory-list')}>
           <ActionList
             items={settings.library.directories.map((directory) => {
-              const dirError = syncDirectoryStats[directory]?.error;
-              const dirHasError = !isNil(dirError);
+              const dirStats = syncDirectoryStats[directory];
+              const dirHasError = !isNil(dirStats?.error);
 
               return {
                 id: directory,
-                label: directory,
+                label: (<MediaDirectoryLabel directory={directory} syncing={syncing} stats={dirStats}/>),
                 icon: dirHasError ? Icons.Error : Icons.Folder,
                 iconClass: cl(dirHasError && 'settings-directory-icon-error'),
-                iconTooltip: dirError,
+                iconTooltip: dirHasError ? dirStats.error : undefined,
               };
             })}
             onRemove={(directory) => {
