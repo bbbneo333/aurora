@@ -28,19 +28,17 @@ function openDirectorySelectionDialog(): string | undefined {
 
 function MediaDirectoryLabel(props: {
   directory: string;
-  syncing?: boolean;
   stats?: MediaSyncDirectoryStats;
 }) {
   const {
     directory,
-    syncing = false,
     stats = {},
   } = props;
 
   const hasError = !isNil(stats.error);
   const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesAdded);
 
-  if (!syncing || !hasValidProgress || hasError) {
+  if (!hasValidProgress || hasError) {
     return (
       <>
         {directory}
@@ -130,7 +128,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
 
               return {
                 id: directory,
-                label: (<MediaDirectoryLabel directory={directory} syncing={syncing} stats={dirStats}/>),
+                label: (<MediaDirectoryLabel directory={directory} stats={dirStats}/>),
                 icon: dirHasError ? Icons.Error : Icons.Folder,
                 iconClass: cl(dirHasError && 'settings-directory-icon-error'),
                 iconTooltip: dirHasError ? dirStats.error : undefined,
