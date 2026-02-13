@@ -6,11 +6,11 @@ import {
 } from 'music-metadata';
 
 import PQueue from 'p-queue';
+import { Semaphore } from 'async-mutex';
 
 import { AudioFileExtensionList, MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
 import { MediaLibraryService, MediaProviderService } from '../../services';
-import { SingleFlight } from '../../types';
 import { DateTimeUtils } from '../../utils';
 
 import { CryptoService } from '../../modules/crypto';
@@ -25,8 +25,9 @@ import { MediaLocalStateActionType, mediaLocalStore } from './media-local.store'
 const debug = require('debug')('aurora:provider:media_local:media_library');
 
 class MediaLocalLibraryService implements IMediaLibraryService {
-  private readonly syncAddFileQueue = new PQueue({ concurrency: 100, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout of 5 minutes
-  private readonly syncRunner = new SingleFlight();
+  private readonly syncAddFileQueue = new PQueue({ concurrency: 50, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout of 5 minutes
+  private readonly syncLock = new Semaphore(1);
+  private syncAbortController: AbortController | null = null;
 
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
@@ -46,10 +47,23 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   }
 
   async syncMediaTracks() {
-    return this.syncRunner.run(async (signal: AbortSignal) => {
+    // cancel currently running sync
+    if (this.syncAbortController) {
+      this.syncAbortController.abort();
+    }
+
+    const abortController = new AbortController();
+    this.syncAbortController = abortController;
+
+    return this.syncLock.runExclusive(async () => {
+      // if we were replaced before acquiring lock, bail
+      if (this.syncAbortController !== abortController) {
+        return;
+      }
       debug('syncMediaTracks - started sync');
 
       const syncStart = performance.now();
+      const { signal } = abortController;
       let syncFileCount = 0;
 
       // finalize
@@ -63,6 +77,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         signal.addEventListener('abort', onAbort);
 
         return () => {
+          if (this.syncAbortController === abortController) {
+            this.syncAbortController = null;
+          }
+
           this.syncAddFileQueue.off('completed', onCompleted);
           signal.removeEventListener('abort', onAbort);
         };
