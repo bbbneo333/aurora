@@ -60,6 +60,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       if (this.syncAbortController !== abortController) {
         return;
       }
+
       debug('syncMediaTracks - started sync');
 
       const syncStart = performance.now();
@@ -96,16 +97,15 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         // wait
         await this.syncAddFileQueue.onIdle();
 
-        // done
-        await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
+        // done - only finish if not aborted or new run is already in place
+        if (signal.aborted || this.syncAbortController !== abortController) {
+          debug('syncMediaTracks - operation aborted');
+          return;
+        }
+
         const syncDuration = performance.now() - syncStart;
-        mediaLocalStore.dispatch({
-          type: MediaLocalStateActionType.FinishSync,
-          data: {
-            syncDuration,
-            syncFileCount,
-          },
-        });
+        await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
+        mediaLocalStore.dispatch({ type: MediaLocalStateActionType.FinishSync, data: { syncDuration, syncFileCount } });
 
         debug(
           'syncMediaTracks - finished sync, took - %s, files added - %d',
