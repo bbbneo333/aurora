@@ -24,7 +24,6 @@ export * from './media-playlist-delete-tracks-modal/media-playlist-delete-tracks
 export * from './media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-playlists/media-playlists.component';
-export * from './progress-bar/progress-bar.component';
 export * from './media-session/media-session.component';
 export * from './media-settings-reset-dialog/media-settings-reset-dialog.component';
 export * from './media-track/media-track.component';
@@ -38,6 +37,7 @@ export * from './media-cover-picture/media-cover-picture-uploadable.component';
 export * from './router-switch/router-switch.component';
 export * from './router-link-toggle/router-link-toggle.component';
 export * from './router-link/router-link.component';
+export * from './slider/slider.component';
 export * from './text/text.component';
 export * from './text/text-clamp.component';
 export * from './text/text-marquee.component';

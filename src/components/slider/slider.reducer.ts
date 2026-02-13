@@ -1,4 +1,4 @@
-import { getPercentFromPosition, getPercentFromValue } from './progress-bar.utils';
+import { getPercentFromPosition, getPercentFromValue } from './slider.utils';
 
 export enum ProgressStateActionType {
   Update = 'progress/update',

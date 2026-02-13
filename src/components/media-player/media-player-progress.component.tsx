@@ -8,7 +8,7 @@ import { MediaEnums } from '../../enums';
 import { RootState } from '../../reducers';
 import { MediaPlayerService } from '../../services';
 
-import { ProgressBar } from '../progress-bar/progress-bar.component';
+import { Slider } from '../slider/slider.component';
 
 import styles from './media-player.component.css';
 
@@ -51,7 +51,7 @@ export function MediaPlayerProgress() {
             : (mediaPlaybackCurrentMediaProgress || 0))}
         </div>
         <div className={cx('media-player-progress-bar-container')}>
-          <ProgressBar
+          <Slider
             disabled={mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
             value={mediaPlaybackCurrentMediaProgress}
             maxValue={mediaPlaybackCurrentMediaTrack.track_duration}

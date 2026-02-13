@@ -9,8 +9,8 @@ import { MediaPlayerService } from '../../services';
 
 import { Icon } from '../icon/icon.component';
 import { Button } from '../button/button.component';
-import { ProgressBar } from '../progress-bar/progress-bar.component';
 import { RouterLinkToggle } from '../router-link-toggle/router-link-toggle.component';
+import { Slider } from '../slider/slider.component';
 
 import styles from './media-player.component.css';
 
@@ -84,7 +84,7 @@ export function MediaPlayerSide() {
           <Icon name={mediaVolumeButtonIcon}/>
         </Button>
         <div className={cx('media-player-volume-bar-container')}>
-          <ProgressBar
+          <Slider
             autoCommitOnUpdate
             value={mediaPlaybackVolumeMuted
               ? 0
