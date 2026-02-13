@@ -45,6 +45,8 @@ export class FileSystemModule implements IAppModule {
     const { directory, fileExtensions } = params;
     const channels = IPCStream.composeChannels(IPCCommChannel.FSReadDirectoryStream, eventId);
 
+    const rootPath = path.resolve(directory);
+    const childFatalErrors = ['EIO', 'ENODEV', 'EBADF'];
     const batchSize = 100;
     let batch: FSFile[] = [];
     let finished = false;
@@ -104,10 +106,16 @@ export class FileSystemModule implements IAppModule {
         console.error(err);
 
         if (err.message !== 'Aborted') {
-          this.app.sendMessageToRenderer(channels.error, err);
+          // rules for fatal:
+          // anything on root
+          // or, EIO / ENODEV / EBADF on child
+          // or, root becomes inaccessible
+          const isFatal = (err.path && path.resolve(err.path) === rootPath)
+            || childFatalErrors.includes(err.code)
+            || !this.isDirectoryAccessible(rootPath);
 
-          // ENOENT will be treated as fatal
-          if (err.code === 'ENOENT') {
+          if (isFatal) {
+            this.app.sendMessageToRenderer(channels.error, err);
             finalize();
           }
         }
@@ -147,5 +155,14 @@ export class FileSystemModule implements IAppModule {
     });
 
     return selection?.[0];
+  }
+
+  private isDirectoryAccessible(directory: string): boolean {
+    try {
+      fs.readdirSync(directory);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

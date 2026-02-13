@@ -118,35 +118,43 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromDirectory(mediaLibraryDirectory: string, signal: AbortSignal): Promise<void> {
+  private addTracksFromDirectory(directory: string, signal: AbortSignal): Promise<void> {
     return new Promise((resolve) => {
-      debug('addTracksFromDirectory - adding tracks from directory - %s', mediaLibraryDirectory);
+      debug('addTracksFromDirectory - adding tracks from directory - %s', directory);
 
       IPCRenderer.stream(
         IPCCommChannel.FSReadDirectoryStream, {
-          directory: mediaLibraryDirectory,
+          directory,
           fileExtensions: AudioFileExtensionList,
         }, (data: { files: FSFile[] }) => {
           // on data
-          this.addTracksFromFiles(data.files, signal);
+          this.addTracksFromFiles(directory, data.files, signal);
+
+          // update stats
+          mediaLocalStore.dispatch({
+            type: MediaLocalStateActionType.IncrementDirectoryFilesFound,
+            data: {
+              directory,
+              count: data.files.length,
+            },
+          });
         }, (err: Error) => {
           // on error
           // don't stop, just log
-          console.error('Encountered error while reading files from path - %s', mediaLibraryDirectory);
+          console.error('Encountered error while reading files from directory - %s', directory);
           console.error(err);
 
           // update stats
           mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.UpdateDirectoryStats,
+            type: MediaLocalStateActionType.SetDirectoryError,
             data: {
-              directory: mediaLibraryDirectory,
-              statsKey: 'error',
-              statsValue: err.message,
+              directory,
+              error: err.message,
             },
           });
         }, () => {
           // on done
-          debug('addTracksFromDirectory - finished adding tracks from directory - %s', mediaLibraryDirectory);
+          debug('addTracksFromDirectory - finished adding tracks from directory - %s', directory);
           resolve();
         },
         signal,
@@ -154,7 +162,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromFiles(files: FSFile[], signal: AbortSignal) {
+  private addTracksFromFiles(directory: string, files: FSFile[], signal: AbortSignal) {
     files.forEach((file) => {
       debug('addTracksFromDirectory - found file at - %s, queueing...', file.path);
 
@@ -166,6 +174,16 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           }
 
           const track = await this.addTrackFromFile(file);
+
+          // update stats
+          mediaLocalStore.dispatch({
+            type: MediaLocalStateActionType.IncrementDirectoryFilesAdded,
+            data: {
+              directory,
+              count: 1,
+            },
+          });
+
           debug('addTracksFromDirectory - added track from file - %s - %s', file.name, track.id);
         })
         .catch((err) => {
