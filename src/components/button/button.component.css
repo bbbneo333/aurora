@@ -23,8 +23,8 @@
 
 .button.primary,
 .button.danger {
-  padding: 14px;
-  border-radius: 14px;
+  padding: 12px;
+  border-radius: 12px;
   font-weight: bold;
   font-size: 15px;
 }
