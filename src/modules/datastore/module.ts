@@ -4,20 +4,19 @@ import path from 'path';
 import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
-import { DatastoreUtils } from '../../utils';
-import { DataStoreQueryData } from '../../types';
-import { IPCCommChannel } from '../../modules/ipc';
+import { IPCCommChannel, IPCMain } from '../ipc';
+import { DatastoreUtils } from './utils';
 
-const debug = require('debug')('app:module:datastore_module');
+import {
+  DataStoreFilterData,
+  DatastoreIndex,
+  DataStoreInputData,
+  DatastoreOptions,
+  DataStoreQueryData,
+  DataStoreUpdateData,
+} from './types';
 
-type DatastoreIndex = {
-  field: string,
-  unique?: boolean,
-};
-
-type DatastoreOptions = {
-  indexes?: DatastoreIndex[]
-};
+const debug = require('debug')('aurora:module:datastore');
 
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;
@@ -48,14 +47,15 @@ export class DatastoreModule implements IAppModule {
   }
 
   private registerMessageHandlers(): void {
-    this.app.registerSyncMessageHandler(IPCCommChannel.DSRegisterDatastore, this.registerDatastore, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSFind, this.find, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSFindOne, this.findOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSInsertOne, this.insertOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSUpdateOne, this.updateOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
-    this.app.registerAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
+    IPCMain.addSyncMessageHandler(IPCCommChannel.DSRegisterDatastore, this.registerDatastore, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSFind, this.find, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSFindOne, this.findOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSInsertOne, this.insertOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpdateOne, this.updateOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpsertOne, this.upsertOne, this);
   }
 
   private removeDatastore(datastore: Datastore): void {
@@ -109,7 +109,7 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData<never>): Promise<any> {
+  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
     const cursor = datastore.find(datastoreQueryDoc.filter);
 
@@ -129,12 +129,12 @@ export class DatastoreModule implements IAppModule {
     return cursor.exec();
   }
 
-  private findOne(datastoreName: string, datastoreFindOneDoc: object): Promise<any> {
+  private findOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-    return datastore.findOne(datastoreFindOneDoc);
+    return datastore.findOne(datastoreFindDoc);
   }
 
-  private insertOne(datastoreName: string, datastoreInsertDoc: object): Promise<any> {
+  private insertOne(datastoreName: string, datastoreInsertDoc: DataStoreInputData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore
@@ -144,18 +144,18 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private async updateOne(datastoreName: string, datastoreFindOneDoc: object, datastoreUpdateOneDoc: object): Promise<void> {
+  private async updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore
-    return datastore.update(datastoreFindOneDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
+    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
       multi: false,
       upsert: false,
       returnUpdatedDocs: true,
     });
   }
 
-  private async remove(datastoreName: string, datastoreFindDoc: object): Promise<void> {
+  private async remove(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
     await datastore.remove(datastoreFindDoc, {
@@ -163,18 +163,44 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private async removeOne(datastoreName: string, datastoreFindOneDoc: object): Promise<void> {
+  private async removeOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
 
-    await datastore.remove(datastoreFindOneDoc, {
+    await datastore.remove(datastoreFindDoc, {
       multi: false,
     });
   }
 
-  private async count(datastoreName: string, datastoreFindOneDoc?: object): Promise<number> {
+  private async count(datastoreName: string, datastoreFindDoc?: DataStoreFilterData): Promise<number> {
     const datastore = this.getDatastore(datastoreName);
 
-    return datastore.count(datastoreFindOneDoc);
+    return datastore.count(datastoreFindDoc);
+  }
+
+  // nedb does not provide atomic upserts - so we had to resolve to insert/update calls
+  // important - make sure datastoreUpdateOneDoc is complete doc, not a partial one
+  // otherwise race conditions can cause data corruption
+  private async upsertOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: DataStoreUpdateData) {
+    const datastore = this.getDatastore(datastoreName);
+
+    try {
+      return await datastore.insert({
+        ...datastoreUpdateOneDoc,
+        id: DatastoreUtils.generateId(),
+      });
+    } catch (e: any) {
+      if (e.errorType === 'uniqueViolated') {
+        return datastore.update(datastoreFindDoc, {
+          $set: datastoreUpdateOneDoc,
+        }, {
+          multi: false,
+          upsert: false,
+          returnUpdatedDocs: true,
+        });
+      }
+
+      throw e;
+    }
   }
 
   private getDatastore(datastoreName: string): Datastore {

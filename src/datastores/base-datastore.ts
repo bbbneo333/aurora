@@ -3,9 +3,9 @@ import {
   DataStoreInputData,
   DataStoreQueryData,
   DataStoreUpdateData,
-} from '../types';
+} from '../modules/datastore';
 
-import { IPCService, IPCCommChannel } from '../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 export abstract class BaseDatastore<T> {
   protected readonly datastoreName: string;
@@ -13,27 +13,27 @@ export abstract class BaseDatastore<T> {
   protected constructor(datastoreName: string, indexes?: { field: keyof T & string; unique?: boolean }[]) {
     this.datastoreName = datastoreName;
 
-    IPCService.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.datastoreName, {
+    IPCRenderer.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.datastoreName, {
       indexes,
     });
   }
 
   count(): Promise<number> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSCount, this.datastoreName);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSCount, this.datastoreName);
   }
 
   // single
 
   findOne(filterData: DataStoreFilterData<T>): Promise<T | undefined> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.datastoreName, filterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFindOne, this.datastoreName, filterData);
   }
 
   insertOne(inputData: DataStoreInputData<T>): Promise<T> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.datastoreName, inputData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.datastoreName, inputData);
   }
 
   updateOne(id: string, updateData: DataStoreUpdateData<T>): Promise<T> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.datastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.datastoreName, {
       id,
     }, {
       $set: updateData,
@@ -41,19 +41,19 @@ export abstract class BaseDatastore<T> {
   }
 
   removeOne(filterData: DataStoreFilterData<T>): Promise<void> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSRemoveOne, this.datastoreName, filterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemoveOne, this.datastoreName, filterData);
   }
 
   // multi
 
   find(filterData?: DataStoreFilterData<T>, filterOptions?: Omit<DataStoreQueryData<T>, 'filter'>): Promise<T[]> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFind, this.datastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.datastoreName, {
       filter: filterData,
       ...(filterOptions || {}),
     });
   }
 
   remove(filterData: DataStoreFilterData<T>): Promise<void> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSRemove, this.datastoreName, filterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.datastoreName, filterData);
   }
 }

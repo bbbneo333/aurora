@@ -5,7 +5,7 @@ import { IAppStatePersistor } from '../interfaces';
 import { RootState } from '../reducers';
 import { PromiseUtils } from '../utils';
 
-const debug = require('debug')('app:store:persistor');
+const debug = require('debug')('aurora:store:persistor');
 
 const statePersistors: Record<string, IAppStatePersistor> = {};
 

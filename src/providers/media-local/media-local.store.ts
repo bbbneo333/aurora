@@ -12,7 +12,16 @@ export enum MediaLocalStateActionType {
   RemoveDirectory = 'mediaLocalSettings/removeDirectory',
   StartSync = 'mediaLocalSettings/startSync',
   FinishSync = 'mediaLocalSettings/finishSync',
+  IncrementDirectorySyncFilesFound = 'mediaLocalSettings/incrementDirectorySyncFilesFound',
+  IncrementDirectorySyncFilesAdded = 'mediaLocalSettings/incrementDirectorySyncFilesAdded',
+  SetDirectorySyncError = 'mediaLocalSettings/setDirectorySyncError',
 }
+
+export type MediaSyncDirectoryStats = {
+  error?: string,
+  filesFound?: number,
+  filesAdded?: number,
+};
 
 export type MediaLocalState = {
   settings: IMediaLocalSettings,
@@ -22,11 +31,14 @@ export type MediaLocalState = {
   saving: boolean,
   saved: boolean,
   syncing: boolean,
+  syncDuration: number, // in ms
+  syncFileCount: number,
+  syncDirectoryStats: Record<string, MediaSyncDirectoryStats>,
 };
 
 export type MediaLocalStateAction = {
   type: MediaLocalStateActionType,
-  data?: any;
+  data?: any,
 };
 
 const mediaLocalInitialState: MediaLocalState = {
@@ -41,6 +53,9 @@ const mediaLocalInitialState: MediaLocalState = {
   saving: false,
   saved: false,
   syncing: false,
+  syncDuration: 0,
+  syncFileCount: 0,
+  syncDirectoryStats: {},
 };
 
 function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState, action: MediaLocalStateAction): MediaLocalState {
@@ -81,8 +96,13 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
       const directories = state.settings ? state.settings.library.directories : [];
       let directoriesAreUpdated = false;
 
+      // added directory to be treated as new if:
+      // - does not already exist
+      // - or, had error in previous sync
       if (!directories.includes(selectedDirectory)) {
         directories.push(selectedDirectory);
+        directoriesAreUpdated = true;
+      } else if (!_.isEmpty(state.syncDirectoryStats[selectedDirectory]?.error)) {
         directoriesAreUpdated = true;
       }
 
@@ -122,12 +142,71 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
       return {
         ...state,
         syncing: true,
+        syncDuration: 0,
+        syncFileCount: 0,
+        syncDirectoryStats: {},
       };
     }
     case MediaLocalStateActionType.FinishSync: {
+      // data.syncDuration - duration in ms
+      // data.syncFileCount - file count
+      const { syncDuration = 0, syncFileCount = 0 } = action.data;
+
       return {
         ...state,
         syncing: false,
+        syncDuration,
+        syncFileCount,
+      };
+    }
+    case MediaLocalStateActionType.SetDirectorySyncError: {
+      // data.directory - string
+      // data.error - string
+      const { directory, error } = action.data;
+
+      return {
+        ...state,
+        syncDirectoryStats: {
+          ...state.syncDirectoryStats,
+          [directory]: {
+            ...state.syncDirectoryStats[directory] || {},
+            error,
+          },
+        },
+      };
+    }
+    case MediaLocalStateActionType.IncrementDirectorySyncFilesFound: {
+      // data.directory - string
+      // data.count - number
+      const { directory, count } = action.data;
+      const value = (state.syncDirectoryStats[directory]?.filesFound || 0) + count;
+
+      return {
+        ...state,
+        syncDirectoryStats: {
+          ...state.syncDirectoryStats,
+          [directory]: {
+            ...state.syncDirectoryStats[directory] || {},
+            filesFound: value,
+          },
+        },
+      };
+    }
+    case MediaLocalStateActionType.IncrementDirectorySyncFilesAdded: {
+      // data.directory - string
+      // data.count - number
+      const { directory, count } = action.data;
+      const value = (state.syncDirectoryStats[directory]?.filesAdded || 0) + count;
+
+      return {
+        ...state,
+        syncDirectoryStats: {
+          ...state.syncDirectoryStats,
+          [directory]: {
+            ...state.syncDirectoryStats[directory] || {},
+            filesAdded: value,
+          },
+        },
       };
     }
     default:

@@ -30,7 +30,6 @@ import installExtension, {
 
 import {
   app,
-  ipcMain,
   shell,
   BrowserWindow,
 } from 'electron';
@@ -41,23 +40,16 @@ import {
   IAppModule,
 } from './interfaces';
 
-import {
-  IPCAsyncMessageHandler,
-  IPCCommChannel,
-  IPCRendererCommChannel,
-  IPCSyncMessageHandler,
-  serializeIPCError,
-} from './modules/ipc';
+import { IPCMain, IPCCommChannel, IPCRendererCommChannel } from './modules/ipc';
+import { PlatformOS } from './modules/platform';
+import { DatastoreModule } from './modules/datastore';
+import { FileSystemModule } from './modules/file-system';
+import { ImageModule } from './modules/image';
 
-import {
-  PlatformOS,
-} from './modules/platform';
-
-import * as AppBuilders from './main/builders';
-import * as AppModules from './main/modules';
+import { MenuBuilder } from './main/builders';
 
 const sourceMapSupport = require('source-map-support');
-const debug = require('debug')('app:main');
+const debug = require('debug')('aurora:main');
 
 function createElectronLogger(name: string, filePath: string) {
   const logger = electronLog.create({ logId: name });
@@ -135,29 +127,6 @@ class App implements IAppMain {
 
   quit(): void {
     app.quit();
-  }
-
-  registerSyncMessageHandler(messageChannel: string, messageHandler: IPCSyncMessageHandler, messageHandlerCtx?: any): void {
-    ipcMain.on(messageChannel, (event, ...args) => {
-      debug('ipc (sync) - received message - channel - %s', messageChannel);
-      // eslint-disable-next-line no-param-reassign
-      event.returnValue = messageHandler.apply(messageHandlerCtx, args);
-    });
-  }
-
-  registerAsyncMessageHandler(messageChannel: string, messageHandler: IPCAsyncMessageHandler, messageHandlerCtx?: any): void {
-    ipcMain.handle(messageChannel, async (_event, ...args) => {
-      try {
-        debug('ipc (async) - received message - channel - %s', messageChannel);
-        return await messageHandler.apply(messageHandlerCtx, args);
-      } catch (err: any) {
-        console.error(`Encountered error while handling message for - ${messageChannel}`);
-        console.error(err);
-        // electron serializes the error before sending it back to the renderer
-        // explicitly send the full shape, set a flag and handle on renderer accordingly
-        return serializeIPCError(err);
-      }
-    });
   }
 
   sendMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any {
@@ -531,15 +500,21 @@ class App implements IAppMain {
   }
 
   private registerBuilders(): void {
-    const builders = _.map(AppBuilders, AppBuilder => new AppBuilder(this));
-    debug('registering builders - %o', _.map(builders, builder => builder.constructor.name));
-    this.builders.push(...builders);
+    debug('registering builders...');
+
+    this.builders.push(new MenuBuilder(this));
+
+    debug('builder registration completed!');
   }
 
   private registerModules(): void {
-    const modules = _.map(AppModules, AppModule => new AppModule(this));
-    debug('registering modules - %o', _.map(modules, module => module.constructor.name));
-    this.modules.push(...modules);
+    debug('registering modules...');
+
+    this.modules.push(new DatastoreModule(this));
+    this.modules.push(new ImageModule(this));
+    this.modules.push(new FileSystemModule(this));
+
+    debug('module registration completed!');
   }
 
   private runBuilders(mainWindow: BrowserWindow): void {
@@ -549,16 +524,16 @@ class App implements IAppMain {
   }
 
   private registerRendererEvents(): void {
-    this.registerSyncMessageHandler(IPCCommChannel.AppToggleWindowFill, () => {
+    IPCMain.addSyncMessageHandler(IPCCommChannel.AppToggleWindowFill, () => {
       this.toggleWindowFill();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppResetSettings, () => {
+    IPCMain.addSyncMessageHandler(IPCCommChannel.AppResetSettings, () => {
       this.removeAppData();
       this.reloadApp();
     });
 
-    this.registerSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetails());
+    IPCMain.addSyncMessageHandler(IPCCommChannel.AppReadDetails, () => this.getDetails());
   }
 
   private isUrlLocal(url: string): boolean {

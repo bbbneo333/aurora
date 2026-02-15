@@ -49,9 +49,11 @@
   --text-dark-color: #b3b3b3;
   --text-light-color: #e9ecef;
   --text-disabled-color: #383838;
-  /*progress*/
-  --progress-bar-bg-color: #b3b3b39e;
-  --loader-color: #b3b3b3;
+  --text-danger-color: #dc3545;
+  --text-warning-color: #ffc107;
+  /*loader*/
+  --loader-color: #e9ecef;
+  --loader-track-color: #b3b3b39e;
   /*misc*/
   --titlebar-overlay-height: 60px;
   --scrollable-scrollbar-width: 6px;

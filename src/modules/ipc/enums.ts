@@ -8,7 +8,7 @@ export enum IPCCommChannel {
   FSReadAsset = 'fs:read_asset',
   FSSelectDirectory = 'fs:select_directory',
   FSSelectFile = 'fs:select_file',
-  FSReadDirectory = 'fs:read_directory',
+  FSReadDirectoryStream = 'fs:read_directory_stream',
   FSReadFile = 'fs:read_file',
   // datastore (ds)
   DSCount = 'ds:count',
@@ -19,8 +19,9 @@ export enum IPCCommChannel {
   DSUpdateOne = 'ds:update_one',
   DSRemoveOne = 'ds:remove_one',
   DSRemove = 'ds:remove',
-  // media
-  MediaScaleAndCacheImage = 'media:scale_and_cache_image',
+  DSUpsertOne = 'ds:upsert_one',
+  // image
+  ImageScale = 'image:scale',
 }
 
 export enum IPCRendererCommChannel {

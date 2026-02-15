@@ -1,4 +1,4 @@
-import { IPCCommChannel, IPCService } from '../modules/ipc';
+import { IPCCommChannel, IPCRenderer } from '../modules/ipc';
 
 export type AppDetails = {
   display_name: string;
@@ -13,13 +13,13 @@ export default class AppService {
 
   static get details(): AppDetails {
     if (!this.Details) {
-      this.Details = IPCService.sendSyncMessage(IPCCommChannel.AppReadDetails);
+      this.Details = IPCRenderer.sendSyncMessage(IPCCommChannel.AppReadDetails);
     }
 
     return this.Details;
   }
 
   static resetAppData(): void {
-    IPCService.sendSyncMessage(IPCCommChannel.AppResetSettings);
+    IPCRenderer.sendSyncMessage(IPCCommChannel.AppResetSettings);
   }
 }

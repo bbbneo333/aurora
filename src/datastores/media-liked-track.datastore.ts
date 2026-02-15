@@ -1,12 +1,12 @@
 import { IMediaLikedTrackData } from '../interfaces';
-import { DataStoreFilterData, DataStoreInputData } from '../types';
-import { IPCService, IPCCommChannel } from '../modules/ipc';
+import { DataStoreFilterData, DataStoreInputData } from '../modules/datastore';
+import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaLikedTracksDatastore {
   private readonly datastoreName = 'media_liked_tracks';
 
   constructor() {
-    IPCService.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.datastoreName, {
+    IPCRenderer.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.datastoreName, {
       indexes: [{
         field: 'id',
         unique: true,
@@ -15,25 +15,25 @@ class MediaLikedTracksDatastore {
   }
 
   countLikedTracks(): Promise<number> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSCount, this.datastoreName);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSCount, this.datastoreName);
   }
 
   findLikedTrack(filterData: DataStoreFilterData<IMediaLikedTrackData>): Promise<IMediaLikedTrackData | undefined> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.datastoreName, filterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFindOne, this.datastoreName, filterData);
   }
 
   findLikedTracks(filterData?: DataStoreFilterData<IMediaLikedTrackData>): Promise<IMediaLikedTrackData[]> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFind, this.datastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.datastoreName, {
       filter: filterData,
     });
   }
 
   insertLikedTrack(inputData: DataStoreInputData<IMediaLikedTrackData>): Promise<IMediaLikedTrackData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.datastoreName, inputData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.datastoreName, inputData);
   }
 
   deleteLikedTrack(filterData: DataStoreFilterData<IMediaLikedTrackData>): Promise<void> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSRemove, this.datastoreName, filterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.datastoreName, filterData);
   }
 }
 

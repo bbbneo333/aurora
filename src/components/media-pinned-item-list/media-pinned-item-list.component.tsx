@@ -9,7 +9,7 @@ import { IMediaPinnedItem } from '../../interfaces';
 import { MediaCollectionService, MediaPinnedItemService } from '../../services';
 import { selectSortedPinnedItems } from '../../selectors';
 
-import { InteractiveList } from '../interactive-list/interactive-list.component';
+import { List } from '../list/list.component';
 import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
 import { MediaCollectionContextMenu, MediaCollectionContextMenuItem } from '../media-collection-context-menu/media-collection-context-menu.component';
 import { MediaPlaylistDeleteModal } from '../media-playlist-delete-modal/media-playlist-delete-modal.component';
@@ -54,7 +54,7 @@ export function MediaPinnedItemList() {
 
   return (
     <>
-      <InteractiveList
+      <List
         disableMultiSelect
         sortable
         className={cx('media-pinned-item-list')}
@@ -74,7 +74,7 @@ export function MediaPinnedItemList() {
             contextMenuId={contextMenuId}
           />
         )}
-      </InteractiveList>
+      </List>
       <MediaCollectionContextMenu
         id={contextMenuId}
         menuItems={[

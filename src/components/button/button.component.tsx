@@ -21,7 +21,7 @@ export type ButtonProps = React.DetailsHTMLAttributes<HTMLDivElement> & {
   onButtonSubmit?(event: MouseEvent | KeyboardEvent): void;
   onButtonMove?(event: KeyboardEvent): void;
   variant?: ButtonVariant | ButtonVariant[];
-  tooltip?: string;
+  tooltip?: string | React.ReactElement;
 };
 
 export type ButtonVariant = 'primary' | 'danger' | 'rounded' | 'outline' | 'lg';

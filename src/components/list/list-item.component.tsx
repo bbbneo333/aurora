@@ -3,11 +3,11 @@ import { defaultAnimateLayoutChanges, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import classNames from 'classnames/bind';
 
-import styles from './interactive-list.component.css';
+import styles from './list.component.css';
 
 const cx = classNames.bind(styles);
 
-export function InteractiveListItem(props: {
+export function ListItem(props: {
   itemId: string;
   index: number;
   child: React.ReactElement;
@@ -75,12 +75,12 @@ export function InteractiveListItem(props: {
       onPointerUp={handlePointerUp}
       onContextMenu={handleContextMenu}
       tabIndex={-1}
-      className={cx('interactive-list-item')}
+      className={cx('list-item')}
     >
       {React.cloneElement(child, {
-        'data-interactive-item-id': itemId,
+        'data-list-item-id': itemId,
         'aria-selected': isSelected,
-        className: cx('interactive-list-item-child', { dragging: isDragging }),
+        className: cx('list-item-content', { dragging: isDragging }),
       })}
     </div>
   );

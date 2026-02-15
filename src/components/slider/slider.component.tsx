@@ -12,35 +12,35 @@ import { SystemEnums } from '../../enums';
 
 import { Button } from '../button/button.component';
 
-import { getValueFromPercent } from './progress-bar.utils';
-import { ProgressJumpDirection, ProgressStateActionType, progressStateReducer } from './progress-bar.reducer';
-import styles from './progress-bar.component.scss';
+import { getValueFromPercent } from './slider.utils';
+import { ProgressJumpDirection, ProgressStateActionType, progressStateReducer } from './slider.reducer';
+import styles from './slider.component.scss';
 
-const debug = require('debug')('app:component:progress_bar');
+const debug = require('debug')('aurora:component:slider');
 
 const cx = classNames.bind(styles);
 
-export type ProgressBarComponentProps = {
+export type SliderProps = {
   value?: number;
   maxValue?: number;
   disabled?: boolean;
-  progressContainerClassName?: string;
-  progressBarClassName?: string;
-  progressHandlerClassName?: string;
+  sliderContainerClassName?: string;
+  sliderTrackClassName?: string;
+  sliderThumbClassName?: string;
   autoCommitOnUpdate?: boolean,
   onDragUpdate?(value: number): boolean;
   onDragEnd?(value: number): boolean;
   onDragCommit?(value: number): void;
 };
 
-export function ProgressBar(props: ProgressBarComponentProps = {}) {
+export function Slider(props: SliderProps = {}) {
   const {
     value = 0,
     maxValue = 100,
     disabled = false,
-    progressContainerClassName,
-    progressBarClassName,
-    progressHandlerClassName,
+    sliderContainerClassName,
+    sliderTrackClassName,
+    sliderThumbClassName,
     autoCommitOnUpdate = false,
     onDragUpdate,
     onDragEnd,
@@ -315,7 +315,7 @@ export function ProgressBar(props: ProgressBarComponentProps = {}) {
     : mediaProgressDragPercent}%`;
 
   return (
-    <div className={cx('media-progress-container', progressContainerClassName, {
+    <div className={cx('media-progress-container', sliderContainerClassName, {
       disabled,
       dragging: mediaProgressIsDragging,
     })}
@@ -331,14 +331,14 @@ export function ProgressBar(props: ProgressBarComponentProps = {}) {
           style={{
             width: mediaProgressPercentage,
           }}
-          className={cx('media-progress-bar', progressBarClassName)}
+          className={cx('media-progress-bar', sliderTrackClassName)}
         />
       </div>
       <Button
         style={{
           left: mediaProgressPercentage,
         }}
-        className={cx('media-progress-handler', progressHandlerClassName)}
+        className={cx('media-progress-handler', sliderThumbClassName)}
         onMouseDown={handleOnProgressHandlerMouseDown}
         onButtonMove={handleOnProgressHandlerButtonMove}
       />

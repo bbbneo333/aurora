@@ -1,12 +1,12 @@
-import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../types';
+import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../modules/datastore';
 import { IMediaPlaylistData, IMediaPlaylistTrackData } from '../interfaces';
-import { IPCService, IPCCommChannel } from '../modules/ipc';
+import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 class MediaPlaylistDatastore {
   private readonly mediaPlaylistsDatastoreName = 'media_playlists';
 
   constructor() {
-    IPCService.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaPlaylistsDatastoreName, {
+    IPCRenderer.sendSyncMessage(IPCCommChannel.DSRegisterDatastore, this.mediaPlaylistsDatastoreName, {
       indexes: [{
         field: 'id',
         unique: true,
@@ -15,13 +15,13 @@ class MediaPlaylistDatastore {
   }
 
   countMediaPlaylists(): Promise<number> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSCount, this.mediaPlaylistsDatastoreName);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSCount, this.mediaPlaylistsDatastoreName);
   }
 
   insertMediaPlaylist(mediaPlaylistInputData: DataStoreInputData<IMediaPlaylistData>): Promise<IMediaPlaylistData> {
     const now = Date.now();
 
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaPlaylistsDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaPlaylistsDatastoreName, {
       ...mediaPlaylistInputData,
       created_at: now,
       updated_at: now,
@@ -29,7 +29,7 @@ class MediaPlaylistDatastore {
   }
 
   addMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackInputDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
       $push: {
@@ -44,7 +44,7 @@ class MediaPlaylistDatastore {
   }
 
   deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylistData> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
       $pull: {
@@ -61,21 +61,21 @@ class MediaPlaylistDatastore {
   }
 
   findMediaPlaylist(mediaPlaylistFilterData: DataStoreFilterData<IMediaPlaylistData>): Promise<IMediaPlaylistData | undefined> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFindOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
   }
 
   findMediaPlaylists(mediaPlaylistFilterData?: DataStoreFilterData<IMediaPlaylistData>): Promise<IMediaPlaylistData[]> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaPlaylistsDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaPlaylistsDatastoreName, {
       filter: mediaPlaylistFilterData,
     });
   }
 
   deleteMediaPlaylist(mediaPlaylistFilterData?: DataStoreFilterData<IMediaPlaylistData>): Promise<void> {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSRemoveOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemoveOne, this.mediaPlaylistsDatastoreName, mediaPlaylistFilterData);
   }
 
   updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: DataStoreUpdateData<IMediaPlaylistData>) {
-    return IPCService.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
       id: mediaPlaylistId,
     }, {
       $set: {

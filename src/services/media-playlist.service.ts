@@ -12,16 +12,12 @@ import {
 } from '../interfaces';
 
 import { MediaPlaylistDatastore } from '../datastores';
-import { DatastoreUtils, MediaUtils } from '../utils';
-import store from '../store';
 import { MediaLibraryActions } from '../enums';
+import store from '../store';
+import { BaseError, EntityNotFoundError } from '../types';
+import { MediaUtils } from '../utils';
 
-import {
-  BaseError,
-  DataStoreInputData,
-  DataStoreUpdateData,
-  EntityNotFoundError,
-} from '../types';
+import { DataStoreInputData, DataStoreUpdateData, DatastoreUtils } from '../modules/datastore';
 
 import NotificationService from './notification.service';
 import I18nService from './i18n.service';
