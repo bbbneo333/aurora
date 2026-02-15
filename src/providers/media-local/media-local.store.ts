@@ -12,9 +12,9 @@ export enum MediaLocalStateActionType {
   RemoveDirectory = 'mediaLocalSettings/removeDirectory',
   StartSync = 'mediaLocalSettings/startSync',
   FinishSync = 'mediaLocalSettings/finishSync',
-  IncrementDirectoryFilesFound = 'mediaLocalSettings/incrementDirectoryFilesFound',
-  IncrementDirectoryFilesAdded = 'mediaLocalSettings/incrementDirectoryFilesAdded',
-  SetDirectoryError = 'mediaLocalSettings/setDirectoryError',
+  IncrementDirectorySyncFilesFound = 'mediaLocalSettings/incrementDirectorySyncFilesFound',
+  IncrementDirectorySyncFilesAdded = 'mediaLocalSettings/incrementDirectorySyncFilesAdded',
+  SetDirectorySyncError = 'mediaLocalSettings/setDirectorySyncError',
 }
 
 export type MediaSyncDirectoryStats = {
@@ -38,7 +38,7 @@ export type MediaLocalState = {
 
 export type MediaLocalStateAction = {
   type: MediaLocalStateActionType,
-  data?: any;
+  data?: any,
 };
 
 const mediaLocalInitialState: MediaLocalState = {
@@ -159,7 +159,7 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         syncFileCount,
       };
     }
-    case MediaLocalStateActionType.SetDirectoryError: {
+    case MediaLocalStateActionType.SetDirectorySyncError: {
       // data.directory - string
       // data.error - string
       const { directory, error } = action.data;
@@ -175,7 +175,7 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         },
       };
     }
-    case MediaLocalStateActionType.IncrementDirectoryFilesFound: {
+    case MediaLocalStateActionType.IncrementDirectorySyncFilesFound: {
       // data.directory - string
       // data.count - number
       const { directory, count } = action.data;
@@ -192,7 +192,7 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         },
       };
     }
-    case MediaLocalStateActionType.IncrementDirectoryFilesAdded: {
+    case MediaLocalStateActionType.IncrementDirectorySyncFilesAdded: {
       // data.directory - string
       // data.count - number
       const { directory, count } = action.data;

@@ -3,9 +3,16 @@ import classNames from 'classnames/bind';
 import { ArgumentArray } from 'classnames';
 import { isNil, isNumber } from 'lodash';
 
-import { ActionList, Button } from '../../components';
+import {
+  ActionList,
+  Button,
+  Icon,
+  LoaderCircle,
+  LoaderCircleProgress,
+} from '../../components';
+
 import { Icons } from '../../constants';
-import { MediaProviderService } from '../../services';
+import { I18nService, MediaProviderService } from '../../services';
 import { DateTimeUtils } from '../../utils';
 
 import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
@@ -26,36 +33,48 @@ function openDirectorySelectionDialog(): string | undefined {
   return IPCRenderer.sendSyncMessage(IPCCommChannel.FSSelectDirectory);
 }
 
-function MediaDirectoryLabel(props: {
-  directory: string;
+function MediaDirectoryIcon(props: {
   stats?: MediaSyncDirectoryStats;
 }) {
   const {
-    directory,
     stats = {},
   } = props;
 
   const hasError = !isNil(stats.error);
   const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesAdded);
 
-  if (!hasValidProgress || hasError) {
+  if (hasError) {
     return (
-      <>
-        {directory}
-      </>
+      <Icon
+        name={Icons.Error}
+        className={cl('settings-directory-icon-error')}
+        tooltip={stats.error}
+      />
     );
   }
 
-  const progress = `(${stats.filesAdded} / ${stats.filesFound})`;
+  if (hasValidProgress) {
+    const progressPct = (stats.filesAdded! / stats.filesFound!) * 100;
+
+    if (progressPct === 100) {
+      return (
+        <Icon
+          name={Icons.Completed}
+          className={cl('settings-directory-icon-success')}
+        />
+      );
+    }
+
+    return (
+      <LoaderCircleProgress
+        size={16}
+        value={progressPct}
+      />
+    );
+  }
 
   return (
-    <div>
-      {directory}
-      &nbsp;
-      <span className={cl('settings-directory-progress-text')}>
-        {progress}
-      </span>
-    </div>
+    <LoaderCircle size={16}/>
   );
 }
 
@@ -117,21 +136,18 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
   return (
     <div className={cx('settings-section')}>
       <div className={cx('settings-heading')}>
-        Selected Directories
+        {I18nService.getString('label_settings_directories')}
       </div>
       <div className={cx('settings-content')}>
         <div className={cl('settings-directory-list')}>
           <ActionList
             items={settings.library.directories.map((directory) => {
               const dirStats = syncDirectoryStats[directory];
-              const dirHasError = !isNil(dirStats?.error);
 
               return {
                 id: directory,
-                label: (<MediaDirectoryLabel directory={directory} stats={dirStats}/>),
-                icon: dirHasError ? Icons.Error : Icons.Folder,
-                iconClass: cl(dirHasError && 'settings-directory-icon-error'),
-                iconTooltip: dirHasError ? dirStats.error : undefined,
+                label: directory,
+                icon: (<MediaDirectoryIcon stats={dirStats}/>),
               };
             })}
             onRemove={(directory) => {
@@ -160,7 +176,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               }
             }}
           >
-            Add Directory
+            {I18nService.getString('button_settings_sync_add_directory')}
           </Button>
         </div>
         <div className={cl('settings-sync-action')}>
@@ -172,15 +188,17 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             }}
             tooltip={(
               <>
-                Files Scanned:&nbsp;
+                {I18nService.getString('tooltip_settings_sync_file_scanned')}
+                :&nbsp;
                 {syncFileCount}
                 <br/>
-                Time Taken:&nbsp;
+                {I18nService.getString('tooltip_settings_sync_time_taken')}
+                :&nbsp;
                 {DateTimeUtils.formatDuration(syncDuration)}
               </>
             )}
           >
-            Refresh
+            {I18nService.getString('button_settings_sync_refresh')}
           </Button>
         </div>
       </div>

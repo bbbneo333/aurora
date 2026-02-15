@@ -13,7 +13,7 @@ const cx = classNames.bind(styles);
 export type ActionItem = {
   id: string;
   label: string | React.ReactElement;
-  icon?: string;
+  icon?: string | React.ReactElement;
   iconClass?: string;
   iconTooltip?: string;
 };
@@ -36,10 +36,12 @@ export const ActionList = ({ items, onRemove }: ActionListProps) => (
       <div className={cx('action-list-item')} key={item.id}>
         {item.icon && (
           <div className={cx('action-list-item-icon', item.iconClass)}>
-            <Icon
-              name={item.icon}
-              tooltip={item.iconTooltip}
-            />
+            {typeof item.icon === 'string' ? (
+              <Icon
+                name={item.icon}
+                tooltip={item.iconTooltip}
+              />
+            ) : (item.icon)}
           </div>
         )}
         <div className={cx('action-list-item-label')}>

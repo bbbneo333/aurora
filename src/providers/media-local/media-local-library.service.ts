@@ -132,7 +132,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
           // update stats
           mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.IncrementDirectoryFilesFound,
+            type: MediaLocalStateActionType.IncrementDirectorySyncFilesFound,
             data: {
               directory,
               count: data.files.length,
@@ -146,7 +146,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
           // update stats
           mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.SetDirectoryError,
+            type: MediaLocalStateActionType.SetDirectorySyncError,
             data: {
               directory,
               error: err.message,
@@ -177,7 +177,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
           // update stats
           mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.IncrementDirectoryFilesAdded,
+            type: MediaLocalStateActionType.IncrementDirectorySyncFilesAdded,
             data: {
               directory,
               count: 1,

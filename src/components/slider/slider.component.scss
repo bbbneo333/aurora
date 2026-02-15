@@ -35,7 +35,7 @@
 
 .media-progress-container.disabled {
   .media-progress-bar-container {
-    background-color: var(--progress-bar-bg-color);
+    background-color: var(--loader-track-color);
   }
 }
 
@@ -43,7 +43,7 @@
   display: flex;
   height: 4px;
   overflow: hidden;
-  background-color: var(--progress-bar-bg-color);
+  background-color: var(--loader-track-color);
   border-radius: 0.25rem;
   transition: background-color .5s ease;
 }

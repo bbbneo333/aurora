@@ -2,6 +2,6 @@
   color: var(--text-danger-color);
 }
 
-.settings-directory-progress-text {
-  color: var(--text-dark-color);
+.settings-directory-icon-success {
+  color: var(--text-light-color);
 }

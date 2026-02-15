@@ -6,7 +6,7 @@ import { I18nService } from '../../services';
 import { Events } from '../../utils';
 import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
 
-import { LoaderIcon } from '../loader/loader-icon.component';
+import { LoaderCircle } from '../loader/loader-circle.component';
 import { Icon } from '../icon/icon.component';
 
 import styles from './upload-overlay.component.css';
@@ -78,12 +78,12 @@ export function UploadOverlay(props: UploadOverlayProps) {
     >
       <div className={cx('upload-overlay-zone')}>
         {isUploading ? (
-          <span className={cx('upload-icon')}>
-            <LoaderIcon/>
+          <span className={cx('upload-loader')}>
+            <LoaderCircle/>
           </span>
         ) : (
           <>
-            <span className={cx('upload-icon')}>
+            <span className={cx('upload-loader')}>
               <Icon name={icon || Icons.Edit}/>
             </span>
             <span className={cx('upload-title')}>
