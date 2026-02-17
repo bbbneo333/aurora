@@ -392,6 +392,7 @@ class App implements IAppMain {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
+        nodeIntegrationInWorker: true,
       },
     });
 

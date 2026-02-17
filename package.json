@@ -232,6 +232,7 @@
     "moment": "^2.29.4",
     "music-metadata": "^7.8.5",
     "nedb-promises": "^4.1.5",
+    "node-vibrant": "^4.0.3",
     "p-queue": "^9.1.0",
     "react": "^18.3.1",
     "react-bootstrap": "^1.6.0",

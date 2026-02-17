@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
 
-import { MediaEnums, ImageFileExtensionList } from '../../enums';
+import { MediaEnums } from '../../enums';
 import { IMediaPicture } from '../../interfaces';
 import { MediaLibraryService } from '../../services';
 import { IPCRenderer, IPCCommChannel } from '../../modules/ipc';
+import { FSImageExtensions } from '../../modules/file-system';
 
 import { UploadOverlay } from '../upload/upload-overlay.component';
 import { MediaCoverPicture, MediaCoverPictureProps } from './media-cover-picture.component';
@@ -39,7 +40,7 @@ export function MediaCoverPictureUploadable(props: MediaCoverPictureUploadablePr
   return (
     <UploadOverlay
       onUpload={handleUpload}
-      extensions={ImageFileExtensionList}
+      extensions={FSImageExtensions}
     >
       <MediaCoverPicture {...rest}/>
     </UploadOverlay>

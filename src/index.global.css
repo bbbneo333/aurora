@@ -237,3 +237,25 @@ body {
   outline: none;
   box-shadow: none;
 }
+
+/*media player tinting*/
+/*these properties are required to be defined in global scope in order to apply transition*/
+/*@see - https://www.w3.org/TR/css-properties-values-api-1/#animation-behavior-of-custom-properties*/
+
+@property --media-player-tint-color-1 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #000000;
+}
+
+@property --media-player-tint-color-2 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #000000;
+}
+
+@property --media-player-tint-color-3 {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #000000;
+}
