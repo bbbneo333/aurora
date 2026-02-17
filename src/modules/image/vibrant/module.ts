@@ -1,8 +1,17 @@
 import { Vibrant } from 'node-vibrant/node';
 
+import { CacheService } from '../../cache';
+
 export class VibrantModule {
   // generates colors for tinting background based on image provided at path
-  async getImageColors(imagePath: string) {
+  async getImageColors(imagePath: string): Promise<string[]> {
+    const cacheKey = `vibrant:palette:file:${imagePath}`;
+    const cached = await CacheService.get(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
     const palette = await Vibrant.from(imagePath).getPalette();
 
     const swatches = [
@@ -31,7 +40,10 @@ export class VibrantModule {
       ambient = this.mix(ambient, swatch, 0.25);
     });
 
-    return [tint1, tint2, ambient];
+    const colors = [tint1, tint2, ambient];
+    await CacheService.set(cacheKey, colors);
+
+    return colors;
   }
 
   private hexToRgb(hex: string) {
