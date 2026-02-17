@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 
 import { MediaTrackCoverPictureImageDataType } from '../../enums';
 import { RootState } from '../../reducers';
-import { VibrantService } from '../../modules/vibrant';
+
+import { IPCCommChannel, IPCRenderer } from '../../modules/ipc';
 
 export const useMediaBackgroundTint = () => {
   const mediaPlaybackCurrentMediaTrack = useSelector((state: RootState) => state.mediaPlayer.mediaPlaybackCurrentMediaTrack);
@@ -30,19 +31,19 @@ export const useMediaBackgroundTint = () => {
       return;
     }
 
-    const picturePath = picture.image_data as string;
+    const imagePath = picture.image_data as string;
 
-    VibrantService.getColors(picturePath)
-      .then((colors) => {
+    IPCRenderer.sendAsyncMessage(IPCCommChannel.ImageGetColors, imagePath)
+      .then((colors: string[]) => {
         if (colors.length !== 3) {
-          console.error('VibrantService.getColors returned invalid response', colors);
+          console.error('ImageGetColors returned invalid response for image - %s', imagePath, colors);
           reset();
         } else {
           change(colors);
         }
       })
       .catch((error) => {
-        console.error('Encountered error on VibrantService.getColors');
+        console.error('Encountered error on ImageGetColors for image - %s', imagePath);
         console.error(error);
 
         // reset on failure

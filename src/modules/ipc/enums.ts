@@ -22,6 +22,7 @@ export enum IPCCommChannel {
   DSUpsertOne = 'ds:upsert_one',
   // image
   ImageScale = 'image:scale',
+  ImageGetColors = 'image:get_colors',
 }
 
 export enum IPCRendererCommChannel {
