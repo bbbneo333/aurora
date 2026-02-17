@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-export class FileSystemUtils {
+export class FSUtils {
   static isFile(path: string) {
     try {
       const stat = fs.statSync(path);

@@ -8,13 +8,13 @@ import {
 import PQueue from 'p-queue';
 import { Semaphore } from 'async-mutex';
 
-import { AudioFileExtensionList, MediaEnums } from '../../enums';
+import { MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
 import { MediaLibraryService, MediaProviderService } from '../../services';
 import { DateTimeUtils } from '../../utils';
 
 import { CryptoService } from '../../modules/crypto';
-import { FSFile } from '../../modules/file-system';
+import { FSFile, FSAudioExtensions } from '../../modules/file-system';
 import { IPCCommChannel, IPCRenderer } from '../../modules/ipc';
 
 import { IMediaLocalSettings } from './media-local.interfaces';
@@ -125,7 +125,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       IPCRenderer.stream(
         IPCCommChannel.FSReadDirectoryStream, {
           directory,
-          fileExtensions: AudioFileExtensionList,
+          fileExtensions: FSAudioExtensions,
         }, (data: { files: FSFile[] }) => {
           // on data
           this.addTracksFromFiles(directory, data.files, signal);

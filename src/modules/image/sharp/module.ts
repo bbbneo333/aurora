@@ -1,17 +1,16 @@
 import path from 'path';
 import sharp from 'sharp';
 
-import { ImageFileExtensions } from '../../../enums';
 import { IAppMain } from '../../../interfaces';
 
 import { CryptoService } from '../../crypto';
-import { FileSystemUtils } from '../../file-system';
+import { FSUtils, FSImageExtension } from '../../file-system';
 
 import { SharpImageScaleOptions } from './types';
 
 export class SharpModule {
   private readonly app: IAppMain;
-  private readonly imageExtension = ImageFileExtensions.JPG;
+  private readonly imageExtension = FSImageExtension.JPG;
   private readonly imagesDataDir = 'Images';
 
   constructor(app: IAppMain) {
@@ -29,7 +28,7 @@ export class SharpModule {
 
     // if file already exists, return that
     // otherwise create and store new image
-    if (FileSystemUtils.isFile(imageCachePath)) {
+    if (FSUtils.isFile(imageCachePath)) {
       return imageCachePath;
     }
 
