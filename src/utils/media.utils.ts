@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {
   IMediaAlbum,
   IMediaArtist,
@@ -115,4 +117,14 @@ export function getLikedTrackKey(track: IMediaLikedTrack) {
 
 export function getLikedTrackKeyFromInput(input: IMediaLikedTrackInputData) {
   return `${input.provider}_${input.provider_id}`;
+}
+
+// expected duration to be in seconds
+export function formatMediaTrackDuration(duration: number) {
+  const formatted = moment
+    .utc(duration * 1000, 'x')
+    .format('HH:mm:ss');
+
+  // remove 00s belonging to hours component if empty
+  return formatted.replace(/^00:/, '');
 }

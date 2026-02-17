@@ -7,7 +7,9 @@
   "button_playlist_ignore_existing_track": "Don't add",
   "button_playlist_ignore_existing_tracks": "Add new ones",
   "button_queue_clear": "Clear queue",
-  "button_reset_settings": "Reset App Data",
+  "button_settings_reset": "Reset App Data",
+  "button_settings_sync_add_directory": "Add Directory",
+  "button_settings_sync_refresh": "Refresh",
   "link_library": "Library",
   "link_library_artists": "Artists",
   "link_library_albums": "Albums",
@@ -19,6 +21,7 @@
   "label_album_header": "Album",
   "label_artist_header": "Artist",
   "label_settings_header": "Settings",
+  "label_settings_directories": "Selected Directories",
   "label_settings_reset_header": "Danger Zone",
   "label_settings_reset": "Reset",
   "label_settings_reset_details": "Removes all playlists, liked tracks, cached images and reset the app to a clean state. Requires a restart.",
@@ -79,5 +82,7 @@
   "tooltip_track_like": "Add to Liked Songs",
   "tooltip_track_dislike": "Remove from Liked Songs",
   "tooltip_pin_collection": "Pin {collectionType}",
-  "tooltip_unpin_collection": "Unpin {collectionType}"
+  "tooltip_unpin_collection": "Unpin {collectionType}",
+  "tooltip_settings_sync_file_scanned": "Files Scanned",
+  "tooltip_settings_sync_time_taken": "Time Taken"
 }

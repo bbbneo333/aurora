@@ -1,6 +1,7 @@
+// TODO: Use the following format for all utils export, remove everything else
+import { DateTimeUtils } from './date-time.utils';
+
 import * as ArrayUtils from './array.utils';
-import * as DatastoreUtils from './datastore.utils';
-import * as DateTimeUtils from './date-time.utils';
 import * as DOM from './dom.utils';
 import * as Events from './event.utils';
 import * as MediaUtils from './media.utils';
@@ -12,7 +13,6 @@ export * from './render.utils';
 
 export {
   ArrayUtils,
-  DatastoreUtils,
   DateTimeUtils,
   DOM,
   Events,

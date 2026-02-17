@@ -10,7 +10,7 @@ import {
   MediaTrackContextMenuItem,
 } from '../media-track-context-menu/media-track-context-menu.component';
 
-import { InteractiveList } from '../interactive-list/interactive-list.component';
+import { List } from '../list/list.component';
 import { MediaTrack } from '../media-track/media-track.component';
 
 export type MediaTrackListProps<T> = {
@@ -83,7 +83,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps
       mediaTracks={mediaTracks}
       mediaTrackList={mediaTrackList}
     >
-      <InteractiveList
+      <List
         items={mediaTracks}
         sortable={sortable}
         getItemId={getMediaTrackId}
@@ -101,7 +101,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps
             onPointerDown={handlePointerDown}
           />
         )}
-      </InteractiveList>
+      </List>
       {contextMenuId && contextMenuItems && (
         <MediaTrackContextMenu
           id={contextMenuId}

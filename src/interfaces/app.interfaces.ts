@@ -1,7 +1,5 @@
 import { BrowserWindow } from 'electron';
 
-import { IPCAsyncMessageHandler, IPCSyncMessageHandler } from '../modules/ipc';
-
 export interface IAppMain {
   readonly env?: string;
   readonly debug: boolean;
@@ -13,10 +11,6 @@ export interface IAppMain {
   readonly description: string;
 
   quit(): void;
-
-  registerSyncMessageHandler(messageChannel: string, messageHandlerSync: IPCSyncMessageHandler, messageHandlerCtx?: any): void;
-
-  registerAsyncMessageHandler(messageChannel: string, messageHandler: IPCAsyncMessageHandler, messageHandlerCtx?: any): void;
 
   sendMessageToRenderer(messageChannel: string, ...messageArgs: any[]): any;
 

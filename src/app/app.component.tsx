@@ -11,7 +11,7 @@ import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
 import { RootState } from '../reducers';
 import { MediaProviderService } from '../services';
-import { IPCService, IPCRendererCommChannel } from '../modules/ipc';
+import { IPCRenderer, IPCRendererCommChannel } from '../modules/ipc';
 
 import statePersistors from '../persistors';
 import store from '../store';
@@ -39,14 +39,14 @@ function Stage() {
 
   // ui related handlers need to be registered under router tree
   useEffect(() => {
-    const listener = IPCService.registerSyncMessageHandler(IPCRendererCommChannel.UIOpenSettings, () => {
+    const listener = IPCRenderer.addMessageHandler(IPCRendererCommChannel.UIOpenSettings, () => {
       if (location.pathname !== Routes.Settings) {
         history.push(Routes.Settings);
       }
     });
 
     return () => {
-      IPCService.removeSyncMessageListener(IPCRendererCommChannel.UIOpenSettings, listener);
+      IPCRenderer.removeMessageHandler(IPCRendererCommChannel.UIOpenSettings, listener);
     };
   }, [
     history,
@@ -54,10 +54,10 @@ function Stage() {
   ]);
 
   useEffect(() => {
-    const listener = IPCService.registerSyncMessageHandler(IPCRendererCommChannel.StateRemovePersisted, removeStates);
+    const listener = IPCRenderer.addMessageHandler(IPCRendererCommChannel.StateRemovePersisted, removeStates);
 
     return () => {
-      IPCService.removeSyncMessageListener(IPCRendererCommChannel.StateRemovePersisted, listener);
+      IPCRenderer.removeMessageHandler(IPCRendererCommChannel.StateRemovePersisted, listener);
     };
   }, []);
 

@@ -74,7 +74,7 @@ export function SettingsPage() {
                 showModal(MediaSettingsResetDialog);
               }}
             >
-              {I18nService.getString('button_reset_settings')}
+              {I18nService.getString('button_settings_reset')}
             </Button>
           </div>
         </div>

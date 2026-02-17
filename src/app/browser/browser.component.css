@@ -12,7 +12,7 @@
   align-items: center;
   flex: 0 0 50px;
   height: var(--titlebar-overlay-height);
-  margin: 5px;
+  margin: 5px 20px;
   gap: 15px;
 }
 

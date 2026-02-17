@@ -12,11 +12,11 @@ import {
 } from 'electron';
 
 import { IAppBuilder, IAppMain } from '../../interfaces';
-import { PlatformOS } from '../../modules/platform';
-import { IPCCommChannel, IPCRendererCommChannel } from '../../modules/ipc';
-
-import { DatastoreModule } from '../modules';
 import { Links } from '../../constants';
+
+import { DatastoreModule } from '../../modules/datastore';
+import { IPCCommChannel, IPCMain, IPCRendererCommChannel } from '../../modules/ipc';
+import { PlatformOS } from '../../modules/platform';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
 }
@@ -41,7 +41,7 @@ export default class MenuBuilder implements IAppBuilder {
     Menu.setApplicationMenu(menu);
 
     // allowing renderer process to request menu on demand
-    this.app.registerSyncMessageHandler(IPCCommChannel.AppOpenMenu, () => {
+    IPCMain.addSyncMessageHandler(IPCCommChannel.AppOpenMenu, () => {
       menu.popup({
         window: this.app.getCurrentWindow(),
       });

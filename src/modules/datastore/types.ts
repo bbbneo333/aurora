@@ -1,4 +1,13 @@
-type DataStoreComparisonOperators<T> = {
+export type DatastoreIndex = {
+  field: string,
+  unique?: boolean,
+};
+
+export type DatastoreOptions = {
+  indexes?: DatastoreIndex[]
+};
+
+export type DataStoreComparisonOperators<T> = {
   $lt?: T;
   $lte?: T;
   $gt?: T;
@@ -10,14 +19,14 @@ type DataStoreComparisonOperators<T> = {
   $regex?: RegExp | string;
 };
 
-type DataStoreLogicalOperators<T> = {
+export type DataStoreLogicalOperators<T> = {
   $or?: DataStoreFilterData<T>[];
   $and?: DataStoreFilterData<T>[];
   $not?: DataStoreFilterData<T>;
   $where?: (this: T) => boolean;
 };
 
-export type DataStoreFilterData<T> = {
+export type DataStoreFilterData<T = any> = {
   [P in keyof T]?: T[P] | DataStoreComparisonOperators<T[P]>;
 } & DataStoreLogicalOperators<T>;
 
@@ -25,7 +34,7 @@ export type DataStoreSortData<T> = {
   [P in keyof T]?: number
 };
 
-export type DataStoreQueryData<T> = {
+export type DataStoreQueryData<T = any> = {
   filter: DataStoreFilterData<T>,
   sort?: DataStoreSortData<T>,
   skip?: number,

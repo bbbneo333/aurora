@@ -29,7 +29,7 @@
   cursor: not-allowed !important;
 }
 
-.upload-icon {
+.upload-loader {
   font-size: 2.5em;
   color: var(--text-light-color);
 }

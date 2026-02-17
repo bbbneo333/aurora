@@ -2,9 +2,10 @@ import _ from 'lodash';
 
 import { MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
 import store from '../store';
-import { DataStoreInputData } from '../types';
 import { MediaUtils } from '../utils';
-import { IPCService, IPCCommChannel } from '../modules/ipc';
+
+import { DataStoreInputData } from '../modules/datastore';
+import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
 import MediaPlayerService from './media-player.service';
 
@@ -25,7 +26,7 @@ import {
   IMediaTrackData,
 } from '../interfaces';
 
-const debug = require('debug')('app:service:media_library_service');
+const debug = require('debug')('aurora:service:media_library');
 
 class MediaLibraryService {
   readonly mediaPictureScaleWidth = 500;
@@ -36,107 +37,57 @@ class MediaLibraryService {
   }
 
   async checkAndInsertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtist> {
-    let mediaArtistData;
-
-    if (!_.isNil(mediaArtistInputData.provider_id)) {
-      mediaArtistData = await MediaArtistDatastore.findMediaArtist({
-        provider: mediaArtistInputData.provider,
-        provider_id: mediaArtistInputData.provider_id,
-      });
-    } else {
+    if (_.isNil(mediaArtistInputData.provider_id)) {
       throw new Error('Provider id is required for checkAndInsertMediaArtist');
     }
 
-    if (mediaArtistData) {
-      mediaArtistData = await MediaArtistDatastore.updateArtistById(mediaArtistData.id, _.pick(mediaArtistInputData, [
-        'sync_timestamp',
-        'artist_name',
-        'extra',
-      ]));
-    } else {
-      mediaArtistData = await MediaArtistDatastore.insertMediaArtist({
-        provider: mediaArtistInputData.provider,
-        provider_id: mediaArtistInputData.provider_id,
-        sync_timestamp: mediaArtistInputData.sync_timestamp,
-        artist_name: mediaArtistInputData.artist_name,
-        artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
-        extra: mediaArtistInputData.extra,
-      });
-    }
+    const mediaArtistData = await MediaArtistDatastore.upsertMediaArtist({
+      provider: mediaArtistInputData.provider,
+      provider_id: mediaArtistInputData.provider_id,
+      sync_timestamp: mediaArtistInputData.sync_timestamp,
+      artist_name: mediaArtistInputData.artist_name,
+      artist_feature_picture: await this.processPicture(mediaArtistInputData.artist_feature_picture),
+      extra: mediaArtistInputData.extra,
+    });
 
     return this.buildMediaArtist(mediaArtistData, true);
   }
 
   async checkAndInsertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbum> {
-    let mediaTrackAlbumData;
-
-    if (!_.isNil(mediaAlbumInputData.provider_id)) {
-      mediaTrackAlbumData = await MediaAlbumDatastore.findMediaAlbum({
-        provider: mediaAlbumInputData.provider,
-        provider_id: mediaAlbumInputData.provider_id,
-      });
-    } else {
+    if (_.isNil(mediaAlbumInputData.provider_id)) {
       throw new Error('Provider id is required for checkAndInsertMediaAlbum');
     }
 
-    if (mediaTrackAlbumData) {
-      mediaTrackAlbumData = await MediaAlbumDatastore.updateAlbumById(mediaTrackAlbumData.id, _.pick(mediaAlbumInputData, [
-        'sync_timestamp',
-        'album_name',
-        'album_artist_id',
-        'extra',
-      ]));
-    } else {
-      mediaTrackAlbumData = await MediaAlbumDatastore.insertMediaAlbum({
-        provider: mediaAlbumInputData.provider,
-        provider_id: mediaAlbumInputData.provider_id,
-        sync_timestamp: mediaAlbumInputData.sync_timestamp,
-        album_name: mediaAlbumInputData.album_name,
-        album_artist_id: mediaAlbumInputData.album_artist_id,
-        album_cover_picture: await this.processPicture(mediaAlbumInputData.album_cover_picture),
-        extra: mediaAlbumInputData.extra,
-      });
-    }
+    const mediaTrackAlbumData = await MediaAlbumDatastore.upsertMediaAlbum({
+      provider: mediaAlbumInputData.provider,
+      provider_id: mediaAlbumInputData.provider_id,
+      sync_timestamp: mediaAlbumInputData.sync_timestamp,
+      album_name: mediaAlbumInputData.album_name,
+      album_artist_id: mediaAlbumInputData.album_artist_id,
+      album_cover_picture: await this.processPicture(mediaAlbumInputData.album_cover_picture),
+      extra: mediaAlbumInputData.extra,
+    });
 
     return this.buildMediaAlbum(mediaTrackAlbumData, true);
   }
 
   async checkAndInsertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrack> {
-    let mediaTrackData;
-
-    if (!_.isNil(mediaTrackInputData.provider_id)) {
-      mediaTrackData = await MediaTrackDatastore.findMediaTrack({
-        provider: mediaTrackInputData.provider,
-        provider_id: mediaTrackInputData.provider_id,
-      });
-    } else {
+    if (_.isNil(mediaTrackInputData.provider_id)) {
       throw new Error('Provider id is required for checkAndInsertMediaTrack');
     }
 
-    if (mediaTrackData) {
-      mediaTrackData = await MediaTrackDatastore.updateTrackById(mediaTrackData.id, _.pick(mediaTrackInputData, [
-        'sync_timestamp',
-        'track_name',
-        'track_number',
-        'track_duration',
-        'track_artist_ids',
-        'track_album_id',
-        'extra',
-      ]));
-    } else {
-      mediaTrackData = await MediaTrackDatastore.insertMediaTrack({
-        provider: mediaTrackInputData.provider,
-        provider_id: mediaTrackInputData.provider_id,
-        sync_timestamp: mediaTrackInputData.sync_timestamp,
-        track_name: mediaTrackInputData.track_name,
-        track_number: mediaTrackInputData.track_number,
-        track_duration: mediaTrackInputData.track_duration,
-        track_cover_picture: await this.processPicture(mediaTrackInputData.track_cover_picture),
-        track_artist_ids: mediaTrackInputData.track_artist_ids,
-        track_album_id: mediaTrackInputData.track_album_id,
-        extra: mediaTrackInputData.extra,
-      });
-    }
+    const mediaTrackData = await MediaTrackDatastore.upsertMediaTrack({
+      provider: mediaTrackInputData.provider,
+      provider_id: mediaTrackInputData.provider_id,
+      sync_timestamp: mediaTrackInputData.sync_timestamp,
+      track_name: mediaTrackInputData.track_name,
+      track_number: mediaTrackInputData.track_number,
+      track_duration: mediaTrackInputData.track_duration,
+      track_cover_picture: await this.processPicture(mediaTrackInputData.track_cover_picture),
+      track_artist_ids: mediaTrackInputData.track_artist_ids,
+      track_album_id: mediaTrackInputData.track_album_id,
+      extra: mediaTrackInputData.extra,
+    });
 
     return this.buildMediaTrack(mediaTrackData, true);
   }
@@ -464,7 +415,7 @@ class MediaLibraryService {
       let imageCachePath;
 
       try {
-        imageCachePath = await IPCService.sendAsyncMessage(IPCCommChannel.MediaScaleAndCacheImage, mediaPicture.image_data, {
+        imageCachePath = await IPCRenderer.sendAsyncMessage(IPCCommChannel.ImageScale, mediaPicture.image_data, {
           width: this.mediaPictureScaleWidth,
           height: this.mediaPictureScaleHeight,
         });
