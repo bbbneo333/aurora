@@ -1,12 +1,12 @@
-import { MediaEnums } from '../enums';
 import { MediaProviderDatastore } from '../datastores';
+import { MediaEnums } from '../enums';
 import { IMediaProvider } from '../interfaces';
 import store from '../store';
 
 const debug = require('debug')('aurora:service:media_provider');
 
-class MediaProviderService {
-  registerMediaProvider(mediaProvider: IMediaProvider) {
+export class MediaProviderService {
+  static registerMediaProvider(mediaProvider: IMediaProvider) {
     debug('registerMediaProvider - registering media provider - %s', mediaProvider.mediaProviderIdentifier);
 
     this.addProviderToDatastore(mediaProvider)
@@ -23,7 +23,7 @@ class MediaProviderService {
       });
   }
 
-  getMediaProvider(mediaProviderIdentifier: string): IMediaProvider {
+  static getMediaProvider(mediaProviderIdentifier: string): IMediaProvider {
     const { mediaProviderRegistry } = store.getState();
 
     const mediaProviderRequested = mediaProviderRegistry.mediaProviders.find(mediaProvider => mediaProvider.mediaProviderIdentifier === mediaProviderIdentifier);
@@ -34,7 +34,7 @@ class MediaProviderService {
     return mediaProviderRequested;
   }
 
-  async getMediaProviderSettings(mediaProviderIdentifier: string): Promise<any> {
+  static async getMediaProviderSettings(mediaProviderIdentifier: string): Promise<any> {
     debug('getMediaProviderSettings - fetching settings for - %s', mediaProviderIdentifier);
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
@@ -45,7 +45,7 @@ class MediaProviderService {
     return mediaProviderData.settings;
   }
 
-  async updateMediaProviderSettings(mediaProviderIdentifier: string, mediaProviderSettings: object): Promise<void> {
+  static async updateMediaProviderSettings(mediaProviderIdentifier: string, mediaProviderSettings: object): Promise<void> {
     debug('updateMediaProviderSettings - getting existing settings for - %s', mediaProviderIdentifier);
     const mediaProvider = this.getMediaProvider(mediaProviderIdentifier);
     const mediaProviderExistingSettings = await this.getMediaProviderSettings(mediaProviderIdentifier);
@@ -63,7 +63,7 @@ class MediaProviderService {
     debug('updateMediaProviderSettings - updated settings - %s', mediaProviderIdentifier);
   }
 
-  private async addProviderToDatastore(mediaProvider: IMediaProvider): Promise<void> {
+  private static async addProviderToDatastore(mediaProvider: IMediaProvider): Promise<void> {
     // check if we already have an existing entry for the provider in the datastore, do nothing if entry already exists
     if (await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProvider.mediaProviderIdentifier)) {
       return;
@@ -83,7 +83,7 @@ class MediaProviderService {
     });
   }
 
-  private addProviderToLocalStore(mediaProvider: IMediaProvider): void {
+  private static addProviderToLocalStore(mediaProvider: IMediaProvider): void {
     store.dispatch({
       type: MediaEnums.MediaProviderRegistryActions.AddProviderSafe,
       data: {
@@ -92,7 +92,7 @@ class MediaProviderService {
     });
   }
 
-  private initializeLibraryInLocalStore(mediaProvider: IMediaProvider): void {
+  private static initializeLibraryInLocalStore(mediaProvider: IMediaProvider): void {
     store.dispatch({
       type: MediaEnums.MediaLibraryActions.Initialize,
       data: {
@@ -101,5 +101,3 @@ class MediaProviderService {
     });
   }
 }
-
-export default new MediaProviderService();

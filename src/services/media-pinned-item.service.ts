@@ -6,12 +6,12 @@ import { IMediaPinnedItem, IMediaPinnedItemData, IMediaPinnedItemInputData } fro
 import { EntityNotFoundError } from '../types';
 import store from '../store';
 
-import MediaCollectionService from './media-collection.service';
+import { MediaCollectionService } from './media-collection.service';
 
-class MediaPinnedItemService {
-  readonly removeOnMissing = false;
+export class MediaPinnedItemService {
+  static readonly removeOnMissing = false;
 
-  loadPinnedItems() {
+  static loadPinnedItems() {
     this.resolvePinnedItems()
       .then((mediaPinnedItems) => {
         store.dispatch({
@@ -23,7 +23,7 @@ class MediaPinnedItemService {
       });
   }
 
-  loadPinnedItemStatus(input: IMediaPinnedItemInputData) {
+  static loadPinnedItemStatus(input: IMediaPinnedItemInputData) {
     this.getPinnedItem(input)
       .then((pinnedItem) => {
         if (pinnedItem) {
@@ -44,7 +44,7 @@ class MediaPinnedItemService {
       });
   }
 
-  async resolvePinnedItems(): Promise<IMediaPinnedItem[]> {
+  static async resolvePinnedItems(): Promise<IMediaPinnedItem[]> {
     // this function fetches pinned items along with their collection item
     // in case collection item entry is not found, it removes the pinned item (if enabled)
     const dataList = await MediaPinnedItemDatastore.find();
@@ -71,7 +71,7 @@ class MediaPinnedItemService {
     return items;
   }
 
-  async getPinnedItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem | undefined> {
+  static async getPinnedItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem | undefined> {
     try {
       const data = await MediaPinnedItemDatastore.findOne({
         collection_item_id: input.id,
@@ -89,7 +89,7 @@ class MediaPinnedItemService {
     }
   }
 
-  async pinCollectionItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem> {
+  static async pinCollectionItem(input: IMediaPinnedItemInputData): Promise<IMediaPinnedItem> {
     const newOrder = await this.getOrderForNewItem();
 
     const data = await MediaPinnedItemDatastore.insertOne({
@@ -111,7 +111,7 @@ class MediaPinnedItemService {
     return pinnedItem;
   }
 
-  async unpinCollectionItem(input: IMediaPinnedItemInputData): Promise<void> {
+  static async unpinCollectionItem(input: IMediaPinnedItemInputData): Promise<void> {
     await MediaPinnedItemDatastore.remove({
       collection_item_id: input.id,
       collection_item_type: input.type,
@@ -125,7 +125,7 @@ class MediaPinnedItemService {
     });
   }
 
-  async updatePinnedItemsOrder(itemIds: string[]): Promise<void> {
+  static async updatePinnedItemsOrder(itemIds: string[]): Promise<void> {
     // update order - itemIds need to be in the required order
     await Promise.map(itemIds, async (itemId, index) => MediaPinnedItemDatastore.updateOne(itemId, {
       order: index,
@@ -134,7 +134,7 @@ class MediaPinnedItemService {
     this.loadPinnedItems();
   }
 
-  private async getOrderForNewItem(): Promise<number> {
+  private static async getOrderForNewItem(): Promise<number> {
     // get the last pinned item for obtaining order
     // we start with 0 if not found (index based)
     const data = await MediaPinnedItemDatastore.find({}, {
@@ -149,7 +149,7 @@ class MediaPinnedItemService {
     return itemData.order + 1;
   }
 
-  private async buildPinnedItem(pinnedItemData: IMediaPinnedItemData): Promise<IMediaPinnedItem> {
+  private static async buildPinnedItem(pinnedItemData: IMediaPinnedItemData): Promise<IMediaPinnedItem> {
     const collectionItem = await MediaCollectionService.getMediaItem(
       pinnedItemData.collection_item_id,
       pinnedItemData.collection_item_type,
@@ -165,5 +165,3 @@ class MediaPinnedItemService {
     };
   }
 }
-
-export default new MediaPinnedItemService();

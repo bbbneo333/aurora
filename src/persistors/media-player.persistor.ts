@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { IAppStatePersistor, IMediaQueueTrack } from '../interfaces';
-import { MediaLibraryService, MediaPlayerService } from '../services';
+import { MediaPlayerService, MediaTrackService } from '../services';
 
 import { MediaPlayerState } from '../reducers/media-player.reducer';
 import { MediaEnums } from '../enums';
@@ -66,7 +66,7 @@ export default class MediaPlayerPersistor implements IAppStatePersistor {
     // load media queue
     // important - load tracks directly to retain original queue info and shuffle order
     const mediaQueueTracks = await Promise.reduce(mediaTracks, async (mediaTracksDeserialized: IMediaQueueTrack[], mediaTrackSerialized) => {
-      const mediaTrack = await MediaLibraryService.getMediaTrack(mediaTrackSerialized.id);
+      const mediaTrack = await MediaTrackService.getMediaTrack(mediaTrackSerialized.id);
 
       if (mediaTrack) {
         mediaTracksDeserialized.push({

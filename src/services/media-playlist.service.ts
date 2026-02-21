@@ -19,9 +19,9 @@ import { MediaUtils } from '../utils';
 
 import { DataStoreInputData, DataStoreUpdateData, DatastoreUtils } from '../modules/datastore';
 
-import NotificationService from './notification.service';
-import I18nService from './i18n.service';
-import MediaLibraryService from './media-library.service';
+import { I18nService } from './i18n.service';
+import { MediaTrackService } from './media-track.service';
+import { NotificationService } from './notification.service';
 
 export class MediaLibraryPlaylistDuplicateTracksError extends BaseError {
   existingTrackDataList: IMediaPlaylistTrackInputData[] = [];
@@ -38,10 +38,10 @@ export class MediaLibraryPlaylistDuplicateTracksError extends BaseError {
   }
 }
 
-class MediaPlaylistService {
-  readonly removeOnMissing = false;
+export class MediaPlaylistService {
+  static readonly removeOnMissing = false;
 
-  loadMediaPlaylists(): void {
+  static loadMediaPlaylists(): void {
     this
       .getMediaPlaylists()
       .then((mediaPlaylists) => {
@@ -54,7 +54,7 @@ class MediaPlaylistService {
       });
   }
 
-  loadMediaPlaylist(mediaPlaylistId: string): void {
+  static loadMediaPlaylist(mediaPlaylistId: string): void {
     this
       .getMediaPlaylist(mediaPlaylistId)
       .then((mediaPlaylist) => {
@@ -67,7 +67,7 @@ class MediaPlaylistService {
       });
   }
 
-  unloadMediaPlaylist(): void {
+  static unloadMediaPlaylist(): void {
     store.dispatch({
       type: MediaLibraryActions.SetPlaylist,
       data: {
@@ -76,7 +76,7 @@ class MediaPlaylistService {
     });
   }
 
-  async searchPlaylistsByName(query: string): Promise<IMediaPlaylist[]> {
+  static async searchPlaylistsByName(query: string): Promise<IMediaPlaylist[]> {
     const playlists = await MediaPlaylistDatastore.findMediaPlaylists({
       name: {
         $regex: new RegExp(query, 'i'),
@@ -86,7 +86,7 @@ class MediaPlaylistService {
     return this.buildMediaPlaylists(playlists);
   }
 
-  async getMediaPlaylist(mediaPlaylistId: string): Promise<IMediaPlaylist | undefined> {
+  static async getMediaPlaylist(mediaPlaylistId: string): Promise<IMediaPlaylist | undefined> {
     const mediaPlaylistData = await MediaPlaylistDatastore.findMediaPlaylist({
       id: mediaPlaylistId,
     });
@@ -94,7 +94,7 @@ class MediaPlaylistService {
     return mediaPlaylistData ? this.buildMediaPlaylist(mediaPlaylistData) : undefined;
   }
 
-  async resolveMediaPlaylistTracks(mediaPlaylistId: string): Promise<IMediaPlaylistTrack[]> {
+  static async resolveMediaPlaylistTracks(mediaPlaylistId: string): Promise<IMediaPlaylistTrack[]> {
     // this function fetches playlist tracks along with the linked media track
     // in case media track is not found, it removes the playlist track entry (if enabled)
     const playlist = await this.getMediaPlaylist(mediaPlaylistId);
@@ -123,7 +123,7 @@ class MediaPlaylistService {
     return playlistTracks;
   }
 
-  async getMediaPlaylists(): Promise<IMediaPlaylist[]> {
+  static async getMediaPlaylists(): Promise<IMediaPlaylist[]> {
     const mediaPlaylistsDataList = await MediaPlaylistDatastore.findMediaPlaylists();
 
     const mediaPlaylists = await Promise.all(
@@ -133,7 +133,7 @@ class MediaPlaylistService {
     return MediaUtils.sortMediaPlaylists(mediaPlaylists);
   }
 
-  async createMediaPlaylist(mediaPlaylistInputData?: IMediaPlaylistInputData): Promise<IMediaPlaylist> {
+  static async createMediaPlaylist(mediaPlaylistInputData?: IMediaPlaylistInputData): Promise<IMediaPlaylist> {
     const inputData: DataStoreInputData<IMediaPlaylistData> = _.defaults(mediaPlaylistInputData, {
       name: await this.getDefaultNewPlaylistName(),
       tracks: [],
@@ -156,7 +156,7 @@ class MediaPlaylistService {
   /**
    * @throws MediaLibraryPlaylistDuplicateTracksError
    */
-  async addMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[], options?: {
+  static async addMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[], options?: {
     ignoreExisting?: boolean; // only add new ones
   }): Promise<IMediaPlaylist> {
     const {
@@ -194,7 +194,7 @@ class MediaPlaylistService {
     return mediaPlaylistUpdated;
   }
 
-  async updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: IMediaPlaylistUpdateData): Promise<IMediaPlaylist> {
+  static async updateMediaPlaylist(mediaPlaylistId: string, mediaPlaylistUpdateData: IMediaPlaylistUpdateData): Promise<IMediaPlaylist> {
     const mediaPlaylistData = await MediaPlaylistDatastore.updateMediaPlaylist(mediaPlaylistId, await this.buildMediaPlaylistUpdateDataFromInput(mediaPlaylistId, mediaPlaylistUpdateData));
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
@@ -208,7 +208,7 @@ class MediaPlaylistService {
     return mediaPlaylist;
   }
 
-  async deleteMediaPlaylist(mediaPlaylistId: string): Promise<void> {
+  static async deleteMediaPlaylist(mediaPlaylistId: string): Promise<void> {
     await MediaPlaylistDatastore.deleteMediaPlaylist({
       id: mediaPlaylistId,
     });
@@ -223,7 +223,7 @@ class MediaPlaylistService {
     NotificationService.showMessage(I18nService.getString('message_playlist_deleted'));
   }
 
-  async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylist> {
+  static async deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylist> {
     const mediaPlaylistData = await MediaPlaylistDatastore.deleteMediaPlaylistTracks(mediaPlaylistId, mediaPlaylistTrackIds);
     const mediaPlaylist = await this.buildMediaPlaylist(mediaPlaylistData);
 
@@ -237,16 +237,16 @@ class MediaPlaylistService {
     return mediaPlaylist;
   }
 
-  private async buildMediaPlaylist(mediaPlaylistData: IMediaPlaylistData) {
+  private static async buildMediaPlaylist(mediaPlaylistData: IMediaPlaylistData) {
     return _.assign(mediaPlaylistData, {});
   }
 
-  private async buildMediaPlaylists(mediaPlaylistDataList: IMediaPlaylistData[]) {
+  private static async buildMediaPlaylists(mediaPlaylistDataList: IMediaPlaylistData[]) {
     return Promise.all(mediaPlaylistDataList.map((mediaPlaylistData: any) => this.buildMediaPlaylist(mediaPlaylistData)));
   }
 
-  private async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack> {
-    const mediaTrack = await MediaLibraryService.getMediaTrackForProvider(mediaPlaylistTrackData.provider, mediaPlaylistTrackData.provider_id);
+  private static async buildMediaPlaylistTrack(mediaPlaylistTrackData: IMediaPlaylistTrackData): Promise<IMediaPlaylistTrack> {
+    const mediaTrack = await MediaTrackService.getMediaTrackForProvider(mediaPlaylistTrackData.provider, mediaPlaylistTrackData.provider_id);
     if (!mediaTrack) {
       throw new EntityNotFoundError(`${mediaPlaylistTrackData.provider}-${mediaPlaylistTrackData.provider_id}`, 'track');
     }
@@ -257,7 +257,7 @@ class MediaPlaylistService {
     };
   }
 
-  private async getDefaultNewPlaylistName(): Promise<string> {
+  private static async getDefaultNewPlaylistName(): Promise<string> {
     const mediaPlaylistsCount = await MediaPlaylistDatastore.countMediaPlaylists();
 
     return `${I18nService.getString('label_new_playlist_default_name', {
@@ -265,7 +265,7 @@ class MediaPlaylistService {
     })}`;
   }
 
-  private buildMediaPlaylistTrackFromInput(trackInputData: IMediaPlaylistTrackInputData): IMediaPlaylistTrackData {
+  private static buildMediaPlaylistTrackFromInput(trackInputData: IMediaPlaylistTrackInputData): IMediaPlaylistTrackData {
     return {
       playlist_track_id: DatastoreUtils.generateId(),
       provider: trackInputData.provider,
@@ -274,7 +274,7 @@ class MediaPlaylistService {
     };
   }
 
-  private async buildMediaPlaylistUpdateDataFromInput(playlistId: string, playlistUpdateData: IMediaPlaylistUpdateData): Promise<DataStoreUpdateData<IMediaPlaylistData>> {
+  private static async buildMediaPlaylistUpdateDataFromInput(playlistId: string, playlistUpdateData: IMediaPlaylistUpdateData): Promise<DataStoreUpdateData<IMediaPlaylistData>> {
     const data: DataStoreUpdateData<IMediaPlaylistData> = {};
     if (playlistUpdateData.name) {
       data.name = playlistUpdateData.name;
@@ -289,7 +289,7 @@ class MediaPlaylistService {
     return data;
   }
 
-  private async buildMediaPlaylistTrackUpdateDataFromInput(playlistId: string, playlistTrackUpdateDataList: IMediaPlaylistTrackUpdateData[]): Promise<IMediaPlaylistTrackData[]> {
+  private static async buildMediaPlaylistTrackUpdateDataFromInput(playlistId: string, playlistTrackUpdateDataList: IMediaPlaylistTrackUpdateData[]): Promise<IMediaPlaylistTrackData[]> {
     // we got tracks to update, we only get playlist_track_id in the order we required
     // we also can have deleted ids, no addition is allowed
     // build the new set of playlist tracks in order we require and set them directly
@@ -316,7 +316,7 @@ class MediaPlaylistService {
     return playlistUpdatedTracks;
   }
 
-  private async getExistingMediaPlaylistTrackInputData(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[]): Promise<{
+  private static async getExistingMediaPlaylistTrackInputData(mediaPlaylistId: string, mediaPlaylistTrackInputDataList: IMediaPlaylistTrackInputData[]): Promise<{
     existingInputDataList: IMediaPlaylistTrackInputData[],
     newInputDataList: IMediaPlaylistTrackInputData[],
   }> {
@@ -347,5 +347,3 @@ class MediaPlaylistService {
     };
   }
 }
-
-export default new MediaPlaylistService();

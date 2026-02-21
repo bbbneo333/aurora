@@ -8,7 +8,7 @@ export type AppDetails = {
   logs_path: string;
 };
 
-export default class AppService {
+export class AppService {
   private static Details: AppDetails;
 
   static get details(): AppDetails {

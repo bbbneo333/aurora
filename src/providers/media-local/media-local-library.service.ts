@@ -195,12 +195,37 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
   private async addTrackFromFile(file: FSFile) {
     const mediaSyncTimestamp = Date.now();
+    // generate local id - we are using location of the file to uniquely identify the track
+    const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
+
+    // // first check if we can simply mark it as seen; required both mtime and size for this to work
+    // if (isNumber(file.stats?.mtime) && isNumber(file.stats?.size)) {
+    //   const mediaTrack = await MediaTrackService.updateMediaTrack({
+    //     provider: MediaLocalConstants.Provider,
+    //     provider_id: mediaTrackId,
+    //     // @ts-ignore - can't get extra props to work with type checking
+    //     'extra.mtime': file.stats?.mtime,
+    //     'extra.size': file.stats?.size,
+    //   }, {
+    //     sync_timestamp: mediaSyncTimestamp,
+    //   });
+    //
+    //   if (mediaTrack) {
+    //     console.log('yolo', mediaTrack.extra);
+    //
+    //     // update media album
+    //
+    //     // update media artists
+    //
+    //     debug('addTracksFromDirectory - track at path %s already added %s, skipping...', file.path, mediaTrack.id);
+    //     return mediaTrack;
+    //   }
+    // }
+
     // read metadata
     const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(file.path);
     // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
     const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
-    // generate local id - we are using location of the file to uniquely identify the track
-    const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
     // add media artist
     const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
       ? audioMetadata.common.artists.map(audioArtist => ({
@@ -246,6 +271,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         location: {
           address: file.path,
         },
+        mtime: file.stats?.mtime,
+        size: file.stats?.size,
       },
       sync_timestamp: mediaSyncTimestamp,
     });

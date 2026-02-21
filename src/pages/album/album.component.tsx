@@ -13,9 +13,15 @@ import {
   TextClamp,
 } from '../../components';
 
+import {
+  I18nService,
+  MediaAlbumService,
+  MediaCollectionService,
+  MediaTrackService,
+} from '../../services';
+
 import { Icons, Layout } from '../../constants';
 import { RootState } from '../../reducers';
-import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
 
 import styles from './album.component.css';
 
@@ -27,9 +33,9 @@ export function AlbumPage() {
   const mediaSelectedAlbumTracks = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedAlbumTracks);
 
   useEffect(() => {
-    MediaLibraryService.loadMediaAlbum(albumId);
+    MediaTrackService.loadMediaAlbumTracks(albumId);
 
-    return () => MediaLibraryService.unloadMediaAlbum();
+    return () => MediaAlbumService.unloadMediaAlbum();
   }, [
     albumId,
   ]);

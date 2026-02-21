@@ -57,11 +57,8 @@ class MediaArtistDatastore {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaArtistDatastoreName, mediaArtistFilterData);
   }
 
-  upsertMediaArtist(input: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
-    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaArtistDatastoreName, {
-      provider: input.provider,
-      provider_id: input.provider_id,
-    }, input);
+  upsertMediaArtist(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>, mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaArtistDatastoreName, mediaArtistFilterData, mediaArtistInputData);
   }
 }
 

@@ -84,7 +84,7 @@ export class FileSystemModule implements IAppModule {
 
     const walker = walkStream(directory, {
       followSymbolicLinks: false,
-      stats: false,
+      stats: true,
       throwErrorOnBrokenSymbolicLink: false,
       entryFilter,
     });
@@ -95,6 +95,10 @@ export class FileSystemModule implements IAppModule {
         batch.push({
           path: entry.path,
           name: path.basename(entry.path),
+          stats: {
+            mtime: entry.stats?.mtimeMs,
+            size: entry.stats?.size,
+          },
         });
 
         if (batch.length >= batchSize) {
