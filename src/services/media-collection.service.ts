@@ -11,28 +11,30 @@ import { Icons, Routes } from '../constants';
 import { MediaCollectionItemType } from '../enums';
 import { StringUtils } from '../utils';
 
-import MediaLibraryService from './media-library.service';
-import MediaLikedTrackService from './media-liked-track.service';
-import MediaPlaylistService from './media-playlist.service';
-import I18nService from './i18n.service';
+import { I18nService } from './i18n.service';
+import { MediaAlbumService } from './media-album.service';
+import { MediaArtistService } from './media-artist.service';
+import { MediaTrackService } from './media-track.service';
+import { MediaLikedTrackService } from './media-liked-track.service';
+import { MediaPlaylistService } from './media-playlist.service';
 
-class MediaCollectionService {
-  async searchCollection(query: string): Promise<IMediaCollectionSearchResults> {
+export class MediaCollectionService {
+  static async searchCollection(query: string): Promise<IMediaCollectionSearchResults> {
     return {
-      tracks: await MediaLibraryService.searchTracksByName(query),
-      albums: await MediaLibraryService.searchAlbumsByName(query),
-      artists: await MediaLibraryService.searchArtistsByName(query),
+      tracks: await MediaTrackService.searchTracksByName(query),
+      albums: await MediaAlbumService.searchAlbumsByName(query),
+      artists: await MediaArtistService.searchArtistsByName(query),
       playlists: await MediaPlaylistService.searchPlaylistsByName(query),
     };
   }
 
-  async getMediaCollectionTracks(mediaCollectionItem: IMediaCollectionItem): Promise<IMediaTrack[]> {
+  static async getMediaCollectionTracks(mediaCollectionItem: IMediaCollectionItem): Promise<IMediaTrack[]> {
     switch (mediaCollectionItem.type) {
       case MediaCollectionItemType.Album: {
-        return MediaLibraryService.getMediaAlbumTracks(mediaCollectionItem.id);
+        return MediaTrackService.getMediaAlbumTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.Artist: {
-        return MediaLibraryService.getMediaArtistTracks(mediaCollectionItem.id);
+        return MediaTrackService.getMediaArtistTracks(mediaCollectionItem.id);
       }
       case MediaCollectionItemType.Playlist: {
         return MediaPlaylistService.resolveMediaPlaylistTracks(mediaCollectionItem.id);
@@ -45,7 +47,7 @@ class MediaCollectionService {
     }
   }
 
-  getMediaItemFromAlbum(mediaAlbum: IMediaAlbum): IMediaCollectionItem {
+  static getMediaItemFromAlbum(mediaAlbum: IMediaAlbum): IMediaCollectionItem {
     return {
       id: mediaAlbum.id,
       type: MediaCollectionItemType.Album,
@@ -54,7 +56,7 @@ class MediaCollectionService {
     };
   }
 
-  getMediaItemFromArtist(mediaArtist: IMediaArtist): IMediaCollectionItem {
+  static getMediaItemFromArtist(mediaArtist: IMediaArtist): IMediaCollectionItem {
     return {
       id: mediaArtist.id,
       name: mediaArtist.artist_name,
@@ -63,7 +65,7 @@ class MediaCollectionService {
     };
   }
 
-  getMediaItemFromPlaylist(mediaPlaylist: IMediaPlaylist): IMediaCollectionItem {
+  static getMediaItemFromPlaylist(mediaPlaylist: IMediaPlaylist): IMediaCollectionItem {
     return {
       id: mediaPlaylist.id,
       name: mediaPlaylist.name,
@@ -72,7 +74,7 @@ class MediaCollectionService {
     };
   }
 
-  getMediaItemForLikedTracks() {
+  static getMediaItemForLikedTracks() {
     return {
       id: 'liked-tracks',
       name: I18nService.getString('label_liked_tracks_collection_name'),
@@ -81,7 +83,7 @@ class MediaCollectionService {
     };
   }
 
-  getItemCoverPlaceholderIcon(mediaCollectionItem: IMediaCollectionItem): string {
+  static getItemCoverPlaceholderIcon(mediaCollectionItem: IMediaCollectionItem): string {
     switch (mediaCollectionItem.type) {
       case MediaCollectionItemType.Artist:
         return Icons.ArtistPlaceholder;
@@ -96,7 +98,7 @@ class MediaCollectionService {
     }
   }
 
-  getItemRouterLink(mediaCollectionItem: IMediaCollectionItem): string {
+  static getItemRouterLink(mediaCollectionItem: IMediaCollectionItem): string {
     switch (mediaCollectionItem.type) {
       case MediaCollectionItemType.Album:
         return StringUtils.buildRoute(Routes.LibraryAlbum, {
@@ -117,7 +119,7 @@ class MediaCollectionService {
     }
   }
 
-  getItemSubtitle(mediaCollectionItem: IMediaCollectionItem): string {
+  static getItemSubtitle(mediaCollectionItem: IMediaCollectionItem): string {
     switch (mediaCollectionItem.type) {
       case MediaCollectionItemType.Artist:
         return I18nService.getString('label_artist_header');
@@ -131,14 +133,14 @@ class MediaCollectionService {
     }
   }
 
-  async getMediaItem(id: string, type: MediaCollectionItemType): Promise<IMediaCollectionItem | undefined> {
+  static async getMediaItem(id: string, type: MediaCollectionItemType): Promise<IMediaCollectionItem | undefined> {
     switch (type) {
       case MediaCollectionItemType.Album: {
-        const album = await MediaLibraryService.getMediaAlbum(id);
+        const album = await MediaAlbumService.getMediaAlbum(id);
         return album ? this.getMediaItemFromAlbum(album) : undefined;
       }
       case MediaCollectionItemType.Artist: {
-        const artist = await MediaLibraryService.getMediaArtist(id);
+        const artist = await MediaArtistService.getMediaArtist(id);
         return artist ? this.getMediaItemFromArtist(artist) : undefined;
       }
       case MediaCollectionItemType.Playlist: {
@@ -153,5 +155,3 @@ class MediaCollectionService {
     }
   }
 }
-
-export default new MediaCollectionService();

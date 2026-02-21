@@ -1,9 +1,9 @@
 type NotificationListener = (message: string) => void;
 
-class NotificationService {
-  private listeners: NotificationListener[] = [];
+export class NotificationService {
+  private static listeners: NotificationListener[] = [];
 
-  subscribe(listener: NotificationListener) {
+  static subscribe(listener: NotificationListener) {
     this.listeners.push(listener);
 
     return () => {
@@ -11,9 +11,7 @@ class NotificationService {
     };
   }
 
-  showMessage(message: string) {
+  static showMessage(message: string) {
     this.listeners.forEach(listener => listener(message));
   }
 }
-
-export default new NotificationService();

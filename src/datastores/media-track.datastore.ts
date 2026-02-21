@@ -35,10 +35,8 @@ class MediaTrackDatastore {
     });
   }
 
-  updateTrackById(mediaTrackId: string, mediaTrackUpdateData: DataStoreUpdateData<IMediaTrackData>): Promise<IMediaTrackData> {
-    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaTrackDatastoreName, {
-      id: mediaTrackId,
-    }, {
+  updateMediaTrack(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>, mediaTrackUpdateData: DataStoreUpdateData<IMediaTrackData>): Promise<IMediaTrackData | undefined> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaTrackDatastoreName, mediaTrackFilterData, {
       $set: mediaTrackUpdateData,
     });
   }
@@ -51,11 +49,8 @@ class MediaTrackDatastore {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaTrackDatastoreName, mediaTrackFilterData);
   }
 
-  upsertMediaTrack(input: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {
-    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaTrackDatastoreName, {
-      provider: input.provider,
-      provider_id: input.provider_id,
-    }, input);
+  upsertMediaTrack(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>, mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaTrackDatastoreName, mediaTrackFilterData, mediaTrackInputData);
   }
 }
 

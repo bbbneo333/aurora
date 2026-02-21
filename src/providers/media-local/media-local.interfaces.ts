@@ -10,6 +10,8 @@ export interface IMediaLocalTrack extends IMediaTrack {
   extra: {
     location: {
       address: string;
-    }
+    },
+    mtime?: number;
+    size?: number;
   }
 }

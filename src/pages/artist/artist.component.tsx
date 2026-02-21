@@ -4,9 +4,12 @@ import { useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import classNames from 'classnames/bind';
 
-import { Icons, Layout } from '../../constants';
-import { RootState } from '../../reducers';
-import { I18nService, MediaCollectionService, MediaLibraryService } from '../../services';
+import {
+  I18nService,
+  MediaAlbumService,
+  MediaArtistService,
+  MediaCollectionService,
+} from '../../services';
 
 import {
   MediaAlbums,
@@ -14,6 +17,9 @@ import {
   MediaCoverPicture,
   TextClamp,
 } from '../../components';
+
+import { Icons, Layout } from '../../constants';
+import { RootState } from '../../reducers';
 
 import styles from './artist.component.css';
 
@@ -26,9 +32,9 @@ export function ArtistPage() {
   const mediaSelectedArtistAlbums = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedArtistAlbums);
 
   useEffect(() => {
-    MediaLibraryService.loadMediaArtist(artistId);
+    MediaAlbumService.loadMediaArtistAlbums(artistId);
 
-    return () => MediaLibraryService.unloadMediaArtist();
+    return () => MediaArtistService.unloadMediaArtist();
   }, [
     artistId,
   ]);

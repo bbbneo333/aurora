@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux';
 
 import { MediaAlbums } from '../../components';
 import { RootState } from '../../reducers';
-import { MediaLibraryService } from '../../services';
+import { MediaAlbumService } from '../../services';
 
 export function AlbumsPage() {
   const { mediaAlbums } = useSelector((state: RootState) => state.mediaLibrary);
 
   useEffect(() => {
-    MediaLibraryService.loadMediaAlbums();
+    MediaAlbumService.loadMediaAlbums();
   }, []);
 
   return (

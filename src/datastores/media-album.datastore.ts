@@ -57,11 +57,8 @@ class MediaAlbumDatastore {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaAlbumDatastoreName, mediaAlbumFilterData);
   }
 
-  upsertMediaAlbum(input: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbumData> {
-    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaAlbumDatastoreName, {
-      provider: input.provider,
-      provider_id: input.provider_id,
-    }, input);
+  upsertMediaAlbum(mediaAlbumFilterData: DataStoreFilterData<IMediaAlbumData>, mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbumData> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpsertOne, this.mediaAlbumDatastoreName, mediaAlbumFilterData, mediaAlbumInputData);
   }
 }
 
