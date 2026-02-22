@@ -2,6 +2,7 @@ import { MediaArtistDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
 import { IMediaArtist, IMediaArtistData } from '../interfaces';
 import { MediaUtils } from '../utils';
+import { DataStoreFilterData, DataStoreUpdateData } from '../modules/datastore';
 import store from '../store';
 
 export class MediaArtistService {
@@ -25,6 +26,11 @@ export class MediaArtistService {
 
     const mediaArtists = await Promise.all(mediaArtistDataList.map(mediaArtistData => this.buildMediaArtist(mediaArtistData)));
     return MediaUtils.sortMediaArtists(mediaArtists);
+  }
+
+  static async updateMediaArtists(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>, mediaArtistUpdateData: DataStoreUpdateData<IMediaArtistData>): Promise<IMediaArtist[] | undefined> {
+    const mediaAlbumDataList = await MediaArtistDatastore.updateArtists(mediaArtistFilterData, mediaArtistUpdateData);
+    return this.buildMediaArtists(mediaAlbumDataList, true);
   }
 
   static loadMediaArtists(): void {

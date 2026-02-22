@@ -93,7 +93,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     saving,
     syncing,
     syncDuration,
-    syncFileCount,
+    syncFilesFoundCount,
+    syncFilesAddedCount,
     syncDirectoryStats,
   } = state;
 
@@ -192,7 +193,11 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               <>
                 {I18nService.getString('tooltip_settings_sync_file_scanned')}
                 :&nbsp;
-                {syncFileCount}
+                {syncFilesFoundCount}
+                <br/>
+                {I18nService.getString('tooltip_settings_sync_file_added')}
+                :&nbsp;
+                {syncFilesAddedCount}
                 <br/>
                 {I18nService.getString('tooltip_settings_sync_time_taken')}
                 :&nbsp;

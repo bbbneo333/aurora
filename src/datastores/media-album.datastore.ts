@@ -49,6 +49,12 @@ class MediaAlbumDatastore {
     });
   }
 
+  updateMediaAlbum(mediaAlbumFilterData: DataStoreFilterData<IMediaAlbumData>, mediaAlbumUpdateData: DataStoreUpdateData<IMediaAlbumData>): Promise<IMediaAlbumData | undefined> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaAlbumDatastoreName, mediaAlbumFilterData, {
+      $set: mediaAlbumUpdateData,
+    });
+  }
+
   insertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbumData> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaAlbumDatastoreName, mediaAlbumInputData);
   }

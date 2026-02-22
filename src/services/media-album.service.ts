@@ -7,6 +7,7 @@ import { MediaUtils } from '../utils';
 import store from '../store';
 
 import { MediaArtistService } from './media-artist.service';
+import { DataStoreFilterData, DataStoreUpdateData } from '../modules/datastore';
 
 export class MediaAlbumService {
   static async searchAlbumsByName(query: string): Promise<IMediaAlbum[]> {
@@ -38,6 +39,15 @@ export class MediaAlbumService {
 
     const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
     return MediaUtils.sortMediaAlbums(mediaAlbums);
+  }
+
+  static async updateMediaAlbum(mediaAlbumFilterData: DataStoreFilterData<IMediaAlbumData>, mediaAlbumUpdateData: DataStoreUpdateData<IMediaAlbumData>): Promise<IMediaAlbum | undefined> {
+    const mediaAlbumData = await MediaAlbumDatastore.updateMediaAlbum(mediaAlbumFilterData, mediaAlbumUpdateData);
+    if (!mediaAlbumData) {
+      return undefined;
+    }
+
+    return this.buildMediaAlbum(mediaAlbumData, true);
   }
 
   static loadMediaAlbums(): void {

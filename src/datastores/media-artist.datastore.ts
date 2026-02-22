@@ -49,6 +49,12 @@ class MediaArtistDatastore {
     });
   }
 
+  updateArtists(mediaArtistFilterData: DataStoreFilterData<IMediaArtistData>, mediaArtistUpdateData: DataStoreUpdateData<IMediaArtistData>): Promise<IMediaArtistData[]> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdate, this.mediaArtistDatastoreName, mediaArtistFilterData, {
+      $set: mediaArtistUpdateData,
+    });
+  }
+
   insertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtistData> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaArtistDatastoreName, mediaArtistInputData);
   }
