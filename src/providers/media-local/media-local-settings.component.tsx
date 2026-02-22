@@ -35,9 +35,11 @@ function openDirectorySelectionDialog(): string | undefined {
 
 function MediaDirectoryIcon(props: {
   stats?: MediaSyncDirectoryStats;
+  syncing?: boolean;
 }) {
   const {
     stats = {},
+    syncing = false,
   } = props;
 
   const hasError = !isNil(stats.error);
@@ -53,17 +55,14 @@ function MediaDirectoryIcon(props: {
     );
   }
 
-  if (hasValidProgress) {
-    const progressPct = (stats.filesAdded! / stats.filesFound!) * 100;
-
-    if (progressPct === 100) {
+  if (syncing) {
+    if (!hasValidProgress) {
       return (
-        <Icon
-          name={Icons.Completed}
-          className={cl('settings-directory-icon-success')}
-        />
+        <LoaderCircle size={16}/>
       );
     }
+
+    const progressPct = (stats.filesAdded! / stats.filesFound!) * 100;
 
     return (
       <LoaderCircleProgress
@@ -74,7 +73,10 @@ function MediaDirectoryIcon(props: {
   }
 
   return (
-    <LoaderCircle size={16}/>
+    <Icon
+      name={Icons.Completed}
+      className={cl('settings-directory-icon-success')}
+    />
   );
 }
 
@@ -147,7 +149,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               return {
                 id: directory,
                 label: directory,
-                icon: (<MediaDirectoryIcon stats={dirStats}/>),
+                icon: (<MediaDirectoryIcon stats={dirStats} syncing={syncing}/>),
               };
             })}
             onRemove={(directory) => {
