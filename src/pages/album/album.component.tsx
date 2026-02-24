@@ -10,6 +10,7 @@ import {
   MediaTrackList,
   MediaTrackContextMenuItem,
   MediaCollectionActions,
+  Text,
   TextClamp,
 } from '../../components';
 
@@ -66,7 +67,9 @@ export function AlbumPage() {
               </TextClamp>
             </div>
             <div className={cx('album-header-info')}>
-              <MediaArtistLink mediaArtist={mediaSelectedAlbum.album_artist}/>
+              <Text>
+                <MediaArtistLink mediaArtist={mediaSelectedAlbum.album_artist}/>
+              </Text>
             </div>
           </div>
         </div>
