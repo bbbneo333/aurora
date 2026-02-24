@@ -7,7 +7,7 @@ import {
 
 import PQueue from 'p-queue';
 import { Semaphore } from 'async-mutex';
-import { isNumber } from 'lodash';
+import { isEmpty, isNumber } from 'lodash';
 
 import { MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
@@ -237,7 +237,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         // update media artists
         await MediaArtistService.updateMediaArtists({
           id: {
-            $in: mediaTrack.track_artists.map(artist => artist.id),
+            $in: [
+              mediaTrack.track_album.album_artist_id,
+              ...mediaTrack.track_artists.map(artist => artist.id),
+            ],
           },
         }, {
           sync_timestamp: scanTimestamp,
@@ -253,8 +256,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
     const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
 
-    // #1: add media artist
-    const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
+    // #1: add media artists
+    // - track artist(s) are at udioMetadata.common.artists - always present
+    // - album artist is at audioMetadata.common.albumartist - sometimes present, if not - first one from track artist
+    const mediaArtists = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
       ? audioMetadata.common.artists.map(audioArtist => ({
         artist_name: audioArtist,
         provider: MediaLocalConstants.Provider,
@@ -268,17 +273,28 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         sync_timestamp: scanTimestamp,
       }]);
 
+    const mediaAlbumArtist = isEmpty(audioMetadata.common.albumartist)
+      ? mediaArtists[0]
+      : await MediaLibraryService.checkAndInsertMediaArtist({
+        artist_name: audioMetadata.common.albumartist as string,
+        provider: MediaLocalConstants.Provider,
+        provider_id: MediaLocalLibraryService.getMediaId(audioMetadata.common.albumartist as string),
+        sync_timestamp: scanTimestamp,
+      });
+
     // #2: add media album
     const mediaAlbumName = audioMetadata.common.album || 'unknown album';
+    const mediaAlbumProviderId = MediaLocalLibraryService.getMediaId(mediaAlbumArtist.artist_name, mediaAlbumName);
+
     const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
       album_name: mediaAlbumName,
-      album_artist_id: mediaArtistDataList[0].id,
+      album_artist_id: mediaAlbumArtist.id,
       album_cover_picture: audioCoverPicture ? {
         image_data: audioCoverPicture.data,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
       } : undefined,
       provider: MediaLocalConstants.Provider,
-      provider_id: MediaLocalLibraryService.getMediaId(mediaAlbumName),
+      provider_id: mediaAlbumProviderId,
       sync_timestamp: scanTimestamp,
     });
 
@@ -294,7 +310,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         image_data: audioCoverPicture.data,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
       } : undefined,
-      track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
+      track_artist_ids: mediaArtists.map(mediaArtist => mediaArtist.id),
       track_album_id: mediaAlbumData.id,
       extra: {
         file_source: directory,
@@ -309,8 +325,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     return mediaTrack;
   }
 
-  private static getMediaId(mediaInput: string): string {
-    return CryptoService.sha256(mediaInput);
+  private static getMediaId(...mediaInput: string[]): string {
+    return CryptoService.sha256(...mediaInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {
