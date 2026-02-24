@@ -66,6 +66,7 @@
   "message_track_disliked": "Removed from Liked Songs",
   "message_tracks_liked": "Added to Liked Songs",
   "message_tracks_disliked": "Removed from Liked Songs",
+  "message_sync_finished": "Sync completed, added {tracksAddedCount} tracks",
   "placeholder_playlist_context_menu_search_input": "Find a playlist",
   "placeholder_search_input": "What do you want to play?",
   "search_result_heading_all": "All",
@@ -83,7 +84,7 @@
   "tooltip_track_dislike": "Remove from Liked Songs",
   "tooltip_pin_collection": "Pin {collectionType}",
   "tooltip_unpin_collection": "Unpin {collectionType}",
-  "tooltip_settings_sync_file_scanned": "Files Scanned",
+  "tooltip_settings_sync_file_found": "Files Found",
   "tooltip_settings_sync_file_added": "Files Added",
   "tooltip_settings_sync_time_taken": "Time Taken"
 }

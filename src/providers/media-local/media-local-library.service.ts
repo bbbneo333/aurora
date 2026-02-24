@@ -14,11 +14,13 @@ import { IMediaLibraryService } from '../../interfaces';
 import { DateTimeUtils } from '../../utils';
 
 import {
+  I18nService,
   MediaAlbumService,
   MediaArtistService,
   MediaLibraryService,
   MediaProviderService,
   MediaTrackService,
+  NotificationService,
 } from '../../services';
 
 import { CryptoService } from '../../modules/crypto';
@@ -117,7 +119,18 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           },
         });
 
-        debug('syncMediaTracks - finished sync, took - %s', DateTimeUtils.formatDuration(syncDuration));
+        // notification
+        const { syncFilesFoundCount, syncFilesAddedCount } = mediaLocalStore.getState();
+        if (syncFilesAddedCount > 0) {
+          NotificationService.showMessage(I18nService.getString('message_sync_finished', {
+            tracksAddedCount: syncFilesAddedCount,
+          }));
+        }
+
+        debug('syncMediaTracks - finished sync, took - %s, found - %d, added - %d',
+          syncFilesFoundCount,
+          syncFilesAddedCount,
+          DateTimeUtils.formatDuration(syncDuration));
       } finally {
         finalize();
       }
