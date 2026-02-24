@@ -94,7 +94,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         mediaLocalStore.dispatch({ type: MediaLocalStateActionType.StartSync });
         await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
         const settings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-        await Promise.map(settings.library.directories, directory => this.addTracksFromDirectory(directory, signal));
+        await Promise.map(settings.library.directories, directory => this.addTracksFromDirectory(directory, {
+          signal,
+        }));
 
         // wait
         await this.syncAddFileQueue.onIdle();
@@ -122,7 +124,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromDirectory(directory: string, signal: AbortSignal): Promise<void> {
+  private addTracksFromDirectory(directory: string, options: { signal: AbortSignal }): Promise<void> {
+    const { signal } = options;
+
     return new Promise((resolve) => {
       const scanTimestamp = Date.now();
       debug('addTracksFromDirectory - reading directory - %s, scan timestamp - %d', directory, scanTimestamp);
@@ -133,7 +137,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           fileExtensions: FSAudioExtensions,
         }, (data: { files: FSFile[] }) => {
           // on data
-          this.addTracksFromFiles(directory, data.files, scanTimestamp, signal);
+          this.addTracksFromFiles(directory, data.files, {
+            scanTimestamp,
+            signal,
+          });
 
           // update stats
           mediaLocalStore.dispatch({
@@ -167,7 +174,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromFiles(directory: string, files: FSFile[], scanTimestamp: number, signal: AbortSignal) {
+  private addTracksFromFiles(directory: string, files: FSFile[], options: { scanTimestamp: number, signal: AbortSignal }) {
+    const { scanTimestamp, signal } = options;
+
     files.forEach((file) => {
       debug('addTracksFromFiles - found file at - %s, queueing...', file.path);
 
@@ -178,7 +187,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
             return;
           }
 
-          await this.addTrackFromFile(file, scanTimestamp);
+          await this.addTrackFromFile(directory, file, {
+            scanTimestamp,
+          });
 
           // update stats
           mediaLocalStore.dispatch({
@@ -196,7 +207,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private async addTrackFromFile(file: FSFile, scanTimestamp: number) {
+  private async addTrackFromFile(directory: string, file: FSFile, options: { scanTimestamp: number }) {
+    const { scanTimestamp } = options;
     debug('addTrackFromFile - adding file - %s', file.path);
 
     // generate local id - we are using location of the file to uniquely identify the track
@@ -208,8 +220,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         provider: MediaLocalConstants.Provider,
         provider_id: mediaTrackId,
         // @ts-ignore - can't get extra props to work with type checking
-        'extra.mtime': file.stats?.mtime,
-        'extra.size': file.stats?.size,
+        'extra.file_mtime': file.stats?.mtime,
+        'extra.file_size': file.stats?.size,
       }, {
         sync_timestamp: scanTimestamp,
       });
@@ -285,11 +297,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
       track_album_id: mediaAlbumData.id,
       extra: {
-        location: {
-          address: file.path,
-        },
-        mtime: file.stats?.mtime,
-        size: file.stats?.size,
+        file_source: directory,
+        file_path: file.path,
+        file_mtime: file.stats?.mtime,
+        file_size: file.stats?.size,
       },
       sync_timestamp: scanTimestamp,
     });

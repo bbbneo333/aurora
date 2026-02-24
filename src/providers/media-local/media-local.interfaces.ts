@@ -8,10 +8,9 @@ export interface IMediaLocalSettings {
 
 export interface IMediaLocalTrack extends IMediaTrack {
   extra: {
-    location: {
-      address: string;
-    },
-    mtime?: number;
-    size?: number;
+    file_source: string;
+    file_path: string;
+    file_mtime?: number;
+    file_size?: number;
   }
 }
