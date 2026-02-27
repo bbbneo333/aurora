@@ -206,7 +206,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
           // update stats
           mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.IncrementDirectorySyncFilesAdded,
+            type: MediaLocalStateActionType.IncrementDirectorySyncFilesProcessed,
             data: {
               directory,
               count: 1,

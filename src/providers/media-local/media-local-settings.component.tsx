@@ -43,7 +43,7 @@ function MediaDirectoryIcon(props: {
   } = props;
 
   const hasError = !isNil(stats.error);
-  const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesAdded);
+  const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesProcessed);
 
   if (hasError) {
     return (
@@ -62,7 +62,7 @@ function MediaDirectoryIcon(props: {
       );
     }
 
-    const progressPct = (stats.filesAdded! / stats.filesFound!) * 100;
+    const progressPct = (stats.filesProcessed! / stats.filesFound!) * 100;
 
     return (
       <LoaderCircleProgress
@@ -94,7 +94,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     syncing,
     syncDuration,
     syncFilesFoundCount,
-    syncFilesAddedCount,
+    syncFilesProcessedCount,
     syncDirectoryStats,
   } = state;
 
@@ -197,7 +197,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
                 <br/>
                 {I18nService.getString('tooltip_settings_sync_file_added')}
                 :&nbsp;
-                {syncFilesAddedCount}
+                {syncFilesProcessedCount}
                 <br/>
                 {I18nService.getString('tooltip_settings_sync_time_taken')}
                 :&nbsp;

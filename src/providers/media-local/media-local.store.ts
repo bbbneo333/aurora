@@ -13,14 +13,14 @@ export enum MediaLocalStateActionType {
   StartSync = 'mediaLocalSettings/startSync',
   FinishSync = 'mediaLocalSettings/finishSync',
   IncrementDirectorySyncFilesFound = 'mediaLocalSettings/incrementDirectorySyncFilesFound',
-  IncrementDirectorySyncFilesAdded = 'mediaLocalSettings/incrementDirectorySyncFilesAdded',
+  IncrementDirectorySyncFilesProcessed = 'mediaLocalSettings/incrementDirectorySyncFilesProcessed',
   SetDirectorySyncError = 'mediaLocalSettings/setDirectorySyncError',
 }
 
 export type MediaSyncDirectoryStats = {
   error?: string,
   filesFound?: number,
-  filesAdded?: number,
+  filesProcessed?: number,
 };
 
 export type MediaLocalState = {
@@ -33,7 +33,7 @@ export type MediaLocalState = {
   syncing: boolean,
   syncDuration: number, // in ms
   syncFilesFoundCount: number,
-  syncFilesAddedCount: number,
+  syncFilesProcessedCount: number,
   syncDirectoryStats: Record<string, MediaSyncDirectoryStats>,
 };
 
@@ -55,7 +55,7 @@ const mediaLocalInitialState: MediaLocalState = {
   saved: false,
   syncing: false,
   syncDuration: 0,
-  syncFilesAddedCount: 0,
+  syncFilesProcessedCount: 0,
   syncFilesFoundCount: 0,
   syncDirectoryStats: {},
 };
@@ -146,7 +146,7 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         syncing: true,
         syncDuration: 0,
         syncFilesFoundCount: 0,
-        syncFilesAddedCount: 0,
+        syncFilesProcessedCount: 0,
         syncDirectoryStats: {},
       };
     }
@@ -195,21 +195,21 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         },
       };
     }
-    case MediaLocalStateActionType.IncrementDirectorySyncFilesAdded: {
+    case MediaLocalStateActionType.IncrementDirectorySyncFilesProcessed: {
       // data.directory - string
       // data.count - number
       const { directory, count } = action.data;
-      const dirCount = (state.syncDirectoryStats[directory]?.filesAdded || 0) + count;
-      const totalCount = state.syncFilesAddedCount + count;
+      const dirCount = (state.syncDirectoryStats[directory]?.filesProcessed || 0) + count;
+      const totalCount = state.syncFilesProcessedCount + count;
 
       return {
         ...state,
-        syncFilesAddedCount: totalCount,
+        syncFilesProcessedCount: totalCount,
         syncDirectoryStats: {
           ...state.syncDirectoryStats,
           [directory]: {
             ...(state.syncDirectoryStats[directory] || {}),
-            filesAdded: dirCount,
+            filesProcessed: dirCount,
           },
         },
       };
