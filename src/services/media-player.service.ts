@@ -13,9 +13,9 @@ import {
   IMediaTrackList,
 } from '../interfaces';
 
-import MediaProviderService from './media-provider.service';
-import NotificationService from './notification.service';
-import I18nService from './i18n.service';
+import { I18nService } from './i18n.service';
+import { MediaProviderService } from './media-provider.service';
+import { NotificationService } from './notification.service';
 
 const debug = require('debug')('aurora:service:media_player');
 

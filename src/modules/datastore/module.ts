@@ -51,6 +51,7 @@ export class DatastoreModule implements IAppModule {
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSFind, this.find, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSFindOne, this.findOne, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSInsertOne, this.insertOne, this);
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpdate, this.update, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpdateOne, this.updateOne, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemove, this.remove, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
@@ -144,7 +145,18 @@ export class DatastoreModule implements IAppModule {
     });
   }
 
-  private async updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): Promise<void> {
+  private async update(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateDoc: object): Promise<any> {
+    const datastore = this.getDatastore(datastoreName);
+
+    // important - id is reserved for datastore
+    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateDoc, ['$set.id', '$unset.id']), {
+      multi: true,
+      upsert: false,
+      returnUpdatedDocs: true,
+    });
+  }
+
+  private async updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
 
     // important - id is reserved for datastore

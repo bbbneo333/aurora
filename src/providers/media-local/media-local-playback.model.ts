@@ -1,4 +1,5 @@
 import { Howl } from 'howler';
+import { isEmpty } from 'lodash';
 
 import { IMediaPlayback, IMediaPlaybackOptions } from '../../interfaces';
 
@@ -14,9 +15,13 @@ export class MediaLocalPlayback implements IMediaPlayback {
   private mediaPlaybackEnded = false;
 
   constructor(mediaTrack: IMediaLocalTrack, mediaPlaybackOptions: IMediaPlaybackOptions) {
+    if (isEmpty(mediaTrack.extra.file_path)) {
+      throw new Error(`MediaLocalPlayback encountered error while loading track - ${mediaTrack.id} - Path must not be empty`);
+    }
+
     this.mediaTrack = mediaTrack;
     this.mediaPlaybackLocalAudio = new Howl({
-      src: mediaTrack.extra.location.address,
+      src: mediaTrack.extra.file_path,
       volume: MediaLocalPlayback.getVolumeForLocalAudioPlayer(mediaPlaybackOptions.mediaPlaybackVolume, mediaPlaybackOptions.mediaPlaybackMaxVolume),
       mute: mediaPlaybackOptions.mediaPlaybackVolumeMuted,
       // important - in order to support MediaSession, we need to used HTML5 audio

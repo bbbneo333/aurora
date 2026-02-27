@@ -35,13 +35,15 @@ function openDirectorySelectionDialog(): string | undefined {
 
 function MediaDirectoryIcon(props: {
   stats?: MediaSyncDirectoryStats;
+  syncing?: boolean;
 }) {
   const {
     stats = {},
+    syncing = false,
   } = props;
 
   const hasError = !isNil(stats.error);
-  const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesAdded);
+  const hasValidProgress = isNumber(stats.filesFound) && isNumber(stats.filesProcessed);
 
   if (hasError) {
     return (
@@ -53,17 +55,14 @@ function MediaDirectoryIcon(props: {
     );
   }
 
-  if (hasValidProgress) {
-    const progressPct = (stats.filesAdded! / stats.filesFound!) * 100;
-
-    if (progressPct === 100) {
+  if (syncing) {
+    if (!hasValidProgress) {
       return (
-        <Icon
-          name={Icons.Completed}
-          className={cl('settings-directory-icon-success')}
-        />
+        <LoaderCircle size={16}/>
       );
     }
+
+    const progressPct = (stats.filesProcessed! / stats.filesFound!) * 100;
 
     return (
       <LoaderCircleProgress
@@ -74,7 +73,10 @@ function MediaDirectoryIcon(props: {
   }
 
   return (
-    <LoaderCircle size={16}/>
+    <Icon
+      name={Icons.Completed}
+      className={cl('settings-directory-icon-success')}
+    />
   );
 }
 
@@ -91,7 +93,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     saving,
     syncing,
     syncDuration,
-    syncFileCount,
+    syncFilesFoundCount,
+    syncFilesProcessedCount,
     syncDirectoryStats,
   } = state;
 
@@ -147,7 +150,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               return {
                 id: directory,
                 label: directory,
-                icon: (<MediaDirectoryIcon stats={dirStats}/>),
+                icon: (<MediaDirectoryIcon stats={dirStats} syncing={syncing}/>),
               };
             })}
             onRemove={(directory) => {
@@ -188,9 +191,13 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             }}
             tooltip={(
               <>
-                {I18nService.getString('tooltip_settings_sync_file_scanned')}
+                {I18nService.getString('tooltip_settings_sync_file_found')}
                 :&nbsp;
-                {syncFileCount}
+                {syncFilesFoundCount}
+                <br/>
+                {I18nService.getString('tooltip_settings_sync_file_processed')}
+                :&nbsp;
+                {syncFilesProcessedCount}
                 <br/>
                 {I18nService.getString('tooltip_settings_sync_time_taken')}
                 :&nbsp;

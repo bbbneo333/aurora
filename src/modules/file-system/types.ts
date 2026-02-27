@@ -10,6 +10,10 @@ export type FSReadDirectoryParams = {
 export type FSFile = {
   path: string;
   name: string;
+  stats?: {
+    mtime?: number;
+    size?: number;
+  },
 };
 
 export type FSSelectFileOptions = {

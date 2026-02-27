@@ -16,6 +16,7 @@ export enum IPCCommChannel {
   DSFind = 'ds:find',
   DSFindOne = 'ds:find_one',
   DSInsertOne = 'ds:insert_one',
+  DSUpdate = 'ds:update',
   DSUpdateOne = 'ds:update_one',
   DSRemoveOne = 'ds:remove_one',
   DSRemove = 'ds:remove',

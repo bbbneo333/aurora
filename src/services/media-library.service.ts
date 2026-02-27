@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { MediaLibraryActions, MediaTrackCoverPictureImageDataType } from '../enums';
 import store from '../store';
-import { MediaUtils } from '../utils';
 
 import { DataStoreInputData } from '../modules/datastore';
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
@@ -26,22 +25,29 @@ import {
   IMediaTrackData,
 } from '../interfaces';
 
+import { MediaTrackService } from './media-track.service';
+import { MediaArtistService } from './media-artist.service';
+import { MediaAlbumService } from './media-album.service';
+
 const debug = require('debug')('aurora:service:media_library');
 
-class MediaLibraryService {
-  readonly mediaPictureScaleWidth = 500;
-  readonly mediaPictureScaleHeight = 500;
+export class MediaLibraryService {
+  static readonly mediaPictureScaleWidth = 500;
+  static readonly mediaPictureScaleHeight = 500;
 
-  async checkAndInsertMediaArtists(mediaArtistInputDataList: DataStoreInputData<IMediaArtistData>[]): Promise<IMediaArtist[]> {
+  static async checkAndInsertMediaArtists(mediaArtistInputDataList: DataStoreInputData<IMediaArtistData>[]): Promise<IMediaArtist[]> {
     return Promise.all(mediaArtistInputDataList.map(mediaArtistInputData => this.checkAndInsertMediaArtist(mediaArtistInputData)));
   }
 
-  async checkAndInsertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtist> {
+  static async checkAndInsertMediaArtist(mediaArtistInputData: DataStoreInputData<IMediaArtistData>): Promise<IMediaArtist> {
     if (_.isNil(mediaArtistInputData.provider_id)) {
       throw new Error('Provider id is required for checkAndInsertMediaArtist');
     }
 
     const mediaArtistData = await MediaArtistDatastore.upsertMediaArtist({
+      provider: mediaArtistInputData.provider,
+      provider_id: mediaArtistInputData.provider_id,
+    }, {
       provider: mediaArtistInputData.provider,
       provider_id: mediaArtistInputData.provider_id,
       sync_timestamp: mediaArtistInputData.sync_timestamp,
@@ -50,15 +56,18 @@ class MediaLibraryService {
       extra: mediaArtistInputData.extra,
     });
 
-    return this.buildMediaArtist(mediaArtistData, true);
+    return MediaArtistService.buildMediaArtist(mediaArtistData, true);
   }
 
-  async checkAndInsertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbum> {
+  static async checkAndInsertMediaAlbum(mediaAlbumInputData: DataStoreInputData<IMediaAlbumData>): Promise<IMediaAlbum> {
     if (_.isNil(mediaAlbumInputData.provider_id)) {
       throw new Error('Provider id is required for checkAndInsertMediaAlbum');
     }
 
     const mediaTrackAlbumData = await MediaAlbumDatastore.upsertMediaAlbum({
+      provider: mediaAlbumInputData.provider,
+      provider_id: mediaAlbumInputData.provider_id,
+    }, {
       provider: mediaAlbumInputData.provider,
       provider_id: mediaAlbumInputData.provider_id,
       sync_timestamp: mediaAlbumInputData.sync_timestamp,
@@ -68,15 +77,18 @@ class MediaLibraryService {
       extra: mediaAlbumInputData.extra,
     });
 
-    return this.buildMediaAlbum(mediaTrackAlbumData, true);
+    return MediaAlbumService.buildMediaAlbum(mediaTrackAlbumData, true);
   }
 
-  async checkAndInsertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrack> {
+  static async checkAndInsertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrack> {
     if (_.isNil(mediaTrackInputData.provider_id)) {
       throw new Error('Provider id is required for checkAndInsertMediaTrack');
     }
 
     const mediaTrackData = await MediaTrackDatastore.upsertMediaTrack({
+      provider: mediaTrackInputData.provider,
+      provider_id: mediaTrackInputData.provider_id,
+    }, {
       provider: mediaTrackInputData.provider,
       provider_id: mediaTrackInputData.provider_id,
       sync_timestamp: mediaTrackInputData.sync_timestamp,
@@ -89,182 +101,10 @@ class MediaLibraryService {
       extra: mediaTrackInputData.extra,
     });
 
-    return this.buildMediaTrack(mediaTrackData, true);
+    return MediaTrackService.buildMediaTrack(mediaTrackData, true);
   }
 
-  async searchTracksByName(query: string): Promise<IMediaTrack[]> {
-    const tracks = await MediaTrackDatastore.findMediaTracks({
-      track_name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
-
-    return this.buildMediaTracks(tracks);
-  }
-
-  async searchAlbumsByName(query: string): Promise<IMediaAlbum[]> {
-    const albums = await MediaAlbumDatastore.findMediaAlbums({
-      album_name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
-
-    return this.buildMediaAlbums(albums);
-  }
-
-  async searchArtistsByName(query: string): Promise<IMediaArtist[]> {
-    const artists = await MediaArtistDatastore.findMediaArtists({
-      artist_name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
-
-    return this.buildMediaArtists(artists);
-  }
-
-  async getMediaTrack(mediaTrackId: string): Promise<IMediaTrack | undefined> {
-    const mediaTrackData = await MediaTrackDatastore.findMediaTrack({
-      id: mediaTrackId,
-    });
-
-    return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
-  }
-
-  async getMediaTrackForProvider(provider: string, provider_id: string): Promise<IMediaTrack | undefined> {
-    const mediaTrackData = await MediaTrackDatastore.findMediaTrack({
-      provider,
-      provider_id,
-    });
-
-    return mediaTrackData ? this.buildMediaTrack(mediaTrackData) : undefined;
-  }
-
-  async getMediaAlbumTracks(mediaAlbumId: string): Promise<IMediaTrack[]> {
-    const mediaAlbumTrackDataList = await MediaTrackDatastore.findMediaTracks({
-      track_album_id: mediaAlbumId,
-    });
-
-    const mediaAlbumTracks = await this.buildMediaTracks(mediaAlbumTrackDataList);
-    return MediaUtils.sortMediaAlbumTracks(mediaAlbumTracks);
-  }
-
-  async getMediaArtistTracks(mediaArtistId: string): Promise<IMediaTrack[]> {
-    const mediaTrackDataList = await MediaTrackDatastore.findMediaTracks({
-      track_artist_ids: [mediaArtistId],
-    });
-
-    const mediaTracks = await this.buildMediaTracks(mediaTrackDataList);
-    return MediaUtils.sortMediaArtistTracks(mediaTracks);
-  }
-
-  async getMediaAlbum(albumId: string): Promise<IMediaAlbum | undefined> {
-    const albumData = await MediaAlbumDatastore.findMediaAlbumById(albumId);
-    return albumData ? this.buildMediaAlbum(albumData) : undefined;
-  }
-
-  async getMediaAlbums(): Promise<IMediaAlbum[]> {
-    const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums();
-
-    const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
-    return MediaUtils.sortMediaAlbums(mediaAlbums);
-  }
-
-  async getMediaArtist(artistId: string): Promise<IMediaArtist | undefined> {
-    const artistData = await MediaArtistDatastore.findMediaArtistById(artistId);
-    return artistData ? this.buildMediaArtist(artistData) : undefined;
-  }
-
-  async getMediaArtists(): Promise<IMediaArtist[]> {
-    const mediaArtistDataList = await MediaArtistDatastore.findMediaArtists();
-
-    const mediaArtists = await Promise.all(mediaArtistDataList.map(mediaArtistData => this.buildMediaArtist(mediaArtistData)));
-    return MediaUtils.sortMediaArtists(mediaArtists);
-  }
-
-  async getMediaArtistAlbums(mediaArtistId: string): Promise<IMediaAlbum[]> {
-    const mediaAlbumDataList = await MediaAlbumDatastore.findMediaAlbums({
-      album_artist_id: mediaArtistId,
-    });
-
-    const mediaAlbums = await Promise.all(mediaAlbumDataList.map(mediaAlbumData => this.buildMediaAlbum(mediaAlbumData)));
-    return MediaUtils.sortMediaAlbums(mediaAlbums);
-  }
-
-  loadMediaAlbums(): void {
-    this
-      .getMediaAlbums()
-      .then((mediaAlbums) => {
-        store.dispatch({
-          type: MediaLibraryActions.SetAlbums,
-          data: {
-            mediaAlbums,
-          },
-        });
-      });
-  }
-
-  loadMediaAlbum(mediaAlbumId: string): void {
-    this
-      .getMediaAlbumTracks(mediaAlbumId)
-      .then(async (mediaAlbumTracks) => {
-        store.dispatch({
-          type: MediaLibraryActions.SetAlbum,
-          data: {
-            mediaAlbum: await this.getMediaAlbum(mediaAlbumId),
-            mediaAlbumTracks,
-          },
-        });
-      });
-  }
-
-  unloadMediaAlbum(): void {
-    store.dispatch({
-      type: MediaLibraryActions.SetAlbum,
-      data: {
-        mediaAlbum: undefined,
-        mediaAlbumTracks: undefined,
-      },
-    });
-  }
-
-  loadMediaArtists(): void {
-    this
-      .getMediaArtists()
-      .then((mediaArtists) => {
-        store.dispatch({
-          type: MediaLibraryActions.SetArtists,
-          data: {
-            mediaArtists,
-          },
-        });
-      });
-  }
-
-  loadMediaArtist(mediaArtistId: string): void {
-    this
-      .getMediaArtistAlbums(mediaArtistId)
-      .then(async (mediaArtistAlbums) => {
-        store.dispatch({
-          type: MediaLibraryActions.SetArtist,
-          data: {
-            mediaArtist: await this.getMediaArtist(mediaArtistId),
-            mediaArtistAlbums,
-          },
-        });
-      });
-  }
-
-  unloadMediaArtist(): void {
-    store.dispatch({
-      type: MediaLibraryActions.SetArtist,
-      data: {
-        mediaArtist: undefined,
-        mediaArtistAlbums: undefined,
-      },
-    });
-  }
-
-  async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
+  static async startMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at startMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
@@ -285,7 +125,7 @@ class MediaLibraryService {
     });
   }
 
-  async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
+  static async finishMediaTrackSync(mediaProviderIdentifier: string): Promise<void> {
     const mediaProviderData = await MediaProviderDatastore.findMediaProviderByIdentifier(mediaProviderIdentifier);
     if (!mediaProviderData) {
       throw new Error(`MediaLibraryService encountered error at finishMediaTrackSync - Provider not found - ${mediaProviderIdentifier}`);
@@ -316,95 +156,7 @@ class MediaLibraryService {
     });
   }
 
-  private async buildMediaTrack(mediaTrackData: IMediaTrackData, loadMediaTrack = false): Promise<IMediaTrack> {
-    const mediaTrack = _.assign({}, mediaTrackData, {
-      track_artists: await this.buildMediaArtists(mediaTrackData.track_artist_ids, loadMediaTrack),
-      track_album: await this.buildMediaAlbum(mediaTrackData.track_album_id, loadMediaTrack),
-    });
-
-    if (loadMediaTrack) {
-      store.dispatch({
-        type: MediaLibraryActions.AddTrack,
-        data: {
-          mediaTrack,
-        },
-      });
-    }
-
-    return mediaTrack;
-  }
-
-  private async buildMediaTracks(mediaTrackDataList: IMediaTrackData[], loadMediaTracks = false): Promise<IMediaTrack[]> {
-    return Promise.all(mediaTrackDataList.map(mediaTrackData => this.buildMediaTrack(mediaTrackData, loadMediaTracks)));
-  }
-
-  private async buildMediaAlbum(mediaAlbum: string | IMediaAlbumData, loadMediaAlbum = false): Promise<IMediaAlbum> {
-    let mediaAlbumData;
-    if (typeof mediaAlbum === 'string') {
-      mediaAlbumData = await MediaAlbumDatastore.findMediaAlbumById(mediaAlbum);
-
-      if (!mediaAlbumData) {
-        throw new Error(`MediaLibraryService encountered error at buildMediaAlbum - Could not find album - ${mediaAlbum}`);
-      }
-    } else {
-      mediaAlbumData = mediaAlbum;
-    }
-
-    const mediaAlbumArtist = await this.getMediaArtist(mediaAlbumData.album_artist_id);
-    if (!mediaAlbumArtist) {
-      throw new Error(`Encountered error while build media album - ${mediaAlbumData.id} - Could not find artist with id - ${mediaAlbumData.album_artist_id}`);
-    }
-
-    const mediaAlbumBuilt = _.assign({}, mediaAlbumData, {
-      album_artist: mediaAlbumArtist,
-    });
-
-    if (loadMediaAlbum) {
-      store.dispatch({
-        type: MediaLibraryActions.AddAlbum,
-        data: {
-          mediaAlbum: mediaAlbumBuilt,
-        },
-      });
-    }
-
-    return mediaAlbumBuilt;
-  }
-
-  private async buildMediaAlbums(mediaAlbums: string[] | IMediaAlbumData[], loadMediaAlbums = false): Promise<IMediaAlbum[]> {
-    return Promise.all(mediaAlbums.map((mediaAlbum: any) => this.buildMediaAlbum(mediaAlbum, loadMediaAlbums)));
-  }
-
-  private async buildMediaArtist(mediaArtist: string | IMediaArtistData, loadMediaArtist = false): Promise<IMediaArtist> {
-    // info - no further processing required for MediaArtistData -> MediaArtist
-    let mediaArtistData;
-    if (typeof mediaArtist === 'string') {
-      mediaArtistData = await MediaArtistDatastore.findMediaArtistById(mediaArtist);
-
-      if (!mediaArtistData) {
-        throw new Error(`MediaLibraryService encountered error at buildMediaArtist - Could not find artist - ${mediaArtist}`);
-      }
-    } else {
-      mediaArtistData = mediaArtist;
-    }
-
-    if (loadMediaArtist) {
-      store.dispatch({
-        type: MediaLibraryActions.AddArtist,
-        data: {
-          mediaArtist: mediaArtistData,
-        },
-      });
-    }
-
-    return mediaArtistData;
-  }
-
-  private async buildMediaArtists(mediaArtists: string[] | IMediaArtistData[], loadMediaArtists = false): Promise<IMediaArtist[]> {
-    return Promise.all(mediaArtists.map((mediaArtist: any) => this.buildMediaArtist(mediaArtist, loadMediaArtists)));
-  }
-
-  private async processPicture(mediaPicture?: IMediaPicture): Promise<IMediaPicture | undefined> {
+  private static async processPicture(mediaPicture?: IMediaPicture): Promise<IMediaPicture | undefined> {
     // this accepts a MediaPicture and returns a serializable instance of MediaPicture which can be stored and
     // further processed system-wide after deserializing
     if (!mediaPicture) {
@@ -437,7 +189,7 @@ class MediaLibraryService {
     return mediaPicture;
   }
 
-  private async deleteUnsyncMedia(mediaProviderIdentifier: string, mediaSyncStartTimestamp: number): Promise<void> {
+  private static async deleteUnsyncMedia(mediaProviderIdentifier: string, mediaSyncStartTimestamp: number): Promise<void> {
     await MediaTrackDatastore.deleteTracks({
       provider: mediaProviderIdentifier,
       sync_timestamp: {
@@ -458,5 +210,3 @@ class MediaLibraryService {
     });
   }
 }
-
-export default new MediaLibraryService();

@@ -7,11 +7,21 @@ import {
 
 import PQueue from 'p-queue';
 import { Semaphore } from 'async-mutex';
+import { isEmpty, isNumber } from 'lodash';
 
 import { MediaEnums } from '../../enums';
 import { IMediaLibraryService } from '../../interfaces';
-import { MediaLibraryService, MediaProviderService } from '../../services';
 import { DateTimeUtils } from '../../utils';
+
+import {
+  I18nService,
+  MediaAlbumService,
+  MediaArtistService,
+  MediaLibraryService,
+  MediaProviderService,
+  MediaTrackService,
+  NotificationService,
+} from '../../services';
 
 import { CryptoService } from '../../modules/crypto';
 import { FSFile, FSAudioExtensions } from '../../modules/file-system';
@@ -65,16 +75,11 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
       const syncStart = performance.now();
       const { signal } = abortController;
-      let syncFileCount = 0;
 
       // finalize
       const finalize = (() => {
-        const onCompleted = () => {
-          syncFileCount += 1;
-        };
         const onAbort = () => this.syncAddFileQueue.clear();
 
-        this.syncAddFileQueue.on('completed', onCompleted);
         signal.addEventListener('abort', onAbort);
 
         return () => {
@@ -82,7 +87,6 @@ class MediaLocalLibraryService implements IMediaLibraryService {
             this.syncAbortController = null;
           }
 
-          this.syncAddFileQueue.off('completed', onCompleted);
           signal.removeEventListener('abort', onAbort);
         };
       })();
@@ -92,7 +96,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         mediaLocalStore.dispatch({ type: MediaLocalStateActionType.StartSync });
         await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
         const settings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
-        await Promise.map(settings.library.directories, directory => this.addTracksFromDirectory(directory, signal));
+        await Promise.map(settings.library.directories, directory => this.addTracksFromDirectory(directory, {
+          signal,
+        }));
 
         // wait
         await this.syncAddFileQueue.onIdle();
@@ -105,12 +111,28 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
         const syncDuration = performance.now() - syncStart;
         await MediaLibraryService.finishMediaTrackSync(MediaLocalConstants.Provider);
-        mediaLocalStore.dispatch({ type: MediaLocalStateActionType.FinishSync, data: { syncDuration, syncFileCount } });
+
+        mediaLocalStore.dispatch({
+          type: MediaLocalStateActionType.FinishSync,
+          data: {
+            syncDuration,
+          },
+        });
+
+        // notification
+        const { syncFilesFoundCount, syncFilesProcessedCount, syncFilesAddedCount } = mediaLocalStore.getState();
+        if (syncFilesAddedCount > 0) {
+          NotificationService.showMessage(I18nService.getString('message_sync_finished', {
+            tracksAddedCount: syncFilesAddedCount,
+          }));
+        }
 
         debug(
-          'syncMediaTracks - finished sync, took - %s, files added - %d',
+          'syncMediaTracks - finished sync, took - %s, found - %d, processed - %d, added - %d',
           DateTimeUtils.formatDuration(syncDuration),
-          syncFileCount,
+          syncFilesFoundCount,
+          syncFilesProcessedCount,
+          syncFilesAddedCount,
         );
       } finally {
         finalize();
@@ -118,9 +140,12 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromDirectory(directory: string, signal: AbortSignal): Promise<void> {
+  private addTracksFromDirectory(directory: string, options: { signal: AbortSignal }): Promise<void> {
+    const { signal } = options;
+
     return new Promise((resolve) => {
-      debug('addTracksFromDirectory - adding tracks from directory - %s', directory);
+      const scanTimestamp = Date.now();
+      debug('addTracksFromDirectory - reading directory - %s, scan timestamp - %d', directory, scanTimestamp);
 
       IPCRenderer.stream(
         IPCCommChannel.FSReadDirectoryStream, {
@@ -128,7 +153,10 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           fileExtensions: FSAudioExtensions,
         }, (data: { files: FSFile[] }) => {
           // on data
-          this.addTracksFromFiles(directory, data.files, signal);
+          this.addTracksFromFiles(directory, data.files, {
+            scanTimestamp,
+            signal,
+          });
 
           // update stats
           mediaLocalStore.dispatch({
@@ -141,7 +169,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         }, (err: Error) => {
           // on error
           // don't stop, just log
-          console.error('Encountered error while reading files from directory - %s', directory);
+          console.error('Encountered error while reading directory - %s', directory);
           console.error(err);
 
           // update stats
@@ -154,7 +182,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           });
         }, () => {
           // on done
-          debug('addTracksFromDirectory - finished adding tracks from directory - %s', directory);
+          debug('addTracksFromDirectory - finished reading directory - %s', directory);
           resolve();
         },
         signal,
@@ -162,74 +190,132 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromFiles(directory: string, files: FSFile[], signal: AbortSignal) {
+  private addTracksFromFiles(directory: string, files: FSFile[], options: { scanTimestamp: number, signal: AbortSignal }) {
+    const { scanTimestamp, signal } = options;
+
     files.forEach((file) => {
-      debug('addTracksFromDirectory - found file at - %s, queueing...', file.path);
+      debug('addTracksFromFiles - found file at - %s, queueing...', file.path);
 
       this.syncAddFileQueue
         .add(async () => {
           if (signal.aborted) {
-            debug('addTracksFromDirectory - operation aborted, skipping - %s', file.name);
+            debug('addTracksFromFiles - operation aborted, skipping - %s', file.name);
             return;
           }
 
-          const track = await this.addTrackFromFile(file);
+          await this.addTrackFromFile(directory, file, {
+            scanTimestamp,
+          });
 
           // update stats
           mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.IncrementDirectorySyncFilesAdded,
+            type: MediaLocalStateActionType.IncrementDirectorySyncFilesProcessed,
             data: {
               directory,
               count: 1,
             },
           });
-
-          debug('addTracksFromDirectory - added track from file - %s - %s', file.name, track.id);
         })
         .catch((err) => {
-          console.error('addTracksFromDirectory - encountered error while adding file - %s', file.name);
+          console.error('addTracksFromFiles - encountered error while adding file - %s', file.name);
           console.error(err);
         });
     });
   }
 
-  private async addTrackFromFile(file: FSFile) {
-    const mediaSyncTimestamp = Date.now();
+  private async addTrackFromFile(directory: string, file: FSFile, options: { scanTimestamp: number }) {
+    const { scanTimestamp } = options;
+    debug('addTrackFromFile - adding file - %s', file.path);
+
+    // generate local id - we are using location of the file to uniquely identify the track
+    const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
+
+    // first check if we can simply mark it as seen; required both mtime and size for this to work
+    if (isNumber(file.stats?.mtime) && isNumber(file.stats?.size)) {
+      const mediaTrack = await MediaTrackService.updateMediaTrack({
+        provider: MediaLocalConstants.Provider,
+        provider_id: mediaTrackId,
+        // @ts-ignore - can't get extra props to work with type checking
+        'extra.file_mtime': file.stats?.mtime,
+        'extra.file_size': file.stats?.size,
+      }, {
+        sync_timestamp: scanTimestamp,
+      });
+
+      if (mediaTrack) {
+        // update media album
+        await MediaAlbumService.updateMediaAlbum({
+          id: mediaTrack.track_album_id,
+        }, {
+          sync_timestamp: scanTimestamp,
+        });
+
+        // update media artists
+        await MediaArtistService.updateMediaArtists({
+          id: {
+            $in: [
+              mediaTrack.track_album.album_artist_id,
+              ...mediaTrack.track_artists.map(artist => artist.id),
+            ],
+          },
+        }, {
+          sync_timestamp: scanTimestamp,
+        });
+
+        debug('addTrackFromFile - track at path %s already added %s, skipping...', file.path, mediaTrack.id);
+        return mediaTrack;
+      }
+    }
+
     // read metadata
     const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(file.path);
     // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
     const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
-    // generate local id - we are using location of the file to uniquely identify the track
-    const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
-    // add media artist
-    const mediaArtistDataList = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
+
+    // #1: add media artists
+    // - track artist(s) are at udioMetadata.common.artists - always present
+    // - album artist is at audioMetadata.common.albumartist - sometimes present, if not - first one from track artist
+    const mediaArtists = await MediaLibraryService.checkAndInsertMediaArtists(audioMetadata.common.artists
       ? audioMetadata.common.artists.map(audioArtist => ({
         artist_name: audioArtist,
         provider: MediaLocalConstants.Provider,
         provider_id: MediaLocalLibraryService.getMediaId(audioArtist),
-        sync_timestamp: mediaSyncTimestamp,
+        sync_timestamp: scanTimestamp,
       }))
       : [{
         artist_name: 'unknown artist',
         provider: MediaLocalConstants.Provider,
         provider_id: MediaLocalLibraryService.getMediaId('unknown artist'),
-        sync_timestamp: mediaSyncTimestamp,
+        sync_timestamp: scanTimestamp,
       }]);
-    // add media album
+
+    const mediaAlbumArtist = isEmpty(audioMetadata.common.albumartist)
+      ? mediaArtists[0]
+      : await MediaLibraryService.checkAndInsertMediaArtist({
+        artist_name: audioMetadata.common.albumartist as string,
+        provider: MediaLocalConstants.Provider,
+        provider_id: MediaLocalLibraryService.getMediaId(audioMetadata.common.albumartist as string),
+        sync_timestamp: scanTimestamp,
+      });
+
+    // #2: add media album
     const mediaAlbumName = audioMetadata.common.album || 'unknown album';
+    const mediaAlbumProviderId = MediaLocalLibraryService.getMediaId(mediaAlbumArtist.artist_name, mediaAlbumName);
+
     const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
       album_name: mediaAlbumName,
-      album_artist_id: mediaArtistDataList[0].id,
+      album_artist_id: mediaAlbumArtist.id,
       album_cover_picture: audioCoverPicture ? {
         image_data: audioCoverPicture.data,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
       } : undefined,
       provider: MediaLocalConstants.Provider,
-      provider_id: MediaLocalLibraryService.getMediaId(mediaAlbumName),
-      sync_timestamp: mediaSyncTimestamp,
+      provider_id: mediaAlbumProviderId,
+      sync_timestamp: scanTimestamp,
     });
-    // add media track
-    return MediaLibraryService.checkAndInsertMediaTrack({
+
+    // #3: add media track
+    const mediaTrack = await MediaLibraryService.checkAndInsertMediaTrack({
       provider: MediaLocalConstants.Provider,
       provider_id: mediaTrackId,
       // fallback to file name if title could not be found in metadata
@@ -240,19 +326,32 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         image_data: audioCoverPicture.data,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
       } : undefined,
-      track_artist_ids: mediaArtistDataList.map(mediaArtistData => mediaArtistData.id),
+      track_artist_ids: mediaArtists.map(mediaArtist => mediaArtist.id),
       track_album_id: mediaAlbumData.id,
       extra: {
-        location: {
-          address: file.path,
-        },
+        file_source: directory,
+        file_path: file.path,
+        file_mtime: file.stats?.mtime,
+        file_size: file.stats?.size,
       },
-      sync_timestamp: mediaSyncTimestamp,
+      sync_timestamp: scanTimestamp,
     });
+
+    // update stats
+    mediaLocalStore.dispatch({
+      type: MediaLocalStateActionType.IncrementDirectorySyncFilesAdded,
+      data: {
+        directory,
+        count: 1,
+      },
+    });
+
+    debug('addTracksFromFiles - added track %s from file %s', mediaTrack.id, file.path);
+    return mediaTrack;
   }
 
-  private static getMediaId(mediaInput: string): string {
-    return CryptoService.sha256(mediaInput);
+  private static getMediaId(...mediaInput: string[]): string {
+    return CryptoService.sha256(...mediaInput);
   }
 
   private static readAudioMetadataFromFile(filePath: string): Promise<IAudioMetadata> {

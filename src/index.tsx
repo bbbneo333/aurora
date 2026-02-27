@@ -9,6 +9,16 @@ import { App } from './app/app.component';
 const isDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 const isProd = process.env.NODE_ENV === 'production';
 
+if (isDebug) {
+  // to enable stack traces in promises
+  Promise.config({
+    longStackTraces: true,
+    warnings: true,
+    cancellation: true,
+    monitoring: true,
+  });
+}
+
 // @ts-ignore
 global.Promise = Promise;
 
