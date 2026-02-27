@@ -195,7 +195,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
                 :&nbsp;
                 {syncFilesFoundCount}
                 <br/>
-                {I18nService.getString('tooltip_settings_sync_file_added')}
+                {I18nService.getString('tooltip_settings_sync_file_processed')}
                 :&nbsp;
                 {syncFilesProcessedCount}
                 <br/>

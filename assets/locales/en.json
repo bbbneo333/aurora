@@ -85,6 +85,6 @@
   "tooltip_pin_collection": "Pin {collectionType}",
   "tooltip_unpin_collection": "Unpin {collectionType}",
   "tooltip_settings_sync_file_found": "Files Found",
-  "tooltip_settings_sync_file_added": "Files Added",
+  "tooltip_settings_sync_file_processed": "Files Processed",
   "tooltip_settings_sync_time_taken": "Time Taken"
 }

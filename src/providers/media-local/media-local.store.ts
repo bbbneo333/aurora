@@ -14,6 +14,7 @@ export enum MediaLocalStateActionType {
   FinishSync = 'mediaLocalSettings/finishSync',
   IncrementDirectorySyncFilesFound = 'mediaLocalSettings/incrementDirectorySyncFilesFound',
   IncrementDirectorySyncFilesProcessed = 'mediaLocalSettings/incrementDirectorySyncFilesProcessed',
+  IncrementDirectorySyncFilesAdded = 'mediaLocalSettings/incrementDirectorySyncFilesAdded',
   SetDirectorySyncError = 'mediaLocalSettings/setDirectorySyncError',
 }
 
@@ -21,6 +22,7 @@ export type MediaSyncDirectoryStats = {
   error?: string,
   filesFound?: number,
   filesProcessed?: number,
+  filesAdded?: number,
 };
 
 export type MediaLocalState = {
@@ -32,8 +34,9 @@ export type MediaLocalState = {
   saved: boolean,
   syncing: boolean,
   syncDuration: number, // in ms
-  syncFilesFoundCount: number,
-  syncFilesProcessedCount: number,
+  syncFilesFoundCount: number, // files reported by scan
+  syncFilesProcessedCount: number, // files processes excluding error
+  syncFilesAddedCount: number, // new or updated file count, files older than mtime are skipped
   syncDirectoryStats: Record<string, MediaSyncDirectoryStats>,
 };
 
@@ -57,6 +60,7 @@ const mediaLocalInitialState: MediaLocalState = {
   syncDuration: 0,
   syncFilesProcessedCount: 0,
   syncFilesFoundCount: 0,
+  syncFilesAddedCount: 0,
   syncDirectoryStats: {},
 };
 
@@ -210,6 +214,25 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
           [directory]: {
             ...(state.syncDirectoryStats[directory] || {}),
             filesProcessed: dirCount,
+          },
+        },
+      };
+    }
+    case MediaLocalStateActionType.IncrementDirectorySyncFilesAdded: {
+      // data.directory - string
+      // data.count - number
+      const { directory, count } = action.data;
+      const dirCount = (state.syncDirectoryStats[directory]?.filesAdded || 0) + count;
+      const totalCount = state.syncFilesAddedCount + count;
+
+      return {
+        ...state,
+        syncFilesAddedCount: totalCount,
+        syncDirectoryStats: {
+          ...state.syncDirectoryStats,
+          [directory]: {
+            ...(state.syncDirectoryStats[directory] || {}),
+            filesAdded: dirCount,
           },
         },
       };

@@ -120,17 +120,20 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         });
 
         // notification
-        const { syncFilesFoundCount, syncFilesAddedCount } = mediaLocalStore.getState();
+        const { syncFilesFoundCount, syncFilesProcessedCount, syncFilesAddedCount } = mediaLocalStore.getState();
         if (syncFilesAddedCount > 0) {
           NotificationService.showMessage(I18nService.getString('message_sync_finished', {
             tracksAddedCount: syncFilesAddedCount,
           }));
         }
 
-        debug('syncMediaTracks - finished sync, took - %s, found - %d, added - %d',
+        debug(
+          'syncMediaTracks - finished sync, took - %s, found - %d, processed - %d, added - %d',
+          DateTimeUtils.formatDuration(syncDuration),
           syncFilesFoundCount,
+          syncFilesProcessedCount,
           syncFilesAddedCount,
-          DateTimeUtils.formatDuration(syncDuration));
+        );
       } finally {
         finalize();
       }
@@ -332,6 +335,15 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         file_size: file.stats?.size,
       },
       sync_timestamp: scanTimestamp,
+    });
+
+    // update stats
+    mediaLocalStore.dispatch({
+      type: MediaLocalStateActionType.IncrementDirectorySyncFilesAdded,
+      data: {
+        directory,
+        count: 1,
+      },
     });
 
     debug('addTracksFromFiles - added track %s from file %s', mediaTrack.id, file.path);
