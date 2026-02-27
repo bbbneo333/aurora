@@ -151,6 +151,7 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
         syncDuration: 0,
         syncFilesFoundCount: 0,
         syncFilesProcessedCount: 0,
+        syncFilesAddedCount: 0,
         syncDirectoryStats: {},
       };
     }
