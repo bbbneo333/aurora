@@ -6,7 +6,7 @@ import { RootState } from '../../reducers';
 import { MediaAlbumService } from '../../services';
 
 export function AlbumsPage() {
-  const { mediaAlbums } = useSelector((state: RootState) => state.mediaLibrary);
+  const mediaAlbums = useSelector((state: RootState) => state.mediaLibrary.mediaAlbums);
 
   useEffect(() => {
     MediaAlbumService.loadMediaAlbums();

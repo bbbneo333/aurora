@@ -1,6 +1,7 @@
 export * from './action-list/action-list.component';
 export * from './browser-navigation/browser-navigation.component';
 export * from './button/button.component';
+export * from './grid/grid.component';
 export * from './icon/icon.component';
 export * from './link/link.component';
 export * from './list/list.component';
@@ -9,6 +10,7 @@ export * from './loader/loader-circle-progress.component';
 export * from './media-albums/media-albums.component';
 export * from './media-artists/media-artists.component';
 export * from './media-collection-actions/media-collection-actions.component';
+export * from './media-collection-grid/media-collection-grid.component';
 export * from './media-collection-item/media-collection-item.component';
 export * from './media-collection-tile/media-collection-tile.component';
 export * from './media-collection-context-menu/media-collection-context-menu.component';
