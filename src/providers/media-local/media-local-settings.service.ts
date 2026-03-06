@@ -9,6 +9,11 @@ class MediaLocalSettingsService implements IMediaSettingsService {
       library: {
         directories: [],
       },
+      cd_import: {
+        output_directory: '',
+        naming_template: '<Artist> - <Album-Title> (<Year>)',
+        discogs_token: '',
+      },
     };
   }
 

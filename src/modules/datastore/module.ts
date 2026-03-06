@@ -21,7 +21,10 @@ const debug = require('debug')('aurora:module:datastore');
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;
   private readonly datastores: Record<string, Datastore> = {};
+  private readonly datastoreActiveWrites: Record<string, number> = {};
   private readonly datastoreDataDir = 'Databases';
+  private readonly datastoreFileReadOnlyMode = 0o400;
+  private readonly datastoreFileReadWriteMode = 0o600;
 
   constructor(app: IAppMain) {
     this.app = app;
@@ -98,6 +101,7 @@ export class DatastoreModule implements IAppModule {
     }
 
     this.datastores[datastoreName] = datastore;
+    this.setDatastoreFileModeSync(datastore, this.datastoreFileReadOnlyMode);
   }
 
   private registerDatastoreIndexes(datastore: Datastore, datastoreIndexes: DatastoreIndex[]): void {
@@ -135,52 +139,82 @@ export class DatastoreModule implements IAppModule {
     return datastore.findOne(datastoreFindDoc);
   }
 
-  private insertOne(datastoreName: string, datastoreInsertDoc: DataStoreInputData): Promise<any> {
+  private async insertOne(datastoreName: string, datastoreInsertDoc: DataStoreInputData): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
-
-    // important - id is reserved for datastore
-    return datastore.insert({
-      ...datastoreInsertDoc,
+    return this.withDatastoreWriteAccess(datastore, async () => datastore.insert({
+      ..._.omit(datastoreInsertDoc, ['id']),
       id: DatastoreUtils.generateId(),
-    });
+    }));
   }
 
   private async update(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateDoc: object): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
+    const sanitizedUpdateDoc = this.sanitizeUpdateDoc(datastoreUpdateDoc);
+    const matchingDocs = await datastore.find(datastoreFindDoc);
+    if (!matchingDocs.length) {
+      return [];
+    }
 
-    // important - id is reserved for datastore
-    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateDoc, ['$set.id', '$unset.id']), {
+    const changedDocIds = matchingDocs
+      .filter(doc => this.wouldDocumentChange(doc, sanitizedUpdateDoc))
+      .map((doc: any) => doc.id)
+      .filter(Boolean);
+    if (!changedDocIds.length) {
+      return matchingDocs;
+    }
+
+    return this.withDatastoreWriteAccess(datastore, async () => datastore.update({
+      id: {
+        $in: changedDocIds,
+      },
+    }, sanitizedUpdateDoc, {
       multi: true,
       upsert: false,
       returnUpdatedDocs: true,
-    });
+    }));
   }
 
   private async updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): Promise<any> {
     const datastore = this.getDatastore(datastoreName);
+    const sanitizedUpdateDoc = this.sanitizeUpdateDoc(datastoreUpdateOneDoc);
+    const matchingDoc = await datastore.findOne(datastoreFindDoc);
+    if (!matchingDoc) {
+      return undefined;
+    }
 
-    // important - id is reserved for datastore
-    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
+    if (!this.wouldDocumentChange(matchingDoc, sanitizedUpdateDoc)) {
+      return matchingDoc;
+    }
+
+    return this.withDatastoreWriteAccess(datastore, async () => datastore.update(datastoreFindDoc, sanitizedUpdateDoc, {
       multi: false,
       upsert: false,
       returnUpdatedDocs: true,
-    });
+    }));
   }
 
   private async remove(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
+    const affectedEntriesCount = await datastore.count(datastoreFindDoc);
+    if (!affectedEntriesCount) {
+      return;
+    }
 
-    await datastore.remove(datastoreFindDoc, {
+    await this.withDatastoreWriteAccess(datastore, async () => datastore.remove(datastoreFindDoc, {
       multi: true,
-    });
+    }));
   }
 
   private async removeOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
     const datastore = this.getDatastore(datastoreName);
+    const affectedEntriesCount = await datastore.count(datastoreFindDoc);
+    if (!affectedEntriesCount) {
+      return;
+    }
 
-    await datastore.remove(datastoreFindDoc, {
+    await this.withDatastoreWriteAccess(datastore, async () => datastore.remove(datastoreFindDoc, {
       multi: false,
-    });
+    }));
   }
 
   private async count(datastoreName: string, datastoreFindDoc?: DataStoreFilterData): Promise<number> {
@@ -194,25 +228,128 @@ export class DatastoreModule implements IAppModule {
   // otherwise race conditions can cause data corruption
   private async upsertOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: DataStoreUpdateData) {
     const datastore = this.getDatastore(datastoreName);
+    const sanitizedUpdateDoc = _.omit(datastoreUpdateOneDoc, ['id']);
+    const existingDoc = await datastore.findOne(datastoreFindDoc);
+
+    if (existingDoc) {
+      if (!this.wouldDocumentChange(existingDoc, {
+        $set: sanitizedUpdateDoc,
+      })) {
+        return existingDoc;
+      }
+
+      return this.withDatastoreWriteAccess(datastore, async () => datastore.update(datastoreFindDoc, {
+        $set: sanitizedUpdateDoc,
+      }, {
+        multi: false,
+        upsert: false,
+        returnUpdatedDocs: true,
+      }));
+    }
 
     try {
-      return await datastore.insert({
-        ...datastoreUpdateOneDoc,
+      return await this.withDatastoreWriteAccess(datastore, async () => datastore.insert({
+        ...sanitizedUpdateDoc,
         id: DatastoreUtils.generateId(),
-      });
+      }));
     } catch (e: any) {
       if (e.errorType === 'uniqueViolated') {
-        return datastore.update(datastoreFindDoc, {
-          $set: datastoreUpdateOneDoc,
+        return this.withDatastoreWriteAccess(datastore, async () => datastore.update(datastoreFindDoc, {
+          $set: sanitizedUpdateDoc,
         }, {
           multi: false,
           upsert: false,
           returnUpdatedDocs: true,
-        });
+        }));
       }
 
       throw e;
     }
+  }
+
+  private sanitizeUpdateDoc(datastoreUpdateDoc: object): object {
+    return _.omit(datastoreUpdateDoc, ['$set.id', '$unset.id']);
+  }
+
+  private wouldDocumentChange(existingDoc: Record<string, any>, datastoreUpdateDoc: Record<string, any>): boolean {
+    const setUpdateDoc = datastoreUpdateDoc.$set;
+    const unsetUpdateDoc = datastoreUpdateDoc.$unset;
+    const hasModifierOps = _.isPlainObject(setUpdateDoc) || _.isPlainObject(unsetUpdateDoc);
+    if (!hasModifierOps) {
+      return !_.isEqual(existingDoc, datastoreUpdateDoc);
+    }
+
+    if (_.isPlainObject(setUpdateDoc)) {
+      const setKeys = Object.keys(setUpdateDoc);
+      if (setKeys.some(key => !_.isEqual(_.get(existingDoc, key), _.get(setUpdateDoc, key)))) {
+        return true;
+      }
+    }
+
+    if (_.isPlainObject(unsetUpdateDoc)) {
+      const unsetKeys = Object.keys(unsetUpdateDoc);
+      if (unsetKeys.some(key => _.has(existingDoc, key))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private async withDatastoreWriteAccess<T>(datastore: Datastore, operation: () => Promise<T>): Promise<T> {
+    const datastoreFilename = this.getDatastoreFilename(datastore);
+    const activeWrites = this.datastoreActiveWrites[datastoreFilename] || 0;
+    this.datastoreActiveWrites[datastoreFilename] = activeWrites + 1;
+    if (activeWrites === 0) {
+      await this.setDatastoreFileMode(datastore, this.datastoreFileReadWriteMode);
+    }
+
+    try {
+      return await operation();
+    } finally {
+      const remainingWrites = Math.max(0, (this.datastoreActiveWrites[datastoreFilename] || 1) - 1);
+      if (remainingWrites === 0) {
+        delete this.datastoreActiveWrites[datastoreFilename];
+        await this.setDatastoreFileMode(datastore, this.datastoreFileReadOnlyMode);
+      } else {
+        this.datastoreActiveWrites[datastoreFilename] = remainingWrites;
+      }
+    }
+  }
+
+  private setDatastoreFileModeSync(datastore: Datastore, fileMode: number): void {
+    const datastoreFilename = this.getDatastoreFilename(datastore);
+    if (!fs.existsSync(datastoreFilename)) {
+      return;
+    }
+
+    try {
+      fs.chmodSync(datastoreFilename, fileMode);
+    } catch (error) {
+      debug('setDatastoreFileModeSync - failed for %s with mode %o: %o', datastoreFilename, fileMode, error);
+    }
+  }
+
+  private async setDatastoreFileMode(datastore: Datastore, fileMode: number): Promise<void> {
+    const datastoreFilename = this.getDatastoreFilename(datastore);
+    const tempDatastoreFilename = `${datastoreFilename}~`;
+
+    try {
+      await Promise.all([
+        this.setFileModeIfExists(datastoreFilename, fileMode),
+        this.setFileModeIfExists(tempDatastoreFilename, fileMode),
+      ]);
+    } catch (error) {
+      debug('setDatastoreFileMode - failed for %s with mode %o: %o', datastoreFilename, fileMode, error);
+    }
+  }
+
+  private async setFileModeIfExists(filename: string, fileMode: number): Promise<void> {
+    if (!fs.existsSync(filename)) {
+      return;
+    }
+
+    await fs.promises.chmod(filename, fileMode);
   }
 
   private getDatastore(datastoreName: string): Datastore {
