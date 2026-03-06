@@ -45,6 +45,7 @@ import { PlatformOS } from './modules/platform';
 import { DatastoreModule } from './modules/datastore';
 import { FileSystemModule } from './modules/file-system';
 import { ImageModule } from './modules/image';
+import { DeviceModule } from './modules/device';
 
 import { MenuBuilder } from './main/builders';
 
@@ -315,7 +316,7 @@ class App implements IAppMain {
   }
 
   private installDebugSupport(): void {
-    if (!this.debug) {
+    if (!this.debug || process.env.ENABLE_ELECTRON_DEBUG !== 'true') {
       return;
     }
 
@@ -323,7 +324,7 @@ class App implements IAppMain {
   }
 
   private async installExtensions(): Promise<void> {
-    if (!this.debug) {
+    if (!this.debug || process.env.ENABLE_ELECTRON_EXTENSIONS !== 'true') {
       return;
     }
 
@@ -470,6 +471,16 @@ class App implements IAppMain {
   }
 
   private registerEvents(): void {
+    process.once('SIGINT', () => {
+      this.isQuitting = true;
+      app.quit();
+    });
+
+    process.once('SIGTERM', () => {
+      this.isQuitting = true;
+      app.quit();
+    });
+
     app.on('window-all-closed', () => {
       // respect the OSX convention of having the application in memory even
       // after all windows have been closed
@@ -512,8 +523,9 @@ class App implements IAppMain {
     debug('registering modules...');
 
     this.modules.push(new DatastoreModule(this));
-    this.modules.push(new ImageModule(this));
     this.modules.push(new FileSystemModule(this));
+    this.modules.push(new ImageModule(this));
+    this.modules.push(new DeviceModule(this));
 
     debug('module registration completed!');
   }
