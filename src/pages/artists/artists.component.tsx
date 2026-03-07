@@ -6,7 +6,7 @@ import { RootState } from '../../reducers';
 import { MediaArtistService } from '../../services';
 
 export function ArtistsPage() {
-  const { mediaArtists } = useSelector((state: RootState) => state.mediaLibrary);
+  const mediaArtists = useSelector((state: RootState) => state.mediaLibrary.mediaArtists);
 
   useEffect(() => {
     MediaArtistService.loadMediaArtists();
@@ -14,9 +14,7 @@ export function ArtistsPage() {
 
   return (
     <div className="container-fluid">
-      <div className="row">
-        <MediaArtists mediaArtists={mediaArtists}/>
-      </div>
+      <MediaArtists mediaArtists={mediaArtists}/>
     </div>
   );
 }

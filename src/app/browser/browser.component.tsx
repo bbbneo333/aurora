@@ -30,7 +30,7 @@ function BrowserViewport() {
   usePersistentScroll({ viewportRef });
 
   return (
-    <div ref={viewportRef} className={cx('browser-viewport', 'app-scrollable')}>
+    <div ref={viewportRef} className={cx('browser-viewport', 'app-viewport', 'app-scrollable')}>
       <RouterSwitchComponent routes={routes.main}/>
     </div>
   );
