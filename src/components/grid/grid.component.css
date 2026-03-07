@@ -2,5 +2,4 @@
   width: 100%;
   position: relative;
   overflow: visible; /* parent handles scrolling */
-  margin: 0 -10px; /* to offset the gap along the borders */
 }
