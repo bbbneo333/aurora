@@ -283,6 +283,25 @@ body {
   gap: 10px;
 }
 
+.modal-dialog.podcast-discover-modal-dialog {
+  width: min(60vw, 1120px);
+  max-width: 95vw;
+  min-width: min(50vw, 920px);
+}
+
+.modal-backdrop.show.podcast-discover-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(6px) saturate(1.05);
+  -webkit-backdrop-filter: blur(6px) saturate(1.05);
+}
+
+@media (max-width: 1200px) {
+  .modal-dialog.podcast-discover-modal-dialog {
+    width: min(90vw, 980px);
+    min-width: 0;
+  }
+}
+
 /*.modal-footer [role="button"]:not([disabled]):hover {*/
 /*  transform: scale(1.05);*/
 /*}*/

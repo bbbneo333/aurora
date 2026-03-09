@@ -30,6 +30,7 @@
   "PlayerNext": "fas fa-step-forward",
   "PlayerRepeat": "fas fa-redo-alt",
   "PlayerQueue": "fas fa-list",
+  "Podcast": "fas fa-podcast",
   "PlayerVolume1": "fas fa-volume-up",
   "PlayerVolume2": "fas fa-volume-down",
   "PlayerVolumeMuted": "fas fa-volume-mute",

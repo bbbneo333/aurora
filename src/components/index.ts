@@ -26,6 +26,7 @@ export * from './media-playlist-delete-tracks-modal/media-playlist-delete-tracks
 export * from './media-playlist-duplicate-track-modal/media-playlist-duplicate-track-modal.component';
 export * from './media-playlist-edit-modal/media-playlist-edit-modal.component';
 export * from './media-playlist-wizard-modal/media-playlist-wizard-modal.component';
+export * from './media-podcast-subscribe-modal/media-podcast-subscribe-modal.component';
 export * from './media-playlists/media-playlists.component';
 export * from './media-session/media-session.component';
 export * from './media-settings-reset-dialog/media-settings-reset-dialog.component';

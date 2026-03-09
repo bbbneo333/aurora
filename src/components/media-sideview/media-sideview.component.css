@@ -121,3 +121,93 @@
 .sideview-tracklist {
   margin-top: 8px;
 }
+
+.sideview-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dark-color);
+  font-size: 40px;
+}
+
+.sideview-description-section {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--stage-overlay-outline-color);
+}
+
+.sideview-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dark-color);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.sideview-description-text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-light-color);
+  white-space: pre-wrap;
+}
+
+.sideview-podcast-episodes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sideview-empty {
+  font-size: 14px;
+  color: var(--text-dark-color);
+}
+
+.sideview-episode-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px;
+  border: 1px solid var(--stage-overlay-outline-color);
+  border-radius: 10px;
+  background-color: var(--selectable-bg-color);
+}
+
+.sideview-episode-play {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sideview-episode-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sideview-episode-title {
+  color: var(--text-light-color);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.sideview-episode-date {
+  color: var(--text-dark-color);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.sideview-episode-description {
+  margin-top: 6px;
+  color: var(--text-dark-color);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}

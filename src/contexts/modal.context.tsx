@@ -7,6 +7,8 @@ export type ModalComponent<P = {}, R = {}, E = Error> = React.ComponentType<P & 
 
 export type ModalOptions<R = any, E = any> = {
   onComplete?: (result?: R, error?: E) => void;
+  dialogClassName?: string;
+  backdropClassName?: string;
 };
 
 export type ShowModal = <P, R, E = Error>(
@@ -26,12 +28,16 @@ const ModalContext = React.createContext<ModalContextType | null>(null);
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
   const [modalContent, setModalContent] = React.useState<React.ReactNode | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [dialogClassName, setDialogClassName] = React.useState<string | undefined>(undefined);
+  const [backdropClassName, setBackdropClassName] = React.useState<string | undefined>(undefined);
 
   const modalOptionsRef = React.useRef<ModalOptions | null>(null);
 
   const hideModal = React.useCallback(<R, E = Error>(result?: R, error?: E) => {
     setModalContent(null);
     setIsOpen(false);
+    setDialogClassName(undefined);
+    setBackdropClassName(undefined);
 
     try {
       modalOptionsRef.current?.onComplete?.(result, error);
@@ -45,6 +51,8 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
 
   const showModal: ShowModal = React.useCallback((Component, mProps, mOptions = {}) => {
     modalOptionsRef.current = mOptions;
+    setDialogClassName(mOptions.dialogClassName);
+    setBackdropClassName(mOptions.backdropClassName);
     setModalContent(
       // @ts-ignore
       <Component
@@ -63,6 +71,8 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
         onHide={() => hideModal()}
         backdrop="static"
         centered
+        dialogClassName={dialogClassName}
+        backdropClassName={backdropClassName}
       >
         {modalContent}
       </Modal>

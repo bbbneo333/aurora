@@ -16,6 +16,10 @@ export default {
       component: AppPages.PlayerPage,
     },
     {
+      path: Routes.Podcasts,
+      component: AppPages.PodcastsPage,
+    },
+    {
       path: Routes.Search,
       component: AppPages.SearchPage,
     },
@@ -41,12 +45,21 @@ export default {
       path: Routes.PlayerQueue,
       component: AppPages.PlayerHeader,
     },
+    {
+      path: Routes.Podcasts,
+      component: AppPages.PodcastsHeader,
+    },
   ],
   sidebar: [
     {
       path: Routes.Library,
       name: 'link_library',
       icon: Icons.LinkLibrary,
+    },
+    {
+      path: Routes.Podcasts,
+      name: 'link_podcasts',
+      icon: Icons.Podcast,
     },
     {
       path: Routes.Settings,

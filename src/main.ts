@@ -52,6 +52,8 @@ import { MenuBuilder } from './main/builders';
 const sourceMapSupport = require('source-map-support');
 const debug = require('debug')('aurora:main');
 
+const APP_DISPLAY_NAME = 'Aurora';
+
 function createElectronLogger(name: string, filePath: string) {
   const logger = electronLog.create({ logId: name });
   logger.transports.file.level = 'info';
@@ -69,7 +71,7 @@ class App implements IAppMain {
   readonly version?: string;
   readonly build?: string;
   readonly platform?: string;
-  readonly displayName = 'Aurora';
+  readonly displayName = APP_DISPLAY_NAME;
   readonly description = 'A cross-platform music player built with Electron';
 
   private mainWindow?: BrowserWindow;
@@ -258,8 +260,9 @@ class App implements IAppMain {
   }
 
   private configureApp(): void {
-    app.name = this.displayName;
-    app.setName(this.displayName);
+    app.name = APP_DISPLAY_NAME;
+    app.setName(APP_DISPLAY_NAME);
+    process.title = APP_DISPLAY_NAME;
     app.setAppUserModelId('com.bbbneo333.aurora');
 
     app.setAboutPanelOptions({

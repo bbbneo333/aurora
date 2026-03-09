@@ -82,7 +82,7 @@ export function LibraryHeader() {
         {isPlaylistModule && mediaPlaylists.length > 0 && (
           <Button
             className={cx('library-playlist-add-button')}
-            variant={['rounded', 'primary']}
+            variant={['rounded', 'outline']}
             tooltip={I18nService.getString('button_create_playlist')}
             onButtonSubmit={() => {
               showModal(MediaPlaylistWizardModal, {}, {

@@ -9,6 +9,7 @@
   "LibraryLikedTracks": "/library/liked-tracks",
   "Player": "/player",
   "PlayerQueue": "/player/queue",
+  "Podcasts": "/podcasts",
   "Settings": "/settings",
   "Search": "/search",
   "AudioCd": "/audio-cd"

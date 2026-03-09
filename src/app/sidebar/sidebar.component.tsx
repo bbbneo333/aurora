@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useSyncExternalStore, useState } from 'react';
 import classNames from 'classnames/bind';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -9,9 +9,9 @@ import {
   RouterLink,
 } from '../../components';
 
-import { AppService, I18nService } from '../../services';
+import { AppService, I18nService, PodcastService } from '../../services';
 import routes from '../app.routes';
-import { Icons } from '../../constants';
+import { Icons, Routes } from '../../constants';
 import { MediaLibraryActions } from '../../enums';
 import { PlatformOS } from '../../modules/platform';
 import { IPCCommChannel, IPCRenderer } from '../../modules/ipc';
@@ -46,7 +46,8 @@ function SidebarNavigationLink(props: {
     path: string,
     icon: string,
     name: string,
-  }
+  },
+  hasNewContent?: boolean,
 }) {
   const {
     route: {
@@ -54,6 +55,7 @@ function SidebarNavigationLink(props: {
       name,
       path,
     },
+    hasNewContent = false,
   } = props;
 
   return (
@@ -66,6 +68,7 @@ function SidebarNavigationLink(props: {
         <Icon name={icon}/>
       </span>
       <span className={cx('sidebar-navigation-item-label')}>
+        {hasNewContent && <span className={cx('sidebar-item-new-dot')}/>}
         {I18nService.getString(name)}
       </span>
     </RouterLink>
@@ -126,10 +129,20 @@ function SidebarAudioCd() {
 }
 
 function SidebarNavigationList() {
+  const hasPodcastUpdates = useSyncExternalStore(
+    listener => PodcastService.subscribe(listener),
+    () => PodcastService.hasNewEpisodes(),
+    () => PodcastService.hasNewEpisodes(),
+  );
+
   return (
     <div className={cx('sidebar-navigation-list')}>
       {routes.sidebar.map(route => (
-        <SidebarNavigationLink key={route.path} route={route}/>
+        <SidebarNavigationLink
+          key={route.path}
+          route={route}
+          hasNewContent={route.path === Routes.Podcasts && hasPodcastUpdates}
+        />
       ))}
       <SidebarAudioCd/>
     </div>

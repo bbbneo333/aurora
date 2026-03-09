@@ -1,7 +1,7 @@
 .sidebar {
-  width: 20vw;
-  min-width: 20vw;
-  max-width: 20vw;
+  width: 12vw;
+  min-width: 12vw;
+  max-width: 12vw;
   background-color: var(--sidebar-glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -119,6 +119,21 @@
 .sidebar-navigation-item-icon {
   margin-right: 12px;
   opacity: 0.8;
+}
+
+.sidebar-navigation-item-label {
+  align-items: center;
+  display: inline-flex;
+}
+
+.sidebar-item-new-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16c784;
+  box-shadow: 0 0 0 3px rgba(22, 199, 132, 0.18);
+  margin-right: 8px;
+  flex: 0 0 auto;
 }
 
 .sidebar-navigation-item.active .sidebar-navigation-item-icon {

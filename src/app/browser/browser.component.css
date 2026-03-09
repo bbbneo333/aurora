@@ -23,9 +23,21 @@
   margin-left: auto;
 }
 
+.browser-header-context-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .browser-search {
   position: relative;
   width: min(460px, 40vw);
+}
+
+.browser-header-inline-controls {
+  display: flex;
+  align-items: center;
+  margin-left: 6px;
 }
 
 .browser-search-input {
@@ -34,7 +46,10 @@
   background-color: var(--selectable-bg-color);
   border: 1px solid var(--selectable-outline-color);
   color: var(--text-light-color);
-  padding: 10px 14px;
+  min-height: 44px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
 }
 
 .browser-search-input :global(.text-input) {

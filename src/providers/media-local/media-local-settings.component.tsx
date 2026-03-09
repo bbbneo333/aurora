@@ -103,6 +103,20 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
     naming_template: '<Artist> - <Album-Title> (<Year>)',
     discogs_token: '',
   };
+  const keywordGroups = [
+    {
+      label: I18nService.getString('label_settings_keyword_album_artist'),
+      keywords: ['<Artist>', '<Album-Artist>', '<Album Artist>'],
+    },
+    {
+      label: I18nService.getString('label_settings_keyword_album_title'),
+      keywords: ['<Album-Title>', '<Album Title>', '<Album>'],
+    },
+    {
+      label: I18nService.getString('label_settings_keyword_release_year'),
+      keywords: ['<Year>'],
+    },
+  ];
 
   useEffect(() => {
     mediaLocalStore.dispatch({
@@ -168,17 +182,21 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             <div className={cx('settings-subheading')}>{I18nService.getString('label_settings_group_compilations')}</div>
             <div className={cx('settings-description')}>{I18nService.getString('label_settings_group_compilations_details')}</div>
           </div>
-          <Form.Check
-            type="switch"
-            id="group-compilations-switch"
-            label=""
-            checked={settings?.library?.group_compilations_by_folder || false}
-            onChange={() => {
-              mediaLocalStore.dispatch({
-                type: MediaLocalStateActionType.ToggleGroupCompilations,
-              });
-            }}
-          />
+          <div className={cx('theme-switch')}>
+            <button
+              type="button"
+              className={cx('theme-switch-item', { active: settings?.library?.group_compilations_by_folder || false })}
+              onClick={() => {
+                mediaLocalStore.dispatch({
+                  type: MediaLocalStateActionType.ToggleGroupCompilations,
+                });
+              }}
+            >
+              {settings?.library?.group_compilations_by_folder
+                ? I18nService.getString('label_toggle_on')
+                : I18nService.getString('label_toggle_off')}
+            </button>
+          </div>
         </div>
 
         <div style={{ marginTop: '20px' }}>
@@ -209,6 +227,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
 
           <div className={cx('settings-action-row')}>
             <Button
+              className={cl('settings-action-button')}
+              variant={['primary']}
               disabled={loading || saving}
               icon={Icons.AddCircle}
               onButtonSubmit={() => {
@@ -241,6 +261,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               </div>
             </div>
             <Button
+              className={cl('settings-action-button')}
+              variant={['primary']}
               icon={Icons.Folder}
               onButtonSubmit={() => {
                 const selectedDirectory = openDirectorySelectionDialog();
@@ -280,45 +302,21 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
               {' '}
               {'<Keyword>'}
             </div>
-            <div className={cl('settings-keywords-table-wrap')}>
-              <table className={cl('settings-keywords-table')}>
-                <thead>
-                  <tr>
-                    <th>{I18nService.getString('label_settings_keyword')}</th>
-                    <th>{I18nService.getString('label_settings_description')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>{'<Artist>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_album_artist')}</td>
-                  </tr>
-                  <tr>
-                    <td>{'<Album-Artist>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_album_artist')}</td>
-                  </tr>
-                  <tr>
-                    <td>{'<Album Artist>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_album_artist')}</td>
-                  </tr>
-                  <tr>
-                    <td>{'<Album-Title>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_album_title')}</td>
-                  </tr>
-                  <tr>
-                    <td>{'<Album Title>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_album_title')}</td>
-                  </tr>
-                  <tr>
-                    <td>{'<Album>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_album_title')}</td>
-                  </tr>
-                  <tr>
-                    <td>{'<Year>'}</td>
-                    <td>{I18nService.getString('label_settings_keyword_release_year')}</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className={cl('settings-keywords-grid')}>
+              {keywordGroups.map(keywordGroup => (
+                <div key={keywordGroup.label} className={cl('settings-keyword-group')}>
+                  <div className={cl('settings-keyword-group-label')}>
+                    {keywordGroup.label}
+                  </div>
+                  <div className={cl('settings-keyword-chip-row')}>
+                    {keywordGroup.keywords.map(keyword => (
+                      <span key={keyword} className={cl('settings-keyword-chip')}>
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
           <Form.Group>
@@ -347,6 +345,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             </div>
             <div className={cl('settings-sync-action')}>
               <Button
+                className={cl('settings-action-button')}
+                variant={['primary']}
                 icon={syncing ? Icons.Refreshing : Icons.Refresh}
                 disabled={syncing}
                 onButtonSubmit={() => {

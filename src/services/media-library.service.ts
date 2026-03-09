@@ -31,6 +31,7 @@ import { MediaTrackService } from './media-track.service';
 import { MediaArtistService } from './media-artist.service';
 import { MediaAlbumService } from './media-album.service';
 import { NotificationService } from './notification.service';
+import { PodcastService } from './podcast.service';
 
 const debug = require('debug')('aurora:service:media_library');
 
@@ -539,6 +540,11 @@ export class MediaLibraryService {
           });
         }, { concurrency: 1 });
       }
+
+      await PodcastService.syncPodcastsToDap({
+        targetDirectory,
+        deleteMissingOnDevice,
+      });
 
       this.clearDapSyncCheckpoint();
       const result = {

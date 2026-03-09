@@ -28,6 +28,7 @@ import {
 import {
   MediaAlbumDatastore,
   MediaArtistDatastore,
+  MediaPlaylistDatastore,
   MediaTrackDatastore,
 } from '../../datastores';
 
@@ -87,9 +88,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       }
 
       debug('syncMediaTracks - started sync');
-    console.log('Reload Media Files start');
-
-    const syncStart = performance.now();
+      const syncStart = performance.now();
       const { signal } = abortController;
 
       // finalize
@@ -142,6 +141,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
         // process compilation album covers
         await this.processCompilationAlbumCovers(settings);
+        await this.processArtistFeaturePictures();
+        await this.processSmartPlaylistCovers();
 
         // done - only finish if not aborted or new run is already in place
         if (signal.aborted || this.syncAbortController !== abortController) {
@@ -572,7 +573,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       // Heuristic 0: Check if there is only one unique artist
       const uniqueArtists = _.uniqBy(artistNames, (name: string) => name.toLowerCase());
       if (uniqueArtists.length === 1) {
-        targetArtistName = uniqueArtists[0];
+        [targetArtistName] = uniqueArtists;
       } else {
         // Heuristic 1: Check if one artist is a prefix of all others (e.g. "Adele" vs "Adele feat. X")
         const shortestArtist = _.minBy(artistNames, 'length');
@@ -733,6 +734,125 @@ class MediaLocalLibraryService implements IMediaLibraryService {
         });
       }
     }, { concurrency: 4 });
+  }
+
+  private async processArtistFeaturePictures(): Promise<void> {
+    const mediaArtists = await MediaArtistDatastore.findMediaArtists({
+      provider: MediaLocalConstants.Provider,
+    });
+    const artistsWithoutPicture = mediaArtists.filter(artist => !artist.artist_feature_picture && !!String(artist.artist_name || '').trim());
+
+    await Promise.map(artistsWithoutPicture, async (artist) => {
+      const artistPicture = await this.fetchArtistFeaturePicture(artist.artist_name);
+      if (!artistPicture) {
+        return;
+      }
+
+      await MediaArtistService.updateMediaArtists({
+        id: artist.id,
+      }, {
+        artist_feature_picture: artistPicture,
+      });
+    }, { concurrency: 3 });
+  }
+
+  private async fetchArtistFeaturePicture(artistName: string): Promise<IMediaPicture | undefined> {
+    const normalizedArtistName = String(artistName || '').trim();
+    if (!normalizedArtistName) {
+      return undefined;
+    }
+
+    try {
+      const deezerApiUrl = new URL('https://api.deezer.com/search/artist');
+      deezerApiUrl.searchParams.set('q', normalizedArtistName);
+      deezerApiUrl.searchParams.set('limit', '1');
+      const deezerResponse = await fetch(deezerApiUrl.toString());
+      if (!deezerResponse.ok) {
+        return undefined;
+      }
+
+      const deezerPayload = await deezerResponse.json();
+      const deezerArtist = Array.isArray(deezerPayload?.data) ? deezerPayload.data[0] : undefined;
+      const artistImageUrl = String(
+        deezerArtist?.picture_xl
+        || deezerArtist?.picture_big
+        || deezerArtist?.picture_medium
+        || deezerArtist?.picture
+        || '',
+      ).trim();
+      if (!artistImageUrl) {
+        return undefined;
+      }
+
+      const imageResponse = await fetch(artistImageUrl);
+      if (!imageResponse.ok) {
+        return undefined;
+      }
+
+      const imageArrayBuffer = await imageResponse.arrayBuffer();
+      const imageBuffer = Buffer.from(imageArrayBuffer);
+      const processedPicture = await MediaLibraryService.processPicture({
+        image_data: imageBuffer,
+        image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+      });
+      return processedPicture;
+    } catch (error) {
+      debug('processArtistFeaturePictures - failed for %s - %o', normalizedArtistName, error);
+      return undefined;
+    }
+  }
+
+  private async processSmartPlaylistCovers(): Promise<void> {
+    const smartPlaylists = await MediaPlaylistDatastore.findMediaPlaylists({
+      is_smart: true,
+    });
+
+    await Promise.map(smartPlaylists, async (smartPlaylist) => {
+      if (smartPlaylist.cover_picture || isEmpty(smartPlaylist.tracks)) {
+        return;
+      }
+
+      const playlistTracks = await Promise.map(smartPlaylist.tracks, playlistTrack => MediaTrackService.getMediaTrackForProvider(
+        playlistTrack.provider,
+        playlistTrack.provider_id,
+      ));
+      const trackCovers = _.uniqBy(
+        playlistTracks
+          .filter(Boolean)
+          .map((playlistTrack: any) => (
+            playlistTrack.track_cover_picture
+            || playlistTrack.track_album?.album_cover_picture
+          ))
+          .filter((picture: IMediaPicture | undefined) => picture?.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Path),
+        'image_data',
+      ).slice(0, 4) as IMediaPicture[];
+
+      if (isEmpty(trackCovers)) {
+        return;
+      }
+
+      let generatedCoverPicture: IMediaPicture | undefined;
+      if (trackCovers.length === 1) {
+        [generatedCoverPicture] = trackCovers;
+      } else {
+        const collageBuffer = await this.createCollage(trackCovers);
+        if (!collageBuffer) {
+          return;
+        }
+        generatedCoverPicture = await MediaLibraryService.processPicture({
+          image_data: collageBuffer,
+          image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+        });
+      }
+
+      if (!generatedCoverPicture) {
+        return;
+      }
+
+      await MediaPlaylistDatastore.updateMediaPlaylist(smartPlaylist.id, {
+        cover_picture: generatedCoverPicture,
+      });
+    }, { concurrency: 3 });
   }
 
   private createCollage(pictures: IMediaPicture[]): Promise<Buffer | null> {

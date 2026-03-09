@@ -262,3 +262,47 @@ export interface IMediaPinnedItemInputData extends Pick<IMediaCollectionItem, 'i
 export interface IMediaPinnedItem extends IMediaPinnedItemData, IMediaCollectionItem {
   pinned_item_id: string;
 }
+
+export type IPodcastDirectorySource = 'global' | 'de' | 'eu';
+
+export interface IPodcastDirectorySearchFilters {
+  query: string;
+  publisher?: string;
+  genre?: string;
+  minRating?: number;
+  source?: IPodcastDirectorySource;
+}
+
+export interface IPodcastDirectoryEntry {
+  id: string;
+  title: string;
+  publisher: string;
+  genre: string;
+  rating: number;
+  imageUrl: string;
+  feedUrl: string;
+  source: IPodcastDirectorySource;
+}
+
+export interface IPodcastEpisode {
+  id: string;
+  title: string;
+  audioUrl: string;
+  publishedAt: number;
+  description?: string;
+  isNew: boolean;
+}
+
+export interface IPodcastSubscription {
+  id: string;
+  title: string;
+  publisher: string;
+  genre: string;
+  rating: number;
+  imageUrl: string;
+  feedUrl: string;
+  source: IPodcastDirectorySource;
+  hasNewEpisodes: boolean;
+  updatedAt: number;
+  episodes: IPodcastEpisode[];
+}

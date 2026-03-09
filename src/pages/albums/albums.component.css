@@ -12,28 +12,39 @@
 .albums-controls {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 10px;
+  flex-wrap: nowrap;
 }
 
 .albums-sort-control {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 8px;
+  background-color: var(--selectable-bg-color);
+  border: 1px solid var(--selectable-outline-color);
+  border-radius: 999px;
+  padding: 0 6px 0 14px;
+  min-height: 44px;
 }
 
 .albums-size-control {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 200px;
+  width: 240px;
+  background-color: var(--selectable-bg-color);
+  border: 1px solid var(--selectable-outline-color);
+  border-radius: 999px;
+  padding: 0 14px;
+  min-height: 44px;
 }
 
 .albums-size-slider {
   flex: 1;
   display: flex;
   align-items: center;
-  height: 24px;
+  height: 20px;
 }
 
 .albums-slider-instance {
@@ -41,16 +52,31 @@
 }
 
 .albums-select {
-  background-color: var(--selectable-bg-color);
+  background-color: transparent;
   color: var(--text-light-color);
-  border: 1px solid var(--selectable-outline-color);
-  border-radius: 8px;
-  padding: 6px 12px;
+  border: none;
+  border-radius: 999px;
+  padding: 0;
   font-size: 14px;
   outline: none;
   cursor: pointer;
+  min-width: 110px;
+  font-weight: var(--font-weight-bold);
 }
 
 .albums-select:focus {
-  border-color: var(--button-primary-bg-color);
+  color: var(--text-normal-color);
+}
+
+.albums-select option {
+  color: var(--text-light-color);
+  background-color: var(--stage-overlay-bg-color);
+}
+
+.albums-slider-track {
+  background-color: var(--text-light-color);
+}
+
+.albums-slider-thumb {
+  background-color: var(--text-light-color);
 }

@@ -37,7 +37,7 @@
 /*primary button*/
 
 .button.primary {
-  color: var(--text-light-color);
+  color: #fff;
   background-color: var(--button-primary-bg-color);
 }
 
@@ -52,7 +52,7 @@
 /*danger button*/
 
 .button.danger {
-  color: var(--text-light-color);
+  color: #fff;
   background-color: var(--button-danger-bg-color);
 }
 

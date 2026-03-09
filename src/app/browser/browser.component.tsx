@@ -46,6 +46,7 @@ function BrowserLinks() {
 function BrowserSearch() {
   const history = useHistory();
   const location = useLocation();
+  const isSettingsPage = location.pathname === Routes.Settings;
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRequestRef = useRef(0);
 
@@ -98,6 +99,11 @@ function BrowserSearch() {
   ]);
 
   useEffect(() => {
+    if (isSettingsPage) {
+      setIsOpen(false);
+      return;
+    }
+
     const queryToBroadcast = canSearch ? trimmedQuery : '';
     localStorage.setItem(TopBarSearchStateKey, queryToBroadcast);
     window.dispatchEvent(new CustomEvent(TopBarSearchChangeEvent, {
@@ -107,6 +113,7 @@ function BrowserSearch() {
     }));
   }, [
     canSearch,
+    isSettingsPage,
     trimmedQuery,
   ]);
 
@@ -127,6 +134,10 @@ function BrowserSearch() {
     location.pathname,
     location.search,
   ]);
+
+  if (isSettingsPage) {
+    return null;
+  }
 
   return (
     <div ref={containerRef} className={cx('browser-search')}>
@@ -198,7 +209,9 @@ function BrowserHeader() {
     <div className={cx('browser-header', 'app-window-drag')}>
       <BrowserNavigation/>
       <BrowserSearch/>
+      <div id="browser-header-inline-controls" className={cx('browser-header-inline-controls')}/>
       <div className={cx('browser-header-actions')}>
+        <div id="browser-header-context-actions" className={cx('browser-header-context-actions')}/>
         <BrowserLinks/>
         <Button
           variant={['rounded', 'outline']}

@@ -44,7 +44,8 @@ function AlbumsHeaderControls({ settings, updateSettings }: {
   settings: IAlbumsViewSettings,
   updateSettings: (partial: Partial<IAlbumsViewSettings>) => void
 }) {
-  const container = document.getElementById('library-header-controls');
+  const container = document.getElementById('browser-header-inline-controls')
+    || document.getElementById('library-header-controls');
   if (!container) return null;
 
   return ReactDOM.createPortal(
@@ -74,6 +75,8 @@ function AlbumsHeaderControls({ settings, updateSettings }: {
         <div className={cx('albums-size-slider')}>
           <Slider
             sliderContainerClassName={cx('albums-slider-instance')}
+            sliderTrackClassName={cx('albums-slider-track')}
+            sliderThumbClassName={cx('albums-slider-thumb')}
             value={settings.coverSize}
             maxValue={400}
             onDragCommit={value => updateSettings({ coverSize: Math.max(100, value) })}

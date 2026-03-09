@@ -2,9 +2,51 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px 24px;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.settings-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.settings-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 4px;
+  position: sticky;
+  top: 24px;
+  min-height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+.settings-info-logo {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center 46%;
+  background-size: min(300px, 84%);
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.settings-info-column > *:not(.settings-info-logo) {
+  position: relative;
+  z-index: 1;
 }
 
 .settings-header {
@@ -51,6 +93,40 @@
 .settings-content.links {
   color: var(--text-dark-color);
   font-size: 14px;
+}
+
+.settings-info-heading {
+  font-weight: 700;
+  color: var(--text-light-color);
+  font-size: 18px;
+}
+
+.settings-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 0;
+}
+
+.settings-info-item {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  color: var(--text-dark-color);
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--stage-overlay-outline-color) 38%, transparent);
+}
+
+.settings-info-item > i {
+  color: var(--stage-overlay-outline-color);
+  margin-top: 2px;
+}
+
+.settings-info-title {
+  color: var(--text-light-color);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
 .theme-switch {
@@ -110,7 +186,8 @@
 .settings-description {
   font-size: 13px;
   color: var(--text-dark-color);
-  margin-top: 4px;
+  margin-top: 6px;
+  line-height: 1.45;
 }
 
 .settings-action-row {
@@ -118,6 +195,15 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 8px;
+}
+
+.settings-reset-button {
+  color: #fff !important;
+}
+
+.settings-reset-button:not(.disabled):hover,
+.settings-reset-button:not(.disabled):active {
+  color: #fff !important;
 }
 
 .dap-progress-container {
@@ -154,4 +240,16 @@
   justify-content: space-between;
   font-size: 12px;
   color: var(--text-dark-color);
+}
+
+@media (max-width: 1180px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .settings-info-column {
+    position: static;
+    padding-top: 0;
+  }
 }

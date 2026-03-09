@@ -3,22 +3,114 @@
 [![Downloads](https://img.shields.io/github/downloads/bbbneo333/aurora/total)](https://github.com/bbbneo333/aurora/releases)
 [![CI](https://github.com/bbbneo333/aurora/actions/workflows/checks.yml/badge.svg)](https://github.com/bbbneo333/aurora/actions/workflows/checks.yml)
 
-**Aurora** is a lightweight, open-source, cross-platform music player built for audiophiles and casual listeners alike.  
-It focuses on a clean interface, local playback, and full user control — without ads, tracking, or cloud dependencies.
+Aurora is a local-first desktop music player built for people who want full control over their library, playback flow, and data.
+Version **1.3** expands Aurora into a broader media hub with podcasts, advanced sync workflows, and smarter library tooling while keeping the app fast and private.
 
-![Main UI](docs/images/screenshot-main-ui.png)
+![Screenshot Placeholder - Main Interface](docs/images/placeholder-main-interface.png)
 
 ---
 
-## Features
+## Why Aurora
 
-- Add and manage music by selecting local directories
-- Supported formats - `flac`, `mp3`, `m4a`, `wav` (Head out to [issues](https://github.com/bbbneo333/aurora/issues) to request new formats).
-- Browse music by album and artist
-- Playlist management (create, edit, reorder — stored locally)
-- Playback queue management
-- Clean, distraction-free UI
-- Works and tested on **macOS**, **Windows**, and **Linux** builds are being currently tested.
+- Local-first playback and library management
+- No telemetry, no analytics, and no usage tracking
+- Focused UI with practical power-user features
+- Optimized for large FLAC libraries and daily listening workflows
+- Fast iteration on highly requested community features
+
+Aurora is designed to reduce friction: import quickly, organize clearly, sync reliably, and keep listening.
+
+---
+
+## What’s New in Version 1.3
+
+- Dedicated **Podcasts** page with discovery and subscription flows
+- Podcast refresh and local persistence pipeline
+- DAP sync support for podcast episodes (`Podcasts` target folder)
+- Enhanced album controls with repeat and multi-mode shuffle
+- Improved settings UX, import flows, and smart cover generation
+
+![Screenshot Placeholder - Version 1.3 Features](docs/images/placeholder-v1-3-features.png)
+
+---
+
+## Core Features
+
+- Local music library scanning from user-selected folders
+- Supported formats: `flac`, `mp3`, `m4a`, `wav`
+- Album, artist, and playlist browsing with fast navigation
+- Queue management and contextual playback controls
+- Manual and smart playlists
+- CD import with metadata-driven naming templates
+- Podcast discovery, subscriptions, and episode sync
+- DAP sync with progress, ETA, and resume support
+
+---
+
+## Functional Areas in Detail
+
+### Library
+
+The library is built around deterministic local indexing. You define source directories, Aurora scans and updates tracks, and the UI reflects changes quickly.
+For compilation-heavy collections, grouping options and improved sync behavior help keep metadata tidy and browsing consistent.
+
+**Benefits**
+- Reliable local indexing for large collections
+- Better handling of mixed-artist albums
+- Fast updates after imports and metadata edits
+
+![Screenshot Placeholder - Library](docs/images/placeholder-library.png)
+
+### Podcasts
+
+Aurora 1.3 introduces podcast support as a first-class area. You can discover shows, subscribe, refresh episodes from RSS feeds, and sync selected episodes to your target device.
+Podcast content is managed with the same local-first mindset as music.
+
+**Benefits**
+- One app for music and podcasts
+- Simple discovery and subscription flow
+- Seamless sync to external listening devices
+
+![Screenshot Placeholder - Podcasts](docs/images/placeholder-podcasts.png)
+
+### CD Import
+
+The CD import workflow focuses on fast FLAC archiving with clean folder and file naming.
+You can configure output directory, naming template keywords, and Discogs credentials for richer metadata.
+
+**Benefits**
+- Cleaner digital archive from physical media
+- Consistent naming standards across imports
+- Less manual post-processing after ripping
+
+![Screenshot Placeholder - CD Import](docs/images/placeholder-cd-import.png)
+
+### Album View vs Artist View
+
+**Album View** is release-centric. It emphasizes a single album’s identity, tracks, genres, and album-level actions.
+This is best when you want focused playback, edit album metadata, or work through an album as a complete work.
+
+**Artist View** is catalog-centric. It emphasizes the artist as the entry point and groups related releases for exploration.
+This is best for browsing an artist’s wider discography and moving between albums quickly.
+
+**Practical difference**
+- Use Album View for depth and per-release control
+- Use Artist View for breadth and discovery across releases
+
+![Screenshot Placeholder - Album vs Artist](docs/images/placeholder-album-vs-artist.png)
+
+---
+
+## Privacy
+
+Aurora is privacy-first:
+
+- No telemetry
+- No analytics
+- No user behavior tracking
+- Local database and local media ownership
+
+Some metadata enrichment flows may perform explicit online lookups when that feature is used, but Aurora does not send analytics or profiling data.
 
 ---
 
@@ -27,60 +119,9 @@ It focuses on a clean interface, local playback, and full user control — witho
 | Platform | Architecture | Status | Minimum OS |
 |---------|---------------|--------|------------|
 | macOS   | Apple Silicon (ARM64) | ✅ Available | macOS 12.0 (Monterey) |
-| macOS   | Intel (x64)          | 🚧 Coming soon | macOS 12.0 (Monterey) |
-| Windows | x64                  | 🚧 Coming soon | Windows 10 |
-| Linux   | x64                  | 🚧 Coming soon | Ubuntu 20.04+ (glibc 2.31+) |
-
----
-
-## Privacy & Security
-
-Aurora is designed to be **fully local-first**:
-
-- ❌ No telemetry
-- ❌ No analytics
-- ❌ No user tracking
-- ❌ No background network requests
-- ✅ All data stays on your machine
-
-Aurora does not collect, store, or transmit any personal or usage data.
-
----
-
-## macOS — Important Notice (Unsigned App)
-
-Aurora is currently **not code-signed or notarized** because it is distributed as an independent open-source project without an Apple Developer
-account.
-
-### What this means
-
-When you open Aurora on macOS for the first time, you may see:
-
-> “Aurora cannot be opened because the developer cannot be verified.”
-
-### How to open Aurora safely
-
-1. Download the `.dmg` from **GitHub Releases**
-2. Drag **Aurora.app** into your **Applications** folder
-3. Right-click **Aurora.app** → **Open**
-4. Click **Open** again when prompted
-5. (Optional) After first launch, macOS will trust the app normally
-
-Aurora does **nothing malicious** — this warning exists purely because the app is unsigned.
-
----
-
-## Installation
-
-### macOS
-
-- Download the `.dmg` from the **Releases** page
-- Drag Aurora into Applications
-- Follow the steps above to bypass Gatekeeper
-
-### Windows / Linux
-
-_Coming Soon_
+| macOS   | Intel (x64) | 🚧 Coming soon | macOS 12.0 (Monterey) |
+| Windows | x64 | 🚧 Coming soon | Windows 10 |
+| Linux   | x64 | 🚧 Coming soon | Ubuntu 20.04+ (glibc 2.31+) |
 
 ---
 
@@ -100,41 +141,28 @@ yarn install
 yarn start
 ```
 
----
-
-## Packaging
+### Package locally
 
 ```bash
 yarn package
 ```
 
-Artifacts will be generated in the `release` output directory.
+Build artifacts are generated in `release/`.
 
 ---
 
-## Releasing
+## Contributing and Feedback
 
-See [RELEASE](./RELEASE.md)
-
----
-
-## Bug Reports & Feedback
-
-- Report bugs via GitHub Issues
-- Feature requests and discussions are welcome
-
-Please open an issue with:
-
-- Clear steps to reproduce
-- Expected vs actual behavior
-- OS and Aurora version
-- Screenshots or logs if available
+- Report bugs and request features via GitHub Issues
+- Include reproduction steps, expected behavior, and logs/screenshots when possible
 
 👉 https://github.com/bbbneo333/aurora/issues
 
 ---
 
-## License
+## Credits and License
 
-Aurora is released under the MIT License.
-See [LICENSE](./LICENSE) for details.
+- Original project by [bbbneo333](https://github.com/bbbneo333)
+- Aurora is licensed under the [MIT License](./LICENSE)
+
+Development of this fork is supported by AI-assisted workflows to accelerate implementation quality and deliver highly requested features from the original repository faster.
