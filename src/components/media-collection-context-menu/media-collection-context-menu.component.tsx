@@ -11,7 +11,14 @@ import {
 import { useContextMenu } from '../../contexts';
 import { useMediaCollectionPin, useScrollLock } from '../../hooks';
 import { IMediaCollectionItem } from '../../interfaces';
-import { I18nService, MediaCollectionService, MediaPlayerService } from '../../services';
+import {
+  I18nService,
+  MediaAlbumService,
+  MediaCollectionService,
+  MediaPlayerService,
+  MediaPlaylistService,
+} from '../../services';
+import { MediaCollectionItemType } from '../../enums';
 
 import { MediaPlaylistContextMenu } from '../media-playlist-context-menu/media-playlist-context-menu.component';
 
@@ -21,11 +28,13 @@ export enum MediaCollectionContextMenuItem {
   Separator,
   ManagePlaylist,
   Pin,
+  ToggleHidden,
 }
 
 export enum MediaCollectionContextMenuItemAction {
   AddToQueue = 'media/collection/action/addToQueue',
   Pin = 'media/collection/action/pin',
+  ToggleHidden = 'media/collection/action/toggleHidden',
 }
 
 export interface MediaCollectionContextMenuItemProps {
@@ -75,6 +84,30 @@ export function MediaCollectionContextMenu(props: {
         }
 
         await togglePinned();
+        break;
+      }
+      case MediaCollectionContextMenuItemAction.ToggleHidden: {
+        if (!mediaItem) {
+          throw new Error('MediaCollectionContextMenu encountered error while performing action ToggleHidden - No media item was provided');
+        }
+
+        if (mediaItem.type === MediaCollectionItemType.Album) {
+          await MediaAlbumService.updateMediaAlbum({
+            id: mediaItem.id,
+          }, {
+            hidden: !mediaItem.hidden,
+          });
+          MediaAlbumService.loadMediaAlbums();
+          MediaPlaylistService.loadMediaPlaylists();
+        } else if (mediaItem.type === MediaCollectionItemType.Playlist && mediaItem.hidden) {
+          await MediaAlbumService.updateMediaAlbum({
+            id: mediaItem.id,
+          }, {
+            hidden: false,
+          });
+          MediaAlbumService.loadMediaAlbums();
+          MediaPlaylistService.loadMediaPlaylists();
+        }
         break;
       }
       default:
@@ -144,6 +177,32 @@ export function MediaCollectionContextMenu(props: {
               <MenuSeparator key={`${MediaCollectionContextMenuItem.Separator}-${menuItemPointer}`}/>
             );
           }
+          case MediaCollectionContextMenuItem.ToggleHidden:
+            if (mediaItem?.type === MediaCollectionItemType.Album) {
+              return (
+                <Item
+                  key={MediaCollectionContextMenuItem.ToggleHidden}
+                  id={MediaCollectionContextMenuItemAction.ToggleHidden}
+                  onClick={handleMenuItemClick}
+                >
+                  {I18nService.getString(mediaItem.hidden ? 'label_submenu_media_collection_show' : 'label_submenu_media_collection_hide')}
+                </Item>
+              );
+            }
+
+            if (mediaItem?.type === MediaCollectionItemType.Playlist && mediaItem.hidden) {
+              return (
+                <Item
+                  key={MediaCollectionContextMenuItem.ToggleHidden}
+                  id={MediaCollectionContextMenuItemAction.ToggleHidden}
+                  onClick={handleMenuItemClick}
+                >
+                  {I18nService.getString('label_submenu_media_collection_show')}
+                </Item>
+              );
+            }
+
+            return <></>;
           default:
             return (
               <></>

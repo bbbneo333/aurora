@@ -24,6 +24,13 @@ export enum IPCCommChannel {
   // image
   ImageScale = 'image:scale',
   ImageGetColors = 'image:get_colors',
+  // device
+  DeviceGetAudioCdStatus = 'device:get_audio_cd_status',
+  DeviceGetAudioCdTracks = 'device:get_audio_cd_tracks',
+  DeviceEjectAudioCd = 'device:eject_audio_cd',
+  DeviceSearchDiscogsReleases = 'device:search_discogs_releases',
+  DeviceGetDiscogsRelease = 'device:get_discogs_release',
+  DeviceImportAudioCd = 'device:import_audio_cd',
 }
 
 export enum IPCRendererCommChannel {
@@ -32,4 +39,6 @@ export enum IPCRendererCommChannel {
   StateRemovePersisted = 'state:remove_persisted',
   // ui
   UIOpenSettings = 'ui:open_settings',
+  // device
+  DeviceAudioCdUpdate = 'device:audio_cd_update',
 }

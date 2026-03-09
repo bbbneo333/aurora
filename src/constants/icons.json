@@ -8,6 +8,7 @@
   "Completed": "fas fa-check-circle",
   "Delete": "fas fa-trash",
   "Edit": "fas fa-pen",
+  "Eject": "fas fa-eject",
   "Error": "fas fa-exclamation-circle",
   "Folder": "fas fa-folder",
   "Github": "fab fa-github",
@@ -35,5 +36,9 @@
   "Refresh": "fas fa-sync-alt",
   "Refreshing": "fas fa-sync-alt fa-spin",
   "Search": "fas fa-search",
+  "SortAsc": "fas fa-sort-amount-down-alt",
+  "SortDesc": "fas fa-sort-amount-down",
+  "Image": "fas fa-image",
+  "Import": "fas fa-file-import",
   "TrackPlaceholder": "fas fa-record-vinyl"
 }

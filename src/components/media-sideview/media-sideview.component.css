@@ -1,0 +1,123 @@
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.sideview {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: clamp(420px, 30vw, 640px);
+  background-color: var(--stage-overlay-bg-color);
+  border-left: 1px solid var(--stage-overlay-outline-color);
+  box-shadow: -16px 0 24px rgba(0,0,0,.3);
+  padding: 16px;
+  overflow: auto;
+  z-index: 1000;
+  animation: slideIn 150ms ease-out;
+}
+
+.sideview-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: clamp(420px, 30vw, 640px);
+  bottom: 0;
+  background: rgba(0,0,0,0.05);
+  backdrop-filter: blur(6px) saturate(1.05);
+  -webkit-backdrop-filter: blur(6px) saturate(1.05);
+  z-index: 999;
+}
+
+.sideview-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Move close button to right */
+  gap: 10px;
+  margin-bottom: 0;
+  padding-bottom: 10px;
+}
+
+.sideview-title {
+  /* hidden or repurposed */
+  display: none;
+}
+
+.sideview-close {
+  border: none;
+  background: var(--selectable-bg-color);
+  color: var(--text-light-color);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sideview-close:hover {
+  background: var(--selectable-hovered-bg-color);
+}
+
+.sideview-cover {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--stage-overlay-outline-color);
+}
+
+.sideview-cover-picture {
+  width: 240px !important;
+  height: 240px !important;
+  flex: 0 0 240px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  object-fit: cover;
+}
+
+.sideview-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0; /* Enable text truncation */
+  padding-top: 4px;
+  /* align with cover */
+  align-self: center; 
+}
+
+.sideview-meta-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-light-color);
+  line-height: 1.2;
+  word-wrap: break-word;
+}
+
+.sideview-meta-artist {
+  font-size: 14px;
+  color: var(--text-dark-color);
+}
+
+.sideview-meta-details {
+  font-size: 14px;
+  color: var(--text-dark-color);
+  margin-top: 4px;
+}
+
+.sideview-actions {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--stage-overlay-outline-color);
+}
+
+.sideview-tracklist {
+  margin-top: 8px;
+}

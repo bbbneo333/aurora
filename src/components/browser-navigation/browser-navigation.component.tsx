@@ -36,6 +36,7 @@ function BrowserNavigationButton(props: {
 
   const location = useLocation();
   const history = useHistory();
+  const memoryHistory = history as any;
 
   const navigationDelta = NavigationDelta[direction];
   const navigationIcon = NavigationIcon[direction];
@@ -45,11 +46,11 @@ function BrowserNavigationButton(props: {
     // simply checking whether we have a history entry that we can go to on applying the
     // navigation delta (back / forward)
     // the button will be disabled if we don't any such entry
-    setNavigationIsDisabled(_.isNil(history.entries[history.index + navigationDelta]));
+    setNavigationIsDisabled(_.isNil(memoryHistory.entries[memoryHistory.index + navigationDelta]));
   }, [
     location.pathname,
-    history.entries,
-    history.index,
+    memoryHistory.entries,
+    memoryHistory.index,
     navigationDelta,
   ]);
 

@@ -42,6 +42,7 @@
   --stage-content-bg-color: #1d1d1d;
   --stage-overlay-bg-color: #181818;
   --stage-overlay-outline-color: #282828;
+  --sidebar-glass-bg: rgba(34, 34, 34, 0.52);
   --stage-scroll-bg-color: rgba(255, 255, 255, 0.3);
   --stage-toast-bg-color: #f8f8f8;
   --stage-toast-color: #1d1d1d;
@@ -75,6 +76,73 @@
   /*--light-bg-color: #1d1d1d;*/
 }
 
+/* Light theme overrides */
+html[data-theme='light'] {
+  --context-menu-color: #333;
+  --context-menu-bg-color: #fff;
+  --selectable-color: #444;
+  --selectable-bg-color: #ffffff;
+  --selectable-active-color: #111;
+  --selectable-active-bg-color: #f3f3f3;
+  --selectable-outline-color: #e5e5e5;
+  --selectable-hovered-color: #111;
+  --selectable-hovered-bg-color: #f3f3f3;
+  --selectable-focused-bg-color: #ececec;
+  --stage-bg-color: #f2f2f2;
+  --stage-content-bg-color: #ffffff;
+  --stage-overlay-bg-color: #ffffff;
+  --stage-overlay-outline-color: #e5e5e5;
+  --sidebar-glass-bg: rgba(248, 246, 240, 0.86);
+  --stage-scroll-bg-color: rgba(0,0,0,0.3);
+  --stage-toast-bg-color: #1d1d1d;
+  --stage-toast-color: #ffffff;
+  --text-dark-color: #555;
+  --text-light-color: #111;
+  --text-disabled-color: #999;
+  --input-color: #111;
+  --input-bg-color: #f6f6f6;
+  --input-outline-color: #e5e5e5;
+  --input-focused-bg-color: #fff;
+  --input-focused-outline-color: #c9c9c9;
+}
+
+/* Dark theme explicit (matches current root defaults) */
+html[data-theme='dark'] {
+  /* no-op: root already has dark defaults */
+}
+
+/* Auto theme follows system preferences when set to 'auto' */
+@media (prefers-color-scheme: light) {
+  html[data-theme='auto'] {
+    --context-menu-color: #333;
+    --context-menu-bg-color: #fff;
+    --selectable-color: #444;
+    --selectable-bg-color: #ffffff;
+    --selectable-active-color: #111;
+    --selectable-active-bg-color: #f3f3f3;
+    --selectable-outline-color: #e5e5e5;
+    --selectable-hovered-color: #111;
+    --selectable-hovered-bg-color: #f3f3f3;
+    --selectable-focused-bg-color: #ececec;
+    --stage-bg-color: #f2f2f2;
+    --stage-content-bg-color: #ffffff;
+    --stage-overlay-bg-color: #ffffff;
+    --stage-overlay-outline-color: #e5e5e5;
+    --sidebar-glass-bg: rgba(248, 246, 240, 0.86);
+    --stage-scroll-bg-color: rgba(0,0,0,0.3);
+    --stage-toast-bg-color: #1d1d1d;
+    --stage-toast-color: #ffffff;
+    --text-dark-color: #555;
+    --text-light-color: #111;
+    --text-disabled-color: #999;
+    --input-color: #111;
+    --input-bg-color: #f6f6f6;
+    --input-outline-color: #e5e5e5;
+    --input-focused-bg-color: #fff;
+    --input-focused-outline-color: #c9c9c9;
+  }
+}
+
 :focus {
   outline: none;
 }
@@ -87,6 +155,7 @@ body {
   user-select: none;
   /* This needs to match with our main stage color to ensure there's no white flash when resizing */
   background-color: var(--stage-content-bg-color);
+  color: var(--text-dark-color);
 }
 
 /*scrollable*/

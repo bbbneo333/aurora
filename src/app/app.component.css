@@ -23,7 +23,13 @@
 .app-player {
   flex: 0 0 100px;
   margin-bottom: -100px;
-  transition: margin-bottom .4s ease;
+  transition: margin-bottom .4s ease, margin-right .4s ease;
+  position: relative;
+  z-index: 1100; /* above sideview/backdrop (1000/999) so player stays sharp and visible */
+}
+
+:global(body.sideview-open) .app-player {
+  margin-right: clamp(420px, 30vw, 640px);
 }
 
 .app-player.active {

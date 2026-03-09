@@ -8,11 +8,13 @@ import { Icons, Routes } from '../../constants';
 import { selectSortedPlaylists } from '../../selectors';
 import { I18nService, MediaPlaylistService } from '../../services';
 import { StringUtils } from '../../utils';
+import { useModal } from '../../contexts';
 
 import {
   Button,
   MediaPlaylists,
   MediaLikedTracksCollectionItem,
+  MediaPlaylistWizardModal,
 } from '../../components';
 
 import styles from './playlists.component.css';
@@ -21,6 +23,7 @@ const cx = classNames.bind(styles);
 
 function PlaylistsEmptySection() {
   const history = useHistory();
+  const { showModal } = useModal();
 
   return (
     <div className={cx('playlists-empty-section')}>
@@ -31,12 +34,17 @@ function PlaylistsEmptySection() {
         <Button
           icon={Icons.AddCircle}
           onButtonSubmit={() => {
-            MediaPlaylistService.createMediaPlaylist().then((mediaPlaylist) => {
-              const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
-                playlistId: mediaPlaylist.id,
-              });
+            showModal(MediaPlaylistWizardModal, {}, {
+              onComplete: (result) => {
+                if (!result?.createdPlaylist) {
+                  return;
+                }
 
-              history.push(pathToPlaylist);
+                const pathToPlaylist = StringUtils.buildRoute(Routes.LibraryPlaylist, {
+                  playlistId: result.createdPlaylist.id,
+                });
+                history.push(pathToPlaylist);
+              },
             });
           }}
         >

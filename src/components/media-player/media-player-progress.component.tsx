@@ -19,6 +19,7 @@ export function MediaPlayerProgress() {
     mediaPlaybackState,
     mediaPlaybackCurrentMediaTrack,
     mediaPlaybackCurrentMediaProgress,
+    mediaPlaybackPreparationStatus,
   } = useSelector((state: RootState) => state.mediaPlayer);
 
   const [mediaProgressDragValue, setMediaProgressDragValue] = useState<number | undefined>(undefined);
@@ -42,25 +43,40 @@ export function MediaPlayerProgress() {
     return (<></>);
   }
 
+  const preparationProgress = Math.max(0, Math.min(100, mediaPlaybackPreparationStatus?.progress || 0));
+  const isPreparingPlayback = !!mediaPlaybackPreparationStatus;
+  const startCounter = isPreparingPlayback
+    ? `${mediaPlaybackPreparationStatus?.phase === 'converting' ? 'Converting' : 'Preparing'} ${preparationProgress}%`
+    : MediaUtils.formatMediaTrackDuration(mediaProgressDragValue !== undefined
+      ? mediaProgressDragValue
+      : (mediaPlaybackCurrentMediaProgress || 0));
+  const endCounter = isPreparingPlayback
+    ? '100%'
+    : MediaUtils.formatMediaTrackDuration(mediaPlaybackCurrentMediaTrack.track_duration);
+  const sliderValue = isPreparingPlayback
+    ? preparationProgress
+    : mediaPlaybackCurrentMediaProgress;
+  const sliderMaxValue = isPreparingPlayback
+    ? 100
+    : mediaPlaybackCurrentMediaTrack.track_duration;
+
   return (
     <Row className={cx('media-player-progress-container')}>
       <Col className={cx('col-12', 'media-player-progress-column')}>
         <div className={cx('media-player-progress-counter', 'start')}>
-          {MediaUtils.formatMediaTrackDuration(mediaProgressDragValue !== undefined
-            ? mediaProgressDragValue
-            : (mediaPlaybackCurrentMediaProgress || 0))}
+          {startCounter}
         </div>
         <div className={cx('media-player-progress-bar-container')}>
           <Slider
-            disabled={mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
-            value={mediaPlaybackCurrentMediaProgress}
-            maxValue={mediaPlaybackCurrentMediaTrack.track_duration}
+            disabled={isPreparingPlayback || mediaPlaybackState === MediaEnums.MediaPlaybackState.Loading}
+            value={sliderValue}
+            maxValue={sliderMaxValue}
             onDragUpdate={handleProgressDragUpdate}
             onDragCommit={handleProgressDragCommit}
           />
         </div>
         <div className={cx('media-player-progress-counter', 'end')}>
-          {MediaUtils.formatMediaTrackDuration(mediaPlaybackCurrentMediaTrack.track_duration)}
+          {endCounter}
         </div>
       </Col>
     </Row>

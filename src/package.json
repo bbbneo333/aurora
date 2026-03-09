@@ -4,7 +4,7 @@
   "main": "./main.prod.js",
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
-    "postinstall": "yarn electron-rebuild"
+    "postinstall": "npm run electron-rebuild"
   },
   "dependencies": {
     "sharp": "^0.34.3"

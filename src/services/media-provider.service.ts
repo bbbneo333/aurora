@@ -8,13 +8,23 @@ const debug = require('debug')('aurora:service:media_provider');
 export class MediaProviderService {
   static registerMediaProvider(mediaProvider: IMediaProvider) {
     debug('registerMediaProvider - registering media provider - %s', mediaProvider.mediaProviderIdentifier);
-
+    let datastoreReady = false;
     this.addProviderToDatastore(mediaProvider)
       .then(() => {
+        datastoreReady = true;
+      })
+      .catch((error) => {
+        console.error(
+          'registerMediaProvider - datastore registration failed for provider - %s, error - %o',
+          mediaProvider.mediaProviderIdentifier,
+          error,
+        );
+      })
+      .finally(() => {
         this.addProviderToLocalStore(mediaProvider);
         this.initializeLibraryInLocalStore(mediaProvider);
 
-        if (mediaProvider.onMediaProviderRegistered) {
+        if (datastoreReady && mediaProvider.onMediaProviderRegistered) {
           debug('registerMediaProvider - invoking onMediaProviderRegistered for provider - %s', mediaProvider.mediaProviderIdentifier);
           mediaProvider.onMediaProviderRegistered();
         }

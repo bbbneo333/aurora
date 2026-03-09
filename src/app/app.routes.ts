@@ -20,6 +20,10 @@ export default {
       component: AppPages.SearchPage,
     },
     {
+      path: Routes.AudioCd,
+      component: AppPages.AudioCdPage,
+    },
+    {
       path: '/',
       redirect: Routes.Library,
     },
@@ -30,16 +34,15 @@ export default {
       component: AppPages.LibraryHeader,
     },
     {
+      path: Routes.AudioCd,
+      component: AppPages.AudioCdHeader,
+    },
+    {
       path: Routes.PlayerQueue,
       component: AppPages.PlayerHeader,
     },
   ],
   sidebar: [
-    {
-      path: Routes.Search,
-      name: 'link_search',
-      icon: Icons.Search,
-    },
     {
       path: Routes.Library,
       name: 'link_library',

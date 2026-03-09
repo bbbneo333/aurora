@@ -4,7 +4,7 @@ import { Redirect, Route as RouteComponent, Switch } from 'react-router-dom';
 export type Route = {
   path: string,
   exact?: boolean,
-  component?: () => JSX.Element,
+  component?: () => JSX.Element | null,
   redirect?: string,
 };
 

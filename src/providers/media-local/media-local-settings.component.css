@@ -5,3 +5,40 @@
 .settings-directory-icon-success {
   color: var(--text-light-color);
 }
+
+.settings-keywords-help {
+  margin-top: 14px;
+}
+
+.settings-keywords-table-wrap {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.settings-keywords-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--stage-overlay-outline-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.settings-keywords-table th,
+.settings-keywords-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--stage-overlay-outline-color);
+  text-align: left;
+}
+
+.settings-keywords-table th {
+  color: var(--text-light-color);
+  font-size: var(--font-size-sm);
+}
+
+.settings-keywords-table td {
+  color: var(--text-normal-color);
+}
+
+.settings-keywords-table tbody tr:last-child td {
+  border-bottom: 0;
+}

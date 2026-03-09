@@ -23,7 +23,6 @@ export class DatastoreModule implements IAppModule {
   private readonly datastores: Record<string, Datastore> = {};
   private readonly datastoreActiveWrites: Record<string, number> = {};
   private readonly datastoreDataDir = 'Databases';
-  private readonly datastoreFileReadOnlyMode = 0o400;
   private readonly datastoreFileReadWriteMode = 0o600;
 
   constructor(app: IAppMain) {
@@ -88,6 +87,7 @@ export class DatastoreModule implements IAppModule {
   private registerDatastore(datastoreName: string, datastoreOptions: DatastoreOptions = {}): void {
     // obtain datastore path and create datastore
     const datastorePath = this.getDatastorePath(datastoreName);
+    this.ensureDatastoreFileWriteAccessSync(datastorePath);
     const datastore = Datastore.create(datastorePath);
     debug('registerDatastore - created datastore - %s at - %s', datastoreName, datastorePath);
 
@@ -101,7 +101,7 @@ export class DatastoreModule implements IAppModule {
     }
 
     this.datastores[datastoreName] = datastore;
-    this.setDatastoreFileModeSync(datastore, this.datastoreFileReadOnlyMode);
+    this.setDatastoreFileModeSync(datastore, this.datastoreFileReadWriteMode);
   }
 
   private registerDatastoreIndexes(datastore: Datastore, datastoreIndexes: DatastoreIndex[]): void {
@@ -310,11 +310,28 @@ export class DatastoreModule implements IAppModule {
       const remainingWrites = Math.max(0, (this.datastoreActiveWrites[datastoreFilename] || 1) - 1);
       if (remainingWrites === 0) {
         delete this.datastoreActiveWrites[datastoreFilename];
-        await this.setDatastoreFileMode(datastore, this.datastoreFileReadOnlyMode);
       } else {
         this.datastoreActiveWrites[datastoreFilename] = remainingWrites;
       }
     }
+  }
+
+  private ensureDatastoreFileWriteAccessSync(datastoreFilename: string): void {
+    const tempDatastoreFilename = `${datastoreFilename}~`;
+    [
+      datastoreFilename,
+      tempDatastoreFilename,
+    ].forEach((filePath) => {
+      if (!fs.existsSync(filePath)) {
+        return;
+      }
+
+      try {
+        fs.chmodSync(filePath, this.datastoreFileReadWriteMode);
+      } catch (error) {
+        debug('ensureDatastoreFileWriteAccessSync - failed for %s: %o', filePath, error);
+      }
+    });
   }
 
   private setDatastoreFileModeSync(datastore: Datastore, fileMode: number): void {

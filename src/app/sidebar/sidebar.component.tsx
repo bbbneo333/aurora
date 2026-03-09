@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import classNames from 'classnames/bind';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   Button,
@@ -11,8 +12,13 @@ import {
 import { AppService, I18nService } from '../../services';
 import routes from '../app.routes';
 import { Icons } from '../../constants';
+import { MediaLibraryActions } from '../../enums';
 import { PlatformOS } from '../../modules/platform';
 import { IPCCommChannel, IPCRenderer } from '../../modules/ipc';
+import { RootState } from '../../reducers';
+
+// @ts-ignore
+import AppLogo from '../../../assets/icons/icon.png';
 
 import styles from './sidebar.component.css';
 
@@ -26,11 +32,14 @@ function SidebarQuickAccess() {
   );
 }
 
-// function SidebarBrandingLogo() {
-//   return (
-//     <div className={cx('sidebar-logo')}/>
-//   );
-// }
+function SidebarBrandingLogo() {
+  return (
+    <div className={cx('sidebar-branding')}>
+      <div className={cx('sidebar-logo')} style={{ backgroundImage: `url(${AppLogo})` }}/>
+      <div className={cx('sidebar-app-name')}>{AppService.details.display_name}</div>
+    </div>
+  );
+}
 
 function SidebarNavigationLink(props: {
   route: {
@@ -63,12 +72,66 @@ function SidebarNavigationLink(props: {
   );
 }
 
+function SidebarAudioCd() {
+  const dispatch = useDispatch();
+  const audioCd = useSelector((state: RootState) => state.mediaLibrary.audioCd);
+  const [isEjecting, setIsEjecting] = useState(false);
+
+  const handleEject = useCallback((event?: MouseEvent | KeyboardEvent) => {
+    event?.stopPropagation();
+    event?.preventDefault();
+    if (isEjecting) {
+      return;
+    }
+
+    setIsEjecting(true);
+    IPCRenderer.sendAsyncMessage(IPCCommChannel.DeviceEjectAudioCd)
+      .catch(() => {})
+      .finally(() => {
+        const status = IPCRenderer.sendSyncMessage(IPCCommChannel.DeviceGetAudioCdStatus);
+        dispatch({
+          type: MediaLibraryActions.SetAudioCd,
+          data: status,
+        });
+        setIsEjecting(false);
+      });
+  }, [dispatch, isEjecting]);
+
+  if (!audioCd?.present) return null;
+
+  return (
+    <div className={cx('sidebar-navigation-item-group')}>
+      <RouterLink
+        to="/audio-cd"
+        activeClassName={cx('active')}
+        className={cx('sidebar-navigation-item', 'app-nav-link')}
+      >
+        <span className={cx('sidebar-navigation-item-icon')}>
+          <Icon name={Icons.AlbumPlaceholder}/>
+        </span>
+        <span className={cx('sidebar-navigation-item-label')}>
+          {audioCd.name || 'Audio CD'}
+        </span>
+      </RouterLink>
+      <Button
+        className={cx('sidebar-cd-eject-button')}
+        tooltip="CD auswerfen"
+        disabled={isEjecting}
+        onButtonSubmit={handleEject}
+      >
+        <Icon name={Icons.Eject}/>
+      </Button>
+    </div>
+  );
+}
+
 function SidebarNavigationList() {
   return (
     <div className={cx('sidebar-navigation-list')}>
       {routes.sidebar.map(route => (
         <SidebarNavigationLink key={route.path} route={route}/>
       ))}
+      <SidebarAudioCd/>
     </div>
   );
 }
@@ -91,6 +154,7 @@ function SidebarHeader() {
 function SidebarContent() {
   return (
     <div className={cx('sidebar-content')}>
+      <SidebarBrandingLogo/>
       <SidebarNavigationList/>
       <SidebarQuickAccess/>
     </div>

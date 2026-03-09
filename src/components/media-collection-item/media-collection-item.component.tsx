@@ -24,6 +24,8 @@ export type MediaCollectionItemProps = {
   disableCover?: boolean;
   className?: string;
   variant?: 'default' | 'compact';
+  chip?: string;
+  onClick?: (e: React.MouseEvent) => void;
 } & HTMLAttributes<HTMLAnchorElement>;
 
 export function MediaCollectionItem(props: MediaCollectionItemProps) {
@@ -37,6 +39,8 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
     disableCover = false,
     className,
     variant = 'default',
+    chip,
+    onClick,
     ...rest
   } = props;
 
@@ -89,6 +93,12 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
       tabIndex={0}
       exact
       to={routerLink}
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick(e);
+        }
+      }}
       activeClassName={cx('active')}
       className={cx('collection-item', 'app-nav-link', variant, {
         current: isMediaActive,
@@ -104,7 +114,7 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
           </div>
         )}
         {!disableCover && (
-          <div className={cx('collection-item-section')}>
+          <div className={cx('collection-item-section', 'collection-item-cover-wrapper')}>
             <MediaCoverPicture
               mediaPicture={mediaItem.picture}
               mediaPictureAltText={mediaItem.name}
@@ -116,6 +126,11 @@ export function MediaCollectionItem(props: MediaCollectionItemProps) {
                 <PlaybackButton/>
               )}
             </MediaCoverPicture>
+            {chip && (
+              <div className={cx('collection-item-chip')}>
+                {chip}
+              </div>
+            )}
           </div>
         )}
         <div className={cx('collection-item-section', 'collection-item-info')}>

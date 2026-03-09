@@ -28,7 +28,9 @@
   gap: 20px;
 }
 
-.media-track-section {
+.media-track-section.button {
+  display: flex;
+  align-items: center;
 }
 
 .media-track-cover {
@@ -36,10 +38,58 @@
   height: 50px;
 }
 
+.media-track-edit-button {
+  color: #28a745;
+  border: 1px solid #28a745;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transition: all 0.2s ease;
+  margin-right: 10px;
+  padding: 0;
+}
+
+.media-track-edit-button:hover {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.media-track-playback-button.sideview {
+  color: var(--button-primary-bg-color);
+  border: 1px solid var(--button-primary-bg-color);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  transition: all 0.2s ease;
+}
+
+.media-track-playback-button.sideview:hover {
+  background-color: var(--button-primary-bg-color);
+  color: #fff;
+}
+
+.media-track-number {
+  color: var(--text-dark-color);
+  font-size: 13px;
+  min-width: 20px;
+  text-align: right;
+  margin-right: 10px;
+}
+
 .media-track-section.info {
   flex: 1 1 auto; /* take remaining horizontal space and be allowed to shrink */
   min-width: 0;
   overflow: visible; /* children handle their own overflow */
+  display: flex;
+  align-items: center;
 }
 
 .media-track-section.end {

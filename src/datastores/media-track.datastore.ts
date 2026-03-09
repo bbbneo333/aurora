@@ -41,12 +41,22 @@ class MediaTrackDatastore {
     });
   }
 
+  updateMediaTracks(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>, mediaTrackUpdateData: DataStoreUpdateData<IMediaTrackData>): Promise<number> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdate, this.mediaTrackDatastoreName, mediaTrackFilterData, {
+      $set: mediaTrackUpdateData,
+    });
+  }
+
   insertMediaTrack(mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSInsertOne, this.mediaTrackDatastoreName, mediaTrackInputData);
   }
 
   deleteTracks(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>): Promise<void> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSRemove, this.mediaTrackDatastoreName, mediaTrackFilterData);
+  }
+
+  countMediaTracks(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>): Promise<number> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSCount, this.mediaTrackDatastoreName, mediaTrackFilterData);
   }
 
   upsertMediaTrack(mediaTrackFilterData: DataStoreFilterData<IMediaTrackData>, mediaTrackInputData: DataStoreInputData<IMediaTrackData>): Promise<IMediaTrackData> {

@@ -24,6 +24,7 @@ export type MediaTrackListProps<T> = {
   sortable?: boolean;
   onMediaTracksSorted?: (mediaTracks: T[]) => Promise<void> | void;
   onSelectionDelete?: (mediaTrackIds: string[]) => Promise<boolean> | boolean;
+  variant?: 'default' | 'sideview';
 };
 
 export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps<T>) {
@@ -38,6 +39,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps
     sortable = false,
     onMediaTracksSorted,
     onSelectionDelete,
+    variant = 'default',
   } = props;
 
   const { showMenu, hideAll } = useContextMenu();
@@ -99,6 +101,7 @@ export function MediaTrackList<T extends IMediaTrack>(props: MediaTrackListProps
             disableAlbumLink={disableAlbumLinks}
             onMediaTrackPlay={onMediaTrackPlay}
             onPointerDown={handlePointerDown}
+            variant={variant}
           />
         )}
       </List>

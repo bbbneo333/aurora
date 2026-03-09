@@ -1,11 +1,14 @@
 .sidebar {
-  width: 35%;
-  min-width: 250px;
-  max-width: 350px;
-  background-color: var(--stage-bg-color);
+  width: 20vw;
+  min-width: 20vw;
+  max-width: 20vw;
+  background-color: var(--sidebar-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   color: var(--text-dark-color);
   display: flex;
   flex-direction: column;
+  border-right: 1px solid var(--stage-overlay-outline-color);
 }
 
 .sidebar-content {
@@ -24,6 +27,32 @@
   padding: 0 30px;
 }
 
+.sidebar-branding {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 20px;
+  margin-bottom: 10px;
+  gap: 15px;
+}
+
+.sidebar-logo {
+  width: 40px;
+  height: 40px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.sidebar-app-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-light-color);
+  letter-spacing: -0.5px;
+}
+
 .sidebar-navigation-list {
   display: flex;
   flex-direction: column;
@@ -31,43 +60,72 @@
   /* this is to keep vertically inline with the scrollable list below it */
   padding-left: var(--scrollable-scrollbar-width);
   padding-right: var(--scrollable-scrollbar-width);
-  gap: 5px;
+  gap: 8px;
 }
 
 .sidebar-navigation-item {
   font-size: 15px;
-  padding: 10px 12px;
+  font-weight: 500;
+  padding: 12px 16px;
   display: flex;
   flex-direction: row;
-  border-radius: 5px;
-  color: var(--selectable-color);
-  transition: var(--selectable-item-transition);
+  border-radius: 8px;
+  color: var(--text-dark-color);
+  transition: all 0.2s ease;
+}
+
+.sidebar-navigation-item-group {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.sidebar-navigation-item-group .sidebar-navigation-item {
+  flex: 1;
+  padding-right: 42px;
+}
+
+.sidebar-cd-eject-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-disabled-color);
+  background: transparent;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sidebar-cd-eject-button:not(.disabled):hover {
+  color: var(--text-dark-color);
+  background-color: rgba(255, 255, 255, 0.06);
 }
 
 .sidebar-navigation-item:hover {
-  color: var(--selectable-hovered-color);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-light-color);
 }
 
 .sidebar-navigation-item.active {
-  background-color: var(--selectable-active-bg-color);
-  color: var(--selectable-active-color);
+  background-color: var(--button-primary-bg-color);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .sidebar-navigation-item-icon {
-  margin-right: 10px;
+  margin-right: 12px;
+  opacity: 0.8;
+}
+
+.sidebar-navigation-item.active .sidebar-navigation-item-icon {
+  opacity: 1;
 }
 
 .sidebar-quick-access {
   flex: 1 0 0; /* stretch to fill remaining space */
   padding: var(--selectable-focus-ring-size); /* this is to not clip focus ring */
-}
-
-.sidebar-logo {
-  /*background-image: url('../../../assets/logo-wide.png');*/
-  background-size: contain;
-  width: 100%;
-  height: 45px;
-  margin-bottom: 10px;
-  background-repeat: no-repeat;
-  background-position: center;
 }

@@ -10,5 +10,6 @@
   "Player": "/player",
   "PlayerQueue": "/player/queue",
   "Settings": "/settings",
-  "Search": "/search"
+  "Search": "/search",
+  "AudioCd": "/audio-cd"
 }

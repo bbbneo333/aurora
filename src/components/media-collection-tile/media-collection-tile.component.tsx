@@ -19,6 +19,9 @@ export type MediaCollectionTileProps = {
   subtitle?: string;
   contextMenuId?: string;
   coverPlaceholderIcon?: string;
+  year?: number;
+  genre?: string;
+  onClick?: (e: React.MouseEvent) => void;
 };
 
 export function MediaCollectionTile(props: MediaCollectionTileProps) {
@@ -28,6 +31,9 @@ export function MediaCollectionTile(props: MediaCollectionTileProps) {
     subtitle,
     contextMenuId,
     coverPlaceholderIcon,
+    year,
+    genre,
+    onClick,
   } = props;
 
   const { showMenu } = useContextMenu();
@@ -39,6 +45,18 @@ export function MediaCollectionTile(props: MediaCollectionTileProps) {
   } = useMediaCollectionPlayback({
     mediaItem,
   });
+
+  // Helper to strip artist name from album title if it's already shown in subtitle
+  const displayTitle = React.useMemo(() => {
+    if (!subtitle || !mediaItem.name) {
+      return mediaItem.name;
+    }
+    const artistPrefix = `${subtitle} - `;
+    if (mediaItem.name.startsWith(artistPrefix)) {
+      return mediaItem.name.substring(artistPrefix.length);
+    }
+    return mediaItem.name;
+  }, [mediaItem.name, subtitle]);
 
   const handleOnContextMenu = useCallback((e: React.MouseEvent) => {
     if (contextMenuId) {
@@ -60,6 +78,12 @@ export function MediaCollectionTile(props: MediaCollectionTileProps) {
       tabIndex={0}
       exact
       to={routerLink}
+      onClick={(e) => {
+        if (onClick) {
+          e.preventDefault();
+          onClick(e);
+        }
+      }}
       className={cx('collection-tile', 'app-nav-link', {
         playing: isMediaPlaying,
       })}
@@ -73,6 +97,16 @@ export function MediaCollectionTile(props: MediaCollectionTileProps) {
             mediaCoverPlaceholderIcon={coverPlaceholderIcon}
             className={cx('collection-tile-cover-picture')}
           />
+          {genre && (
+            <div className={cx('collection-tile-genre-chip')}>
+              {genre}
+            </div>
+          )}
+          {year && (
+            <div className={cx('collection-tile-year-chip')}>
+              {year}
+            </div>
+          )}
           <div className={cx('collection-tile-cover-overlay')}>
             <div className={cx('collection-tile-cover-action')}>
               <MediaPlaybackButton
@@ -88,7 +122,7 @@ export function MediaCollectionTile(props: MediaCollectionTileProps) {
         </div>
         <div className={cx('collection-tile-info')}>
           <div className={cx('collection-tile-title')}>
-            {mediaItem.name}
+            {displayTitle}
           </div>
           {subtitle && (
             <div className={cx('collection-tile-subtitle')}>

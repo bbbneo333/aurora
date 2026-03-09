@@ -1,5 +1,6 @@
 .media-playlists {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--album-cover-size, 200px), 1fr));
+  gap: 20px;
+  width: 100%;
 }

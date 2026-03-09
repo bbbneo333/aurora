@@ -53,6 +53,7 @@ export class MediaCollectionService {
       type: MediaCollectionItemType.Album,
       name: mediaAlbum.album_name,
       picture: mediaAlbum.album_cover_picture,
+      hidden: mediaAlbum.hidden,
     };
   }
 
@@ -71,6 +72,7 @@ export class MediaCollectionService {
       name: mediaPlaylist.name,
       type: MediaCollectionItemType.Playlist,
       picture: mediaPlaylist.cover_picture,
+      hidden: mediaPlaylist.is_hidden_album,
     };
   }
 

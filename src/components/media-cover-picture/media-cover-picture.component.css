@@ -8,6 +8,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 8px 24px rgb(0 0 0 / 50%);
+  border-radius: 12px;
 }
 
 .media-cover-picture > img {
@@ -15,6 +16,7 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 12px;
 }
 
 /*a trick learned from https://mademyday.de/height-equals-width-with-pure-css*/

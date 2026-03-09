@@ -1,7 +1,12 @@
 import _ from 'lodash';
 
 import { MediaEnums } from '../enums';
-import { IMediaPlayback, IMediaQueueTrack, IMediaTrackList } from '../interfaces';
+import {
+  IMediaPlayback,
+  IMediaPlaybackPreparationStatus,
+  IMediaQueueTrack,
+  IMediaTrackList,
+} from '../interfaces';
 
 export type MediaPlayerState = {
   mediaTracks: IMediaQueueTrack[];
@@ -9,6 +14,7 @@ export type MediaPlayerState = {
   mediaPlaybackCurrentMediaTrack?: IMediaQueueTrack;
   mediaPlaybackCurrentTrackList?: IMediaTrackList,
   mediaPlaybackCurrentMediaProgress?: number;
+  mediaPlaybackPreparationStatus?: IMediaPlaybackPreparationStatus;
   mediaPlaybackCurrentPlayingInstance?: IMediaPlayback;
   mediaPlaybackVolumeMaxLimit: number,
   mediaPlaybackVolumeCurrent: number,
@@ -29,6 +35,7 @@ const mediaPlayerInitialState: MediaPlayerState = {
   mediaPlaybackCurrentMediaTrack: undefined,
   mediaPlaybackCurrentTrackList: undefined,
   mediaPlaybackCurrentMediaProgress: undefined,
+  mediaPlaybackPreparationStatus: undefined,
   mediaPlaybackCurrentPlayingInstance: undefined,
   mediaPlaybackVolumeMaxLimit: 100,
   mediaPlaybackVolumeCurrent: 100,
@@ -98,6 +105,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         mediaPlaybackState: MediaEnums.MediaPlaybackState.Paused,
         mediaPlaybackCurrentMediaTrack: mediaTrackToLoad,
         mediaPlaybackCurrentMediaProgress: undefined,
+        mediaPlaybackPreparationStatus: undefined,
         mediaPlaybackCurrentPlayingInstance: mediaPlayingInstance,
       };
     }
@@ -111,6 +119,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState: MediaEnums.MediaPlaybackState.Playing,
         mediaPlaybackCurrentMediaProgress: action.data.mediaPlaybackProgress || 0,
+        mediaPlaybackPreparationStatus: undefined,
       };
     }
     case MediaEnums.MediaPlayerActions.PausePlayer: {
@@ -125,6 +134,7 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         mediaPlaybackCurrentMediaTrack: undefined,
         mediaPlaybackState: MediaEnums.MediaPlaybackState.Stopped,
         mediaPlaybackCurrentMediaProgress: 0,
+        mediaPlaybackPreparationStatus: undefined,
       };
     }
     case MediaEnums.MediaPlayerActions.UpdatePlaybackProgress: {
@@ -140,6 +150,12 @@ export default (state: MediaPlayerState = mediaPlayerInitialState, action: Media
         ...state,
         mediaPlaybackState,
         mediaPlaybackCurrentMediaProgress: mediaPlaybackProgress,
+      };
+    }
+    case MediaEnums.MediaPlayerActions.UpdatePreparationStatus: {
+      return {
+        ...state,
+        mediaPlaybackPreparationStatus: action.data?.mediaPlaybackPreparationStatus,
       };
     }
     case MediaEnums.MediaPlayerActions.UpdatePlaybackVolume: {

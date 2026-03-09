@@ -2,16 +2,29 @@
   margin-bottom: 20px;
 }
 
+.album-header-cover-column {
+  flex: 0 0 240px !important;
+  max-width: 240px !important;
+}
+
 .album-cover-picture {
-  /* size for placeholder icon */
-  font-size: 50px;
+  font-size: 40px;
+  width: 240px !important;
+  height: 240px !important;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .album-header-info-column {
   display: flex;
   flex-direction: column;
-  align-self: flex-end;
-  justify-items: flex-start;
+  justify-content: center;
+  padding-left: 15px;
+  min-width: 0; /* Enable text truncation in flex items */
 }
 
 .album-header-label {
@@ -22,17 +35,45 @@
 }
 
 .album-header-name {
-  font-size: 36px;
+  font-size: 24px;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: horizontal;
+  line-height: 1.2;
+  margin-bottom: 5px;
+  word-break: break-word;
 }
 
-.album-header-info {
-  color: var(--text-dark-color);
+.album-header-artist {
+  color: #35c26b;
+  font-size: 16px;
+  line-height: 1.2;
+  margin-top: 2px;
+  margin-bottom: 10px;
+}
+
+.album-header-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.album-genre-chip {
+  background-color: var(--bg-color-hover);
+  color: var(--text-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.album-header-actions {
+  display: flex;
+  margin-top: 5px;
 }
 
 .album-actions {

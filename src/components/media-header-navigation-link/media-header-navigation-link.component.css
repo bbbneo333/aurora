@@ -1,16 +1,19 @@
 .media-header-navigation-link {
-  padding: 10px 15px;
-  font-size: 15px;
-  border-radius: 5px;
-  color: var(--selectable-color);
+  padding: 9px 16px;
+  font-size: 14px;
+  border-radius: 999px;
+  color: var(--text-dark-color);
+  border: 1px solid transparent;
   transition: var(--selectable-item-transition);
 }
 
 .media-header-navigation-link:hover {
-  color: var(--selectable-hovered-color);
+  color: var(--text-light-color);
+  background-color: var(--selectable-hovered-bg-color);
 }
 
 .media-header-navigation-link.active {
-  background-color: var(--selectable-active-bg-color);
+  background-color: var(--button-primary-bg-color);
   color: var(--selectable-active-color);
+  border-color: var(--button-primary-bg-color);
 }

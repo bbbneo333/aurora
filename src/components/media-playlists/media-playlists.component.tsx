@@ -1,5 +1,4 @@
-import { isEmpty } from 'lodash';
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { Icons, Routes } from '../../constants';
@@ -7,7 +6,8 @@ import { IMediaPlaylist } from '../../interfaces';
 import { I18nService, MediaCollectionService } from '../../services';
 import { StringUtils } from '../../utils';
 
-import { MediaCollectionItem } from '../media-collection-item/media-collection-item.component';
+import { MediaCollectionTile } from '../media-collection-tile/media-collection-tile.component';
+import { MediaPlaylistSideView } from '../media-sideview/media-sideview.component';
 
 import {
   MediaCollectionContextMenu,
@@ -23,6 +23,7 @@ export function MediaPlaylists(props: {
 }) {
   const { mediaPlaylists } = props;
   const mediaContextMenuId = 'media_playlists_context_menu';
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | undefined>();
 
   return (
     <>
@@ -31,19 +32,20 @@ export function MediaPlaylists(props: {
           const mediaItem = MediaCollectionService.getMediaItemFromPlaylist(mediaPlaylist);
 
           return (
-            <MediaCollectionItem
-              key={mediaPlaylist.id}
-              mediaItem={mediaItem}
-              contextMenuId={mediaContextMenuId}
-              routerLink={StringUtils.buildRoute(Routes.LibraryPlaylist, {
-                playlistId: mediaPlaylist.id,
-              })}
-              subtitle={I18nService.getString('label_playlist_subtitle', {
-                trackCount: mediaPlaylist.tracks.length.toString(),
-              })}
-              disablePlayback={isEmpty(mediaPlaylist.tracks)}
-              coverPlaceholderIcon={Icons.PlaylistPlaceholder}
-            />
+            <div key={mediaPlaylist.id}>
+              <MediaCollectionTile
+                mediaItem={mediaItem}
+                contextMenuId={mediaContextMenuId}
+                routerLink={StringUtils.buildRoute(Routes.LibraryPlaylist, {
+                  playlistId: mediaPlaylist.id,
+                })}
+                subtitle={I18nService.getString('label_playlist_subtitle', {
+                  trackCount: mediaPlaylist.tracks.length.toString(),
+                })}
+                onClick={() => setSelectedPlaylistId(mediaPlaylist.id)}
+                coverPlaceholderIcon={Icons.PlaylistPlaceholder}
+              />
+            </div>
           );
         })}
       </div>
@@ -52,8 +54,15 @@ export function MediaPlaylists(props: {
         menuItems={[
           MediaCollectionContextMenuItem.AddToQueue,
           MediaCollectionContextMenuItem.ManagePlaylist,
+          MediaCollectionContextMenuItem.ToggleHidden,
         ]}
       />
+      {selectedPlaylistId && (
+        <MediaPlaylistSideView
+          playlistId={selectedPlaylistId}
+          onClose={() => setSelectedPlaylistId(undefined)}
+        />
+      )}
     </>
   );
 }

@@ -29,6 +29,11 @@
   font-size: 50px;
 }
 
+.collection-tile-cover :global(img),
+.collection-tile-cover :global(.media-cover-picture) {
+  border-radius: 12px;
+}
+
 .collection-tile-cover-overlay {
   position: absolute;
   overflow: hidden;
@@ -74,6 +79,33 @@
 }
 
 .collection-tile-subtitle {
-  font-size: 13px;
-  color: var(--text-dark-color);
+  font-size: 12px;
+  color: var(--button-primary-bg-color);
+}
+
+.collection-tile-year-chip {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: var(--button-primary-bg-color);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.collection-tile-genre-chip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: var(--button-primary-bg-color);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 10;
+  pointer-events: none;
 }

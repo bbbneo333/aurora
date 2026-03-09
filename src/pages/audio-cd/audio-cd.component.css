@@ -1,0 +1,195 @@
+.audio-cd-empty {
+  padding: 40px;
+  color: var(--text-light-color);
+}
+
+.audio-cd-topbar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.audio-cd-topbar-title {
+  color: var(--text-light-color);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.audio-cd-topbar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.audio-cd-topbar-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.audio-cd-header {
+  margin-top: 16px;
+}
+
+.audio-cd-header-content {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.audio-cd-cover-column {
+  flex: 0 0 auto;
+}
+
+.audio-cd-cover {
+  align-items: center;
+  background-color: var(--stage-overlay-color);
+  border: 1px solid var(--stage-overlay-outline-color);
+  border-radius: 6px;
+  display: flex;
+  height: 200px;
+  justify-content: center;
+  width: 200px;
+}
+
+.audio-cd-info-column {
+  align-items: flex-start;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.audio-cd-label {
+  color: var(--text-light-color);
+  font-size: var(--font-size-sm);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.audio-cd-name {
+  color: var(--text-normal-color);
+  font-size: var(--font-size-xxl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 10px;
+}
+
+.audio-cd-meta {
+  color: var(--text-light-color);
+  margin-bottom: 8px;
+}
+
+.audio-cd-search-inputs {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.audio-cd-input-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.audio-cd-select-group {
+  margin-bottom: 0;
+}
+
+.audio-cd-dialog-text {
+  color: var(--text-light-color);
+  margin-bottom: 12px;
+}
+
+.audio-cd-dialog-actions {
+  margin: 14px 0;
+}
+
+.audio-cd-dialog-summary {
+  background: var(--stage-overlay-color);
+  border: 1px solid var(--stage-overlay-outline-color);
+  border-radius: 8px;
+  color: var(--text-normal-color);
+  margin-bottom: 12px;
+  padding: 10px 12px;
+}
+
+.audio-cd-release-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.audio-cd-release-item {
+  align-items: center;
+  background: var(--stage-overlay-color);
+  border: 1px solid var(--stage-overlay-outline-color);
+  border-radius: 8px;
+  color: var(--text-normal-color);
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  text-align: left;
+  transition: border-color .2s ease, transform .15s ease;
+  width: 100%;
+}
+
+.audio-cd-release-item:hover {
+  border-color: var(--accent-normal-color);
+  transform: translateY(-1px);
+}
+
+.audio-cd-release-item.selected {
+  border-color: var(--accent-normal-color);
+  box-shadow: 0 0 0 1px var(--accent-normal-color) inset;
+}
+
+.audio-cd-release-cover {
+  align-items: center;
+  background: var(--background-color);
+  border-radius: 6px;
+  display: flex;
+  flex: 0 0 56px;
+  height: 56px;
+  justify-content: center;
+  overflow: hidden;
+  width: 56px;
+}
+
+.audio-cd-release-cover-image {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.audio-cd-release-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.audio-cd-release-title {
+  color: var(--text-normal-color);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 2px;
+}
+
+.audio-cd-release-meta {
+  color: var(--text-light-color);
+  font-size: var(--font-size-xs);
+}
+
+.audio-cd-status {
+  color: var(--text-light-color);
+  margin-top: 14px;
+}
+
+.audio-cd-tracklist {
+  margin-top: 20px;
+}

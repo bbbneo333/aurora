@@ -16,6 +16,10 @@ export enum MediaLocalStateActionType {
   IncrementDirectorySyncFilesProcessed = 'mediaLocalSettings/incrementDirectorySyncFilesProcessed',
   IncrementDirectorySyncFilesAdded = 'mediaLocalSettings/incrementDirectorySyncFilesAdded',
   SetDirectorySyncError = 'mediaLocalSettings/setDirectorySyncError',
+  ToggleGroupCompilations = 'mediaLocalSettings/toggleGroupCompilations',
+  SetCdImportDirectory = 'mediaLocalSettings/setCdImportDirectory',
+  SetCdImportNamingTemplate = 'mediaLocalSettings/setCdImportNamingTemplate',
+  SetDiscogsToken = 'mediaLocalSettings/setDiscogsToken',
 }
 
 export type MediaSyncDirectoryStats = {
@@ -50,6 +54,11 @@ const mediaLocalInitialState: MediaLocalState = {
     library: {
       directories: [],
     },
+    cd_import: {
+      output_directory: '',
+      naming_template: '<Artist> - <Album-Title> (<Year>)',
+      discogs_token: '',
+    },
   },
   dirty: false,
   loading: false,
@@ -75,9 +84,17 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
     }
     case MediaLocalStateActionType.SettingsLoaded: {
       // data.settings - loaded settings
+      const loadedSettings = action.data.settings as IMediaLocalSettings;
       return {
         ...state,
-        settings: action.data.settings,
+        settings: {
+          ...loadedSettings,
+          cd_import: {
+            output_directory: loadedSettings?.cd_import?.output_directory || '',
+            naming_template: loadedSettings?.cd_import?.naming_template || '<Artist> - <Album-Title> (<Year>)',
+            discogs_token: loadedSettings?.cd_import?.discogs_token || '',
+          },
+        },
         loading: false,
         loaded: true,
       };
@@ -115,8 +132,10 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
       return {
         ...state,
         settings: {
+          ...state.settings,
           library: {
             directories,
+            group_compilations_by_folder: state.settings.library.group_compilations_by_folder,
           },
         },
         dirty: directoriesAreUpdated,
@@ -137,11 +156,65 @@ function mediaLocalStateReducer(state: MediaLocalState = mediaLocalInitialState,
       return {
         ...state,
         settings: {
+          ...state.settings,
           library: {
             directories,
+            group_compilations_by_folder: state.settings.library.group_compilations_by_folder,
           },
         },
         dirty: directoriesAreUpdated,
+      };
+    }
+    case MediaLocalStateActionType.ToggleGroupCompilations: {
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          library: {
+            ...state.settings.library,
+            group_compilations_by_folder: !state.settings.library.group_compilations_by_folder,
+          },
+        },
+        dirty: true,
+      };
+    }
+    case MediaLocalStateActionType.SetCdImportDirectory: {
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          cd_import: {
+            ...state.settings.cd_import,
+            output_directory: action.data.outputDirectory,
+          },
+        },
+        dirty: true,
+      };
+    }
+    case MediaLocalStateActionType.SetCdImportNamingTemplate: {
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          cd_import: {
+            ...state.settings.cd_import,
+            naming_template: action.data.namingTemplate,
+          },
+        },
+        dirty: true,
+      };
+    }
+    case MediaLocalStateActionType.SetDiscogsToken: {
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          cd_import: {
+            ...state.settings.cd_import,
+            discogs_token: action.data.discogsToken,
+          },
+        },
+        dirty: true,
       };
     }
     case MediaLocalStateActionType.StartSync: {

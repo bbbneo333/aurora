@@ -4,6 +4,7 @@
   align-items: center;
   height: 100%;
   color: var(--text-dark-color);
+  background-color: var(--stage-overlay-bg-color);
   border-top: 1px solid var(--stage-overlay-outline-color);
   padding: 10px;
   user-select: none;
@@ -13,7 +14,6 @@
 
 .media-player-container:not(.tinted) {
   transition: background 700ms ease;
-  background-color: var(--stage-overlay-bg-color);
 }
 
 .media-player-container.tinted {

@@ -118,6 +118,15 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             settings: mediaSettings,
           },
         });
+      })
+      .catch((error) => {
+        console.error('MediaLocalSettingsComponent - failed loading settings - %o', error);
+        mediaLocalStore.dispatch({
+          type: MediaLocalStateActionType.SettingsLoaded,
+          data: {
+            settings: mediaLocalStore.getState().settings,
+          },
+        });
       });
   }, []);
 
@@ -136,6 +145,12 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         mediaLocalStore.dispatch({
           type: MediaLocalStateActionType.SettingsSaved,
         });
+      })
+      .catch((error) => {
+        console.error('MediaLocalSettingsComponent - failed saving settings - %o', error);
+        mediaLocalStore.dispatch({
+          type: MediaLocalStateActionType.SettingsSaved,
+        });
       });
   }, [
     dirty,
@@ -150,7 +165,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
       <div className={cx('settings-content')}>
         <div className={cx('settings-row')}>
           <div>
-            <div className={cx('settings-subheading')}>Compact View</div>
+            <div className={cx('settings-subheading')}>{I18nService.getString('label_settings_group_compilations')}</div>
             <div className={cx('settings-description')}>{I18nService.getString('label_settings_group_compilations_details')}</div>
           </div>
           <Form.Check
@@ -167,7 +182,9 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         </div>
 
         <div style={{ marginTop: '20px' }}>
-          <div className={cx('settings-subheading')} style={{ marginBottom: '10px' }}>Managed Directories</div>
+          <div className={cx('settings-subheading')} style={{ marginBottom: '10px' }}>
+            {I18nService.getString('label_settings_managed_directories')}
+          </div>
           <div className={cl('settings-directory-list')}>
             <ActionList
               items={settings.library.directories.map((directory) => {
@@ -214,12 +231,14 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         <div style={{ marginTop: '20px', borderTop: '1px solid var(--stage-overlay-outline-color)', paddingTop: '20px' }}>
           <div className={cx('settings-subheading')}>Audio-CD Import</div>
           <div className={cx('settings-description')} style={{ marginBottom: '12px' }}>
-            Output directory, naming template and Discogs credentials for FLAC imports
+            {I18nService.getString('label_settings_audio_cd_import_description')}
           </div>
           <div className={cx('settings-row')}>
             <div style={{ flex: 1, minWidth: '320px' }}>
-              <div className={cx('settings-subheading')}>Import Directory</div>
-              <div className={cx('settings-description')}>{cdImportSettings.output_directory || 'No directory selected'}</div>
+              <div className={cx('settings-subheading')}>{I18nService.getString('label_settings_import_directory')}</div>
+              <div className={cx('settings-description')}>
+                {cdImportSettings.output_directory || I18nService.getString('label_settings_no_directory_selected')}
+              </div>
             </div>
             <Button
               icon={Icons.Folder}
@@ -235,11 +254,11 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
                 }
               }}
             >
-              Select Directory
+              {I18nService.getString('button_settings_select_directory')}
             </Button>
           </div>
           <Form.Group>
-            <Form.Label>Naming Template</Form.Label>
+            <Form.Label>{I18nService.getString('label_settings_naming_template')}</Form.Label>
             <Form.Control
               type="text"
               value={cdImportSettings.naming_template || ''}
@@ -255,57 +274,55 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             />
           </Form.Group>
           <div className={cl('settings-keywords-help')}>
-            <div className={cx('settings-subheading')}>Available Keywords</div>
+            <div className={cx('settings-subheading')}>{I18nService.getString('label_settings_available_keywords')}</div>
             <div className={cx('settings-description')}>
-              Keywords in the format
+              {I18nService.getString('label_settings_keywords_description')}
               {' '}
               {'<Keyword>'}
-              {' '}
-              are automatically replaced in the folder name.
             </div>
             <div className={cl('settings-keywords-table-wrap')}>
               <table className={cl('settings-keywords-table')}>
                 <thead>
                   <tr>
-                    <th>Keyword</th>
-                    <th>Description</th>
+                    <th>{I18nService.getString('label_settings_keyword')}</th>
+                    <th>{I18nService.getString('label_settings_description')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>{'<Artist>'}</td>
-                    <td>Album Artist</td>
+                    <td>{I18nService.getString('label_settings_keyword_album_artist')}</td>
                   </tr>
                   <tr>
                     <td>{'<Album-Artist>'}</td>
-                    <td>Album Artist</td>
+                    <td>{I18nService.getString('label_settings_keyword_album_artist')}</td>
                   </tr>
                   <tr>
                     <td>{'<Album Artist>'}</td>
-                    <td>Album Artist</td>
+                    <td>{I18nService.getString('label_settings_keyword_album_artist')}</td>
                   </tr>
                   <tr>
                     <td>{'<Album-Title>'}</td>
-                    <td>Album Title</td>
+                    <td>{I18nService.getString('label_settings_keyword_album_title')}</td>
                   </tr>
                   <tr>
                     <td>{'<Album Title>'}</td>
-                    <td>Album Title</td>
+                    <td>{I18nService.getString('label_settings_keyword_album_title')}</td>
                   </tr>
                   <tr>
                     <td>{'<Album>'}</td>
-                    <td>Album Title</td>
+                    <td>{I18nService.getString('label_settings_keyword_album_title')}</td>
                   </tr>
                   <tr>
                     <td>{'<Year>'}</td>
-                    <td>Release Year</td>
+                    <td>{I18nService.getString('label_settings_keyword_release_year')}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </div>
           <Form.Group>
-            <Form.Label>Discogs Dev Key</Form.Label>
+            <Form.Label>{I18nService.getString('label_settings_discogs_dev_key')}</Form.Label>
             <Form.Control
               type="password"
               value={cdImportSettings.discogs_token || ''}
@@ -317,7 +334,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
                   },
                 });
               }}
-              placeholder="Discogs Token"
+              placeholder={I18nService.getString('placeholder_settings_discogs_token')}
             />
           </Form.Group>
         </div>
@@ -325,8 +342,8 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
         <div style={{ marginTop: '20px', borderTop: '1px solid var(--stage-overlay-outline-color)', paddingTop: '20px' }}>
           <div className={cx('settings-row')}>
             <div>
-              <div className={cx('settings-subheading')}>Synchronize Library</div>
-              <div className={cx('settings-description')}>Manual database refresh</div>
+              <div className={cx('settings-subheading')}>{I18nService.getString('label_settings_synchronize_library')}</div>
+              <div className={cx('settings-description')}>{I18nService.getString('label_settings_manual_database_refresh')}</div>
             </div>
             <div className={cl('settings-sync-action')}>
               <Button

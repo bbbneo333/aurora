@@ -4,13 +4,14 @@ import {
   parseFile,
   selectCover,
 } from 'music-metadata';
+import path from 'path';
 
 import PQueue from 'p-queue';
 import { Semaphore } from 'async-mutex';
-import { isEmpty, isNumber } from 'lodash';
+import _, { isEmpty, isNumber } from 'lodash';
 
 import { MediaEnums } from '../../enums';
-import { IMediaLibraryService } from '../../interfaces';
+import { IMediaLibraryService, IMediaPicture } from '../../interfaces';
 import { DateTimeUtils } from '../../utils';
 
 import {
@@ -18,10 +19,17 @@ import {
   MediaAlbumService,
   MediaArtistService,
   MediaLibraryService,
+  MediaPlaylistService,
   MediaProviderService,
   MediaTrackService,
   NotificationService,
 } from '../../services';
+
+import {
+  MediaAlbumDatastore,
+  MediaArtistDatastore,
+  MediaTrackDatastore,
+} from '../../datastores';
 
 import { CryptoService } from '../../modules/crypto';
 import { FSFile, FSAudioExtensions } from '../../modules/file-system';
@@ -38,6 +46,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
   private readonly syncAddFileQueue = new PQueue({ concurrency: 10, autoStart: true, timeout: 5 * 60 * 1000 }); // timeout 5 minutes / track
   private readonly syncLock = new Semaphore(1);
   private syncAbortController: AbortController | null = null;
+  private syncFilesQueuedCount = 0;
+  private syncFilesProcessedQueueCount = 0;
 
   onProviderRegistered(): void {
     debug('onProviderRegistered - received');
@@ -50,13 +60,18 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
   onProviderSettingsUpdated(existingSettings: object, updatedSettings: object): void {
     debug('onProviderSettingsUpdated - received - existing settings - %o, updated settings - %o', existingSettings, updatedSettings);
-    this.syncMediaTracks()
+    const oldSettings = existingSettings as IMediaLocalSettings;
+    const newSettings = updatedSettings as IMediaLocalSettings;
+    const forceRescan = oldSettings.library?.group_compilations_by_folder !== newSettings.library?.group_compilations_by_folder;
+
+    this.syncMediaTracks({ forceRescan, settings: newSettings })
       .then(() => {
         debug('onProviderSettingsUpdated - sync completed');
       });
   }
 
-  async syncMediaTracks() {
+  async syncMediaTracks(options?: { forceRescan?: boolean, settings?: IMediaLocalSettings }) {
+    const { forceRescan, settings: settingsOverride } = options || {};
     // cancel currently running sync
     if (this.syncAbortController) {
       this.syncAbortController.abort();
@@ -72,8 +87,9 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       }
 
       debug('syncMediaTracks - started sync');
+    console.log('Reload Media Files start');
 
-      const syncStart = performance.now();
+    const syncStart = performance.now();
       const { signal } = abortController;
 
       // finalize
@@ -93,15 +109,39 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
       try {
         // start
+        this.syncFilesQueuedCount = 0;
+        this.syncFilesProcessedQueueCount = 0;
         mediaLocalStore.dispatch({ type: MediaLocalStateActionType.StartSync });
         await MediaLibraryService.startMediaTrackSync(MediaLocalConstants.Provider);
-        const settings: IMediaLocalSettings = await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
+        const settings: IMediaLocalSettings = settingsOverride || await MediaProviderService.getMediaProviderSettings(MediaLocalConstants.Provider);
         await Promise.map(settings.library.directories, directory => this.addTracksFromDirectory(directory, {
           signal,
+          settings,
+          forceRescan,
         }));
 
-        // wait
+        // Wait for potential IPC delays/race conditions where 'complete' arrives before 'data'
+        // This ensures the queue is populated before we check for idleness
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // wait for queue to empty and process all files
+        debug('syncMediaTracks - waiting for queue to drain. Queued: %d, Processed: %d', this.syncFilesQueuedCount, this.syncFilesProcessedQueueCount);
         await this.syncAddFileQueue.onIdle();
+
+        // Safety check: ensure all queued files are processed
+        let retries = 0;
+        while (this.syncFilesProcessedQueueCount < this.syncFilesQueuedCount && retries < 60) {
+          debug('syncMediaTracks - waiting for processing completion... %d/%d', this.syncFilesProcessedQueueCount, this.syncFilesQueuedCount);
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          retries += 1;
+        }
+
+        // consolidate compilation albums
+        await this.consolidateCompilationAlbums(settings);
+
+        // process compilation album covers
+        await this.processCompilationAlbumCovers(settings);
 
         // done - only finish if not aborted or new run is already in place
         if (signal.aborted || this.syncAbortController !== abortController) {
@@ -127,6 +167,11 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           }));
         }
 
+        // reload library
+        MediaAlbumService.loadMediaAlbums();
+        MediaArtistService.loadMediaArtists();
+        MediaPlaylistService.loadMediaPlaylists();
+
         debug(
           'syncMediaTracks - finished sync, took - %s, found - %d, processed - %d, added - %d',
           DateTimeUtils.formatDuration(syncDuration),
@@ -140,8 +185,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromDirectory(directory: string, options: { signal: AbortSignal }): Promise<void> {
-    const { signal } = options;
+  private addTracksFromDirectory(directory: string, options: { signal: AbortSignal, settings: IMediaLocalSettings, forceRescan?: boolean }): Promise<void> {
+    const { signal, settings, forceRescan } = options;
 
     return new Promise((resolve) => {
       const scanTimestamp = Date.now();
@@ -156,6 +201,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           this.addTracksFromFiles(directory, data.files, {
             scanTimestamp,
             signal,
+            settings,
+            forceRescan,
           });
 
           // update stats
@@ -190,31 +237,43 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private addTracksFromFiles(directory: string, files: FSFile[], options: { scanTimestamp: number, signal: AbortSignal }) {
-    const { scanTimestamp, signal } = options;
+  private addTracksFromFiles(directory: string, files: FSFile[], options: { scanTimestamp: number, signal: AbortSignal, settings: IMediaLocalSettings, forceRescan?: boolean }) {
+    const {
+      scanTimestamp,
+      signal,
+      settings,
+      forceRescan,
+    } = options;
 
     files.forEach((file) => {
       debug('addTracksFromFiles - found file at - %s, queueing...', file.path);
+      this.syncFilesQueuedCount += 1;
 
       this.syncAddFileQueue
         .add(async () => {
-          if (signal.aborted) {
-            debug('addTracksFromFiles - operation aborted, skipping - %s', file.name);
-            return;
+          try {
+            if (signal.aborted) {
+              debug('addTracksFromFiles - operation aborted, skipping - %s', file.name);
+              return;
+            }
+
+            await this.addTrackFromFile(directory, file, {
+              scanTimestamp,
+              settings,
+              forceRescan,
+            });
+
+            // update stats
+            mediaLocalStore.dispatch({
+              type: MediaLocalStateActionType.IncrementDirectorySyncFilesProcessed,
+              data: {
+                directory,
+                count: 1,
+              },
+            });
+          } finally {
+            this.syncFilesProcessedQueueCount += 1;
           }
-
-          await this.addTrackFromFile(directory, file, {
-            scanTimestamp,
-          });
-
-          // update stats
-          mediaLocalStore.dispatch({
-            type: MediaLocalStateActionType.IncrementDirectorySyncFilesProcessed,
-            data: {
-              directory,
-              count: 1,
-            },
-          });
         })
         .catch((err) => {
           console.error('addTracksFromFiles - encountered error while adding file - %s', file.name);
@@ -223,15 +282,15 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     });
   }
 
-  private async addTrackFromFile(directory: string, file: FSFile, options: { scanTimestamp: number }) {
-    const { scanTimestamp } = options;
+  private async addTrackFromFile(directory: string, file: FSFile, options: { scanTimestamp: number, settings: IMediaLocalSettings, forceRescan?: boolean }) {
+    const { scanTimestamp, settings, forceRescan } = options;
     debug('addTrackFromFile - adding file - %s', file.path);
 
     // generate local id - we are using location of the file to uniquely identify the track
     const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
 
     // first check if we can simply mark it as seen; required both mtime and size for this to work
-    if (isNumber(file.stats?.mtime) && isNumber(file.stats?.size)) {
+    if (!forceRescan && isNumber(file.stats?.mtime) && isNumber(file.stats?.size)) {
       const mediaTrack = await MediaTrackService.updateMediaTrack({
         provider: MediaLocalConstants.Provider,
         provider_id: mediaTrackId,
@@ -243,34 +302,127 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       });
 
       if (mediaTrack) {
-        // update media album
-        await MediaAlbumService.updateMediaAlbum({
-          id: mediaTrack.track_album_id,
-        }, {
-          sync_timestamp: scanTimestamp,
-        });
+        // if grouping is enabled, verify that the track is correctly grouped
+        if (settings.library.group_compilations_by_folder) {
+          const parentDir = path.dirname(file.path);
+          let folderName = path.basename(parentDir);
 
-        // update media artists
-        await MediaArtistService.updateMediaArtists({
-          id: {
-            $in: [
-              mediaTrack.track_album.album_artist_id,
-              ...mediaTrack.track_artists.map(artist => artist.id),
-            ],
-          },
-        }, {
-          sync_timestamp: scanTimestamp,
-        });
+          // Check if current folder is generic "Disc X" or "CD X"
+          if (folderName.match(/^(disc|cd)\s*\d+$/i)) {
+            const grandParentDir = path.dirname(parentDir);
+            const parentName = path.basename(grandParentDir);
+            folderName = `${parentName} (${folderName})`;
+          }
 
-        debug('addTrackFromFile - track at path %s already added %s, skipping...', file.path, mediaTrack.id);
-        return mediaTrack;
+          // Extract year if present in folder name (e.g. "Album Name (2024)")
+          const yearMatch = folderName.match(/\s*\((\d{4})\)/);
+          if (yearMatch) {
+            folderName = folderName.replace(yearMatch[0], '');
+          }
+
+          // Check if album name matches the folder name (cleaned)
+          const isGrouped = mediaTrack.track_album.album_name === folderName;
+
+          if (!isGrouped) {
+            debug('addTrackFromFile - track %s needs grouping update, falling back to full scan', file.path);
+          } else {
+            // update media album
+            await MediaAlbumService.updateMediaAlbum({
+              id: mediaTrack.track_album_id,
+            }, {
+              sync_timestamp: scanTimestamp,
+            });
+
+            // update media artists
+            await MediaArtistService.updateMediaArtists({
+              id: {
+                $in: [
+                  mediaTrack.track_album.album_artist_id,
+                  ...mediaTrack.track_artists.map(artist => artist.id),
+                ],
+              },
+            }, {
+              sync_timestamp: scanTimestamp,
+            });
+
+            debug('addTrackFromFile - track at path %s already added %s, skipping...', file.path, mediaTrack.id);
+            return mediaTrack;
+          }
+        } else {
+          // update media album
+          await MediaAlbumService.updateMediaAlbum({
+            id: mediaTrack.track_album_id,
+          }, {
+            sync_timestamp: scanTimestamp,
+          });
+
+          // update media artists
+          await MediaArtistService.updateMediaArtists({
+            id: {
+              $in: [
+                mediaTrack.track_album.album_artist_id,
+                ...mediaTrack.track_artists.map(artist => artist.id),
+              ],
+            },
+          }, {
+            sync_timestamp: scanTimestamp,
+          });
+
+          debug('addTrackFromFile - track at path %s already added %s, skipping...', file.path, mediaTrack.id);
+          return mediaTrack;
+        }
       }
     }
 
     // read metadata
     const audioMetadata = await MediaLocalLibraryService.readAudioMetadataFromFile(file.path);
+
+    let effectiveFolderForGrouping: string | undefined;
+    if (settings.library.group_compilations_by_folder) {
+      const parentDir = path.dirname(file.path);
+      let folderName = path.basename(parentDir);
+      // If current folder is a disc folder (e.g., "Disc 1" or "CD 2"), use the parent directory name as album
+      // and try to set disc number from folder suffix to keep discs separated logically
+      if (/^(disc|cd)\s*\d+$/i.test(folderName)) {
+        const grandParentDir = path.dirname(parentDir);
+        const parentName = path.basename(grandParentDir);
+        const discMatch = folderName.match(/(disc|cd)\s*(\d+)/i);
+        folderName = parentName;
+        effectiveFolderForGrouping = grandParentDir;
+        if (discMatch && audioMetadata.common) {
+          // ensure disk structure exists
+          // @ts-ignore - music-metadata typings allow partials at runtime
+          audioMetadata.common.disk = audioMetadata.common.disk || {};
+          // @ts-ignore
+          audioMetadata.common.disk.no = parseInt(discMatch[2], 10);
+        }
+      } else {
+        effectiveFolderForGrouping = parentDir;
+      }
+
+      // Extract year if present in folder name (e.g. "Album Name (2024)")
+      const yearMatch = folderName.match(/\s*\((\d{4})\)$/);
+      if (yearMatch) {
+        if (audioMetadata.common) {
+          audioMetadata.common.year = parseInt(yearMatch[1], 10);
+        }
+        folderName = folderName.replace(yearMatch[0], '');
+      }
+
+      if (audioMetadata.common) {
+        audioMetadata.common.album = folderName;
+        // We do NOT force 'Various Artists' here anymore.
+        // Instead, we let the consolidation process handle mixed albums later.
+      }
+    }
+
     // obtain cover image (important - there can be cases where audio has no cover image, handle accordingly)
     const audioCoverPicture = MediaLocalLibraryService.getAudioCoverPictureFromMetadata(audioMetadata);
+
+    if (settings.library.group_compilations_by_folder) {
+      // debug(`[DEBUG-IMPORT] File: ${file.path}`);
+      // debug(`[DEBUG-IMPORT] Grouping enabled. Folder: ${effectiveFolderForGrouping}, Album Name: ${audioMetadata.common.album}`);
+    }
 
     // #1: add media artists
     // - track artist(s) are at udioMetadata.common.artists - always present
@@ -305,6 +457,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     const mediaAlbumData = await MediaLibraryService.checkAndInsertMediaAlbum({
       album_name: mediaAlbumName,
       album_artist_id: mediaAlbumArtist.id,
+      album_genre: audioMetadata.common.genre ? audioMetadata.common.genre[0] : undefined,
+      album_year: audioMetadata.common.year,
       album_cover_picture: audioCoverPicture ? {
         image_data: audioCoverPicture.data,
         image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
@@ -329,7 +483,7 @@ class MediaLocalLibraryService implements IMediaLibraryService {
       track_artist_ids: mediaArtists.map(mediaArtist => mediaArtist.id),
       track_album_id: mediaAlbumData.id,
       extra: {
-        file_source: directory,
+        file_source: effectiveFolderForGrouping || path.dirname(file.path),
         file_path: file.path,
         file_mtime: file.stats?.mtime,
         file_size: file.stats?.size,
@@ -360,6 +514,280 @@ class MediaLocalLibraryService implements IMediaLibraryService {
 
   private static getAudioCoverPictureFromMetadata(audioMetadata: IAudioMetadata): IPicture | null {
     return selectCover(audioMetadata.common.picture);
+  }
+
+  private async consolidateCompilationAlbums(settings: IMediaLocalSettings): Promise<void> {
+    if (!settings.library.group_compilations_by_folder) {
+      return;
+    }
+    debug('consolidateCompilationAlbums - starting consolidation');
+
+    // Find all tracks with file_source (directory)
+    const tracks = await MediaTrackDatastore.findMediaTracks({
+      provider: MediaLocalConstants.Provider,
+      'extra.file_source': { $exists: true },
+    } as any);
+
+    // Group by directory
+    const tracksByDir = _.groupBy(tracks, (t: any) => t.extra?.file_source);
+
+    // Process each directory
+    await Promise.map(Object.keys(tracksByDir), async (dir) => {
+      const dirTracks = tracksByDir[dir];
+      if (isEmpty(dirTracks)) {
+        return;
+      }
+
+      const albumIds = _.uniq(dirTracks.map((t: any) => t.track_album_id));
+
+      if (albumIds.length <= 1) {
+        return;
+      }
+
+      // Found split album! Check if they share the same album name
+      // eslint-disable-next-line no-underscore-dangle
+      // @ts-ignore
+      // eslint-disable-next-line no-underscore-dangle
+      // @ts-ignore
+      const albums = await MediaAlbumDatastore.findMediaAlbums({ id: { $in: albumIds } });
+      const albumNames = _.uniq(albums.map((a: any) => a.album_name));
+
+      let targetAlbumName = albumNames[0];
+      let targetArtistName = 'Various Artists';
+
+      // If multiple albums, use folder name as album name
+      if (albumNames.length > 1) {
+        targetAlbumName = path.basename(dir);
+        const yearMatch = targetAlbumName.match(/\s*\((\d{4})\)$/);
+        if (yearMatch) {
+          targetAlbumName = targetAlbumName.replace(yearMatch[0], '');
+        }
+      }
+
+      // Determine target artist
+      const albumArtistIds = _.uniq(albums.map((a: any) => a.album_artist_id));
+      const artists = await MediaArtistDatastore.findMediaArtists({ id: { $in: albumArtistIds } });
+      const artistNames = artists.map((a: any) => a.artist_name);
+
+      // Heuristic 0: Check if there is only one unique artist
+      const uniqueArtists = _.uniqBy(artistNames, (name: string) => name.toLowerCase());
+      if (uniqueArtists.length === 1) {
+        targetArtistName = uniqueArtists[0];
+      } else {
+        // Heuristic 1: Check if one artist is a prefix of all others (e.g. "Adele" vs "Adele feat. X")
+        const shortestArtist = _.minBy(artistNames, 'length');
+        if (shortestArtist) {
+          const allStartsWithShortest = artistNames.every(name => name.toLowerCase().startsWith(shortestArtist.toLowerCase()));
+          if (allStartsWithShortest) {
+            targetArtistName = shortestArtist;
+          }
+        }
+
+        // Heuristic 2: Check folder name matches an artist
+        if (targetArtistName === 'Various Artists') {
+          const folderName = path.basename(dir);
+          const matchingArtist = artistNames.find(name => folderName.toLowerCase().startsWith(name.toLowerCase()));
+          if (matchingArtist) {
+            targetArtistName = matchingArtist;
+          }
+        }
+      }
+
+      debug('consolidateCompilationAlbums - consolidating album %s in %s into %s - %s', targetAlbumName, dir, targetArtistName, targetAlbumName);
+
+      // Find or Create target artist
+      // @ts-ignore
+      let targetArtist = await MediaArtistDatastore.findMediaArtist({
+        provider: MediaLocalConstants.Provider,
+        provider_id: MediaLocalLibraryService.getMediaId(targetArtistName),
+      });
+
+      if (!targetArtist) {
+        targetArtist = await MediaLibraryService.checkAndInsertMediaArtist({
+          artist_name: targetArtistName,
+          provider: MediaLocalConstants.Provider,
+          provider_id: MediaLocalLibraryService.getMediaId(targetArtistName),
+          sync_timestamp: Date.now(),
+        });
+      }
+
+      const targetAlbumId = MediaLocalLibraryService.getMediaId(targetArtistName, targetAlbumName);
+      // @ts-ignore
+      let targetAlbum = await MediaAlbumDatastore.findMediaAlbum({ provider_id: targetAlbumId });
+
+      if (!targetAlbum) {
+        // Create it using metadata from the first album
+        const firstAlbum = albums[0];
+        targetAlbum = await MediaLibraryService.checkAndInsertMediaAlbum({
+          album_name: targetAlbumName,
+          // eslint-disable-next-line no-underscore-dangle
+          album_artist_id: targetArtist.id || (targetArtist as any)._id,
+          album_genre: firstAlbum.album_genre,
+          album_year: firstAlbum.album_year,
+          album_cover_picture: firstAlbum.album_cover_picture,
+          provider: MediaLocalConstants.Provider,
+          provider_id: targetAlbumId,
+          sync_timestamp: Date.now(),
+        });
+      }
+
+      // Move tracks to consolidated album
+      // eslint-disable-next-line no-underscore-dangle
+      // @ts-ignore
+      await MediaTrackDatastore.updateMediaTracks(
+        // eslint-disable-next-line no-underscore-dangle
+        { id: { $in: dirTracks.map((t: any) => t.id) } },
+        // eslint-disable-next-line no-underscore-dangle
+        { track_album_id: targetAlbum.id || (targetAlbum as any)._id },
+      );
+
+      // Generate collage if needed (immediate update)
+      // Get tracks for this album (could be more than just this dir if existing album)
+      // But for collage we might want to prioritize variety
+      const currentTracks = await MediaTrackService.getMediaAlbumTracks(targetAlbum.id);
+      const coverPictures = _.uniqBy(
+        currentTracks
+          .filter(track => track.track_cover_picture && track.track_cover_picture.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Path)
+          .map(track => track.track_cover_picture as IMediaPicture),
+        'image_data',
+      ).slice(0, 4);
+
+      if (coverPictures.length > 1) {
+        const collageBuffer = await this.createCollage(coverPictures);
+        if (collageBuffer) {
+          const processedPicture = await MediaLibraryService.processPicture({
+            image_data: collageBuffer,
+            image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+          });
+          if (processedPicture) {
+            await MediaAlbumService.updateMediaAlbum({ id: targetAlbum.id }, { album_cover_picture: processedPicture });
+          }
+        }
+      }
+
+      // Delete old albums if empty
+      // eslint-disable-next-line no-underscore-dangle
+      const targetAlbumResolvedId = targetAlbum ? (targetAlbum.id || (targetAlbum as any)._id) : undefined;
+      if (!targetAlbumResolvedId) {
+        return;
+      }
+      const oldAlbumIds = albumIds.filter(id => id !== targetAlbumResolvedId);
+
+      await Promise.map(oldAlbumIds, async (oldId) => {
+        // @ts-ignore
+        const count = await MediaTrackDatastore.countMediaTracks({ track_album_id: oldId });
+        if (count === 0) {
+          // @ts-ignore
+          await MediaAlbumDatastore.deleteAlbums({ id: oldId });
+        }
+      });
+    }, { concurrency: 4 });
+
+    debug('consolidateCompilationAlbums - finished consolidation');
+  }
+
+  private async processCompilationAlbumCovers(settings: IMediaLocalSettings): Promise<void> {
+    if (!settings.library.group_compilations_by_folder) {
+      return;
+    }
+
+    const mediaAlbums = await MediaAlbumService.getMediaAlbums();
+    const compilationAlbums = mediaAlbums.filter(album => (
+      album.provider === MediaLocalConstants.Provider
+      && album.album_artist.artist_name === 'Various Artists'
+    ));
+
+    await Promise.map(compilationAlbums, async (album) => {
+      const tracks = await MediaTrackService.getMediaAlbumTracks(album.id);
+      if (isEmpty(tracks)) {
+        return;
+      }
+
+      const coverPictures = _.uniqBy(
+        tracks
+          .filter(track => track.track_cover_picture && track.track_cover_picture.image_data_type === MediaEnums.MediaTrackCoverPictureImageDataType.Path)
+          .map(track => track.track_cover_picture as IMediaPicture),
+        'image_data',
+      ).slice(0, 4);
+
+      if (coverPictures.length <= 1) {
+        return;
+      }
+
+      // Generate collage
+      const collageBuffer = await this.createCollage(coverPictures);
+      if (!collageBuffer) {
+        return;
+      }
+
+      const processedPicture = await MediaLibraryService.processPicture({
+        image_data: collageBuffer,
+        image_data_type: MediaEnums.MediaTrackCoverPictureImageDataType.Buffer,
+      });
+
+      if (processedPicture) {
+        await MediaAlbumService.updateMediaAlbum({
+          id: album.id,
+        }, {
+          album_cover_picture: processedPicture,
+        });
+      }
+    }, { concurrency: 4 });
+  }
+
+  private createCollage(pictures: IMediaPicture[]): Promise<Buffer | null> {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(null);
+        return;
+      }
+
+      const size = 500;
+      canvas.width = size;
+      canvas.height = size;
+
+      // Draw background
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, size, size);
+
+      const count = pictures.length;
+      let loadedCount = 0;
+      const images: HTMLImageElement[] = [];
+
+      const onImageLoad = () => {
+        loadedCount += 1;
+        if (loadedCount === count) {
+          // All images loaded, draw them
+          if (count === 4) {
+            ctx.drawImage(images[0], 0, 0, size / 2, size / 2);
+            ctx.drawImage(images[1], size / 2, 0, size / 2, size / 2);
+            ctx.drawImage(images[2], 0, size / 2, size / 2, size / 2);
+            ctx.drawImage(images[3], size / 2, size / 2, size / 2, size / 2);
+          } else if (count === 3) {
+            ctx.drawImage(images[0], 0, 0, size / 2, size / 2);
+            ctx.drawImage(images[1], size / 2, 0, size / 2, size / 2);
+            ctx.drawImage(images[2], 0, size / 2, size, size / 2);
+          } else if (count === 2) {
+            ctx.drawImage(images[0], 0, 0, size / 2, size);
+            ctx.drawImage(images[1], size / 2, 0, size / 2, size);
+          }
+
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          const buffer = Buffer.from(dataUrl.split(',')[1], 'base64');
+          resolve(buffer);
+        }
+      };
+
+      pictures.forEach((picture) => {
+        const img = new Image();
+        images.push(img); // Push before setting src to avoid race condition
+        img.onload = onImageLoad;
+        img.onerror = onImageLoad; // Continue even if error
+        img.src = `file://${picture.image_data}`;
+      });
+    });
   }
 }
 

@@ -8,6 +8,7 @@ import { MediaTrackDatastore } from '../datastores';
 
 import {
   IMediaPlayback,
+  IMediaPlaybackPreparationStatus,
   IMediaQueueTrack,
   IMediaTrack,
   IMediaTrackList,
@@ -332,6 +333,9 @@ class MediaPlayerService {
       mediaPlaybackVolume: mediaPlaybackVolumeCurrent,
       mediaPlaybackMaxVolume: mediaPlaybackVolumeMaxLimit,
       mediaPlaybackVolumeMuted,
+    });
+    mediaPlayback.setPreparationStatusListener((mediaPlaybackPreparationStatus) => {
+      this.setPlaybackPreparationStatus(mediaPlaybackPreparationStatus);
     });
 
     // load the track
@@ -829,6 +833,7 @@ class MediaPlayerService {
 
     const mediaPlayed = await mediaPlayback.play();
     if (!mediaPlayed) {
+      this.setPlaybackPreparationStatus(undefined);
       return false;
     }
 
@@ -841,6 +846,15 @@ class MediaPlayerService {
 
     this.reportMediaPlaybackProgress();
     return true;
+  }
+
+  private setPlaybackPreparationStatus(mediaPlaybackPreparationStatus?: IMediaPlaybackPreparationStatus): void {
+    store.dispatch({
+      type: MediaEnums.MediaPlayerActions.UpdatePreparationStatus,
+      data: {
+        mediaPlaybackPreparationStatus,
+      },
+    });
   }
 
   private async changePlaybackVolumeAsync(mediaPlaybackVolume: number): Promise<boolean> {

@@ -24,11 +24,12 @@ const publicPath = `http://localhost:${port}/dist`;
 const dllDir = path.join(__dirname, '../dll');
 const manifest = path.resolve(dllDir, 'renderer.json');
 const requiredByDLLConfig = module.parent.filename.includes('webpack.config.renderer.dev.dll');
+const startMainCommand = process.env.START_MAIN_CMD || 'start:main';
 
 // warn if the DLL is not built
 if (!requiredByDLLConfig && !(fs.existsSync(dllDir) && fs.existsSync(manifest))) {
-  console.log(chalk.black.bgYellow.bold('The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'));
-  execSync('yarn postinstall');
+  console.log(chalk.black.bgYellow.bold('The DLL files are missing. Sit back while we build them for you with "npm run postinstall"'));
+  execSync('npm run postinstall', { stdio: 'inherit' });
 }
 
 export default merge(baseConfig, {
@@ -254,7 +255,7 @@ export default merge(baseConfig, {
     },
     before() {
       console.log('webpack:renderer - starting main process...');
-      spawn('npm', ['run', 'start:main'], {
+      spawn('npm', ['run', startMainCommand], {
         shell: true,
         env: process.env,
         stdio: 'inherit',

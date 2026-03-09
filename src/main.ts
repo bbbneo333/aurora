@@ -87,6 +87,7 @@ class App implements IAppMain {
   private readonly dataPath: string;
   private isQuitting = false;
   private localProtocols = new Set(['file:', 'app:']);
+  private datastoreDataDir = 'Databases';
   private logsDataDir = 'Logs';
   private logsMainFile = 'main.log';
   private logsRendererFile = 'renderer.log';
@@ -104,6 +105,8 @@ class App implements IAppMain {
     this.dataPath = this.debug ? `${this.displayName}-debug` : this.displayName;
     this.htmlFilePath = path.join(__dirname, 'index.html');
 
+    this.configureUserDataPath();
+    this.migrateLegacyDatastorePath();
     this.configureLogger();
     this.configureApp();
     this.installSourceMapSupport();
@@ -144,7 +147,7 @@ class App implements IAppMain {
   }
 
   getDataPath(...paths: string[]): string {
-    return path.join(app.getPath('userData'), this.dataPath, ...paths);
+    return path.join(app.getPath('userData'), ...paths);
   }
 
   getLogsPath(file?: string) {
@@ -267,6 +270,56 @@ class App implements IAppMain {
 
     // darwin only
     app.dock?.setIcon(this.iconPath);
+  }
+
+  private configureUserDataPath(): void {
+    const appDataPath = app.getPath('appData');
+    app.setPath('userData', path.join(appDataPath, this.dataPath));
+  }
+
+  private migrateLegacyDatastorePath(): void {
+    const appDataPath = app.getPath('appData');
+    const legacyUserDataPath = path.join(appDataPath, 'Electron', this.dataPath);
+    const currentUserDataPath = app.getPath('userData');
+
+    if (legacyUserDataPath === currentUserDataPath) {
+      return;
+    }
+
+    const legacyDatastorePath = path.join(legacyUserDataPath, this.datastoreDataDir);
+    if (!fs.existsSync(legacyDatastorePath)) {
+      return;
+    }
+
+    const currentDatastorePath = this.getDataPath(this.datastoreDataDir);
+    if (fs.existsSync(currentDatastorePath)) {
+      return;
+    }
+
+    this.createDataDir(this.datastoreDataDir);
+    try {
+      this.copyDirectoryRecursive(legacyDatastorePath, currentDatastorePath);
+    } catch (error: any) {
+      console.error('migrateLegacyDatastorePath - encountered error - %o', error);
+    }
+  }
+
+  private copyDirectoryRecursive(sourcePath: string, destinationPath: string): void {
+    fs.mkdirSync(destinationPath, { recursive: true });
+    const sourceEntries = fs.readdirSync(sourcePath, {
+      withFileTypes: true,
+    });
+
+    sourceEntries.forEach((sourceEntry) => {
+      const sourceEntryPath = path.join(sourcePath, sourceEntry.name);
+      const destinationEntryPath = path.join(destinationPath, sourceEntry.name);
+
+      if (sourceEntry.isDirectory()) {
+        this.copyDirectoryRecursive(sourceEntryPath, destinationEntryPath);
+      } else {
+        fs.copyFileSync(sourceEntryPath, destinationEntryPath);
+      }
+    });
   }
 
   private removeDirectorySafe(directory: string) {

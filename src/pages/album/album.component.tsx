@@ -10,10 +10,13 @@ import {
   MediaTrackList,
   MediaTrackContextMenuItem,
   MediaCollectionActions,
-  Text,
+  MediaAlbumEditModal,
   TextClamp,
+  Button,
+  Icon,
 } from '../../components';
 
+import { useModal } from '../../contexts';
 import {
   I18nService,
   MediaAlbumService,
@@ -21,7 +24,7 @@ import {
   MediaTrackService,
 } from '../../services';
 
-import { Icons, Layout } from '../../constants';
+import { Icons } from '../../constants';
 import { RootState } from '../../reducers';
 
 import styles from './album.component.css';
@@ -30,6 +33,7 @@ const cx = classNames.bind(styles);
 
 export function AlbumPage() {
   const { albumId } = useParams() as { albumId: string };
+  const { showModal } = useModal();
   const mediaSelectedAlbum = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedAlbum);
   const mediaSelectedAlbumTracks = useSelector((state: RootState) => state.mediaLibrary.mediaSelectedAlbumTracks);
 
@@ -49,7 +53,7 @@ export function AlbumPage() {
     <div className="container-fluid">
       <div className={cx('album-header')}>
         <div className="row">
-          <div className={cx(Layout.Grid.CollectionHeaderCoverColumn, 'album-header-cover-column')}>
+          <div className={cx('col-auto', 'album-header-cover-column')}>
             <MediaCoverPicture
               mediaPicture={mediaSelectedAlbum.album_cover_picture}
               mediaPictureAltText={mediaSelectedAlbum.album_name}
@@ -57,7 +61,7 @@ export function AlbumPage() {
               className={cx('album-cover-picture')}
             />
           </div>
-          <div className={cx(Layout.Grid.CollectionHeaderInfoColumn, 'album-header-info-column')}>
+          <div className={cx('col', 'album-header-info-column')}>
             <div className={cx('album-header-label')}>
               {I18nService.getString('label_album_header')}
             </div>
@@ -66,10 +70,38 @@ export function AlbumPage() {
                 {mediaSelectedAlbum.album_name}
               </TextClamp>
             </div>
-            <div className={cx('album-header-info')}>
-              <Text>
-                <MediaArtistLink mediaArtist={mediaSelectedAlbum.album_artist}/>
-              </Text>
+            <div className={cx('album-header-artist')}>
+              <MediaArtistLink mediaArtist={mediaSelectedAlbum.album_artist}/>
+            </div>
+            {mediaSelectedAlbum.album_genre && (
+              <div className={cx('album-header-genres')}>
+                {mediaSelectedAlbum.album_genre.split(',').map(genre => (
+                  <span key={genre} className={cx('album-genre-chip')}>
+                    {genre.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className={cx('album-header-actions')}>
+              <Button
+                variant={['rounded', 'outline']}
+                tooltip={I18nService.getString('tooltip_edit_album')}
+                onButtonSubmit={() => {
+                  showModal(MediaAlbumEditModal, {
+                    mediaAlbumId: mediaSelectedAlbum.id,
+                  }, {
+                    onComplete: (result) => {
+                      if (!result?.updatedAlbum) {
+                        return;
+                      }
+
+                      MediaTrackService.loadMediaAlbumTracks(result.updatedAlbum.id);
+                    },
+                  });
+                }}
+              >
+                <Icon name={Icons.Edit}/>
+              </Button>
             </div>
           </div>
         </div>

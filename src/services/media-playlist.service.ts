@@ -1,9 +1,15 @@
 import _ from 'lodash';
+import fs from 'fs';
+import path from 'path';
 
 import {
+  IMediaAlbumData,
   IMediaPlaylist,
   IMediaPlaylistData,
   IMediaPlaylistInputData,
+  IMediaPlaylistSmartMatchMode,
+  IMediaPlaylistSmartRuleData,
+  IMediaTrack,
   IMediaPlaylistTrack,
   IMediaPlaylistTrackData,
   IMediaPlaylistTrackInputData,
@@ -11,7 +17,7 @@ import {
   IMediaPlaylistUpdateData,
 } from '../interfaces';
 
-import { MediaPlaylistDatastore } from '../datastores';
+import { MediaAlbumDatastore, MediaPlaylistDatastore, MediaTrackDatastore } from '../datastores';
 import { MediaLibraryActions } from '../enums';
 import store from '../store';
 import { BaseError, EntityNotFoundError } from '../types';
@@ -22,6 +28,7 @@ import { DataStoreInputData, DataStoreUpdateData, DatastoreUtils } from '../modu
 import { I18nService } from './i18n.service';
 import { MediaTrackService } from './media-track.service';
 import { NotificationService } from './notification.service';
+import { AppService } from './app.service';
 
 export class MediaLibraryPlaylistDuplicateTracksError extends BaseError {
   existingTrackDataList: IMediaPlaylistTrackInputData[] = [];
@@ -87,11 +94,21 @@ export class MediaPlaylistService {
   }
 
   static async getMediaPlaylist(mediaPlaylistId: string): Promise<IMediaPlaylist | undefined> {
-    const mediaPlaylistData = await MediaPlaylistDatastore.findMediaPlaylist({
+    let mediaPlaylistData = await MediaPlaylistDatastore.findMediaPlaylist({
       id: mediaPlaylistId,
     });
 
-    return mediaPlaylistData ? this.buildMediaPlaylist(mediaPlaylistData) : undefined;
+    if (mediaPlaylistData) {
+      mediaPlaylistData = await this.syncSmartPlaylistData(mediaPlaylistData);
+      return this.buildMediaPlaylist(mediaPlaylistData);
+    }
+
+    const mediaAlbumData = await MediaAlbumDatastore.findMediaAlbumById(mediaPlaylistId);
+    if (mediaAlbumData && mediaAlbumData.hidden) {
+      return this.buildMediaPlaylistFromAlbum(mediaAlbumData);
+    }
+
+    return undefined;
   }
 
   static async resolveMediaPlaylistTracks(mediaPlaylistId: string): Promise<IMediaPlaylistTrack[]> {
@@ -125,10 +142,41 @@ export class MediaPlaylistService {
 
   static async getMediaPlaylists(): Promise<IMediaPlaylist[]> {
     const mediaPlaylistsDataList = await MediaPlaylistDatastore.findMediaPlaylists();
+    const mediaPlaylistsDataResolved = await Promise.all(
+      mediaPlaylistsDataList.map(mediaPlaylistData => this.syncSmartPlaylistData(mediaPlaylistData)),
+    );
 
     const mediaPlaylists = await Promise.all(
-      mediaPlaylistsDataList.map(mediaPlaylistData => this.buildMediaPlaylist(mediaPlaylistData)),
+      mediaPlaylistsDataResolved.map(mediaPlaylistData => this.buildMediaPlaylist(mediaPlaylistData)),
     );
+
+    const hiddenAlbums = await MediaAlbumDatastore.findMediaAlbums({
+      hidden: true,
+    });
+
+    if (!_.isEmpty(hiddenAlbums)) {
+      const hiddenAlbumIds = hiddenAlbums.map(album => album.id);
+      const allTracks = await MediaTrackDatastore.findMediaTracks({
+        track_album_id: {
+          $in: hiddenAlbumIds,
+        },
+      });
+      const tracksByAlbumId = _.groupBy(allTracks, 'track_album_id');
+
+      const hiddenAlbumPlaylists = await Promise.all(
+        hiddenAlbums.map(async (album) => {
+          const tracks = tracksByAlbumId[album.id] || [];
+          const playlistTracks: IMediaPlaylistTrackData[] = tracks.map(track => ({
+            playlist_track_id: track.id,
+            provider: track.provider,
+            provider_id: track.provider_id,
+            added_at: track.sync_timestamp,
+          }));
+          return this.buildMediaPlaylistFromAlbum(album, playlistTracks);
+        }),
+      );
+      return MediaUtils.sortMediaPlaylists([...mediaPlaylists, ...hiddenAlbumPlaylists]);
+    }
 
     return MediaUtils.sortMediaPlaylists(mediaPlaylists);
   }
@@ -151,6 +199,75 @@ export class MediaPlaylistService {
     });
 
     return mediaPlaylist;
+  }
+
+  static async createIntelligentMediaPlaylist(input: {
+    name?: string;
+    matchMode?: IMediaPlaylistSmartMatchMode;
+    rules: IMediaPlaylistSmartRuleData[];
+  }): Promise<IMediaPlaylist> {
+    const rules = (input.rules || [])
+      .map(rule => ({
+        keyword: rule.keyword,
+        pattern: (rule.pattern || '').trim(),
+      }))
+      .filter(rule => !!rule.pattern);
+    if (_.isEmpty(rules)) {
+      throw new Error('Cannot create intelligent playlist without rules');
+    }
+
+    const matchMode: IMediaPlaylistSmartMatchMode = input.matchMode || 'all';
+    const tracks = await this.resolveSmartPlaylistTrackInputData(rules, matchMode);
+    const mediaPlaylist = await this.createMediaPlaylist({
+      name: input.name,
+      tracks,
+      is_smart: true,
+      smart_match_mode: matchMode,
+      smart_rules: rules,
+    });
+    return mediaPlaylist;
+  }
+
+  static async exportMediaPlaylist(mediaPlaylistId: string, format: 'm3u' | 'm3u8'): Promise<string> {
+    const mediaPlaylist = await this.getMediaPlaylist(mediaPlaylistId);
+    if (!mediaPlaylist) {
+      throw new Error(`MediaPlaylistService encountered error at exportMediaPlaylist - Playlist not found - ${mediaPlaylistId}`);
+    }
+
+    const playlistTracks = await this.resolveMediaPlaylistTracks(mediaPlaylistId);
+    const playlistDirectoryPath = this.getPlaylistsDirectoryPath();
+    fs.mkdirSync(playlistDirectoryPath, { recursive: true });
+
+    const fileName = `${this.sanitizePlaylistFileName(mediaPlaylist.name)}.${format}`;
+    const filePath = path.join(playlistDirectoryPath, fileName);
+
+    const lines: string[] = ['#EXTM3U'];
+    playlistTracks.forEach((track) => {
+      const trackFilePath = _.get(track, 'extra.file_path');
+      if (!trackFilePath || typeof trackFilePath !== 'string') {
+        return;
+      }
+
+      const artist = track.track_artists?.[0]?.artist_name || track.track_album?.album_artist?.artist_name || '';
+      const trackName = track.track_name || '';
+      const title = artist ? `${artist} - ${trackName}` : trackName;
+      const duration = Math.max(0, Math.round(track.track_duration || 0));
+      const relativePath = (path.relative(playlistDirectoryPath, trackFilePath) || path.basename(trackFilePath)).split(path.sep).join('/');
+
+      lines.push(`#EXTINF:${duration},${title}`);
+      lines.push(relativePath);
+    });
+
+    fs.writeFileSync(filePath, `${lines.join('\n')}\n`, {
+      encoding: 'utf8',
+    });
+
+    NotificationService.showMessage(I18nService.getString('message_playlist_exported', {
+      playlistName: mediaPlaylist.name,
+      format: format.toUpperCase(),
+    }));
+
+    return filePath;
   }
 
   /**
@@ -241,6 +358,31 @@ export class MediaPlaylistService {
     return _.assign(mediaPlaylistData, {});
   }
 
+  private static async buildMediaPlaylistFromAlbum(mediaAlbumData: IMediaAlbumData, tracks?: IMediaPlaylistTrackData[]): Promise<IMediaPlaylist> {
+    let playlistTracks = tracks;
+    if (!playlistTracks) {
+      const albumTracks = await MediaTrackDatastore.findMediaTracks({
+        track_album_id: mediaAlbumData.id,
+      });
+      playlistTracks = albumTracks.map(track => ({
+        playlist_track_id: track.id,
+        provider: track.provider,
+        provider_id: track.provider_id,
+        added_at: track.sync_timestamp,
+      }));
+    }
+
+    return {
+      id: mediaAlbumData.id,
+      name: mediaAlbumData.album_name,
+      tracks: playlistTracks || [],
+      cover_picture: mediaAlbumData.album_cover_picture,
+      created_at: mediaAlbumData.sync_timestamp,
+      updated_at: mediaAlbumData.sync_timestamp,
+      is_hidden_album: true,
+    };
+  }
+
   private static async buildMediaPlaylists(mediaPlaylistDataList: IMediaPlaylistData[]) {
     return Promise.all(mediaPlaylistDataList.map((mediaPlaylistData: any) => this.buildMediaPlaylist(mediaPlaylistData)));
   }
@@ -281,6 +423,15 @@ export class MediaPlaylistService {
     }
     if (playlistUpdateData.cover_picture) {
       data.cover_picture = playlistUpdateData.cover_picture;
+    }
+    if (!_.isUndefined(playlistUpdateData.is_smart)) {
+      data.is_smart = playlistUpdateData.is_smart;
+    }
+    if (playlistUpdateData.smart_match_mode) {
+      data.smart_match_mode = playlistUpdateData.smart_match_mode;
+    }
+    if (playlistUpdateData.smart_rules) {
+      data.smart_rules = playlistUpdateData.smart_rules;
     }
     if (playlistUpdateData.tracks) {
       data.tracks = await this.buildMediaPlaylistTrackUpdateDataFromInput(playlistId, playlistUpdateData.tracks);
@@ -345,5 +496,108 @@ export class MediaPlaylistService {
       existingInputDataList,
       newInputDataList,
     };
+  }
+
+  private static async resolveSmartPlaylistTrackInputData(
+    rules: IMediaPlaylistSmartRuleData[],
+    matchMode: IMediaPlaylistSmartMatchMode,
+  ): Promise<IMediaPlaylistTrackInputData[]> {
+    const mediaTrackDataList = await MediaTrackDatastore.findMediaTracks();
+    const mediaTracks = await MediaTrackService.buildMediaTracks(mediaTrackDataList);
+
+    const matchingTracks = mediaTracks.filter((track) => {
+      const ruleMatches = rules.map(rule => this.matchSmartPlaylistRule(track, rule));
+      return matchMode === 'any'
+        ? ruleMatches.some(Boolean)
+        : ruleMatches.every(Boolean);
+    });
+
+    return matchingTracks.map(track => ({
+      provider: track.provider,
+      provider_id: track.provider_id,
+    }));
+  }
+
+  private static async syncSmartPlaylistData(mediaPlaylistData: IMediaPlaylistData): Promise<IMediaPlaylistData> {
+    if (!mediaPlaylistData.is_smart || _.isEmpty(mediaPlaylistData.smart_rules)) {
+      return mediaPlaylistData;
+    }
+
+    const matchMode: IMediaPlaylistSmartMatchMode = mediaPlaylistData.smart_match_mode || 'all';
+    const smartTrackInputData = await this.resolveSmartPlaylistTrackInputData(mediaPlaylistData.smart_rules || [], matchMode);
+    const smartTracks = smartTrackInputData.map(trackInputData => this.buildMediaPlaylistTrackFromInput(trackInputData));
+    const existingTracks = mediaPlaylistData.tracks || [];
+    const hasChanged = existingTracks.length !== smartTracks.length
+      || existingTracks.some((track, index) => (
+        track.provider !== smartTracks[index]?.provider
+        || track.provider_id !== smartTracks[index]?.provider_id
+      ));
+
+    if (!hasChanged) {
+      return mediaPlaylistData;
+    }
+
+    return MediaPlaylistDatastore.updateMediaPlaylist(mediaPlaylistData.id, {
+      tracks: smartTracks,
+    });
+  }
+
+  private static matchSmartPlaylistRule(
+    track: IMediaTrack,
+    rule: IMediaPlaylistSmartRuleData,
+  ): boolean {
+    const regex = this.buildWildcardRegex(rule.pattern);
+    const values = this.getTrackValuesForSmartKeyword(track, rule.keyword);
+    return values.some(value => regex.test(value));
+  }
+
+  private static getTrackValuesForSmartKeyword(
+    track: IMediaTrack,
+    keyword: IMediaPlaylistSmartRuleData['keyword'],
+  ): string[] {
+    if (keyword === 'track') {
+      return [track.track_name];
+    }
+    if (keyword === 'album') {
+      return [track.track_album?.album_name || ''];
+    }
+    if (keyword === 'artist') {
+      return [
+        ...(track.track_artists || []).map(artist => artist.artist_name),
+        track.track_album?.album_artist?.artist_name || '',
+      ].filter(Boolean);
+    }
+    if (keyword === 'genre') {
+      return [track.track_album?.album_genre || ''];
+    }
+    if (keyword === 'path') {
+      return [
+        _.get(track, 'extra.file_path', ''),
+        _.get(track, 'extra.file_source', ''),
+      ].filter(Boolean);
+    }
+
+    return [];
+  }
+
+  private static buildWildcardRegex(pattern: string): RegExp {
+    const escapedPattern = pattern
+      .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+      .replace(/\*/g, '.*')
+      .replace(/\?/g, '.');
+    return new RegExp(`^${escapedPattern}$`, 'i');
+  }
+
+  private static sanitizePlaylistFileName(name: string): string {
+    const value = (name || 'playlist')
+      .trim()
+      .replace(/[<>:"/\\|?*]/g, '_');
+    return value || 'playlist';
+  }
+
+  private static getPlaylistsDirectoryPath(): string {
+    const logsPath = AppService.details.logs_path;
+    const appDataPath = path.dirname(path.dirname(logsPath));
+    return path.join(appDataPath, 'Playlists');
   }
 }

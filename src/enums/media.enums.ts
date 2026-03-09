@@ -22,6 +22,7 @@ export enum MediaLibraryActions {
   SetPinnedItems = 'media/library/setPinnedItems',
   AddPinnedItem = 'media/library/addPinnedItem',
   RemovePinnedItem = 'media/library/removePinnedItem',
+  SetAudioCd = 'media/library/setAudioCd',
 }
 
 export enum MediaPlayerActions {
@@ -33,6 +34,7 @@ export enum MediaPlayerActions {
   PausePlayer = 'media/player/pausePlayer',
   StopPlayer = 'media/player/stopPlayer',
   UpdatePlaybackProgress = 'media/player/updatePlaybackProgress',
+  UpdatePreparationStatus = 'media/player/updatePreparationStatus',
   UpdatePlaybackVolume = 'media/player/updatePlaybackVolume',
   MutePlaybackVolume = 'media/player/mutePlaybackVolume',
   UnmutePlaybackVolume = 'media/player/unmutePlaybackVolume',

@@ -24,6 +24,7 @@ export type MediaLibraryState = {
   mediaSelectedPlaylist?: IMediaPlaylist;
   mediaLikedTracksRecord: Record<string, IMediaLikedTrack>;
   mediaPinnedItemsRecord: Record<string, IMediaPinnedItem>;
+  audioCd?: { present: boolean, path?: string, name?: string };
 };
 
 export type MediaLibraryStateAction = {
@@ -38,6 +39,7 @@ const mediaLibraryInitialState: MediaLibraryState = {
   mediaPlaylists: [],
   mediaLikedTracksRecord: {},
   mediaPinnedItemsRecord: {},
+  audioCd: { present: false },
 };
 
 export default (state: MediaLibraryState = mediaLibraryInitialState, action: MediaLibraryStateAction): MediaLibraryState => {
@@ -47,6 +49,12 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       // TODO: To be implemented
 
       return state;
+    }
+    case MediaLibraryActions.SetAudioCd: {
+      return {
+        ...state,
+        audioCd: action.data,
+      };
     }
     case MediaLibraryActions.StartSync: {
       // data.mediaProviderIdentifier
@@ -121,20 +129,22 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
       const { mediaAlbum } = action.data;
       const { mediaAlbums, mediaSelectedArtist, mediaSelectedArtistAlbums = [] } = state;
       let { mediaSelectedAlbum } = state;
+      const nextMediaAlbums = [...mediaAlbums];
+      const nextMediaSelectedArtistAlbums = [...mediaSelectedArtistAlbums];
 
-      const mediaAlbumIdx = mediaAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
+      const mediaAlbumIdx = nextMediaAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
       if (mediaAlbumIdx === -1) {
-        ArrayUtils.updateSortedArray<IMediaAlbum>(mediaAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
+        ArrayUtils.updateSortedArray<IMediaAlbum>(nextMediaAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
       } else {
-        mediaAlbums[mediaAlbumIdx] = mediaAlbum;
+        nextMediaAlbums[mediaAlbumIdx] = mediaAlbum;
       }
 
-      const mediaAlbumSelectedIdx = mediaSelectedArtistAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
+      const mediaAlbumSelectedIdx = nextMediaSelectedArtistAlbums.findIndex(exMediaAlbum => exMediaAlbum.id === mediaAlbum.id);
       if (mediaSelectedArtist?.id === mediaAlbum.album_artist_id) {
         if (mediaAlbumSelectedIdx === -1) {
-          ArrayUtils.updateSortedArray<IMediaAlbum>(mediaSelectedArtistAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
+          ArrayUtils.updateSortedArray<IMediaAlbum>(nextMediaSelectedArtistAlbums, mediaAlbum, MediaUtils.mediaAlbumComparator);
         } else {
-          mediaSelectedArtistAlbums[mediaAlbumSelectedIdx] = mediaAlbum;
+          nextMediaSelectedArtistAlbums[mediaAlbumSelectedIdx] = mediaAlbum;
         }
       }
 
@@ -144,8 +154,8 @@ export default (state: MediaLibraryState = mediaLibraryInitialState, action: Med
 
       return {
         ...state,
-        mediaAlbums,
-        mediaSelectedArtistAlbums,
+        mediaAlbums: nextMediaAlbums,
+        mediaSelectedArtistAlbums: nextMediaSelectedArtistAlbums,
         mediaSelectedAlbum,
       };
     }
