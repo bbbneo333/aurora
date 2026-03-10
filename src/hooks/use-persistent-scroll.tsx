@@ -5,21 +5,26 @@ export type UsePersistentScrollProps = {
   viewportRef: React.RefObject<HTMLDivElement>;
 };
 
+// local store for storing scroll position per location
+const scrollStore = new Map<string, number>();
+
 export function usePersistentScroll({ viewportRef }: UsePersistentScrollProps) {
   const location = useLocation();
 
   // restore scrollTop when route changes
   useEffect(() => {
     const container = viewportRef.current;
-    if (!container) return;
+    const scrollKey = location.key;
 
-    const savedY = sessionStorage.getItem(`scroll-${location.key}`);
+    if (!container || !scrollKey) return;
+
+    const scrollPosition = scrollStore.get(scrollKey);
 
     // delay until after content has rendered
     requestAnimationFrame(() => {
-      if (savedY !== null) {
-        // console.log('usePersistentScroll: persisting', savedY, location.key, location.pathname);
-        container.scrollTop = Number(savedY);
+      if (scrollPosition) {
+        // console.log('usePersistentScroll: persisting', scrollPosition, scrollKey, location.pathname);
+        container.scrollTop = scrollPosition;
       } else {
         container.scrollTop = 0; // default for fresh navigation
       }
@@ -32,19 +37,21 @@ export function usePersistentScroll({ viewportRef }: UsePersistentScrollProps) {
   // save scrollTop whenever unmounting / navigating away
   useEffect(() => {
     const container = viewportRef.current;
-    if (!container) return;
+    const scrollKey = location.key;
+
+    if (!container || !scrollKey) return;
 
     const saveScroll = () => {
-      const scroll = container.scrollTop;
-      if (!scroll) {
+      const scrollPosition = container.scrollTop;
+      if (!scrollPosition) {
         return;
       }
 
-      // console.log('usePersistentScroll: saving', scroll, location.key, location.pathname);
-      sessionStorage.setItem(`scroll-${location.key}`, String(scroll));
+      // console.log('usePersistentScroll: saving', scrollPosition, scrollKey, location.pathname);
+      scrollStore.set(scrollKey, scrollPosition);
     };
 
-    // save when tab is closing
+    // listen to scroll events
     container.addEventListener('scroll', saveScroll);
 
     // save when unmounting or route changes

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
-import { useElementSize } from '../../hooks';
+import { useViewport } from '../../contexts/viewport.context';
 
 import { GridItem } from './grid-item.component';
 import styles from './grid.component.css';
@@ -21,9 +21,7 @@ export type GridItemType = {
 
 export function Grid<T extends GridItemType>(props: GridProps<T>) {
   const { items, children } = props;
-
-  const [containerRef, { width }] = useElementSize<HTMLDivElement>();
-  const scrollElement = document.querySelector('.app-viewport');
+  const { viewportRef, width } = useViewport();
 
   const columnCount = width > 0
     ? Math.max(1, Math.floor(width / (MIN_TILE_WIDTH + GAP)))
@@ -40,7 +38,7 @@ export function Grid<T extends GridItemType>(props: GridProps<T>) {
   const rowVirtualizer = useVirtualizer({
     count: rowCount,
     estimateSize: () => tileHeight + GAP,
-    getScrollElement: () => scrollElement,
+    getScrollElement: () => viewportRef.current,
     overscan: 2,
   });
 
@@ -53,7 +51,7 @@ export function Grid<T extends GridItemType>(props: GridProps<T>) {
   ]);
 
   return (
-    <div ref={containerRef} className={styles.container}>
+    <div className={styles.container}>
       <div
         style={{
           height: rowVirtualizer.getTotalSize(),

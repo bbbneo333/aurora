@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * Observes layout for an element reference and returns height and width
  */
-export function useElementSize<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+export function useElementSize(ref: React.MutableRefObject<HTMLElement>) {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -31,7 +30,9 @@ export function useElementSize<T extends HTMLElement>() {
     observer.observe(el);
 
     return () => observer.disconnect();
-  }, []);
+  }, [
+    ref,
+  ]);
 
-  return [ref, size] as const;
+  return size;
 }
