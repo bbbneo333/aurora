@@ -138,3 +138,7 @@ Please open an issue with:
 
 Aurora is released under the MIT License.
 See [LICENSE](./LICENSE) for details.
+
+## Contribution
+
+Feature requests may still be submitted through issues for discussion, but feature pull requests will not be accepted at this time.
