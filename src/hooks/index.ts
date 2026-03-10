@@ -1,5 +1,6 @@
 export * from './use-data-action';
 export * from './use-data-load';
+export * from './use-element-size';
 export * from './use-entity-missing';
 export * from './use-media-collection-pin';
 export * from './use-media-collection-playback';
