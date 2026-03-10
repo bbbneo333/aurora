@@ -11,30 +11,7 @@ const scrollStore = new Map<string, number>();
 export function usePersistentScroll({ viewportRef }: UsePersistentScrollProps) {
   const location = useLocation();
 
-  // restore scrollTop when route changes
-  useEffect(() => {
-    const container = viewportRef.current;
-    const scrollKey = location.key;
-
-    if (!container || !scrollKey) return;
-
-    const scrollPosition = scrollStore.get(scrollKey);
-
-    // delay until after content has rendered
-    requestAnimationFrame(() => {
-      if (scrollPosition) {
-        // console.log('usePersistentScroll: persisting', scrollPosition, scrollKey, location.pathname);
-        container.scrollTop = scrollPosition;
-      } else {
-        container.scrollTop = 0; // default for fresh navigation
-      }
-    });
-  }, [
-    location,
-    viewportRef,
-  ]);
-
-  // save scrollTop whenever unmounting / navigating away
+  // save
   useEffect(() => {
     const container = viewportRef.current;
     const scrollKey = location.key;
@@ -60,6 +37,42 @@ export function usePersistentScroll({ viewportRef }: UsePersistentScrollProps) {
       saveScroll();
       container.removeEventListener('scroll', saveScroll);
     };
+  }, [
+    location,
+    viewportRef,
+  ]);
+
+  // restore
+  useEffect(() => {
+    const container = viewportRef.current;
+    const scrollKey = location.key;
+
+    if (!container || !scrollKey) return;
+
+    const scrollPosition = scrollStore.get(scrollKey);
+
+    if (scrollPosition === undefined) {
+      container.scrollTop = 0;
+      return;
+    }
+
+    let frame: number;
+
+    // wait for page to have a height - a hack to determine whether page has content, then restore
+    const tryRestore = () => {
+      if (container.scrollHeight < scrollPosition + container.clientHeight) {
+        frame = requestAnimationFrame(tryRestore);
+        return;
+      }
+
+      // console.log('usePersistentScroll: restoring', scrollPosition, scrollKey, location.pathname);
+      container.scrollTop = scrollPosition;
+    };
+
+    frame = requestAnimationFrame(tryRestore);
+
+    // eslint-disable-next-line consistent-return
+    return () => cancelAnimationFrame(frame);
   }, [
     location,
     viewportRef,
