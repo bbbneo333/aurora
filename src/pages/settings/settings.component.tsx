@@ -1,5 +1,4 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import classNames from 'classnames/bind';
 
 import {
@@ -11,42 +10,12 @@ import {
 
 import { Icons, Links } from '../../constants';
 import { useModal } from '../../contexts';
-import { RootState } from '../../reducers';
 import { AppService, I18nService } from '../../services';
 
 import styles from './settings.component.css';
+import { ProviderSettings } from './provider-settings.component';
 
 const cx = classNames.bind(styles);
-
-function ProviderSettings() {
-  const mediaProviderRegistry = useSelector((state: RootState) => state.mediaProviderRegistry);
-
-  return (
-    <>
-      {
-        mediaProviderRegistry.mediaProviders.map((mediaRegisteredProvider) => {
-          const mediaProviderSettingsComponent = mediaRegisteredProvider.mediaSettingsService.getSettingsComponent();
-
-          if (mediaProviderSettingsComponent) {
-            return (
-              <div
-                key={mediaRegisteredProvider.mediaProviderIdentifier}
-              >
-                {React.createElement(mediaProviderSettingsComponent, {
-                  cx,
-                })}
-              </div>
-            );
-          }
-
-          return (
-            <></>
-          );
-        })
-      }
-    </>
-  );
-}
 
 export function SettingsPage() {
   const { showModal } = useModal();

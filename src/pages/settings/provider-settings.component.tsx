@@ -1,0 +1,39 @@
+import React from 'react';
+import { useSelector } from 'react-redux';
+import classNames from 'classnames/bind';
+
+import { RootState } from '../../reducers';
+
+import styles from './settings.component.css';
+
+const cx = classNames.bind(styles);
+
+export function ProviderSettings() {
+  const mediaProviderRegistry = useSelector((state: RootState) => state.mediaProviderRegistry);
+
+  return (
+    <>
+      {
+        mediaProviderRegistry.mediaProviders.map((mediaRegisteredProvider) => {
+          const mediaProviderSettingsComponent = mediaRegisteredProvider.mediaSettingsService.getSettingsComponent();
+
+          if (mediaProviderSettingsComponent) {
+            return (
+              <div
+                key={mediaRegisteredProvider.mediaProviderIdentifier}
+              >
+                {React.createElement(mediaProviderSettingsComponent, {
+                  cx,
+                })}
+              </div>
+            );
+          }
+
+          return (
+            <></>
+          );
+        })
+      }
+    </>
+  );
+}
