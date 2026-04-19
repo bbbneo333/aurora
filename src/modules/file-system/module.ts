@@ -20,6 +20,8 @@ import { IPCCommChannel, IPCMain, IPCStream } from '../ipc';
 
 const debug = require('debug')('aurora:module:file-system');
 
+const isAppleDoubleFile = (fileName: string): boolean => fileName.startsWith('._');
+
 export class FileSystemModule implements IAppModule {
   private readonly app: IAppMain;
 
@@ -73,6 +75,7 @@ export class FileSystemModule implements IAppModule {
 
     const entryFilter = (entry: Entry): boolean => {
       if (!entry.dirent.isFile()) return false;
+      if (isAppleDoubleFile(entry.name)) return false;
       if (!fileExtensions || isEmpty(fileExtensions)) return true;
 
       const i = entry.name.lastIndexOf('.');
