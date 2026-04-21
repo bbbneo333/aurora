@@ -74,6 +74,7 @@
   "message_tracks_liked": "Added to Liked Songs",
   "message_tracks_disliked": "Removed from Liked Songs",
   "message_sync_finished": "Sync completed, added {tracksAddedCount} tracks",
+  "message_update_check_error": "Could not check for updates - {error}",
   "placeholder_playlist_context_menu_search_input": "Find a playlist",
   "placeholder_search_input": "What do you want to play?",
   "search_result_heading_all": "All",

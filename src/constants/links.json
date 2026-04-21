@@ -1,5 +1,6 @@
 {
   "Project": "https://github.com/bbbneo333/aurora",
   "ProjectReportIssue": "https://github.com/bbbneo333/aurora/issues",
-  "ProjectRelease": "https://github.com/bbbneo333/aurora/releases/tag/v{version}"
+  "ProjectRelease": "https://github.com/bbbneo333/aurora/releases/tag/v{version}",
+  "ProjectRepository": "bbbneo333/aurora"
 }

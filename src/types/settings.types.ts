@@ -1,5 +1,7 @@
 export enum SettingsActions {
   LoadSettings = 'loadSettings',
+  LoadingRelease = 'loadingRelease',
+  LoadedRelease = 'loadedRelease',
 }
 
 export type Settings = {

@@ -1,5 +1,6 @@
 // TODO: Use the following format for all utils export, remove everything else
 import { DateTimeUtils } from './date-time.utils';
+import { VersionUtils } from './version.utils';
 
 import * as ArrayUtils from './array.utils';
 import * as DOM from './dom.utils';
@@ -18,4 +19,5 @@ export {
   MediaUtils,
   PromiseUtils,
   StringUtils,
+  VersionUtils,
 };

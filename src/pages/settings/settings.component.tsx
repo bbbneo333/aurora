@@ -14,7 +14,7 @@ import { Icons, Links } from '../../constants';
 import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
 import { AppService, I18nService, SettingsService } from '../../services';
-import { StringUtils } from '../../utils';
+import { StringUtils, VersionUtils } from '../../utils';
 
 import styles from './settings.component.css';
 import { ProviderSettings } from './provider-settings.component';
@@ -27,6 +27,8 @@ export function SettingsPage() {
     loading,
     saving,
     updateCheckInProgress,
+    updateAvailable,
+    updateLatestRelease,
   } = useSelector((state: RootState) => state.mediaSettings);
 
   const { showModal } = useModal();
@@ -85,17 +87,31 @@ export function SettingsPage() {
           >
             {I18nService.getString('button_settings_updates_check')}
           </Button>
-          <Link
-            disabled={updateCheckInProgress}
-            href={StringUtils.buildLink(Links.ProjectRelease, {
-              version: AppService.details.version,
-            })}
-          >
-            <Icon name={Icons.Github}/>
-            {I18nService.getString('link_settings_installed_version', {
-              version: AppService.details.version,
-            })}
-          </Link>
+          {(updateAvailable && updateLatestRelease) ? (
+            <Link
+              disabled={updateCheckInProgress}
+              href={StringUtils.buildLink(Links.ProjectRelease, {
+                version: VersionUtils.normalizeVersion(updateLatestRelease.version),
+              })}
+            >
+              <Icon name={Icons.Github}/>
+              {I18nService.getString('link_settings_available_version', {
+                version: VersionUtils.normalizeVersion(updateLatestRelease.version),
+              })}
+            </Link>
+          ) : (
+            <Link
+              disabled={updateCheckInProgress}
+              href={StringUtils.buildLink(Links.ProjectRelease, {
+                version: VersionUtils.normalizeVersion(AppService.details.version),
+              })}
+            >
+              <Icon name={Icons.Github}/>
+              {I18nService.getString('link_settings_installed_version', {
+                version: VersionUtils.normalizeVersion(AppService.details.version),
+              })}
+            </Link>
+          )}
         </div>
       </div>
       <div className={cx('settings-section')}>

@@ -1,3 +1,5 @@
+import { GithubReleaseInfo } from '../modules/github';
+
 import { Settings, SettingsActions } from '../types';
 
 export type SettingsState = {
@@ -5,6 +7,8 @@ export type SettingsState = {
   loading: boolean;
   saving: boolean;
   updateCheckInProgress: boolean;
+  updateLatestRelease?: GithubReleaseInfo;
+  updateAvailable: boolean;
 };
 
 export type MediaSettingsStateAction = {
@@ -20,6 +24,8 @@ const mediaSettingsInitialState: SettingsState = {
   loading: false,
   saving: false,
   updateCheckInProgress: false,
+  updateLatestRelease: undefined,
+  updateAvailable: false,
 };
 
 export default (state: SettingsState = mediaSettingsInitialState, action: MediaSettingsStateAction): SettingsState => {
@@ -30,6 +36,23 @@ export default (state: SettingsState = mediaSettingsInitialState, action: MediaS
       return {
         ...state,
         settings: data,
+      };
+    }
+    case SettingsActions.LoadingRelease: {
+      return {
+        ...state,
+        updateCheckInProgress: true,
+      };
+    }
+    case SettingsActions.LoadedRelease: {
+      const { data } = action;
+      const { latestRelease, isUpdateAvailable } = data;
+
+      return {
+        ...state,
+        updateCheckInProgress: false,
+        updateLatestRelease: latestRelease,
+        updateAvailable: isUpdateAvailable,
       };
     }
     default:
