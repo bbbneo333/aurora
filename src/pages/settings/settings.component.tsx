@@ -78,39 +78,45 @@ export function SettingsPage() {
               />
             </div>
           </div>
-          <Button
-            disabled={updateCheckInProgress}
-            icon={updateCheckInProgress ? Icons.Refreshing : Icons.Refresh}
-            onButtonSubmit={() => {
-              SettingsService.checkForUpdates();
-            }}
-          >
-            {I18nService.getString('button_settings_updates_check')}
-          </Button>
+          <div>
+            <Button
+              disabled={updateCheckInProgress}
+              icon={updateCheckInProgress ? Icons.Refreshing : Icons.Refresh}
+              onButtonSubmit={() => {
+                SettingsService.checkForUpdates();
+              }}
+            >
+              {I18nService.getString('button_settings_updates_check')}
+            </Button>
+          </div>
           {(updateAvailable && updateLatestRelease) ? (
-            <Link
-              disabled={updateCheckInProgress}
-              href={StringUtils.buildLink(Links.ProjectRelease, {
-                version: VersionUtils.normalizeVersion(updateLatestRelease.version),
-              })}
-            >
-              <Icon name={Icons.Github}/>
-              {I18nService.getString('link_settings_available_version', {
-                version: VersionUtils.normalizeVersion(updateLatestRelease.version),
-              })}
-            </Link>
+            <div>
+              <Link
+                disabled={updateCheckInProgress}
+                href={StringUtils.buildLink(Links.ProjectRelease, {
+                  version: VersionUtils.normalizeVersion(updateLatestRelease.version),
+                })}
+              >
+                <Icon name={Icons.Github}/>
+                {I18nService.getString('link_settings_available_version', {
+                  version: VersionUtils.normalizeVersion(updateLatestRelease.version),
+                })}
+              </Link>
+            </div>
           ) : (
-            <Link
-              disabled={updateCheckInProgress}
-              href={StringUtils.buildLink(Links.ProjectRelease, {
-                version: VersionUtils.normalizeVersion(AppService.details.version),
-              })}
-            >
-              <Icon name={Icons.Github}/>
-              {I18nService.getString('link_settings_installed_version', {
-                version: VersionUtils.normalizeVersion(AppService.details.version),
-              })}
-            </Link>
+            <div>
+              <Link
+                disabled={updateCheckInProgress}
+                href={StringUtils.buildLink(Links.ProjectRelease, {
+                  version: VersionUtils.normalizeVersion(AppService.details.version),
+                })}
+              >
+                <Icon name={Icons.Github}/>
+                {I18nService.getString('link_settings_installed_version', {
+                  version: VersionUtils.normalizeVersion(AppService.details.version),
+                })}
+              </Link>
+            </div>
           )}
         </div>
       </div>
