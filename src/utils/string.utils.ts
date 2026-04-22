@@ -15,9 +15,10 @@ export function buildRoute(
   // builds: /search/books
   // empty value for a mapping will throw error
   const path = base.replace(/:(\w*)/g, (...args) => {
-    const mapping = get(mappings, args[1]);
+    const key = args[1];
+    const mapping = get(mappings, key);
     if (!mapping) {
-      throw new Error(`Could not build route - Unknown mapping for key ${args[1]}`);
+      throw new Error(`Could not build route - Unknown mapping for key ${key}`);
     }
 
     return mapping;
@@ -39,4 +40,19 @@ export function buildRoute(
   }
 
   return path;
+}
+
+export function buildLink(
+  base: string,
+  mappings?: Record<string, string>,
+): string {
+  return base.replace(/\{(\w*)\}/g, (...args) => {
+    const key = args[1];
+    const mapping = get(mappings, key);
+    if (!mapping) {
+      throw new Error(`Could not build link - Unknown mapping for key ${key}`);
+    }
+
+    return mapping;
+  });
 }
