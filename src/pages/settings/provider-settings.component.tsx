@@ -17,20 +17,17 @@ export function ProviderSettings() {
         mediaProviderRegistry.mediaProviders.map((mediaRegisteredProvider) => {
           const mediaProviderSettingsComponent = mediaRegisteredProvider.mediaSettingsService.getSettingsComponent();
 
-          if (mediaProviderSettingsComponent) {
+          if (!mediaProviderSettingsComponent) {
             return (
-              <div
-                key={mediaRegisteredProvider.mediaProviderIdentifier}
-              >
-                {React.createElement(mediaProviderSettingsComponent, {
-                  cx,
-                })}
-              </div>
+              <></>
             );
           }
 
           return (
-            <></>
+            React.createElement(mediaProviderSettingsComponent, {
+              key: mediaRegisteredProvider.mediaProviderIdentifier,
+              cx,
+            })
           );
         })
       }
