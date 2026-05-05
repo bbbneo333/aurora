@@ -66,6 +66,12 @@
   --input-focused-bg-color: #282828;
   --input-focused-outline-color: #6d6d6d;
   --input-transition: background-color 200ms ease;
+  /*switch*/
+  --switch-active-track-color: #009233;
+  --switch-inactive-track-color: #3c3c3c;
+  --switch-thumb-color: #e9ecef;
+  --switch-disabled-thumb-color: #383838;
+  --switch-disabled-track-color: #3c3c3c;
   /*--button-color: #b3b3b3;*/
   /*--dark-music-player-bg-color: #181818;*/
   /*--dark-music-player-border-color: #282828;*/
@@ -258,4 +264,10 @@ body {
   syntax: '<color>';
   inherits: true;
   initial-value: #000000;
+}
+
+/* typography */
+
+.text-dark {
+  color: var(--text-dark-color) !important;
 }

@@ -25,6 +25,9 @@
   gap: 10px;
 }
 
-.settings-content.links {
-  color: var(--text-dark-color);
+.settings-form-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 }
