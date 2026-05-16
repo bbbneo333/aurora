@@ -45,6 +45,7 @@ import { PlatformOS } from './modules/platform';
 import { DatastoreModule } from './modules/datastore';
 import { FileSystemModule } from './modules/file-system';
 import { ImageModule } from './modules/image';
+import { StoreModule } from './modules/store';
 
 import { MenuBuilder } from './main/builders';
 
@@ -514,6 +515,7 @@ class App implements IAppMain {
     this.modules.push(new DatastoreModule(this));
     this.modules.push(new ImageModule(this));
     this.modules.push(new FileSystemModule(this));
+    this.modules.push(new StoreModule(this));
 
     debug('module registration completed!');
   }

@@ -7,14 +7,22 @@ const cx = classNames.bind(styles);
 
 export type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   children?: any;
+  disabled?: boolean;
 };
 
 export function Link(props: LinkProps) {
-  const { children, className, ...rest } = props;
+  const {
+    children,
+    className,
+    disabled = false,
+    ...rest
+  } = props;
 
   return (
     <a
-      className={cx('app-nav-link', 'link', className)}
+      aria-disabled={disabled}
+      className={cx('app-nav-link', 'link', { disabled }, className)}
+      tabIndex={disabled ? -1 : 0}
       {...rest}
     >
       {children}

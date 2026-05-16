@@ -1,13 +1,18 @@
 .link {
   font-size: inherit;
-  color: inherit !important;
+  color: var(--text-dark-color);
   transition: var(--selectable-item-transition);
 }
 
 .link:hover {
-  color: var(--text-light-color) !important;
+  color: var(--text-light-color);
 }
 
 .link > :global(.icon) {
   margin-right: 5px;
+}
+
+.link.disabled {
+  color: var(--text-disabled-color) !important;
+  pointer-events: none;
 }

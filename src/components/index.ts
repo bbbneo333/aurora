@@ -1,4 +1,5 @@
 export * from './action-list/action-list.component';
+export * from './badge/badge.component';
 export * from './browser-navigation/browser-navigation.component';
 export * from './button/button.component';
 export * from './grid/grid.component';
@@ -41,6 +42,7 @@ export * from './router-switch/router-switch.component';
 export * from './router-link-toggle/router-link-toggle.component';
 export * from './router-link/router-link.component';
 export * from './slider/slider.component';
+export * from './switch/switch.component';
 export * from './text/text.component';
 export * from './text/text-clamp.component';
 export * from './text/text-marquee.component';

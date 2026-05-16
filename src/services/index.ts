@@ -10,6 +10,7 @@ import { MediaLikedTrackService } from './media-liked-track.service';
 import { MediaPinnedItemService } from './media-pinned-item.service';
 import { MediaPlaylistService } from './media-playlist.service';
 import { MediaProviderService } from './media-provider.service';
+import { SettingsService } from './settings.service';
 import { MediaTrackService } from './media-track.service';
 import { NotificationService } from './notification.service';
 
@@ -25,6 +26,7 @@ export {
   MediaPlayerService,
   MediaPlaylistService,
   MediaProviderService,
+  SettingsService,
   MediaTrackService,
   NotificationService,
 };

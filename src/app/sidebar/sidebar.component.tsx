@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames/bind';
+import { useSelector } from 'react-redux';
 
 import {
   Button,
@@ -8,6 +9,7 @@ import {
   RouterLink,
 } from '../../components';
 
+import { RootState } from '../../reducers';
 import { AppService, I18nService } from '../../services';
 import routes from '../app.routes';
 import { Icons } from '../../constants';
@@ -37,6 +39,7 @@ function SidebarNavigationLink(props: {
     path: string,
     icon: string,
     name: string,
+    badge?: (state: RootState) => boolean;
   }
 }) {
   const {
@@ -44,8 +47,11 @@ function SidebarNavigationLink(props: {
       icon,
       name,
       path,
+      badge,
     },
   } = props;
+
+  const isBadgeActive = useSelector((state: RootState) => badge?.(state) ?? false);
 
   return (
     <RouterLink
@@ -54,7 +60,7 @@ function SidebarNavigationLink(props: {
       className={cx('sidebar-navigation-item', 'app-nav-link')}
     >
       <span className={cx('sidebar-navigation-item-icon')}>
-        <Icon name={icon}/>
+        <Icon name={icon} badge={isBadgeActive}/>
       </span>
       <span className={cx('sidebar-navigation-item-label')}>
         {I18nService.getString(name)}

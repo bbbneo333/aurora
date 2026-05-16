@@ -24,6 +24,7 @@ jobs:
 
     outputs:
       version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
       prerelease: ${{ steps.version.outputs.prerelease }}
 
     steps:
@@ -65,6 +66,7 @@ jobs:
           VERSION="${VERSION#v}"
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
 
           if [[ "$VERSION" == *-* ]]; then
             echo "prerelease=true" >> $GITHUB_OUTPUT
@@ -114,7 +116,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
-          TAG="${{ needs.build.outputs.version }}"
+          TAG="${{ needs.build.outputs.tag }}"
 
           git fetch --tags
           if git rev-parse "$TAG" >/dev/null 2>&1; then
@@ -128,8 +130,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ needs.build.outputs.version }}
-          name: Release ${{ needs.build.outputs.version }}
+          tag_name: ${{ needs.build.outputs.tag }}
+          name: Release ${{ needs.build.outputs.tag }}
           prerelease: ${{ needs.build.outputs.prerelease }}
           files: |
             release/*.exe

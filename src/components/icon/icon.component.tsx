@@ -1,32 +1,39 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import { Badge, BadgeProps } from '../badge/badge.component';
 import { Tooltip } from '../tooltip/tooltip.component';
 
-export function Icon(props: {
-  name: string,
-  className?: string,
-  tooltip?: string,
-}) {
+export type IconProps = {
+  name: string;
+  className?: string;
+  tooltip?: string;
+  badge?: BadgeProps | boolean;
+};
+
+export function Icon(props: IconProps) {
   const {
     name,
     className,
     tooltip,
+    badge,
   } = props;
 
-  function icon() {
-    return <i className={classNames('icon', name, className)}/>;
-  }
+  let icon = (<i className={classNames('icon', name, className)}/>);
 
   if (tooltip) {
-    return (
-      <Tooltip title={tooltip}>
-        {icon()}
-      </Tooltip>
+    icon = (<Tooltip title={tooltip}>{icon}</Tooltip>);
+  }
+
+  if (badge) {
+    icon = (
+      <Badge>
+        {icon}
+      </Badge>
     );
   }
 
   return (
-    icon()
+    icon
   );
 }

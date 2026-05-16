@@ -137,12 +137,12 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
   ]);
 
   return (
-    <div className={cx('settings-section')}>
+    <>
       <div className={cx('settings-heading')}>
         {I18nService.getString('label_settings_directories')}
       </div>
       <div className={cx('settings-content')}>
-        <div className={cl('settings-directory-list')}>
+        <div>
           <ActionList
             items={settings.library.directories.map((directory) => {
               const dirStats = syncDirectoryStats[directory];
@@ -163,7 +163,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             }}
           />
         </div>
-        <div className={cl('settings-directory-action')}>
+        <div>
           <Button
             disabled={loading || saving}
             icon={Icons.AddCircle}
@@ -182,7 +182,7 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
             {I18nService.getString('button_settings_sync_add_directory')}
           </Button>
         </div>
-        <div className={cl('settings-sync-action')}>
+        <div>
           <Button
             icon={syncing ? Icons.Refreshing : Icons.Refresh}
             disabled={syncing}
@@ -209,6 +209,6 @@ export function MediaLocalSettingsComponent({ cx }: MediaLocalSettingsProps) {
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

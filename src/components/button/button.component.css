@@ -13,10 +13,7 @@
 .button.disabled {
   color: var(--text-disabled-color) !important;
   outline: none;
-}
-
-.button.disabled:hover {
-  cursor: not-allowed;
+  pointer-events: none;
 }
 
 /*primary, danger button*/

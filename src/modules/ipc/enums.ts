@@ -24,6 +24,9 @@ export enum IPCCommChannel {
   // image
   ImageScale = 'image:scale',
   ImageGetColors = 'image:get_colors',
+  // store
+  StoreRead = 'store:read',
+  StoreWriteKey = 'store:write_key',
 }
 
 export enum IPCRendererCommChannel {
