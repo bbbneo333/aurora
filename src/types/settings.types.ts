@@ -14,7 +14,7 @@ export type Settings = {
 export const SettingsSchema = {
   updates_auto_check: {
     type: 'boolean',
-    default: false,
+    default: true,
   },
   updates_prerelease: {
     type: 'boolean',
