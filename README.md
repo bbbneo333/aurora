@@ -18,18 +18,18 @@ It focuses on a clean interface, local playback, and full user control — witho
 - Playlist management (create, edit, reorder — stored locally)
 - Playback queue management
 - Clean, distraction-free UI
-- Works and tested on **macOS**, **Windows**, and **Linux** builds are being currently tested.
+- Works and tested on **macOS** and **Windows** - **Linux** build is being currently tested.
 
 ---
 
 ## System Requirements
 
-| Platform | Architecture | Status | Minimum OS |
-|---------|---------------|--------|------------|
-| macOS   | Apple Silicon (ARM64) | ✅ Available | macOS 12.0 (Monterey) |
-| macOS   | Intel (x64)          | 🚧 Coming soon | macOS 12.0 (Monterey) |
-| Windows | x64                  | 🚧 Coming soon | Windows 10 |
-| Linux   | x64                  | 🚧 Coming soon | Ubuntu 20.04+ (glibc 2.31+) |
+| Platform | Architecture          | Status         | Minimum OS                  |
+|----------|-----------------------|----------------|-----------------------------|
+| macOS    | Apple Silicon (ARM64) | ✅ Available    | macOS 12.0 (Monterey)       |
+| macOS    | Intel (x64)           | ✅ Available    | macOS 12.0 (Monterey)       |
+| Windows  | x64                   | ✅ Available    | Windows 10                  |
+| Linux    | x64                   | 🚧 Coming soon | Ubuntu 20.04+ (glibc 2.31+) |
 
 ---
 
@@ -80,7 +80,7 @@ Aurora does **nothing malicious** — this warning exists purely because the app
 
 ### Windows / Linux
 
-_Coming Soon_
+- Download and run the `.exe` file from **Releases** page
 
 ---
 
