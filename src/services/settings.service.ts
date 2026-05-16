@@ -40,7 +40,7 @@ export class SettingsService {
     });
   }
 
-  static async checkForUpdates() {
+  static async checkForUpdates(): Promise<boolean> {
     store.dispatch({
       type: SettingsActions.LoadingRelease,
     });
@@ -75,6 +75,12 @@ export class SettingsService {
         },
       });
     }
+
+    return isUpdateAvailable;
+  }
+
+  static isAutoUpdateCheckEnabled(): boolean {
+    return this.readSettings().updates_auto_check;
   }
 
   private static readSettings(): Settings {

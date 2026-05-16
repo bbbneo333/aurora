@@ -10,7 +10,8 @@ import { ContextMenuProvider, ModalProvider, NotificationProvider } from '../con
 import { IAppStatePersistor } from '../interfaces';
 import { MediaLocalProvider } from '../providers';
 import { RootState } from '../reducers';
-import { MediaProviderService } from '../services';
+import { MediaProviderService, SettingsService } from '../services';
+import { SettingsActions } from '../types';
 import { IPCRenderer, IPCRendererCommChannel } from '../modules/ipc';
 
 import statePersistors from '../persistors';
@@ -130,6 +131,23 @@ export function App() {
       .catch((error) => {
         throw new Error(`App encountered error while loading state - ${error.message}`);
       });
+  }, []);
+
+  useEffect(() => {
+    if (SettingsService.isAutoUpdateCheckEnabled()) {
+      SettingsService.checkForUpdates()
+        .then((updateAvailable) => {
+          if (updateAvailable) {
+            store.dispatch({
+              type: SettingsActions.ShowUpdateBadge,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('App encountered error while checking for updates');
+          console.error(error);
+        });
+    }
   }, []);
 
   return (

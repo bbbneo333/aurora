@@ -72,6 +72,9 @@
   --switch-thumb-color: #e9ecef;
   --switch-disabled-thumb-color: #383838;
   --switch-disabled-track-color: #3c3c3c;
+  /*badge*/
+  --badge-active-dot-color: #3ba55d;
+  --badge-active-dot-shadow: 0 0 0 2px var(--badge-active-dot-color);
   /*--button-color: #b3b3b3;*/
   /*--dark-music-player-bg-color: #181818;*/
   /*--dark-music-player-border-color: #282828;*/

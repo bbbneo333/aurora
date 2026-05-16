@@ -1,4 +1,5 @@
 export * from './action-list/action-list.component';
+export * from './badge/badge.component';
 export * from './browser-navigation/browser-navigation.component';
 export * from './button/button.component';
 export * from './grid/grid.component';

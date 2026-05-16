@@ -9,6 +9,7 @@ export type SettingsState = {
   updateCheckInProgress: boolean;
   updateLatestRelease?: GithubReleaseInfo;
   updateAvailable: boolean;
+  updateBadgeActive: boolean;
 };
 
 export type MediaSettingsStateAction = {
@@ -26,6 +27,7 @@ const mediaSettingsInitialState: SettingsState = {
   updateCheckInProgress: false,
   updateLatestRelease: undefined,
   updateAvailable: false,
+  updateBadgeActive: false,
 };
 
 export default (state: SettingsState = mediaSettingsInitialState, action: MediaSettingsStateAction): SettingsState => {
@@ -53,6 +55,18 @@ export default (state: SettingsState = mediaSettingsInitialState, action: MediaS
         updateCheckInProgress: false,
         updateLatestRelease: latestRelease,
         updateAvailable: isUpdateAvailable,
+      };
+    }
+    case SettingsActions.ShowUpdateBadge: {
+      return {
+        ...state,
+        updateBadgeActive: true,
+      };
+    }
+    case SettingsActions.HideUpdateBadge: {
+      return {
+        ...state,
+        updateBadgeActive: false,
       };
     }
     default:

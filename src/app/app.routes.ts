@@ -1,5 +1,6 @@
 import { Icons, Routes } from '../constants';
 import * as AppPages from '../pages';
+import { RootState } from '../reducers';
 
 export default {
   main: [
@@ -49,6 +50,7 @@ export default {
       path: Routes.Settings,
       name: 'link_settings',
       icon: Icons.LinkSettings,
+      badge: (state: RootState) => state.mediaSettings.updateBadgeActive,
     },
   ],
 };

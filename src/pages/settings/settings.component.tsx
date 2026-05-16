@@ -15,6 +15,8 @@ import { useModal } from '../../contexts';
 import { RootState } from '../../reducers';
 import { AppService, I18nService, SettingsService } from '../../services';
 import { StringUtils, VersionUtils } from '../../utils';
+import { SettingsActions } from '../../types';
+import store from '../../store';
 
 import styles from './settings.component.css';
 import { ProviderSettings } from './provider-settings.component';
@@ -35,6 +37,11 @@ export function SettingsPage() {
 
   useEffect(() => {
     SettingsService.loadSettings();
+
+    // always hide update badge on page visit
+    store.dispatch({
+      type: SettingsActions.HideUpdateBadge,
+    });
   }, []);
 
   return (

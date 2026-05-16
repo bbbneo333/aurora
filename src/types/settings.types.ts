@@ -2,6 +2,8 @@ export enum SettingsActions {
   LoadSettings = 'loadSettings',
   LoadingRelease = 'loadingRelease',
   LoadedRelease = 'loadedRelease',
+  ShowUpdateBadge = 'showUpdateBadge',
+  HideUpdateBadge = 'hideUpdateBadge',
 }
 
 export type Settings = {
