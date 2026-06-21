@@ -231,7 +231,7 @@
     "electron-store": "^11.0.2",
     "electron-updater": "^6.3.0",
     "howler": "^2.2.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.18.1",
     "moment": "^2.29.4",
     "music-metadata": "^7.8.5",
     "nedb-promises": "^4.1.5",
