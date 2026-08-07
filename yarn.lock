@@ -2527,10 +2527,10 @@
   dependencies:
     undici-types "~5.26.4"
 
-"@types/node@^20.9.0":
-  version "20.19.13"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.19.13.tgz#b79004a05068e28fb2de281b3a44c5c993650e59"
-  integrity sha512-yCAeZl7a0DxgNVteXFHt9+uyFbqXGy/ShC4BlcHkoE0AfGXYv/BUiplV72DjMYXHDBXFjhvr6DD1NiRVfB4j8g==
+"@types/node@^22.7.7":
+  version "22.20.1"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.20.1.tgz#84e7cdf63cdaa20c134aa317ccc901aa21e16f0e"
+  integrity sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==
   dependencies:
     undici-types "~6.21.0"
 
@@ -5494,13 +5494,13 @@ electron-updater@^6.3.0:
     semver "^7.6.3"
     tiny-typed-emitter "^2.1.0"
 
-electron@^31.2.0:
-  version "31.7.7"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-31.7.7.tgz#81d5d0eef818b40008cd290dc4fd30565ef7b225"
-  integrity sha512-HZtZg8EHsDGnswFt0QeV8If8B+et63uD6RJ7I4/xhcXqmTIbI08GoubX/wm+HdY0DwcuPe1/xsgqpmYvjdjRoA==
+electron@^39.8.10:
+  version "39.8.10"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-39.8.10.tgz#998d9c5b9e7601debb70bd7355e8d4dfd6d70f43"
+  integrity sha512-zbYtGPYUI7PzqLAzkk21Rk6j67WN0hxn0Mq/njErZo1d0HSf33is4f8ICI5fMLy5vYe0JtCtM5sYunNOaochSQ==
   dependencies:
     "@electron/get" "^2.0.0"
-    "@types/node" "^20.9.0"
+    "@types/node" "^22.7.7"
     extract-zip "^2.0.1"
 
 emittery@^0.7.1:
