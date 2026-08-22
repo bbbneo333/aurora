@@ -3,7 +3,7 @@
  * electron renderer process from here and communicate with the other processes
  * through IPC.
  *
- * When running `yarn build` or `yarn build:main`, this file is compiled to
+ * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  *
  * TODO: Using defaults, following to be looked into before release
@@ -51,6 +51,16 @@ import { MenuBuilder } from './main/builders';
 
 const sourceMapSupport = require('source-map-support');
 const debug = require('debug')('aurora:main');
+
+// NeDB 1.x relies on legacy Node util type guards removed from Electron's
+// embedded Node runtime. Restore only the helpers NeDB uses until the
+// datastore dependency can be replaced.
+// TODO: To be removed when NeDb is replaced
+const nodeUtil = require('util');
+
+nodeUtil.isArray ??= Array.isArray;
+nodeUtil.isDate ??= nodeUtil.types.isDate;
+nodeUtil.isRegExp ??= nodeUtil.types.isRegExp;
 
 function createElectronLogger(name: string, filePath: string) {
   const logger = electronLog.create({ logId: name });
