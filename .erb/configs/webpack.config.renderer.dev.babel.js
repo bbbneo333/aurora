@@ -27,8 +27,8 @@ const requiredByDLLConfig = module.parent.filename.includes('webpack.config.rend
 
 // warn if the DLL is not built
 if (!requiredByDLLConfig && !(fs.existsSync(dllDir) && fs.existsSync(manifest))) {
-  console.log(chalk.black.bgYellow.bold('The DLL files are missing. Sit back while we build them for you with "yarn build-dll"'));
-  execSync('yarn postinstall');
+  console.log(chalk.black.bgYellow.bold('The DLL files are missing. Sit back while we build them for you with "npm run postinstall"'));
+  execSync('npm run postinstall');
 }
 
 export default merge(baseConfig, {

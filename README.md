@@ -88,16 +88,16 @@ Aurora does **nothing malicious** — this warning exists purely because the app
 
 ### Prerequisites
 
-- Node.js `^20.19.5`
-- Yarn `^1.22.22`
+- Node.js `^22.18.0`
+- npm `^10.9.3`
 
 ### Run in development
 
 ```bash
 git clone https://github.com/bbbneo333/aurora.git
 cd aurora
-yarn install
-yarn start
+npm install
+npm start
 ```
 
 ---
@@ -105,7 +105,7 @@ yarn start
 ## Packaging
 
 ```bash
-yarn package
+npm run package
 ```
 
 Artifacts will be generated in the `release` output directory.

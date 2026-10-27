@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -43,7 +43,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       # Resolve version once (input, tag or commit)
       - name: Resolve version
@@ -85,7 +85,7 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          yarn package:win
+          npm run package:win
 
       # Always upload CI artifact
       - name: Upload Windows artifact

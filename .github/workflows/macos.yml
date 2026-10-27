@@ -43,7 +43,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
+          cache: 'npm'
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -51,7 +51,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       # Resolve version once (input, tag or commit)
       - name: Resolve version
@@ -95,7 +95,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
           ARCH: ${{ matrix.arch }}
         run: |
-          yarn package:mac
+          npm run package:mac
 
           if [ "$ARCH" = "arm64" ]; then
             APP_DIR="mac-arm64"

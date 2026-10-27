@@ -4,17 +4,18 @@
   "version": "1.1.0",
   "description": "A cross-platform music player built with Electron",
   "scripts": {
-    "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
+    "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
     "build:renderer": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.renderer.prod.babel.js",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir src",
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "yarn lint -- --fix",
-    "package": "rimraf src/dist && yarn build && node ./.erb/scripts/Package.js",
-    "package:mac": "yarn package --mac --c.mac.identity=null",
-    "package:win": "yarn package --win",
-    "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && yarn cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && opencollective-postinstall && yarn-deduplicate yarn.lock",
-    "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && yarn start:renderer",
+    "lint:fix": "npm run lint -- --fix",
+    "package": "rimraf src/dist && npm run build && node ./.erb/scripts/Package.js",
+    "package:mac": "npm run package -- --mac --c.mac.identity=null",
+    "package:win": "npm run package -- --win",
+    "postinstall": "node -r @babel/register .erb/scripts/CheckNativeDep.js && electron-builder install-app-deps && cross-env NODE_ENV=development webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.babel.js && opencollective-postinstall",
+    "prepare": "husky",
+    "start": "node -r @babel/register ./.erb/scripts/CheckPortInUse.js && npm run start:renderer",
     "start:renderer": "cross-env NODE_ENV=development webpack serve --config ./.erb/configs/webpack.config.renderer.dev.babel.js",
     "start:main": "webpack --config ./.erb/configs/webpack.config.main.dev.babel.js && cross-env DEBUG=aurora:*,-aurora:module:ipc:main electron ./src/main.dev.js",
     "test": "jest"
@@ -168,7 +169,7 @@
     "css-minimizer-webpack-plugin": "^1.1.5",
     "debug": "^4.4.3",
     "detect-port": "^1.3.0",
-    "electron": "^31.2.0",
+    "electron": "41.10.6",
     "electron-builder": "^24.13.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.0.0",
@@ -187,7 +188,7 @@
     "eslint-plugin-react": "^7.20.6",
     "eslint-plugin-react-hooks": "^4.0.8",
     "file-loader": "^6.0.0",
-    "husky": "^4.2.5",
+    "husky": "^9.1.7",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.1.0",
     "lint-staged": "^10.2.11",
@@ -208,8 +209,7 @@
     "webpack-bundle-analyzer": "^4.1.0",
     "webpack-cli": "^4.2.0",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.4.0",
-    "yarn-deduplicate": "^3.1.0"
+    "webpack-merge": "^5.4.0"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -257,13 +257,9 @@
     "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "browserslist": [],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "engines": {
-    "node": "^20.19.5",
-    "yarn": "^1.22.22"
-  }
+    "node": "^22.18.0",
+    "npm": "^10.9.3"
+  },
+  "packageManager": "npm@10.9.3"
 }
