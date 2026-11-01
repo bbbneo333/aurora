@@ -1,4 +1,9 @@
-import { DataStoreFilterData, DataStoreInputData, DataStoreUpdateData } from '../modules/datastore';
+import {
+  DataStoreFilterData,
+  DataStoreInputData,
+  DataStoreUpdateData,
+  DatastoreOperation,
+} from '../modules/datastore';
 import { IMediaPlaylistData, IMediaPlaylistTrackData } from '../interfaces';
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
 
@@ -29,34 +34,16 @@ class MediaPlaylistDatastore {
   }
 
   addMediaPlaylistTracks(mediaPlaylistId: string, mediaTrackInputDataList: IMediaPlaylistTrackData[]): Promise<IMediaPlaylistData> {
-    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
-      id: mediaPlaylistId,
-    }, {
-      $push: {
-        tracks: {
-          $each: mediaTrackInputDataList,
-        },
-      },
-      $set: {
-        updated_at: Date.now(),
-      },
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaPlaylistsDatastoreName, DatastoreOperation.AddPlaylistTracks, {
+      playlistId: mediaPlaylistId,
+      tracks: mediaTrackInputDataList,
     });
   }
 
   deleteMediaPlaylistTracks(mediaPlaylistId: string, mediaPlaylistTrackIds: string[]): Promise<IMediaPlaylistData> {
-    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSUpdateOne, this.mediaPlaylistsDatastoreName, {
-      id: mediaPlaylistId,
-    }, {
-      $pull: {
-        tracks: {
-          playlist_track_id: {
-            $in: mediaPlaylistTrackIds,
-          },
-        },
-      },
-      $set: {
-        updated_at: Date.now(),
-      },
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaPlaylistsDatastoreName, DatastoreOperation.RemovePlaylistTracks, {
+      playlistId: mediaPlaylistId,
+      playlistTrackIds: mediaPlaylistTrackIds,
     });
   }
 
@@ -67,6 +54,12 @@ class MediaPlaylistDatastore {
   findMediaPlaylists(mediaPlaylistFilterData?: DataStoreFilterData<IMediaPlaylistData>): Promise<IMediaPlaylistData[]> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaPlaylistsDatastoreName, {
       filter: mediaPlaylistFilterData,
+    });
+  }
+
+  searchMediaPlaylistsByName(query: string): Promise<IMediaPlaylistData[]> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaPlaylistsDatastoreName, DatastoreOperation.SearchByName, {
+      query,
     });
   }
 

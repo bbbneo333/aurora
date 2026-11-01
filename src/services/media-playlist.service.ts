@@ -77,11 +77,7 @@ export class MediaPlaylistService {
   }
 
   static async searchPlaylistsByName(query: string): Promise<IMediaPlaylist[]> {
-    const playlists = await MediaPlaylistDatastore.findMediaPlaylists({
-      name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
+    const playlists = await MediaPlaylistDatastore.searchMediaPlaylistsByName(query);
 
     return this.buildMediaPlaylists(playlists);
   }

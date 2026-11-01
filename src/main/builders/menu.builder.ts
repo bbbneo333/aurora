@@ -14,7 +14,7 @@ import {
 import { IAppBuilder, IAppMain } from '../../interfaces';
 import { Links } from '../../constants';
 
-import { DatastoreModule } from '../../modules/datastore';
+import { DatastoreModule } from '../../modules/datastore/module';
 import { IPCCommChannel, IPCMain, IPCRendererCommChannel } from '../../modules/ipc';
 import { PlatformOS } from '../../modules/platform';
 

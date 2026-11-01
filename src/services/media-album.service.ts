@@ -11,11 +11,7 @@ import { DataStoreFilterData, DataStoreUpdateData } from '../modules/datastore';
 
 export class MediaAlbumService {
   static async searchAlbumsByName(query: string): Promise<IMediaAlbum[]> {
-    const albums = await MediaAlbumDatastore.findMediaAlbums({
-      album_name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
+    const albums = await MediaAlbumDatastore.searchMediaAlbumsByName(query);
 
     return this.buildMediaAlbums(albums);
   }

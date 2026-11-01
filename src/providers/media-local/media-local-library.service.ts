@@ -230,8 +230,11 @@ class MediaLocalLibraryService implements IMediaLibraryService {
     // generate local id - we are using location of the file to uniquely identify the track
     const mediaTrackId = MediaLocalLibraryService.getMediaId(file.path);
 
-    // first check if we can simply mark it as seen; required both mtime and size for this to work
-    if (isNumber(file.stats?.mtime) && isNumber(file.stats?.size)) {
+    // TODO(sqlite-operators): Replace the nested extra-field lookup with an
+    // explicit fingerprint operation. Until then, fall through to metadata
+    // parsing so a scan remains correct, at the cost of being slower.
+    const supportsFileFingerprintLookup = false;
+    if (supportsFileFingerprintLookup && isNumber(file.stats?.mtime) && isNumber(file.stats?.size)) {
       const mediaTrack = await MediaTrackService.updateMediaTrack({
         provider: MediaLocalConstants.Provider,
         provider_id: mediaTrackId,
@@ -250,6 +253,8 @@ class MediaLocalLibraryService implements IMediaLibraryService {
           sync_timestamp: scanTimestamp,
         });
 
+        // TODO(sqlite-operators): Replace this $in update when the fingerprint
+        // fast path is restored.
         // update media artists
         await MediaArtistService.updateMediaArtists({
           id: {

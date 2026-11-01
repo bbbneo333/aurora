@@ -7,11 +7,7 @@ import store from '../store';
 
 export class MediaArtistService {
   static async searchArtistsByName(query: string): Promise<IMediaArtist[]> {
-    const artists = await MediaArtistDatastore.findMediaArtists({
-      artist_name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
+    const artists = await MediaArtistDatastore.searchMediaArtistsByName(query);
 
     return this.buildMediaArtists(artists);
   }

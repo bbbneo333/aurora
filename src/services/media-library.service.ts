@@ -190,23 +190,13 @@ export class MediaLibraryService {
   }
 
   private static async deleteUnsyncMedia(mediaProviderIdentifier: string, mediaSyncStartTimestamp: number): Promise<void> {
-    await MediaTrackDatastore.deleteTracks({
-      provider: mediaProviderIdentifier,
-      sync_timestamp: {
-        $lt: mediaSyncStartTimestamp,
-      },
-    });
-    await MediaAlbumDatastore.deleteAlbums({
-      provider: mediaProviderIdentifier,
-      sync_timestamp: {
-        $lt: mediaSyncStartTimestamp,
-      },
-    });
-    await MediaArtistDatastore.deleteArtists({
-      provider: mediaProviderIdentifier,
-      sync_timestamp: {
-        $lt: mediaSyncStartTimestamp,
-      },
-    });
+    // TODO(sqlite-sync): Replace timestamp deletion with non-destructive,
+    // per-source availability reconciliation. This is intentionally a no-op
+    // during the SQLite transition so an incomplete scan cannot remove media.
+    debug(
+      'deleteUnsyncMedia - stale cleanup disabled during SQLite transition for provider %s, scan %d',
+      mediaProviderIdentifier,
+      mediaSyncStartTimestamp,
+    );
   }
 }
