@@ -4,6 +4,7 @@ import {
   DataStoreFilterData,
   DataStoreInputData,
   DataStoreUpdateData,
+  DatastoreOperation,
 } from '../modules/datastore';
 
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
@@ -38,6 +39,12 @@ class MediaArtistDatastore {
   findMediaArtists(mediaArtistFilterData?: DataStoreFilterData<IMediaArtistData>): Promise<IMediaArtistData[]> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaArtistDatastoreName, {
       filter: mediaArtistFilterData,
+    });
+  }
+
+  searchMediaArtistsByName(query: string): Promise<IMediaArtistData[]> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaArtistDatastoreName, DatastoreOperation.SearchByName, {
+      query,
     });
   }
 

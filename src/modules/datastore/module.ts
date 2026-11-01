@@ -1,16 +1,13 @@
-import Datastore from 'nedb-promises';
 import fs from 'fs';
 import path from 'path';
-import _ from 'lodash';
 
 import { IAppMain, IAppModule } from '../../interfaces';
 import { IPCCommChannel, IPCMain } from '../ipc';
+import { SQLiteDatastore } from './sqlite';
 import { DatastoreUtils } from './utils';
 
 import {
   DataStoreFilterData,
-  DatastoreIndex,
-  DataStoreInputData,
   DatastoreOptions,
   DataStoreQueryData,
   DataStoreUpdateData,
@@ -20,30 +17,38 @@ const debug = require('debug')('aurora:module:datastore');
 
 export class DatastoreModule implements IAppModule {
   private readonly app: IAppMain;
-  private readonly datastores: Record<string, Datastore> = {};
   private readonly datastoreDataDir = 'Databases';
+  private readonly sqliteFilename = 'aurora.sqlite';
+  private datastore: SQLiteDatastore;
 
   constructor(app: IAppMain) {
     this.app = app;
+    this.datastore = this.openDatastore();
     this.registerMessageHandlers();
   }
 
   removeDatastores(): void {
-    Object
-      .keys(this.datastores)
-      .forEach((datastoreName) => {
-        const datastore = this.datastores[datastoreName];
-        this.removeDatastore(datastore);
-      });
+    this.datastore.close();
+
+    // Only remove files owned by the SQLite implementation. Legacy NeDB files
+    // are immutable migration sources and must never be changed here.
+    [
+      this.getSQLitePath(),
+      `${this.getSQLitePath()}-wal`,
+      `${this.getSQLitePath()}-shm`,
+    ].forEach((filename) => {
+      try {
+        fs.unlinkSync(filename);
+      } catch (error: any) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+    });
+
+    this.datastore = this.openDatastore();
   }
 
   compactDatastores(): void {
-    Object
-      .keys(this.datastores)
-      .forEach((datastoreName) => {
-        const datastore = this.datastores[datastoreName];
-        this.compactDatastore(datastore);
-      });
+    this.datastore.compact();
   }
 
   private registerMessageHandlers(): void {
@@ -57,180 +62,73 @@ export class DatastoreModule implements IAppModule {
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSRemoveOne, this.removeOne, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSCount, this.count, this);
     IPCMain.addAsyncMessageHandler(IPCCommChannel.DSUpsertOne, this.upsertOne, this);
-  }
-
-  private removeDatastore(datastore: Datastore): void {
-    const datastoreFilename = this.getDatastoreFilename(datastore);
-    debug('removeDatastore - attempting to remove datastore file - %s', datastoreFilename);
-
-    try {
-      fs.unlinkSync(datastoreFilename);
-      debug('removeDatastore - datastore file was removed successfully');
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
-        console.error('removeDatastore - datastore file does not exists');
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  private compactDatastore(datastore: Datastore): void {
-    const datastoreFilename = this.getDatastoreFilename(datastore);
-    debug('compactDatastore - compacting datastore file - %s', datastoreFilename);
-
-    datastore.persistence.compactDatafile();
+    IPCMain.addAsyncMessageHandler(IPCCommChannel.DSExecuteOperation, this.executeOperation, this);
   }
 
   private registerDatastore(datastoreName: string, datastoreOptions: DatastoreOptions = {}): void {
-    // obtain datastore path and create datastore
-    const datastorePath = this.getDatastorePath(datastoreName);
-    const datastore = Datastore.create(datastorePath);
-    debug('registerDatastore - created datastore - %s at - %s', datastoreName, datastorePath);
-
-    // configure datastore
-    datastore.on('error', (_datastore, event: string, error: Error) => {
-      console.error('datastore encountered error - %s, event - %s, error - %s', datastoreName, event, error.message);
-    });
-
-    if (datastoreOptions.indexes) {
-      this.registerDatastoreIndexes(datastore, datastoreOptions.indexes);
-    }
-
-    this.datastores[datastoreName] = datastore;
-  }
-
-  private registerDatastoreIndexes(datastore: Datastore, datastoreIndexes: DatastoreIndex[]): void {
-    datastoreIndexes.forEach((datastoreIndex) => {
-      debug('registerDatastoreIndexes - registering index - %o', datastoreIndex);
-      datastore.ensureIndex({
-        fieldName: datastoreIndex.field,
-        unique: datastoreIndex.unique === true,
-      });
-    });
-  }
-
-  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData): Promise<any> {
-    const datastore = this.getDatastore(datastoreName);
-    const cursor = datastore.find(datastoreQueryDoc.filter);
-
-    _.forEach([
-      'sort',
-      'skip',
-      'limit',
-    ], (key) => {
-      const value = _.get(datastoreQueryDoc, key);
-
-      if (!_.isNil(value)) {
-        // @ts-ignore
-        cursor[key]?.(value);
+    // Tables and indexes are declared centrally. Keep datastore registration as
+    // a compatibility boundary until domain-specific IPC replaces it.
+    const schema = this.datastore.getSchema(datastoreName);
+    datastoreOptions.indexes?.forEach((index) => {
+      if (!schema.columns[index.field]) {
+        throw new Error(`Unknown index field for ${datastoreName}: ${index.field}`);
       }
     });
-
-    return cursor.exec();
+    debug('registerDatastore - registered SQLite table - %s', datastoreName);
   }
 
-  private findOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<any> {
-    const datastore = this.getDatastore(datastoreName);
-    return datastore.findOne(datastoreFindDoc);
+  private find(datastoreName: string, datastoreQueryDoc: DataStoreQueryData): any[] {
+    return this.datastore.find(datastoreName, datastoreQueryDoc || { filter: {} });
   }
 
-  private insertOne(datastoreName: string, datastoreInsertDoc: DataStoreInputData): Promise<any> {
-    const datastore = this.getDatastore(datastoreName);
+  private findOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): any | undefined {
+    return this.datastore.findOne(datastoreName, datastoreFindDoc);
+  }
 
-    // important - id is reserved for datastore
-    return datastore.insert({
+  private insertOne(datastoreName: string, datastoreInsertDoc: Record<string, any>): any {
+    return this.datastore.insert(datastoreName, {
       ...datastoreInsertDoc,
       id: DatastoreUtils.generateId(),
     });
   }
 
-  private async update(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateDoc: object): Promise<any> {
-    const datastore = this.getDatastore(datastoreName);
+  private update(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateDoc: object): any[] {
+    return this.datastore.update(datastoreName, datastoreFindDoc, datastoreUpdateDoc, true);
+  }
 
-    // important - id is reserved for datastore
-    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateDoc, ['$set.id', '$unset.id']), {
-      multi: true,
-      upsert: false,
-      returnUpdatedDocs: true,
+  private updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): any | undefined {
+    return this.datastore.update(datastoreName, datastoreFindDoc, datastoreUpdateOneDoc, false);
+  }
+
+  private remove(datastoreName: string, datastoreFindDoc: DataStoreFilterData): void {
+    this.datastore.remove(datastoreName, datastoreFindDoc, true);
+  }
+
+  private removeOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): void {
+    this.datastore.remove(datastoreName, datastoreFindDoc, false);
+  }
+
+  private count(datastoreName: string, datastoreFindDoc?: DataStoreFilterData): number {
+    return this.datastore.count(datastoreName, datastoreFindDoc);
+  }
+
+  private upsertOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: DataStoreUpdateData): any {
+    return this.datastore.upsert(datastoreName, datastoreFindDoc, {
+      ...datastoreUpdateOneDoc,
+      id: DatastoreUtils.generateId(),
     });
   }
 
-  private async updateOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: object): Promise<any> {
-    const datastore = this.getDatastore(datastoreName);
-
-    // important - id is reserved for datastore
-    return datastore.update(datastoreFindDoc, _.omit(datastoreUpdateOneDoc, ['$set.id', '$unset.id']), {
-      multi: false,
-      upsert: false,
-      returnUpdatedDocs: true,
-    });
+  private executeOperation(datastoreName: string, operation: string, operationArgs: unknown): any {
+    return this.datastore.executeOperation(datastoreName, operation, operationArgs);
   }
 
-  private async remove(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
-    const datastore = this.getDatastore(datastoreName);
-
-    await datastore.remove(datastoreFindDoc, {
-      multi: true,
-    });
+  private openDatastore(): SQLiteDatastore {
+    return new SQLiteDatastore(this.getSQLitePath());
   }
 
-  private async removeOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData): Promise<void> {
-    const datastore = this.getDatastore(datastoreName);
-
-    await datastore.remove(datastoreFindDoc, {
-      multi: false,
-    });
-  }
-
-  private async count(datastoreName: string, datastoreFindDoc?: DataStoreFilterData): Promise<number> {
-    const datastore = this.getDatastore(datastoreName);
-
-    return datastore.count(datastoreFindDoc);
-  }
-
-  // nedb does not provide atomic upserts - so we had to resolve to insert/update calls
-  // important - make sure datastoreUpdateOneDoc is complete doc, not a partial one
-  // otherwise race conditions can cause data corruption
-  private async upsertOne(datastoreName: string, datastoreFindDoc: DataStoreFilterData, datastoreUpdateOneDoc: DataStoreUpdateData) {
-    const datastore = this.getDatastore(datastoreName);
-
-    try {
-      return await datastore.insert({
-        ...datastoreUpdateOneDoc,
-        id: DatastoreUtils.generateId(),
-      });
-    } catch (e: any) {
-      if (e.errorType === 'uniqueViolated') {
-        return datastore.update(datastoreFindDoc, {
-          $set: datastoreUpdateOneDoc,
-        }, {
-          multi: false,
-          upsert: false,
-          returnUpdatedDocs: true,
-        });
-      }
-
-      throw e;
-    }
-  }
-
-  private getDatastore(datastoreName: string): Datastore {
-    const datastore = this.datastores[datastoreName];
-    if (!datastore) {
-      throw new Error(`DatastoreModule encountered error at getDatastore - Could not find datastore for - ${datastoreName}`);
-    }
-    return datastore;
-  }
-
-  private getDatastoreFilename(datastore: Datastore) {
-    // for some reason, filename is not declared in types by NeDb
-    // @ts-ignore
-    return datastore.persistence.filename;
-  }
-
-  private getDatastorePath(datastoreName: string): string {
+  private getSQLitePath(): string {
     const dir = this.app.createDataDir(this.datastoreDataDir);
-    return path.join(dir, `${datastoreName}.db`);
+    return path.join(dir, this.sqliteFilename);
   }
 }

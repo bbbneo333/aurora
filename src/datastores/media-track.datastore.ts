@@ -4,6 +4,7 @@ import {
   DataStoreFilterData,
   DataStoreInputData,
   DataStoreUpdateData,
+  DatastoreOperation,
 } from '../modules/datastore';
 
 import { IPCRenderer, IPCCommChannel } from '../modules/ipc';
@@ -32,6 +33,24 @@ class MediaTrackDatastore {
   findMediaTracks(mediaTrackFilterData?: DataStoreFilterData<IMediaTrackData>): Promise<IMediaTrackData[]> {
     return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSFind, this.mediaTrackDatastoreName, {
       filter: mediaTrackFilterData,
+    });
+  }
+
+  findMediaTracksByIds(mediaTrackIds: string[]): Promise<IMediaTrackData[]> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaTrackDatastoreName, DatastoreOperation.FindByIds, {
+      ids: mediaTrackIds,
+    });
+  }
+
+  searchMediaTracksByName(query: string): Promise<IMediaTrackData[]> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaTrackDatastoreName, DatastoreOperation.SearchByName, {
+      query,
+    });
+  }
+
+  findMediaTracksByArtistId(mediaArtistId: string): Promise<IMediaTrackData[]> {
+    return IPCRenderer.sendAsyncMessage(IPCCommChannel.DSExecuteOperation, this.mediaTrackDatastoreName, DatastoreOperation.FindTracksByArtistId, {
+      artistId: mediaArtistId,
     });
   }
 

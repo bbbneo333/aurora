@@ -374,11 +374,7 @@ class MediaPlayerService {
 
     // revalidate queue
     const mediaTrackIds = mediaTracks.map(mediaTrack => mediaTrack.id);
-    const mediaTracksUpdated = await MediaTrackDatastore.findMediaTracks({
-      id: {
-        $in: mediaTrackIds,
-      },
-    });
+    const mediaTracksUpdated = await MediaTrackDatastore.findMediaTracksByIds(mediaTrackIds);
     const mediaTracksUpdatedIds = mediaTracksUpdated.map(mediaTrack => mediaTrack.id);
     const mediaQueueTracksUpdated = mediaTracks.filter(mediaTrack => mediaTracksUpdatedIds.includes(mediaTrack.id));
 

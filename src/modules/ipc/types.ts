@@ -2,7 +2,9 @@ import { IpcRendererEvent, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 
 export type IPCSyncMessageHandler = (...args: any[]) => any;
 
-export type IPCAsyncMessageHandler = (...args: any[]) => Promise<any>;
+type MaybePromise<T> = T | PromiseLike<T>;
+
+export type IPCAsyncMessageHandler = (...args: any[]) => MaybePromise<unknown>;
 
 export type IPCRenderListener = (event: IpcRendererEvent, ...args: any[]) => void;
 

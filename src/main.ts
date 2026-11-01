@@ -42,7 +42,7 @@ import {
 
 import { IPCMain, IPCCommChannel, IPCRendererCommChannel } from './modules/ipc';
 import { PlatformOS } from './modules/platform';
-import { DatastoreModule } from './modules/datastore';
+import { DatastoreModule } from './modules/datastore/module';
 import { FileSystemModule } from './modules/file-system';
 import { ImageModule } from './modules/image';
 import { StoreModule } from './modules/store';
@@ -51,16 +51,6 @@ import { MenuBuilder } from './main/builders';
 
 const sourceMapSupport = require('source-map-support');
 const debug = require('debug')('aurora:main');
-
-// NeDB 1.x relies on legacy Node util type guards removed from Electron's
-// embedded Node runtime. Restore only the helpers NeDB uses until the
-// datastore dependency can be replaced.
-// TODO: To be removed when NeDb is replaced
-const nodeUtil = require('util');
-
-nodeUtil.isArray ??= Array.isArray;
-nodeUtil.isDate ??= nodeUtil.types.isDate;
-nodeUtil.isRegExp ??= nodeUtil.types.isRegExp;
 
 function createElectronLogger(name: string, filePath: string) {
   const logger = electronLog.create({ logId: name });

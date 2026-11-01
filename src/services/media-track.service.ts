@@ -12,11 +12,7 @@ import { MediaAlbumService } from './media-album.service';
 
 export class MediaTrackService {
   static async searchTracksByName(query: string): Promise<IMediaTrack[]> {
-    const tracks = await MediaTrackDatastore.findMediaTracks({
-      track_name: {
-        $regex: new RegExp(query, 'i'),
-      },
-    });
+    const tracks = await MediaTrackDatastore.searchMediaTracksByName(query);
 
     return this.buildMediaTracks(tracks);
   }
@@ -48,9 +44,7 @@ export class MediaTrackService {
   }
 
   static async getMediaArtistTracks(mediaArtistId: string): Promise<IMediaTrack[]> {
-    const mediaTrackDataList = await MediaTrackDatastore.findMediaTracks({
-      track_artist_ids: [mediaArtistId],
-    });
+    const mediaTrackDataList = await MediaTrackDatastore.findMediaTracksByArtistId(mediaArtistId);
 
     const mediaTracks = await this.buildMediaTracks(mediaTrackDataList);
     return MediaUtils.sortMediaArtistTracks(mediaTracks);
