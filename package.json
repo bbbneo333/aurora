@@ -135,7 +135,7 @@
     "@babel/preset-typescript": "^7.12.7",
     "@babel/register": "^7.12.1",
     "@electron/rebuild": "^3.6.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.4.3",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.3",
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
     "@types/bluebird-global": "^3.5.12",
@@ -208,7 +208,7 @@
     "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.1.0",
     "webpack-cli": "^4.2.0",
-    "webpack-dev-server": "^3.11.0",
+    "webpack-dev-server": "^6.1.0",
     "webpack-merge": "^5.4.0"
   },
   "dependencies": {
